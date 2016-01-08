@@ -28,6 +28,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 
@@ -50,6 +51,7 @@ public class FGauge extends Region {
     private double             size;
     private Region             frame;
     private Circle             background;
+    private Circle             foreground;
     private GaugeDesign        design;
     private InnerShadow        innerShadow;
 
@@ -87,11 +89,12 @@ public class FGauge extends Region {
 
         frame = new Region();
 
-        background = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.5);
-        background.setFill(Color.rgb(240, 240, 240));
+        background = new Circle();
         background.setEffect(innerShadow);
 
-        getChildren().setAll(frame, background, gauge);
+        foreground = new Circle();
+
+        getChildren().setAll(frame, background, gauge, foreground);
     }
 
     private void registerListeners() {
@@ -124,9 +127,6 @@ public class FGauge extends Region {
                 setTranslateY(0.5 * (getHeight() - size));
             }
 
-            innerShadow.setRadius(0.07407407 * size);
-            innerShadow.setOffsetY(0.07407407 * size);
-
             frame.setPrefSize(size, size);
             frame.setBorder(new Border(design.getBorderStrokes(size)));
 
@@ -138,14 +138,32 @@ public class FGauge extends Region {
                 case STEEL_SERIES:
                     background.setFill(new LinearGradient(0, background.getLayoutBounds().getMinY(), 0, background.getLayoutBounds().getMaxY(), false, CycleMethod.NO_CYCLE,
                                                           new Stop(0, Color.BLACK), new Stop(0.39, Color.rgb(50,50,50)), new Stop(0.40, Color.rgb(51, 51, 51)), new Stop(1.0, Color.rgb(153,153,153))));
+                    innerShadow.setColor(Color.rgb(0, 0, 0, 0.65));
+                    innerShadow.setRadius(0.08 * size);
+                    innerShadow.setOffsetX(0);
+                    innerShadow.setOffsetY(0.0 * size);
+                    foreground.setFill(new RadialGradient(0, 0, size * 0.5, size * design.FRAME_FACTOR * 0.5, size * 0.4, false, CycleMethod.NO_CYCLE,
+                                                          new Stop(0, Color.rgb(255, 255, 255, 0.6)),
+                                                          new Stop(1, Color.rgb(255, 255, 255, 0))));
+                    foreground.setStroke(null);
                     break;
                 case ENZO:
                     background.setFill(Color.rgb(240, 240, 240));
+                    innerShadow.setRadius(0.07407407 * size);
+                    innerShadow.setOffsetX(0);
+                    innerShadow.setOffsetY(0.07407407 * size);
+                    innerShadow.setColor(Color.rgb(0, 0, 0, 0.35));
+                    foreground.setFill(Color.TRANSPARENT);
+                    foreground.setStroke(null);
                     break;
             }
 
             gauge.setPrefSize(size * (1d - design.FRAME_FACTOR * 2d), size * (1d - design.FRAME_FACTOR * 2d));
             gauge.relocate(design.FRAME_FACTOR * size, design.FRAME_FACTOR * size);
+
+            foreground.setCenterX(size * 0.5);
+            foreground.setCenterY(size * 0.5);
+            foreground.setRadius(size * 0.42);
         }
     }
 }
