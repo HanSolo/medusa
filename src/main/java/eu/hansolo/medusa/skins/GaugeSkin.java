@@ -1064,7 +1064,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             } else {
                 thresholdAngle = startAngle + (getSkinnable().getThreshold() - getSkinnable().getMinValue()) * angleStep;
             }
-            double thresholdSize = 0.00625 * size;
+            double thresholdSize = clamp(3, 3.5, 0.01 * size);
             double sinValue      = Math.sin(Math.toRadians(thresholdAngle));
             double cosValue      = Math.cos(Math.toRadians(thresholdAngle));
             switch (tickLabelLocation) {
