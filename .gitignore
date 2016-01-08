@@ -1,0 +1,14 @@
+.idea
+medusa.iml
+build
+gradle
+logos
+signing.properties
+cache.properties.lock
+fileHashes.bin
+fileSnapshots.bin
+outputFileStates.bin
+taskArtifacts.bin
+otherResources
+._*
+.gradle

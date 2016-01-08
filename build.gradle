@@ -1,0 +1,138 @@
+// Medusa main build file
+import org.gradle.api.XmlProvider
+import org.gradle.api.artifacts.maven.MavenDeployment
+
+apply plugin: 'idea'
+apply plugin: 'signing'
+
+def isDevBuild
+def isSnapshotBuild
+def isReleaseBuild
+
+def sonatypeRepositoryUrl
+
+// Apply settings for signing if available
+if (file("signing.properties").exists()) {
+    Properties props = new Properties()
+    props.load(new FileInputStream("signing.properties"))
+    props.each { key, value -> project.ext[key] = value }
+}
+
+
+//set build variables based on build type (release, continuous integration, development)
+if(hasProperty("release")) {
+    isReleaseBuild = true
+    sonatypeRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+} else if (hasProperty("snapshot")) {
+    isSnapshotBuild = true
+    version += "-SNAPSHOT"
+    sonatypeRepositoryUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+} else {
+    isDevBuild = true
+}
+
+repositories {
+    jcenter()
+}
+
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    idea {
+        project {
+            jdkName '1.8'
+            languageLevel '1.8'
+        }
+    }
+}
+
+// create one jar for the javadoc
+task docs(type: Javadoc) {
+    source subprojects.collect { project -> project.sourceSets.main.allJava }
+    classpath = files(subprojects.collect { project -> project.sourceSets.main.compileClasspath })
+    destinationDir = new File('build/docs/javadoc')
+}
+task javadocJar(type: Jar, dependsOn: docs) {
+    classifier ='javadoc'
+    from 'build/docs/javadoc'
+}
+
+
+// create one jar for the source files
+task sourcesJar(type: Jar, dependsOn: javadocJar) {
+    classifier  = 'sources'
+    subprojects.each {
+        subproject ->
+            from subproject.configurations.archives.allArtifacts.files.filter { it.name.endsWith("sources.jar") }.collect { zipTree(it) }
+    }
+}
+
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+
+// signing the artifacts
+if (isReleaseBuild) {
+    signing {
+        sign configurations.archives
+    }
+} else {
+    task signArchives {
+        // do nothing
+    }
+}
+
+
+// upload artifacts to maven
+uploadArchives {
+    repositories {
+        if (isDevBuild) {
+            //mavenLocal()
+        }
+        else {
+            mavenDeployer {
+                if(isReleaseBuild) {
+                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                }
+
+                repository(url: sonatypeRepositoryUrl) {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
+
+                pom.project {
+                    name 'Medusa'
+                    packaging 'jar'
+                    description 'Medusa is a JavaFX 8 gauges library'
+                    url 'https://github.com/HanSolo/Medusa/wiki'
+
+                    scm {
+                        url 'scm:git@github.com:HanSolo/Medusa.git'
+                        connection 'scm:git@github.com:HanSolo/Medusa.git'
+                        developerConnection 'scm:git@github.com:HanSolo/Medusa.git'
+                    }
+
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'HanSolo'
+                            name 'Gerrit Grunwald'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
