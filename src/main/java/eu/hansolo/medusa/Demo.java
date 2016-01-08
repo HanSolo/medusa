@@ -250,6 +250,7 @@ public class Demo extends Application {
                              .titleColor(Color.WHITE)
                              .subTitleColor(Color.WHITE)
                              .unitColor(Color.WHITE)
+                             .zeroColor(Color.LIGHTSKYBLUE)
                              .lcdVisible(true)
                              .lcdDesign(LcdDesign.FLAT_CONCRETE)
                              .title("Title")

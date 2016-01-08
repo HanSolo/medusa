@@ -23,8 +23,10 @@ import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
 import eu.hansolo.medusa.Marker.MarkerType;
+import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
+import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -61,14 +63,23 @@ public class Test extends Application {
         gauge = GaugeBuilder.create()
                             .prefSize(500,500)
                             .scaleDirection(ScaleDirection.COUNTER_CLOCKWISE)
+                            .tickLabelLocation(TickLabelLocation.OUTSIDE)
                             .startAngle(0)
                             .angleRange(270)
                             .minValue(-1)
                             .maxValue(2)
+                            .zeroColor(Color.ORANGE)
                             .majorTickMarkType(TickMarkType.TRIANGLE)
-                            .mediumTickMarksVisible(false)
+                            .sectionsVisible(true)
+                            .sections(new Section(1.5, 2, Color.rgb(200, 0, 0, 0.5)))
+                            .areasVisible(true)
+                            .areas(new Section(-0.5, 0.5, Color.rgb(0, 200, 0, 0.5)))
+                            .markersVisible(true)
+                            .markers(new Marker(0.75, "Marker 1", Color.MAGENTA, MarkerType.STANDARD))
+                            .needleColor(Color.DARKCYAN)
+                            .needleSize(NeedleSize.THICK)
                             .build();
-
+        
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -83,6 +94,7 @@ public class Test extends Application {
 
     @Override public void start(Stage stage) {
         StackPane pane = new StackPane(gauge);
+        pane.setPadding(new Insets(10));
         //pane.setBackground(new Background(new BackgroundFill(Color.rgb(50, 50, 50), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
@@ -95,7 +107,7 @@ public class Test extends Application {
         calcNoOfNodes(gauge);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        //timer.start();
+        timer.start();
     }
 
     @Override public void stop() {

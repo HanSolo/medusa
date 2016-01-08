@@ -426,31 +426,31 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         BigDecimal           counterBD            = BigDecimal.valueOf(minValue);
         double               counter              = minValue;
 
-        List<Section> tickMarkSections   = getSkinnable().getTickMarkSections();
-        List<Section> tickLabelSections  = getSkinnable().getTickLabelSections();
-        Color tickMarkColor              = getSkinnable().getTickMarkColor();
-        Color majorTickMarkColor         = getSkinnable().getMajorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMajorTickMarkColor();
-        Color mediumTickMarkColor        = getSkinnable().getMediumTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMediumTickMarkColor();
-        Color minorTickMarkColor         = getSkinnable().getMinorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMinorTickMarkColor();
-        Color tickLabelColor             = getSkinnable().getTickLabelColor();
-        Color zeroColor                  = getSkinnable().getZeroColor();
-        boolean isNotZero                = true;
-        TickMarkType majorTickMarkType   = getSkinnable().getMajorTickMarkType();
-        TickMarkType mediumTickMarkType  = getSkinnable().getMediumTickMarkType();
-        TickMarkType minorTickMarkType   = getSkinnable().getMinorTickMarkType();
-        boolean tickMarkSectionsVisible  = getSkinnable().areTickMarkSectionsVisible();
-        boolean tickLabelSectionsVisible = getSkinnable().areTickLabelSectionsVisible();
-        boolean majorTickMarksVisible    = getSkinnable().areMajorTickMarksVisible();
-        boolean mediumTickMarksVisible   = getSkinnable().areMediumTickMarksVisible();
-        boolean minorTickMarksVisible    = getSkinnable().areMinorTickMarksVisible();
-        boolean tickLabelsVisible        = getSkinnable().areTickLabelsVisible();
-        double textDisplacementFactor    = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
-        double majorDotSize;
-        double majorHalfDotSize;
-        double mediumDotSize;
-        double mediumHalfDotSize;
-        double minorDotSize;
-        double minorHalfDotSize;
+        List<Section> tickMarkSections         = getSkinnable().getTickMarkSections();
+        List<Section> tickLabelSections        = getSkinnable().getTickLabelSections();
+        Color         tickMarkColor            = getSkinnable().getTickMarkColor();
+        Color         majorTickMarkColor       = getSkinnable().getMajorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMajorTickMarkColor();
+        Color         mediumTickMarkColor      = getSkinnable().getMediumTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMediumTickMarkColor();
+        Color         minorTickMarkColor       = getSkinnable().getMinorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMinorTickMarkColor();
+        Color         tickLabelColor           = getSkinnable().getTickLabelColor();
+        Color         zeroColor                = getSkinnable().getZeroColor();
+        boolean       isNotZero                = true;
+        TickMarkType  majorTickMarkType        = getSkinnable().getMajorTickMarkType();
+        TickMarkType  mediumTickMarkType       = getSkinnable().getMediumTickMarkType();
+        TickMarkType  minorTickMarkType        = getSkinnable().getMinorTickMarkType();
+        boolean       tickMarkSectionsVisible  = getSkinnable().areTickMarkSectionsVisible();
+        boolean       tickLabelSectionsVisible = getSkinnable().areTickLabelSectionsVisible();
+        boolean       majorTickMarksVisible    = getSkinnable().areMajorTickMarksVisible();
+        boolean       mediumTickMarksVisible   = getSkinnable().areMediumTickMarksVisible();
+        boolean       minorTickMarksVisible    = getSkinnable().areMinorTickMarksVisible();
+        boolean       tickLabelsVisible        = getSkinnable().areTickLabelsVisible();
+        double        textDisplacementFactor   = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
+        double        majorDotSize;
+        double        majorHalfDotSize;
+        double        mediumDotSize;
+        double        mediumHalfDotSize;
+        double        minorDotSize;
+        double        minorHalfDotSize;
 
         double orthTextFactor;
         if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
@@ -852,8 +852,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void drawSections(final GraphicsContext CTX) {
         if (getSkinnable().getSections().isEmpty()) return;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
-        final double         xy              = TickLabelLocation.OUTSIDE == tickLabelLocation ? (size - 0.79 * size) * 0.5 : (size - 0.897 * size) * 0.5;
-        final double         wh              = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.79 : size * 0.897;
+        final double         xy              = TickLabelLocation.OUTSIDE == tickLabelLocation ? (size - 0.77 * size) * 0.5 : (size - 0.897 * size) * 0.5;
+        final double         wh              = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
         final double         MIN_VALUE       = getSkinnable().getMinValue();
         final double         MAX_VALUE       = getSkinnable().getMaxValue();
         final double         OFFSET          = 90 - getSkinnable().getStartAngle();
@@ -888,8 +888,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void drawAreas(final GraphicsContext CTX) {
         if (getSkinnable().getAreas().isEmpty()) return;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
-        final double         xy              = TickLabelLocation.OUTSIDE == tickLabelLocation ? (size - 0.841 * size) * 0.5 : (size - 0.95 * size) * 0.5;
-        final double         wh              = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.841 : size * 0.95;
+        final double         xy              = TickLabelLocation.OUTSIDE == tickLabelLocation ? (size - 0.821 * size) * 0.5 : (size - 0.95 * size) * 0.5;
+        final double         wh              = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.821 : size * 0.95;
         final double         MIN_VALUE       = getSkinnable().getMinValue();
         final double         MAX_VALUE       = getSkinnable().getMaxValue();
         final double         OFFSET          = 90 - getSkinnable().getStartAngle();

@@ -632,6 +632,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setTickMarkColor(Color.BLACK);
                 CONTROL.setTickLabelOrientation(TickLabelOrientation.ORTHOGONAL);
             } else if (skinClass == SpaceXSkin.class) {
+                CONTROL.setDecimals(0);
                 CONTROL.setThresholdColor(Color.rgb(180, 0, 0));
                 CONTROL.setBarColor(Color.rgb(169, 169, 169));
                 CONTROL.setBackgroundPaint(Color.rgb(169, 169, 169, 0.3));

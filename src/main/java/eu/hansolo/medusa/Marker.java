@@ -71,6 +71,9 @@ public class Marker {
     public Marker(final double VALUE, final Color COLOR, final MarkerType TYPE) {
         this(VALUE, "", COLOR, TYPE);
     }
+    public Marker(final double VALUE, final String TEXT, final MarkerType TYPE) {
+        this(VALUE, TEXT, DEFAULT_MARKER_COLOR, TYPE);
+    }
     public Marker(final double VALUE, final String TEXT, final Color COLOR) {
         this(VALUE, TEXT, COLOR, MarkerType.STANDARD);
     }

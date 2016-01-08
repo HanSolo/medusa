@@ -176,8 +176,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         needleRotate = new Rotate(180 - START_ANGLE);
 
-        angleStep          = ANGLE_RANGE / (getSkinnable().getMaxValue() - getSkinnable().getMinValue());
-        double targetAngle = 180 - START_ANGLE + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep;
+        double targetAngle = 180 - START_ANGLE + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
         targetAngle        = Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle);
         setRotationAngle(targetAngle);
 
@@ -380,7 +379,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void rotateNeedle() {
-        angleStep          = ANGLE_RANGE / (getSkinnable().getMaxValue() - getSkinnable().getMinValue());
+        angleStep          = ANGLE_RANGE / getSkinnable().getRange();
         double targetAngle = 180 - START_ANGLE + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
         targetAngle        = Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle);
         setRotationAngle(targetAngle);

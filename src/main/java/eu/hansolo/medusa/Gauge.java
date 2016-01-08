@@ -92,7 +92,7 @@ public class Gauge extends Control {
         }
     }
     public enum TickLabelOrientation { ORTHOGONAL,  HORIZONTAL, TANGENT }
-    public enum TickMarkType { LINE, DOT, TRIANGLE, SQUARE, TICK_LABEL }
+    public enum TickMarkType { LINE, DOT, TRIANGLE, DIAMOND, TICK_LABEL }
     public enum NumberFormat {
         AUTO("0"),
         STANDARD("0"),
@@ -322,7 +322,7 @@ public class Gauge extends Control {
 
     // ******************** Initialization ************************************
     private void init() {
-        lastCall                       = Instant.now().minusSeconds(2);
+        lastCall                       = Instant.now();
         _minValue                      = 0;
         _maxValue                      = 100;
         value                          = new DoublePropertyBase(0) {
@@ -339,16 +339,7 @@ public class Gauge extends Control {
                     final KeyValue KEY_VALUE = new KeyValue(currentValue, nValue, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
                     final KeyFrame KEY_FRAME = new KeyFrame(Duration.millis(animationDuration), KEY_VALUE);
                     timeline.getKeyFrames().setAll(KEY_FRAME);
-
                     timeline.play();
-                    timeline.setOnFinished(e -> {
-                        if (isReturnToZero() && Double.compare(currentValue.get(), 0d) != 0d) {
-                            final KeyValue KEY_VALUE2 = new KeyValue(value, 0, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
-                            final KeyFrame KEY_FRAME2 = new KeyFrame(Duration.millis(animationDuration), KEY_VALUE2);
-                            timeline.getKeyFrames().setAll(KEY_FRAME2);
-                            timeline.play();
-                        }
-                    });
                 } else {
                     currentValue.set(nValue);
                 }
@@ -356,7 +347,7 @@ public class Gauge extends Control {
             @Override public Object getBean() { return Gauge.this; }
             @Override public String getName() { return "value"; }
         };
-        currentValue                   = new DoublePropertyBase(0) {
+        currentValue                   = new DoublePropertyBase(value.get()) {
             @Override public void set(final double VALUE) {
                 super.set(VALUE);
                 if (VALUE < getMinMeasuredValue()) { setMinMeasuredValue(VALUE); }
@@ -452,6 +443,15 @@ public class Gauge extends Control {
         originalMinValue               = -Double.MAX_VALUE;
         originalMaxValue               = Double.MAX_VALUE;
         timeline                       = new Timeline();
+        timeline.setOnFinished(e -> {
+            System.out.println("CurrentValue: " + getCurrentValue());
+            if (isReturnToZero() && Double.compare(currentValue.get(), 0d) != 0d) {
+                final KeyValue KEY_VALUE2 = new KeyValue(value, 0, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
+                final KeyFrame KEY_FRAME2 = new KeyFrame(Duration.millis(animationDuration), KEY_VALUE2);
+                timeline.getKeyFrames().setAll(KEY_FRAME2);
+                timeline.play();
+            }
+        });
     }
 
 
