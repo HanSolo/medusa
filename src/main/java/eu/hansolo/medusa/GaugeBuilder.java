@@ -132,6 +132,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B zeroColor(final Color COLOR) {
+        properties.put("zeroColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B minMeasuredValueVisible(final boolean VISIBLE) {
         properties.put("minMeasuredValueVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
@@ -769,6 +774,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setStartFromZero(((BooleanProperty) properties.get(key)).get());
             } else if("returnToZero".equals(key)) {
                 CONTROL.setReturnToZero(((BooleanProperty) properties.get(key)).get());
+            } else if("zeroColor".equals(key)) {
+                CONTROL.setZeroColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("minMeasuredValueVisible".equals(key)) {
                 CONTROL.setMinMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("maxMeasuredValueVisible".equals(key)) {

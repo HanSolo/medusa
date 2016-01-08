@@ -433,6 +433,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         Color mediumTickMarkColor        = getSkinnable().getMediumTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMediumTickMarkColor();
         Color minorTickMarkColor         = getSkinnable().getMinorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMinorTickMarkColor();
         Color tickLabelColor             = getSkinnable().getTickLabelColor();
+        Color zeroColor                  = getSkinnable().getZeroColor();
+        boolean isNotZero                = true;
         TickMarkType majorTickMarkType   = getSkinnable().getMajorTickMarkType();
         TickMarkType mediumTickMarkType  = getSkinnable().getMediumTickMarkType();
         TickMarkType minorTickMarkType   = getSkinnable().getMinorTickMarkType();
@@ -689,9 +691,11 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             // Set the general tickmark color
             CTX.setStroke(tickMarkColor);
+            CTX.setFill(tickMarkColor);
 
             if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
                 // Draw major tick mark
+                isNotZero = Double.compare(0d, counter) != 0;
                 TickMarkType tickMarkType = null;
                 if (majorTickMarksVisible) {
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
@@ -703,6 +707,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     CTX.setLineWidth(size * 0.00225);
                     tickMarkType = minorTickMarkType;
+                }
+                if (!isNotZero) {
+                    CTX.setFill(zeroColor);
+                    CTX.setStroke(zeroColor);
                 }
 
                 switch (tickMarkType) {
@@ -729,7 +737,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
                             Helper.rotateContextForText(CTX, startAngle, angle, tickLabelOrientation);
 
-                            CTX.setFont(Double.compare(0d, counter) != 0 ? tickMarkFont : tickMarkZeroFont);
+                            CTX.setFont(isNotZero ? tickMarkFont : tickMarkZeroFont);
                             CTX.setTextAlign(TextAlignment.CENTER);
                             CTX.setTextBaseline(VPos.CENTER);
                             CTX.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
@@ -756,10 +764,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     CTX.translate(textPointX, textPointY);
 
                     Helper.rotateContextForText(CTX, startAngle, angle, tickLabelOrientation);
-                    CTX.setFont(Double.compare(0d, counter) != 0 ? tickLabelFont : tickLabelZeroFont);
+                    CTX.setFont(isNotZero ? tickLabelFont : tickLabelZeroFont);
                     CTX.setTextAlign(TextAlignment.CENTER);
                     CTX.setTextBaseline(VPos.CENTER);
-                    CTX.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
+                    if (isNotZero) {
+                        CTX.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
+                    } else {
+                        CTX.setFill(zeroColor);
+                    }
                     CTX.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
                     CTX.restore();
                 }

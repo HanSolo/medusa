@@ -164,6 +164,8 @@ public class Gauge extends Control {
     private BooleanProperty                      startFromZero;
     private boolean                              _returnToZero;
     private BooleanProperty                      returnToZero;
+    private Color                                _zeroColor;
+    private ObjectProperty<Color>                zeroColor;
     private double                               _minMeasuredValue;
     private DoubleProperty                       minMeasuredValue;
     private double                               _maxMeasuredValue;
@@ -377,6 +379,7 @@ public class Gauge extends Control {
 
         _startFromZero                 = false;
         _returnToZero                  = false;
+        _zeroColor                     = DARK_COLOR;
         _minMeasuredValue              = _maxValue;
         _maxMeasuredValue              = _minValue;
         _minMeasuredValueVisible       = false;
@@ -675,6 +678,20 @@ public class Gauge extends Control {
     public BooleanProperty returnToZeroProperty() {
         if (null == returnToZero) { returnToZero = new SimpleBooleanProperty(Gauge.this, "returnToZero", _returnToZero); }
         return returnToZero;
+    }
+
+    public Color getZeroColor() { return null == zeroColor ? _zeroColor : zeroColor.get(); }
+    public void setZeroColor(final Color COLOR) {
+        if (null == zeroColor) {
+            _zeroColor = COLOR;
+        } else {
+            zeroColor.set(COLOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public ObjectProperty<Color> zeroColorProperty() {
+        if (null == zeroColor) { zeroColor = new SimpleObjectProperty<>(Gauge.this, "zeroColor", _zeroColor); }
+        return zeroColor;
     }
 
     public double getMinMeasuredValue() { return null == minMeasuredValue ? _minMeasuredValue : minMeasuredValue.get(); }
