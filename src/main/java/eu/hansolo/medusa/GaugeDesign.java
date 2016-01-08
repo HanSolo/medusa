@@ -16,26 +16,46 @@
 
 package eu.hansolo.medusa;
 
+import javafx.geometry.Insets;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+
+
 /**
  * Created by hansolo on 18.12.15.
  */
 public enum GaugeDesign {
-    STEEL_SERIES("steel-series-frame", 22.5) { String getInsets(final double SIZE) {
-        return "-fx-background-insets: " + 0 + "," + (0.0037037 * SIZE) + "," + (FRAME_FACTOR * SIZE) + ";";
-    }},
-    ENZO("enzo-frame", 13) { String getInsets(final double SIZE) {
-        return "-fx-background-insets: " + 0 + "," + (0.02222222 * SIZE) + "," + (0.02592593 * SIZE) + "," + (FRAME_FACTOR * SIZE) + ";";
-    }};
+    STEEL_SERIES(0.08333333) {
+        public BorderStroke[] getBorderStrokes(final double SIZE) {
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
+            BorderStroke innerBorder = new BorderStroke(new LinearGradient(0, 0, 0, SIZE, false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(254, 254, 254)), new Stop(0.07, Color.rgb(210, 210, 210)), new Stop(0.12, Color.rgb(179,179,179)), new Stop(1.0, Color.rgb(213,213,213))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0.0037037 * SIZE));
+            BorderStroke bodyStroke  = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
+            
+            return new BorderStroke[] {outerBorder, innerBorder, bodyStroke };
+        }
+    },
+    ENZO(0.04814815) {
+        public BorderStroke[] getBorderStrokes(final double SIZE) {
+            BorderStroke outerBorder     = new BorderStroke(new LinearGradient(0, 0, 0, SIZE, false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(224,224,224)), new Stop(0.26, Color.rgb(133,133,133)), new Stop(1.0, Color.rgb(84,84,84))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
+            BorderStroke highlightBorder = new BorderStroke(new LinearGradient(0, 0.02222222 * SIZE, 0, (SIZE - 0.04444444 * SIZE), false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(255,255,255)), new Stop(0.50, Color.rgb(146,146,147)), new Stop(1.0, Color.rgb(135,136,138))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0.02222222 * SIZE));
+            BorderStroke innerBorder     = new BorderStroke(new LinearGradient(0, 0.02592593 * SIZE, 0, (SIZE - 0.05185186 * SIZE), false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(71,72,72)), new Stop(0.50, Color.rgb(110,106,107)), new Stop(1.0, Color.rgb(186,185,187))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0.02592593 * SIZE));
+            BorderStroke bodyStroke      = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
 
-    final public String FRAME_STYLE;
-    final public double FRAME_SIZE;
-    final public double FRAME_FACTOR;
+            return new BorderStroke[] {outerBorder, highlightBorder, innerBorder, bodyStroke };
+        }
+    };
 
-    abstract String getInsets(final double SIZE);
+    final public double  FRAME_FACTOR;
 
-    GaugeDesign(final String FRAME_STYLE, final double FRAME_SIZE) {
-        this.FRAME_STYLE  = FRAME_STYLE;
-        this.FRAME_SIZE   = FRAME_SIZE;
-        this.FRAME_FACTOR = FRAME_SIZE / FramedGauge.PREFERRED_WIDTH;
+    public abstract BorderStroke[] getBorderStrokes(final double SIZE);
+
+    GaugeDesign(final double FRAME_FACTOR) {
+        this.FRAME_FACTOR = FRAME_FACTOR;
     }
 }

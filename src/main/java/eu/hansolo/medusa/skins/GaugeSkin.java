@@ -454,7 +454,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         double orthTextFactor;
         if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
-            orthTextFactor    = Gauge.TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.46 * textDisplacementFactor : 0.45 * textDisplacementFactor;
+            orthTextFactor    = Gauge.TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.45 * textDisplacementFactor : 0.45 * textDisplacementFactor;
             majorDotSize      = 0.02 * size;
             majorHalfDotSize  = majorDotSize * 0.5;
             mediumDotSize     = 0.01375 * size;
@@ -462,7 +462,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             minorDotSize      = 0.0075 * size;
             minorHalfDotSize  = minorDotSize * 0.5;
         } else {
-            orthTextFactor    = Gauge.TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.39 * textDisplacementFactor : 0.37 * textDisplacementFactor;
+            orthTextFactor    = Gauge.TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.38 * textDisplacementFactor : 0.37 * textDisplacementFactor;
             majorDotSize      = 0.025 * size;
             majorHalfDotSize  = majorDotSize * 0.5;
             mediumDotSize     = 0.01875 * size;
@@ -547,9 +547,11 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         // Main loop
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
-        double         angle          = 0;
-        double         tmpStep        = minValue < 0 ? tmpAngleStep : 0;
-        for (double i = 0 ; Double.compare(-angleRange - tmpStep, i) < 0 ; i -= tmpAngleStep) {
+        BigDecimal tmpStepBD = new BigDecimal(tmpAngleStep);
+        tmpStepBD = tmpStepBD.setScale(3, BigDecimal.ROUND_HALF_UP);
+        double tmpStep = tmpStepBD.doubleValue();
+        double angle   = 0;
+        for (double i = 0 ; Double.compare(-angleRange - tmpStep, i) <= 0 ; i -= tmpStep) {
             switch (scaleDirection) {
                 case CLOCKWISE        : if (Double.compare(-angleRange - tmpAngleStep, angle) < 0) break;
                     break;
@@ -1150,8 +1152,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             pane.setMaxSize(size, size);
             pane.relocate((getSkinnable().getWidth() - size) * 0.5, (getSkinnable().getHeight() - size) * 0.5);
 
-            dropShadow.setRadius(0.005 * size);
-            dropShadow.setOffsetY(0.005 * size);
+            dropShadow.setRadius(0.008 * size);
+            dropShadow.setOffsetY(0.008 * size);
 
             backgroundInnerShadow.setOffsetX(0);
             backgroundInnerShadow.setOffsetY(size * 0.03);
@@ -1271,22 +1273,22 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleCubicCurveTo6.setControlX2(0.25 * needleWidth); needleCubicCurveTo6.setControlY2(0.025423728813559324 * needleHeight);
             needleCubicCurveTo6.setX(0.25 * needleWidth); needleCubicCurveTo6.setY(0.025423728813559324 * needleHeight);
 
-            /*
+
             LinearGradient needleGradient = new LinearGradient(needle.getLayoutBounds().getMinX(), 0,
                                                                needle.getLayoutBounds().getMaxX(), 0,
                                                                false, CycleMethod.NO_CYCLE,
                                                                new Stop(0.0, getSkinnable().getNeedleColor()),
                                                                new Stop(0.5, getSkinnable().getNeedleColor()),
-                                                               new Stop(0.5, getSkinnable().getNeedleColor().brighter().brighter()),
-                                                               new Stop(1.0, getSkinnable().getNeedleColor().brighter().brighter()));
-            */
+                                                               new Stop(0.5, getSkinnable().getNeedleColor().brighter()),
+                                                               new Stop(1.0, getSkinnable().getNeedleColor().brighter()));
+            /*
             LinearGradient needleGradient = new LinearGradient(needle.getLayoutBounds().getMinX(), 0,
                                                                needle.getLayoutBounds().getMaxX(), 0,
                                                                false, CycleMethod.NO_CYCLE,
                                                                new Stop(0.0, getSkinnable().getNeedleColor()),
                                                                new Stop(0.5, getSkinnable().getNeedleColor().brighter().brighter()),
                                                                new Stop(1.0, getSkinnable().getNeedleColor()));
-
+            */
             needle.setFill(needleGradient);
             needle.setStrokeWidth(0);
             needle.setStroke(Color.TRANSPARENT);

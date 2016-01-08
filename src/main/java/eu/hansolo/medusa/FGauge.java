@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 by Gerrit Grunwald
+ * Copyright (c) 2016 by Gerrit Grunwald
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,26 @@
 
 package eu.hansolo.medusa;
 
+import javafx.geometry.Insets;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.InnerShadow;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.Circle;
 
 
 /**
- * Created by hansolo on 18.12.15.
+ * Created by hansolo on 08.01.16.
  */
-public class FramedGauge extends Region {
+public class FGauge extends Region {
     public static final double PREFERRED_WIDTH  = 270;
     public static final double PREFERRED_HEIGHT = 270;
     public static final double MINIMUM_WIDTH    = 50;
@@ -31,16 +44,18 @@ public class FramedGauge extends Region {
     public static final double MAXIMUM_HEIGHT   = 1024;
 
     // Model related
-    private Gauge               gauge;
+    private Gauge              gauge;
 
     // View related
-    private double              size;
-    private Region              frame;
-    private GaugeDesign         design;
+    private double             size;
+    private Region             frame;
+    private Circle             background;
+    private GaugeDesign        design;
+    private InnerShadow        innerShadow;
 
 
     // ******************** Constructors **************************************
-    public FramedGauge(final Gauge GAUGE, final GaugeDesign DESIGN) {
+    public FGauge(final Gauge GAUGE, final GaugeDesign DESIGN) {
         getStylesheets().add(getClass().getResource("framed-gauge.css").toExternalForm());
         getStyleClass().setAll("framed-gauge");
 
@@ -68,10 +83,15 @@ public class FramedGauge extends Region {
     }
 
     private void initGraphics() {
-        frame = new Region();
-        frame.getStyleClass().add(design.FRAME_STYLE);
+        innerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.35), 20, 0.0, 0, 20);
 
-        getChildren().setAll(frame, gauge);
+        frame = new Region();
+
+        background = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.5);
+        background.setFill(Color.rgb(240, 240, 240));
+        background.setEffect(innerShadow);
+
+        getChildren().setAll(frame, background, gauge);
     }
 
     private void registerListeners() {
@@ -104,11 +124,28 @@ public class FramedGauge extends Region {
                 setTranslateY(0.5 * (getHeight() - size));
             }
 
+            innerShadow.setRadius(0.07407407 * size);
+            innerShadow.setOffsetY(0.07407407 * size);
+
             frame.setPrefSize(size, size);
+            frame.setBorder(new Border(design.getBorderStrokes(size)));
+
+            background.setCenterX(size * 0.5);
+            background.setCenterY(size * 0.5);
+            background.setRadius(size * 0.4375);
+
+            switch(design) {
+                case STEEL_SERIES:
+                    background.setFill(new LinearGradient(0, background.getLayoutBounds().getMinY(), 0, background.getLayoutBounds().getMaxY(), false, CycleMethod.NO_CYCLE,
+                                                          new Stop(0, Color.BLACK), new Stop(0.39, Color.rgb(50,50,50)), new Stop(0.40, Color.rgb(51, 51, 51)), new Stop(1.0, Color.rgb(153,153,153))));
+                    break;
+                case ENZO:
+                    background.setFill(Color.rgb(240, 240, 240));
+                    break;
+            }
+
             gauge.setPrefSize(size * (1d - design.FRAME_FACTOR * 2d), size * (1d - design.FRAME_FACTOR * 2d));
             gauge.relocate(design.FRAME_FACTOR * size, design.FRAME_FACTOR * size);
-
-            frame.setStyle(design.getInsets(size));
         }
     }
 }

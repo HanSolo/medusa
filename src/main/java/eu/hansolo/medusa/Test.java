@@ -38,12 +38,17 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
 
+import java.awt.*;
 import java.util.Random;
 
 
@@ -56,30 +61,35 @@ public class Test extends Application {
     private static final Random         RND = new Random();
     private static       int            noOfNodes = 0;
     private              Gauge          gauge;
+    private              FGauge         framedGauge;
     private              long           lastTimerCall;
     private              AnimationTimer timer;
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
                             .prefSize(500,500)
-                            .scaleDirection(ScaleDirection.COUNTER_CLOCKWISE)
+                            //.scaleDirection(ScaleDirection.COUNTER_CLOCKWISE)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
-                            .startAngle(0)
-                            .angleRange(270)
-                            .minValue(-1)
-                            .maxValue(2)
+                            .minValue(0)
+                            .maxValue(50)
                             .zeroColor(Color.ORANGE)
                             .majorTickMarkType(TickMarkType.TRIANGLE)
+                            .tickLabelOrientation(TickLabelOrientation.ORTHOGONAL)
                             .sectionsVisible(true)
-                            .sections(new Section(1.5, 2, Color.rgb(200, 0, 0, 0.5)))
+                            .sections(new Section(15, 20, Color.rgb(200, 0, 0, 0.5)))
                             .areasVisible(true)
-                            .areas(new Section(-0.5, 0.5, Color.rgb(0, 200, 0, 0.5)))
+                            .areas(new Section(45, 50, Color.rgb(0, 200, 0, 0.5)))
                             .markersVisible(true)
-                            .markers(new Marker(0.75, "Marker 1", Color.MAGENTA, MarkerType.STANDARD))
-                            .needleColor(Color.DARKCYAN)
+                            .markers(new Marker(35, "Marker 1", Color.MAGENTA, MarkerType.STANDARD))
+                            //.needleColor(Color.DARKCYAN)
+                            .lcdVisible(true)
                             .needleSize(NeedleSize.THICK)
+                            .shadowsEnabled(true)
+                            .animated(true)
                             .build();
-        
+
+        framedGauge = new FGauge(gauge, GaugeDesign.STEEL_SERIES);
+
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -93,7 +103,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(gauge);
+        StackPane pane = new StackPane(framedGauge);
         pane.setPadding(new Insets(10));
         //pane.setBackground(new Background(new BackgroundFill(Color.rgb(50, 50, 50), CornerRadii.EMPTY, Insets.EMPTY)));
 

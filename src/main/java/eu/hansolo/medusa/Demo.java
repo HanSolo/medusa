@@ -59,9 +59,9 @@ import java.util.Random;
 public class Demo extends Application {
     private static final Random         RND       = new Random();
     private static       int            noOfNodes = 0;
-    private              FramedGauge    framedGauge1;
+    private              FGauge         framedGauge1;
     private              Gauge          gauge1;
-    private              FramedGauge    framedGauge2;
+    private              FGauge         framedGauge2;
     private              Gauge          gauge2;
     private              Gauge          gauge3;
     private              Gauge          gauge4;
@@ -280,9 +280,9 @@ public class Demo extends Application {
                               .animated(true)
                               .build();
 
-        framedGauge1 = new FramedGauge(gauge1, GaugeDesign.ENZO);
+        framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO);
 
-        framedGauge2 = new FramedGauge(gauge2, GaugeDesign.STEEL_SERIES);
+        framedGauge2 = new FGauge(gauge2, GaugeDesign.STEEL_SERIES);
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
