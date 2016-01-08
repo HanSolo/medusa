@@ -547,8 +547,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         // Main loop
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
-        double angle = 0;
-        for (double i = 0 ; Double.compare(-angleRange - tmpAngleStep, i) < 0 ; i -= tmpAngleStep) {
+        double         angle          = 0;
+        double         tmpStep        = minValue < 0 ? tmpAngleStep : 0;
+        for (double i = 0 ; Double.compare(-angleRange - tmpStep, i) < 0 ; i -= tmpAngleStep) {
             switch (scaleDirection) {
                 case CLOCKWISE        : if (Double.compare(-angleRange - tmpAngleStep, angle) < 0) break;
                     break;
@@ -708,7 +709,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     CTX.setLineWidth(size * 0.00225);
                     tickMarkType = minorTickMarkType;
                 }
-                if (!isNotZero) {
+                if (fullRange && !isNotZero) {
                     CTX.setFill(zeroColor);
                     CTX.setStroke(zeroColor);
                 }
@@ -770,7 +771,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     if (isNotZero) {
                         CTX.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
                     } else {
-                        CTX.setFill(zeroColor);
+                        if (fullRange) CTX.setFill(zeroColor);
                     }
                     CTX.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
                     CTX.restore();
