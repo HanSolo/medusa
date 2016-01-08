@@ -444,7 +444,6 @@ public class Gauge extends Control {
         originalMaxValue               = Double.MAX_VALUE;
         timeline                       = new Timeline();
         timeline.setOnFinished(e -> {
-            System.out.println("CurrentValue: " + getCurrentValue());
             if (isReturnToZero() && Double.compare(currentValue.get(), 0d) != 0d) {
                 final KeyValue KEY_VALUE2 = new KeyValue(value, 0, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
                 final KeyFrame KEY_FRAME2 = new KeyFrame(Duration.millis(animationDuration), KEY_VALUE2);
