@@ -31,12 +31,38 @@ import javafx.scene.paint.Stop;
  * Created by hansolo on 18.12.15.
  */
 public enum GaugeDesign {
-    STEEL_SERIES(0.08333333) {
+    STEEL_SERIES_METAL(0.08333333) {
         public BorderStroke[] getBorderStrokes(final double SIZE) {
             BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
-            BorderStroke innerBorder = new BorderStroke(new LinearGradient(0, 0, 0, SIZE, false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(254, 254, 254)), new Stop(0.07, Color.rgb(210, 210, 210)), new Stop(0.12, Color.rgb(179,179,179)), new Stop(1.0, Color.rgb(213,213,213))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0.0037037 * SIZE));
+            BorderStroke innerBorder = new BorderStroke(new LinearGradient(0, 0, 0, SIZE, false, CycleMethod.NO_CYCLE,
+                                                                           new Stop(0, Color.rgb(254, 254, 254)),
+                                                                           new Stop(0.07, Color.rgb(210, 210, 210)),
+                                                                           new Stop(0.12, Color.rgb(179,179,179)),
+                                                                           new Stop(1.0, Color.rgb(213,213,213))),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        BorderWidths.FULL,
+                                                        new Insets(0.0037037 * SIZE));
             BorderStroke bodyStroke  = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
-            
+            return new BorderStroke[] {outerBorder, innerBorder, bodyStroke };
+        }
+    },
+    STEEL_SERIES_STEEL(0.08333333) {
+        public BorderStroke[] getBorderStrokes(final double SIZE) {
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
+            BorderStroke innerBorder = new BorderStroke(new LinearGradient(0, 0, 0, SIZE, false, CycleMethod.NO_CYCLE,
+                                                                           new Stop(0, Color.rgb(231,237,237)),
+                                                                           new Stop(0.03, Color.rgb(189,199,198)),
+                                                                           new Stop(0.06, Color.rgb(192,201,200)),
+                                                                           new Stop(0.48, Color.rgb(23,31,33)),
+                                                                           new Stop(0.93, Color.rgb(196,205,204)),
+                                                                           new Stop(0.96, Color.rgb(194,204,203)),
+                                                                           new Stop(1.00, Color.rgb(189,201,199))),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        BorderWidths.FULL,
+                                                        new Insets(0.0037037 * SIZE));
+            BorderStroke bodyStroke  = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
             return new BorderStroke[] {outerBorder, innerBorder, bodyStroke };
         }
     },
@@ -46,12 +72,16 @@ public enum GaugeDesign {
             BorderStroke highlightBorder = new BorderStroke(new LinearGradient(0, 0.02222222 * SIZE, 0, (SIZE - 0.04444444 * SIZE), false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(255,255,255)), new Stop(0.50, Color.rgb(146,146,147)), new Stop(1.0, Color.rgb(135,136,138))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0.02222222 * SIZE));
             BorderStroke innerBorder     = new BorderStroke(new LinearGradient(0, 0.02592593 * SIZE, 0, (SIZE - 0.05185186 * SIZE), false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(71,72,72)), new Stop(0.50, Color.rgb(110,106,107)), new Stop(1.0, Color.rgb(186,185,187))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0.02592593 * SIZE));
             BorderStroke bodyStroke      = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
-
             return new BorderStroke[] {outerBorder, highlightBorder, innerBorder, bodyStroke };
         }
     };
 
-    final public double  FRAME_FACTOR;
+    public enum GaugeBackground {
+        DARK_GRAY,
+        RETRO
+    }
+
+    final public double     FRAME_FACTOR;
 
     public abstract BorderStroke[] getBorderStrokes(final double SIZE);
 

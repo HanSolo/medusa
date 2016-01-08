@@ -282,7 +282,7 @@ public class Demo extends Application {
 
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO);
 
-        framedGauge2 = new FGauge(gauge2, GaugeDesign.STEEL_SERIES);
+        framedGauge2 = new FGauge(gauge2, GaugeDesign.STEEL_SERIES_METAL);
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {

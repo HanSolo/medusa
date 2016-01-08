@@ -90,7 +90,7 @@ public class Test extends Application {
                             .animated(true)
                             .build();
 
-        framedGauge = new FGauge(gauge, GaugeDesign.STEEL_SERIES);
+        framedGauge = new FGauge(gauge, GaugeDesign.STEEL_SERIES_STEEL);
 
 
         lastTimerCall = System.nanoTime();

@@ -16,14 +16,10 @@
 
 package eu.hansolo.medusa;
 
-import javafx.geometry.Insets;
+import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -45,24 +41,29 @@ public class FGauge extends Region {
     public static final double MAXIMUM_HEIGHT   = 1024;
 
     // Model related
-    private Gauge              gauge;
+    private Gauge                  gauge;
 
     // View related
-    private double             size;
-    private Region             frame;
-    private Circle             background;
-    private Circle             foreground;
-    private GaugeDesign        design;
-    private InnerShadow        innerShadow;
+    private double          size;
+    private Region          frame;
+    private Circle          background;
+    private Circle          foreground;
+    private GaugeDesign     gaugeDesign;
+    private GaugeBackground gaugeBackground;
+    private InnerShadow     innerShadow;
 
 
     // ******************** Constructors **************************************
     public FGauge(final Gauge GAUGE, final GaugeDesign DESIGN) {
+        this(GAUGE, DESIGN, GaugeBackground.DARK_GRAY);
+    }
+    public FGauge(final Gauge GAUGE, final GaugeDesign DESIGN, final GaugeBackground BACKGROUND) {
         getStylesheets().add(getClass().getResource("framed-gauge.css").toExternalForm());
         getStyleClass().setAll("framed-gauge");
 
-        gauge  = GAUGE;
-        design = DESIGN;
+        gauge           = GAUGE;
+        gaugeDesign     = DESIGN;
+        gaugeBackground = BACKGROUND;
 
         init();
         initGraphics();
@@ -104,9 +105,15 @@ public class FGauge extends Region {
 
 
     // ******************** Methods *******************************************
-    public GaugeDesign getDesign() { return design; }
-    public void setDesign(final GaugeDesign DESIGN) {
-        design = DESIGN;
+    public GaugeDesign getGaugeDesign() { return gaugeDesign; }
+    public void setGaugeDesign(final GaugeDesign DESIGN) {
+        gaugeDesign = DESIGN;
+        redraw();
+    }
+
+    public GaugeBackground getGaugeBackground() { return gaugeBackground; }
+    public void setGaugeBackground(final GaugeBackground BACKGROUND) {
+        gaugeBackground = BACKGROUND;
         redraw();
     }
 
@@ -128,21 +135,40 @@ public class FGauge extends Region {
             }
 
             frame.setPrefSize(size, size);
-            frame.setBorder(new Border(design.getBorderStrokes(size)));
+            frame.setBorder(new Border(gaugeDesign.getBorderStrokes(size)));
 
             background.setCenterX(size * 0.5);
             background.setCenterY(size * 0.5);
             background.setRadius(size * 0.4375);
 
-            switch(design) {
-                case STEEL_SERIES:
+            switch (gaugeBackground) {
+                case RETRO:
+
+                    break;
+                case DARK_GRAY:
+                default:
                     background.setFill(new LinearGradient(0, background.getLayoutBounds().getMinY(), 0, background.getLayoutBounds().getMaxY(), false, CycleMethod.NO_CYCLE,
                                                           new Stop(0, Color.BLACK), new Stop(0.39, Color.rgb(50,50,50)), new Stop(0.40, Color.rgb(51, 51, 51)), new Stop(1.0, Color.rgb(153,153,153))));
+                    break;
+            }
+
+            switch(gaugeDesign) {
+                case STEEL_SERIES_METAL:
                     innerShadow.setColor(Color.rgb(0, 0, 0, 0.65));
                     innerShadow.setRadius(0.08 * size);
                     innerShadow.setOffsetX(0);
                     innerShadow.setOffsetY(0.0 * size);
-                    foreground.setFill(new RadialGradient(0, 0, size * 0.5, size * design.FRAME_FACTOR * 0.5, size * 0.4, false, CycleMethod.NO_CYCLE,
+                    foreground.setFill(new RadialGradient(0, 0, size * 0.5, size * gaugeDesign.FRAME_FACTOR * 0.5, size * 0.4, false, CycleMethod.NO_CYCLE,
+                                                          new Stop(0, Color.rgb(255, 255, 255, 0.6)),
+                                                          new Stop(1, Color.rgb(255, 255, 255, 0))));
+                    foreground.setStroke(null);
+                    break;
+                case STEEL_SERIES_STEEL:
+                    innerShadow.setColor(Color.rgb(0, 0, 0, 0.65));
+                    innerShadow.setRadius(0.08 * size);
+                    innerShadow.setOffsetX(0);
+                    innerShadow.setOffsetY(0.0 * size);
+                    foreground.setFill(new RadialGradient(0, 0, size * 0.5, size * gaugeDesign.FRAME_FACTOR * 0.5, size * 0.4, false, CycleMethod.NO_CYCLE,
                                                           new Stop(0, Color.rgb(255, 255, 255, 0.6)),
                                                           new Stop(1, Color.rgb(255, 255, 255, 0))));
                     foreground.setStroke(null);
@@ -158,8 +184,8 @@ public class FGauge extends Region {
                     break;
             }
 
-            gauge.setPrefSize(size * (1d - design.FRAME_FACTOR * 2d), size * (1d - design.FRAME_FACTOR * 2d));
-            gauge.relocate(design.FRAME_FACTOR * size, design.FRAME_FACTOR * size);
+            gauge.setPrefSize(size * (1d - gaugeDesign.FRAME_FACTOR * 2d), size * (1d - gaugeDesign.FRAME_FACTOR * 2d));
+            gauge.relocate(gaugeDesign.FRAME_FACTOR * size, gaugeDesign.FRAME_FACTOR * size);
 
             foreground.setCenterX(size * 0.5);
             foreground.setCenterY(size * 0.5);
