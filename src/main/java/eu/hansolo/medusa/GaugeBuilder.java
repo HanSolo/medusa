@@ -412,6 +412,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B checkThreshold(final boolean CHECK) {
+        properties.put("checkThreshold", new SimpleBooleanProperty(CHECK));
+        return (B)this;
+    }
+
     public final B innerShadowEnabled(final boolean ENABLED) {
         properties.put("innerShadowEnabled", new SimpleBooleanProperty(ENABLED));
         return (B)this;
@@ -544,6 +549,16 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B onButtonReleased(final EventHandler<Gauge.ButtonEvent> HANDLER) {
         properties.put("onButtonReleased", new SimpleObjectProperty<>(HANDLER));
+        return (B)this;
+    }
+
+    public final B onThresholdExceeded(final EventHandler<Gauge.ThresholdEvent> HANDLER) {
+        properties.put("onThresholdExceeded", new SimpleObjectProperty<>(HANDLER));
+        return (B)this;
+    }
+
+    public final B onThresholdUnderrun(final EventHandler<Gauge.ThresholdEvent> HANDLER) {
+        properties.put("onThresholdUnderrun", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
 
@@ -903,10 +918,16 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
             } else if ("checkAreasForValue".equals(key)) {
                 CONTROL.setCheckAreasForValue(((BooleanProperty) properties.get(key)).get());
+            } else if ("checkThreshold".equals(key)) {
+                CONTROL.setCheckThreshold(((BooleanProperty) properties.get(key)).get());
             } else if ("onButtonPressed".equals(key)) {
                 CONTROL.setOnButtonPressed(((ObjectProperty<EventHandler>) properties.get(key)).get());
             } else if ("onButtonReleased".equals(key)) {
                 CONTROL.setOnButtonReleased(((ObjectProperty<EventHandler>) properties.get(key)).get());
+            } else if ("onThresholdExceeded".equals(key)) {
+                CONTROL.setOnThresholdExceeded(((ObjectProperty<EventHandler>) properties.get(key)).get());
+            } else if ("onThresholdUnderrun".equals(key)) {
+                CONTROL.setOnThresholdUnderrun(((ObjectProperty<EventHandler>) properties.get(key)).get());
             } else if ("buttonTooltipText".equals(key)) {
                 CONTROL.setButtonTooltipText(((StringProperty) properties.get(key)).get());
             }

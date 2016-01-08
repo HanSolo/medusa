@@ -114,27 +114,31 @@ public class Gauge extends Control {
     public enum LcdFont { STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA }
     public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE }
 
-    public  static final Color              DARK_COLOR           = Color.rgb(36, 36, 36);
-    public  static final Color              BRIGHT_COLOR         = Color.rgb(223, 223, 223);
-    private static final long               LED_BLINK_INTERVAL   = 500l;
+    public  static final Color                 DARK_COLOR           = Color.rgb(36, 36, 36);
+    public  static final Color                 BRIGHT_COLOR         = Color.rgb(223, 223, 223);
+    private static final long                  LED_BLINK_INTERVAL   = 500l;
 
-    public         final ButtonEvent        BUTTON_PRESSED_EVENT = new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_PRESSED);
-    public         final ButtonEvent        BUTTON_RELEASED_EVENT= new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_RELEASED);
-    private        final UpdateEvent        RECALC_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
-    private        final UpdateEvent        REDRAW_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
-    private        final UpdateEvent        RESIZE_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
-    private        final UpdateEvent        LED_BLINK_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED_BLINK);
-    private        final UpdateEvent        VISIBILITY_EVENT     = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
-    private        final UpdateEvent        INTERACTIVITY_EVENT  = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
+    public         final ButtonEvent           BUTTON_PRESSED_EVENT = new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_PRESSED);
+    public         final ButtonEvent           BUTTON_RELEASED_EVENT= new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_RELEASED);
+    private        final ThresholdEvent        EXCEEDED_EVENT       = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_EXCEEDED);
+    private        final ThresholdEvent        UNDERRUN_EVENT       = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_UNDERRUN);
+    private        final UpdateEvent           RECALC_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
+    private        final UpdateEvent           REDRAW_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
+    private        final UpdateEvent           RESIZE_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
+    private        final UpdateEvent           LED_BLINK_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED_BLINK);
+    private        final UpdateEvent           VISIBILITY_EVENT     = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
+    private        final UpdateEvent           INTERACTIVITY_EVENT  = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
 
-    private static volatile Future          blinkFuture;
-    private static ScheduledExecutorService blinkService         = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
-    private static volatile Callable<Void>  blinkTask;
+    private static volatile Future             blinkFuture;
+    private static ScheduledExecutorService    blinkService         = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
+    private static volatile Callable<Void>     blinkTask;
 
     // Update events
-    private List<UpdateEventListener>       listenerList         = new CopyOnWriteArrayList();
-    private List<EventHandler<ButtonEvent>> pressedHandlerList   = new CopyOnWriteArrayList<>();
-    private List<EventHandler<ButtonEvent>> releasedHandlerList  = new CopyOnWriteArrayList<>();
+    private List<UpdateEventListener>          listenerList        = new CopyOnWriteArrayList();
+    private List<EventHandler<ButtonEvent>>    pressedHandlerList  = new CopyOnWriteArrayList<>();
+    private List<EventHandler<ButtonEvent>>    releasedHandlerList = new CopyOnWriteArrayList<>();
+    private List<EventHandler<ThresholdEvent>> exceededHandlerList = new CopyOnWriteArrayList<>();
+    private List<EventHandler<ThresholdEvent>> underrunHandlerList = new CopyOnWriteArrayList<>();
 
     // Data related
     private DoubleProperty                       value;
@@ -251,6 +255,8 @@ public class Gauge extends Control {
     private BooleanProperty                      checkSectionsForValue;
     private boolean                              _checkAreasForValue;
     private BooleanProperty                      checkAreasForValue;
+    private boolean                              _checkThreshold;
+    private BooleanProperty                      checkThreshold;
     private boolean                              _innerShadowEnabled;
     private BooleanProperty                      innerShadowEnabled;
     private boolean                              _thresholdVisible;
@@ -349,7 +355,16 @@ public class Gauge extends Control {
         };
         currentValue                   = new DoublePropertyBase(value.get()) {
             @Override public void set(final double VALUE) {
+                double formerValue = get();
                 super.set(VALUE);
+                if (isCheckThreshold()) {
+                    double thrshld = getThreshold();
+                    if (formerValue < thrshld && VALUE > thrshld) {
+                        fireThresholdEvent(EXCEEDED_EVENT);
+                    } else if (formerValue > thrshld && VALUE < thrshld ) {
+                        fireThresholdEvent(UNDERRUN_EVENT);
+                    }
+                }
                 if (VALUE < getMinMeasuredValue()) { setMinMeasuredValue(VALUE); }
                 if (VALUE > getMaxMeasuredValue()) { setMaxMeasuredValue(VALUE); }
             }
@@ -414,6 +429,7 @@ public class Gauge extends Control {
         _thresholdColor                = Color.CRIMSON;
         _checkSectionsForValue         = false;
         _checkAreasForValue            = false;
+        _checkThreshold                = false;
         _innerShadowEnabled            = false;
         _thresholdVisible              = false;
         _sectionsVisible               = false;
@@ -1311,6 +1327,19 @@ public class Gauge extends Control {
         return checkAreasForValue;
     }
 
+    public boolean isCheckThreshold() { return null == checkThreshold ? _checkThreshold : checkThreshold.get(); }
+    public void setCheckThreshold(final boolean CHECK) {
+        if (null == checkThreshold) {
+            _checkThreshold = CHECK;
+        } else {
+            checkThreshold.set(CHECK);
+        }
+    }
+    public BooleanProperty checkThresholdProperty() {
+        if (null == checkThreshold) { checkThreshold = new SimpleBooleanProperty(Gauge.this, "checkThreshold", _checkThreshold); }
+        return checkThreshold;
+    }
+
     public boolean isInnerShadowEnabled() { return null == innerShadowEnabled ? _innerShadowEnabled : innerShadowEnabled.get(); }
     public void setInnerShadowEnabled(final boolean ENABLED) {
         if (null == innerShadowEnabled) {
@@ -1724,6 +1753,7 @@ public class Gauge extends Control {
         listenerList.forEach(listener -> listener.onUpdateEvent(EVENT));
     }
 
+    
     public void setOnButtonPressed(EventHandler<ButtonEvent> handler) { addButtonPressedHandler(handler); }
     public void addButtonPressedHandler(EventHandler<ButtonEvent> handler) { pressedHandlerList.add(handler); }
     public void removeButtonPressedHandler(EventHandler<ButtonEvent> handler) { pressedHandlerList.remove(handler); }
@@ -1742,6 +1772,24 @@ public class Gauge extends Control {
     }
 
 
+    public void setOnThresholdExceeded(EventHandler<ThresholdEvent> handler) { addThresholdExceededHandler(handler); }
+    public void addThresholdExceededHandler(EventHandler<ThresholdEvent> handler) { exceededHandlerList.add(handler); }
+    public void removeThresholdExceededHandler(EventHandler<ThresholdEvent> handler) { exceededHandlerList.remove(handler); }
+
+    public void setOnThresholdUnderrun(EventHandler<ThresholdEvent> handler) { addThresholdUnderrunHandler(handler); }
+    public void addThresholdUnderrunHandler(EventHandler<ThresholdEvent> handler) { underrunHandlerList.add(handler); }
+    public void removeThresholdUnderrunHandler(EventHandler<ThresholdEvent> handler) { underrunHandlerList.remove(handler); }
+
+    public void fireThresholdEvent(final ThresholdEvent EVENT) {
+        final EventType TYPE = EVENT.getEventType();
+        if (ThresholdEvent.THRESHOLD_EXCEEDED == TYPE) {
+            exceededHandlerList.forEach(handler -> handler.handle(EVENT));
+        } else if (ThresholdEvent.THRESHOLD_UNDERRUN == TYPE) {
+            underrunHandlerList.forEach(handler -> handler.handle(EVENT));
+        }
+    }
+    
+
     // ******************** Inner Classes *************************************
     public static class ButtonEvent extends Event {
         public static final EventType<ButtonEvent> BUTTON_PRESSED  = new EventType(ANY, "BUTTON_PRESSED");
@@ -1749,6 +1797,16 @@ public class Gauge extends Control {
 
         // ******************** Constructors **************************************
         public ButtonEvent(final Object SOURCE, final EventTarget TARGET, EventType<ButtonEvent> TYPE) {
+            super(SOURCE, TARGET, TYPE);
+        }
+    }
+    
+    public static class ThresholdEvent extends Event {
+        public static final EventType<ThresholdEvent> THRESHOLD_EXCEEDED = new EventType(ANY, "THRESHOLD_EXCEEDED");
+        public static final EventType<ThresholdEvent> THRESHOLD_UNDERRUN = new EventType(ANY, "THRESHOLD_UNDERRUN");
+
+        // ******************** Constructors **************************************
+        public ThresholdEvent(final Object SOURCE, final EventTarget TARGET, EventType<ThresholdEvent> TYPE) {
             super(SOURCE, TARGET, TYPE);
         }
     }
