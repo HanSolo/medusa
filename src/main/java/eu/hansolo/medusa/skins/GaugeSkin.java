@@ -1091,8 +1091,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     break;
             }
             threshold.setFill(getSkinnable().getThresholdColor());
-            //threshold.setStroke(getSkinnable().getThresholdColor().brighter().brighter());
-            threshold.setStroke(Color.WHITE);
+            threshold.setStroke(getSkinnable().getTickMarkColor());
         }
     }
 
