@@ -1057,6 +1057,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         if (getSkinnable().isThresholdVisible()) {
             // Draw threshold
+            threshold.getElements().clear();
             double thresholdAngle;
             if (ScaleDirection.CLOCKWISE == scaleDirection) {
                 thresholdAngle = startAngle - (getSkinnable().getThreshold() - getSkinnable().getMinValue()) * angleStep;
@@ -1090,7 +1091,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     break;
             }
             threshold.setFill(getSkinnable().getThresholdColor());
-            threshold.setStroke(getSkinnable().getThresholdColor().darker());
+            //threshold.setStroke(getSkinnable().getThresholdColor().brighter().brighter());
+            threshold.setStroke(Color.WHITE);
         }
     }
 
