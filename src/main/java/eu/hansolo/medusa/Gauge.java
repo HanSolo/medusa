@@ -92,7 +92,7 @@ public class Gauge extends Control {
             this.FACTOR = FACTOR;
         }
     }
-    public enum KnobType { STANDARD, METAL }
+    public enum KnobType { STANDARD, PLAIN, METAL }
     public enum TickLabelOrientation { ORTHOGONAL,  HORIZONTAL, TANGENT }
     public enum TickMarkType { LINE, DOT, TRIANGLE, DIAMOND, TICK_LABEL }
     public enum NumberFormat {
