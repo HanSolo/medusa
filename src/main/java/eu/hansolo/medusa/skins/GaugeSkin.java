@@ -379,18 +379,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         final EventType TYPE = EVENT.getEventType();
         if (MouseEvent.MOUSE_PRESSED == TYPE) {
             getSkinnable().fireButtonEvent(getSkinnable().BUTTON_PRESSED_EVENT);
-            knob.setFill(new LinearGradient(0, size * 0.473, 0, size * 0.527,
-                                                   false, CycleMethod.NO_CYCLE,
-                                                   new Stop(0.0, getSkinnable().getKnobColor().darker()),
-                                                   new Stop(0.55, getSkinnable().getKnobColor()),
-                                                   new Stop(1.0, getSkinnable().getKnobColor().brighter())));
+            drawKnob(true);
         } else if (MouseEvent.MOUSE_RELEASED == TYPE) {
             getSkinnable().fireButtonEvent(getSkinnable().BUTTON_RELEASED_EVENT);
-            knob.setFill(new LinearGradient(0, size * 0.473, 0, size * 0.527,
-                                            false, CycleMethod.NO_CYCLE,
-                                            new Stop(0.0, getSkinnable().getKnobColor().brighter()),
-                                            new Stop(0.45, getSkinnable().getKnobColor()),
-                                            new Stop(1.0, getSkinnable().getKnobColor().darker())));
+            drawKnob(false);
         }
     }
 
@@ -1118,50 +1110,53 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         });
     }
 
-    private void drawKnob() {
+    private void drawKnob(final boolean PRESSED) {
         knobCanvas.setCache(false);
-        double x = 0;
-        double y = 0;
         double w = knobCanvas.getWidth();
         double h = knobCanvas.getHeight();
-        knob.clearRect(x, y, w, h);
+        knob.clearRect(0, 0, w, h);
+
+        Color  knobColor = getSkinnable().getKnobColor();
+        double hue       = knobColor.getHue();
+        double sat       = knobColor.getSaturation();
+        double alp       = knobColor.getOpacity();
+        double gradTop;
+        double gradBot;
 
         switch (getSkinnable().getKnobType()) {
             case PLAIN:
-                knob.setFill(new LinearGradient(0, y, 0, h, false, CycleMethod.NO_CYCLE,
+                knob.setFill(new LinearGradient(0, 0, 0, h, false, CycleMethod.NO_CYCLE,
                                                new Stop(0.0, Color.rgb(180,180,180)),
                                                new Stop(0.46, Color.rgb(63,63,63)),
                                                new Stop(1.0, Color.rgb(40,40,40))));
-                knob.fillOval(x, y, w, h);
+                knob.fillOval(0, 0, w, h);
 
-                knob.setFill(new LinearGradient(0, y, 0, h, false, CycleMethod.NO_CYCLE,
-                                               new Stop(0.0, Color.rgb(215,215,215)),
-                                               new Stop(0.01, Color.rgb(213,213,213)),
-                                               new Stop(0.5, Color.rgb(116,116,116)),
-                                               new Stop(0.51, Color.rgb(117,117,117)),
-                                               new Stop(1.0, Color.rgb(215,215,215))));
+                knob.setFill(new LinearGradient(0, 0.11764706 * h, 0, 0.76470588 * h, false, CycleMethod.NO_CYCLE,
+                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? 0.9 : 1.0, alp)),
+                                                new Stop(0.01, Color.hsb(hue, sat, PRESSED ? 0.75 : 0.85, alp)),
+                                                new Stop(0.5, Color.hsb(hue, sat, PRESSED ? 0.4 : 0.5, alp)),
+                                                new Stop(0.51, Color.hsb(hue, sat, PRESSED ? 0.35 : 0.45, alp)),
+                                                new Stop(1.0, Color.hsb(hue, sat, PRESSED ? 0.7 : 0.8, alp))));
                 knob.fillOval(w * 0.11764706, h * 0.11764706, w - w * 0.23529412, h - h * 0.23529412);
 
                 knob.setFill(new RadialGradient(0, 0, 0.5 * w, 0.47 * h, w * 0.38, false, CycleMethod.NO_CYCLE,
                                                new Stop(0, Color.TRANSPARENT),
                                                new Stop(0.76, Color.TRANSPARENT),
-                                               new Stop(1.0, Color.rgb(0, 0, 0, 0.2))));
+                                               new Stop(1.0, Color.rgb(0, 0, 0, PRESSED ? 0.5 : 0.2))));
                 knob.fillOval(w * 0.11764706, h * 0.11764706, w - w * 0.23529412, h - h * 0.23529412);
                 break;
             case METAL:
-                knob.setFill(new LinearGradient(0.5294117647058824 * w, 0.0,
-                                                0.5294117647058825 * w, h,
+                knob.setFill(new LinearGradient(0, 0, 0, h,
                                                 false, CycleMethod.NO_CYCLE,
                                                 new Stop(0.0, Color.rgb(92,95,101)),
                                                 new Stop(0.47, Color.rgb(46,49,53)),
                                                 new Stop(1.0, Color.rgb(22,23,26))));
-                knob.fillOval(x, y, w, h);
+                knob.fillOval(0, 0, w, h);
 
-                knob.setFill(new LinearGradient(0.5294117647058824 * w, 0.058823529411764705 * h,
-                                                0.5294117647058825 * w, 0.9411764705882353 * h,
+                knob.setFill(new LinearGradient(0, 0.058823529411764705 * h, 0, 0.9411764705882353 * h,
                                                 false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.rgb(204, 204, 204)),
-                                                new Stop(1.0, Color.rgb(87, 92, 98))));
+                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? 0.7 : 0.9, alp)),
+                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? 0.3 : 0.5, alp))));
                 knob.fillOval(0.05882353 * w, 0.05882353 * h, w * 0.88235294, h * 0.88235294);
 
                 knob.beginPath();
@@ -1175,7 +1170,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                 0.47058823529411764 * w, 0.8823529411764706 * h,
                                                 0.3235294117647059 * w,
                                                 false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.rgb(255, 255, 255, 0.6)),
+                                                new Stop(0.0, Color.rgb(255, 255, 255, PRESSED ? 0.3 : 0.6)),
                                                 new Stop(1.0, Color.TRANSPARENT)));
                 knob.fill();
 
@@ -1190,7 +1185,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                 0.47058823529411764 * w, 0.0,
                                                 0.4411764705882353 * w,
                                                 false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.rgb(255, 255, 255, 0.75)),
+                                                new Stop(0.0, Color.rgb(255, 255, 255, PRESSED ? 0.45 : 0.75)),
                                                 new Stop(1.0, Color.TRANSPARENT)));
                 knob.fill();
 
@@ -1215,13 +1210,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                        new Stop(0.0, Color.rgb(133, 133, 133).brighter().brighter()),
                                                        new Stop(0.52, Color.rgb(133, 133, 133)),
                                                        new Stop(1.0, Color.rgb(133, 133, 133).darker().darker())));
-                knob.fillOval(x, y, w, h);
-
-                knob.setFill(new LinearGradient(0, size * 0.005, 0, h - size * 0.01,
+                knob.fillOval(0, 0, w, h);
+                gradTop = PRESSED ? h - size * 0.01 : size * 0.005;
+                gradBot = PRESSED ? size * 0.005 : h - size * 0.01;
+                knob.setFill(new LinearGradient(0,gradTop, 0, gradBot,
                                                        false, CycleMethod.NO_CYCLE,
-                                                       new Stop(0.0, getSkinnable().getKnobColor().brighter()),
-                                                       new Stop(0.45, getSkinnable().getKnobColor()),
-                                                       new Stop(1.0, getSkinnable().getKnobColor().darker())));
+                                                       new Stop(0.0, Color.hsb(hue, sat, 0.85, alp)),
+                                                       new Stop(0.45, Color.hsb(hue, sat, 0.65, alp)),
+                                                       new Stop(1.0, Color.hsb(hue, sat, 0.4, alp))));
                 knob.fillOval(size * 0.005, size * 0.005, w - size * 0.01, h - size * 0.01);
                 break;
         }
@@ -1470,7 +1466,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ticksAndSectionsCanvas.setCache(true);
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
-        drawKnob();
+        drawKnob(false);
 
         drawMarkers();
         thresholdTooltip.setText("Threshold\n(" + String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getThreshold()) + ")");

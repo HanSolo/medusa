@@ -398,7 +398,7 @@ public class Gauge extends Control {
         _backgroundPaint               = Color.TRANSPARENT;
         _borderPaint                   = Color.TRANSPARENT;
         _foregroundPaint               = Color.TRANSPARENT;
-        _knobColor                     = Color.rgb(133, 133, 133);
+        _knobColor                     = Color.rgb(204, 204, 204);
         _knobType                      = KnobType.STANDARD;
         _animated                      = false;
         animationDuration              = 800;

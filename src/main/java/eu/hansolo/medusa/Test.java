@@ -92,7 +92,10 @@ public class Test extends Application {
                             .lcdFont(LcdFont.STANDARD)
                             .ledVisible(true)
                             .shadowsEnabled(true)
-                            .knobType(KnobType.METAL)
+                            .knobType(KnobType.STANDARD)
+                            .interactive(true)
+                            .onButtonPressed(e -> System.out.println("Pressed"))
+                            .onButtonReleased(e -> System.out.println("Released"))
                             .animated(true)
                             .build();
 
