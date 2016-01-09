@@ -22,7 +22,6 @@ import javafx.scene.effect.InnerShadow;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
@@ -116,6 +115,12 @@ public class FGauge extends Region {
         redraw();
     }
 
+    public boolean isForegroundVisible() { return foreground.isVisible(); }
+    public void setForegroundVisible(final boolean VISIBLE) {
+        foreground.setVisible(VISIBLE);
+        foreground.setManaged(VISIBLE);
+    }
+
     public Gauge getGauge() { return gauge; }
     public void setGauge(final Gauge GAUGE) { gauge = GAUGE; }
 
@@ -158,8 +163,8 @@ public class FGauge extends Region {
                     innerShadow.setRadius(0.08 * size);
                     innerShadow.setOffsetX(0);
                     innerShadow.setOffsetY(0.0 * size);
-                    foreground.setFill(new RadialGradient(0, 0, size * 0.5, size * gaugeDesign.FRAME_FACTOR * 0.5, size * 0.4, false, CycleMethod.NO_CYCLE,
-                                                          new Stop(0, Color.rgb(255, 255, 255, 0.6)),
+                    foreground.setFill(new RadialGradient(0, 0, size * 0.5, size * gaugeDesign.FRAME_FACTOR * 0.5, size * 0.5, false, CycleMethod.NO_CYCLE,
+                                                          new Stop(0, Color.rgb(255, 255, 255, 0.7)),
                                                           new Stop(1, Color.rgb(255, 255, 255, 0))));
                     foreground.setStroke(null);
                     break;
