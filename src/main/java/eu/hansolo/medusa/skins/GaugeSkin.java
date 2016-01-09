@@ -1233,7 +1233,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             markerPane.setPrefSize(size, size);
 
             ledSize = 0.06 * size;
-            final Color LED_COLOR = getSkinnable().getLedColor();
             frameGradient = new LinearGradient(0.14 * ledSize, 0.14 * ledSize,
                                                0.84 * ledSize, 0.84 * ledSize,
                                                false, CycleMethod.NO_CYCLE,
@@ -1244,19 +1243,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                new Stop(0.85, Color.rgb(200, 200, 200, 0.41)),
                                                new Stop(1.0, Color.rgb(200, 200, 200, 0.35)));
 
-            ledOnGradient = new LinearGradient(0.25 * ledSize, 0.25 * ledSize,
-                                               0.74 * ledSize, 0.74 * ledSize,
-                                               false, CycleMethod.NO_CYCLE,
-                                               new Stop(0.0, LED_COLOR.deriveColor(0d, 1d, 0.77, 1d)),
-                                               new Stop(0.49, LED_COLOR.deriveColor(0d, 1d, 0.5, 1d)),
-                                               new Stop(1.0, LED_COLOR));
-
-            ledOffGradient = new LinearGradient(0.25 * ledSize, 0.25 * ledSize,
-                                                0.74 * ledSize, 0.74 * ledSize,
-                                                false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, LED_COLOR.deriveColor(0d, 1d, 0.20, 1d)),
-                                                new Stop(0.49, LED_COLOR.deriveColor(0d, 1d, 0.13, 1d)),
-                                                new Stop(1.0, LED_COLOR.deriveColor(0d, 1d, 0.2, 1d)));
+            generateLedColorGradients();
 
             highlightGradient = new RadialGradient(0, 0,
                                                    0.3 * ledSize, 0.3 * ledSize,
@@ -1391,7 +1378,27 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
+    private void generateLedColorGradients()
+    {
+        final Color LED_COLOR = getSkinnable().getLedColor();
+        ledOnGradient = new LinearGradient(0.25 * ledSize, 0.25 * ledSize,
+                                           0.74 * ledSize, 0.74 * ledSize,
+                                           false, CycleMethod.NO_CYCLE,
+                                           new Stop(0.0, LED_COLOR.deriveColor(0d, 1d, 0.77, 1d)),
+                                           new Stop(0.49, LED_COLOR.deriveColor(0d, 1d, 0.5, 1d)),
+                                           new Stop(1.0, LED_COLOR));
+
+        ledOffGradient = new LinearGradient(0.25 * ledSize, 0.25 * ledSize,
+                                            0.74 * ledSize, 0.74 * ledSize,
+                                            false, CycleMethod.NO_CYCLE,
+                                            new Stop(0.0, LED_COLOR.deriveColor(0d, 1d, 0.20, 1d)),
+                                            new Stop(0.49, LED_COLOR.deriveColor(0d, 1d, 0.13, 1d)),
+                                            new Stop(1.0, LED_COLOR.deriveColor(0d, 1d, 0.2, 1d)));
+    }
+
     private void redraw() {
+        generateLedColorGradients();
+
         shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
 
         background.setStroke(getSkinnable().getBorderPaint());
