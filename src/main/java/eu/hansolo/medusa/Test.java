@@ -94,7 +94,8 @@ public class Test extends Application {
                             .animated(true)
                             .build();
 
-        framedGauge = new FGauge(gauge, GaugeDesign.METAL, GaugeBackground.WHITE);
+        framedGauge = new FGauge(gauge, GaugeDesign.BLACK_METAL, GaugeBackground.BEIGE);
+        framedGauge.setForegroundVisible(false);
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
