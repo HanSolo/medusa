@@ -77,9 +77,9 @@ public class Test extends Application {
                             .titleColor(Color.WHITE)
                             .unitColor(Color.WHITE)
                             .valueColor(Color.WHITE)
-                            //.majorTickMarkType(TickMarkType.TRIANGLE)
-                            //.sectionsVisible(true)
-                            .sections(new Section(70, 90, Color.rgb(200, 0, 0, 0.5)))
+                            .majorTickMarkType(TickMarkType.TRIANGLE)
+                            .sectionsVisible(true)
+                            .sections(new Section(80, 100, Color.rgb(200, 0, 0, 0.5)))
                             //.areasVisible(true)
                             .areas(new Section(90, 100, Color.rgb(200, 0, 0, 0.75)))
                             .thresholdVisible(true)
@@ -92,14 +92,14 @@ public class Test extends Application {
                             .lcdFont(LcdFont.STANDARD)
                             .ledVisible(true)
                             .shadowsEnabled(true)
-                            .knobType(KnobType.STANDARD)
+                            .knobType(KnobType.METAL)
                             .interactive(true)
                             .onButtonPressed(e -> System.out.println("Pressed"))
                             .onButtonReleased(e -> System.out.println("Released"))
                             .animated(true)
                             .build();
 
-        framedGauge = new FGauge(gauge, GaugeDesign.METAL, GaugeBackground.DARK_GRAY);
+        framedGauge = new FGauge(gauge, GaugeDesign.TILTED_GRAY, GaugeBackground.CARBON);
         framedGauge.setForegroundVisible(false);
 
         lastTimerCall = System.nanoTime();
