@@ -18,8 +18,16 @@ package eu.hansolo.medusa.tools;
 
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Section;
+import javafx.application.Platform;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -33,13 +41,13 @@ import java.util.concurrent.ThreadFactory;
  */
 public class Helper {
 
-    public static <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
+    public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
         if (VALUE.doubleValue() < MIN.doubleValue()) return MIN;
         if (VALUE.doubleValue() > MAX.doubleValue()) return MAX;
         return VALUE;
     }
 
-    public static double[] calcAutoScale(final double MIN_VALUE, final double MAX_VALUE) {
+    public static final double[] calcAutoScale(final double MIN_VALUE, final double MAX_VALUE) {
         double maxNoOfMajorTicks = 10;
         double maxNoOfMinorTicks = 10;
         double niceMinValue;
@@ -64,7 +72,7 @@ public class Helper {
      * @param ROUND whether to round the result or ceil
      * @return a "niceScaling" number to be used for the value range
      */
-    public static double calcNiceNumber(final double RANGE, final boolean ROUND) {
+    public static final double calcNiceNumber(final double RANGE, final boolean ROUND) {
         double niceFraction;
         double exponent = Math.floor(Math.log10(RANGE));   // exponent of range
         double fraction = RANGE / Math.pow(10, exponent);  // fractional part of range
@@ -93,14 +101,14 @@ public class Helper {
         return niceFraction * Math.pow(10, exponent);
     }
 
-    public static Color getColorOfSection(final List<Section> SECTIONS, final double VALUE, final Color DEFAULT_COLOR) {
+    public static final Color getColorOfSection(final List<Section> SECTIONS, final double VALUE, final Color DEFAULT_COLOR) {
         for (Section section : SECTIONS) {
             if (section.contains(VALUE)) return section.getColor();
         }
         return DEFAULT_COLOR;
     }
 
-    public static void rotateContextForText(final GraphicsContext CTX, final double START_ANGLE, final double ANGLE, final TickLabelOrientation ORIENTATION) {
+    public static final void rotateContextForText(final GraphicsContext CTX, final double START_ANGLE, final double ANGLE, final TickLabelOrientation ORIENTATION) {
         switch (ORIENTATION) {
             case ORTHOGONAL:
                 if ((360 - START_ANGLE - ANGLE) % 360 > 90 && (360 - START_ANGLE - ANGLE) % 360 < 270) {
@@ -122,7 +130,7 @@ public class Helper {
         }
     }
 
-    public static void adjustTextSize(final Text TEXT, final double MAX_WIDTH, final double DECREMENT_FACTOR, final double SIZE) {
+    public static final void adjustTextSize(final Text TEXT, final double MAX_WIDTH, final double DECREMENT_FACTOR, final double SIZE) {
         double decrement = 0d;
         while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && TEXT.getFont().getSize() > 0) {
             TEXT.setFont(new Font(TEXT.getFont().getName(), SIZE * (DECREMENT_FACTOR - decrement)));
@@ -130,11 +138,11 @@ public class Helper {
         }
     }
 
-    public static String colorToCss(final Color COLOR) {
+    public static final String colorToCss(final Color COLOR) {
         return COLOR.toString().replace("0x", "#");
     }
 
-    public static ThreadFactory getThreadFactory(final String THREAD_NAME, final boolean IS_DAEMON) {
+    public static final ThreadFactory getThreadFactory(final String THREAD_NAME, final boolean IS_DAEMON) {
         return runnable -> {
             Thread thread = new Thread(runnable, THREAD_NAME);
             thread.setDaemon(IS_DAEMON);
@@ -142,9 +150,68 @@ public class Helper {
         };
     }
 
-    public static void stopTask(ScheduledFuture<?> task) {
+    public static final void stopTask(ScheduledFuture<?> task) {
         if (null == task) return;
         task.cancel(true);
         task = null;
+    }
+
+    public static final ImagePattern createCarbonPattern() {
+        final double          SIZE   = 12;
+        final Canvas          CANVAS = new Canvas(SIZE, SIZE);
+        final GraphicsContext CTX    = CANVAS.getGraphicsContext2D();
+
+        CTX.setFill(new LinearGradient(0, 0, 0, 0.5 * SIZE,
+                                       false, CycleMethod.NO_CYCLE,
+                                       new Stop(0, Color.rgb(35, 35, 35)),
+                                       new Stop(1, Color.rgb(23, 23, 23))));
+        CTX.fillRect(0, 0, SIZE * 0.5, SIZE * 0.5);
+
+        CTX.setFill(new LinearGradient(0, 0, 0, 0.416666 * SIZE,
+                                       false, CycleMethod.NO_CYCLE,
+                                       new Stop(0, Color.rgb(38, 38, 38)),
+                                       new Stop(1, Color.rgb(30, 30, 30))));
+        CTX.fillRect(SIZE * 0.083333, 0, SIZE * 0.333333, SIZE * 0.416666);
+
+        CTX.setFill(new LinearGradient(0, 0.5 * SIZE, 0, SIZE,
+                                       false, CycleMethod.NO_CYCLE,
+                                       new Stop(0, Color.rgb(35, 35, 35)),
+                                       new Stop(1, Color.rgb(23, 23, 23))));
+        CTX.fillRect(SIZE * 0.5, SIZE * 0.5, SIZE * 0.5, SIZE * 0.5);
+
+        CTX.setFill(new LinearGradient(0, 0.5 * SIZE, 0, 0.916666 * SIZE,
+                                       false, CycleMethod.NO_CYCLE,
+                                       new Stop(0, Color.rgb(38, 38, 38)),
+                                       new Stop(1, Color.rgb(30, 30, 30))));
+        CTX.fillRect(SIZE * 0.583333, SIZE * 0.5, SIZE * 0.333333, SIZE * 0.416666);
+
+        CTX.setFill(new LinearGradient(0, 0, 0, 0.5 * SIZE,
+                                       false, CycleMethod.NO_CYCLE,
+                                       new Stop(0, Color.rgb(48, 48, 48)),
+                                       new Stop(1, Color.rgb(40, 40, 40))));
+        CTX.fillRect(SIZE * 0.5, 0, SIZE * 0.5, SIZE * 0.5);
+
+        CTX.setFill(new LinearGradient(0, 0.083333 * SIZE, 0, 0.5 * SIZE,
+                                       false, CycleMethod.NO_CYCLE,
+                                       new Stop(0, Color.rgb(53, 53, 53)),
+                                       new Stop(1, Color.rgb(45, 45, 45))));
+        CTX.fillRect(SIZE * 0.583333, SIZE * 0.083333, SIZE * 0.333333, SIZE * 0.416666);
+
+        CTX.setFill(new LinearGradient(0, 0.5 * SIZE, 0, SIZE,
+                                       false, CycleMethod.NO_CYCLE,
+                                       new Stop(0, Color.rgb(48, 48, 48)),
+                                       new Stop(1, Color.rgb(40, 40, 40))));
+        CTX.fillRect(0, SIZE * 0.5, SIZE * 0.5, SIZE * 0.5);
+
+        CTX.setFill(new LinearGradient(0, 0.583333 * SIZE, 0, SIZE,
+                                       false, CycleMethod.NO_CYCLE,
+                                       new Stop(0, Color.rgb(53, 53, 53)),
+                                       new Stop(1, Color.rgb(45, 45, 45))));
+        CTX.fillRect(SIZE * 0.083333, SIZE * 0.583333, SIZE * 0.333333, SIZE * 0.416666);
+
+        final Image        PATTERN_IMAGE = CANVAS.snapshot(new SnapshotParameters(), null);
+        final ImagePattern PATTERN       = new ImagePattern(PATTERN_IMAGE, 0, 0, SIZE, SIZE, false);
+
+        return PATTERN;
     }
 }

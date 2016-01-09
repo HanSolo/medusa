@@ -17,8 +17,13 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.tools.ConicalGradient;
+import eu.hansolo.medusa.tools.Helper;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderImage;
@@ -29,6 +34,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
@@ -278,6 +284,11 @@ public enum GaugeDesign {
                 return Color.BLACK;
             }
         },
+        CARBON() {
+            @Override public Paint getPaint(final double X1, final double Y1, final double X2, final double Y2) {
+                return Helper.createCarbonPattern();
+            }
+        },
         TRANSPARENT() {
             @Override public Paint getPaint(final double X1, final double Y1, final double X2, final double Y2) {
                 return Color.TRANSPARENT;
@@ -287,7 +298,7 @@ public enum GaugeDesign {
         public abstract Paint getPaint(final double X1, final double Y1, final double X2, final double Y2);
     }
 
-    final public double FRAME_FACTOR;
+    public final double FRAME_FACTOR;
 
     public abstract Border getBorder(final double SIZE);
 
