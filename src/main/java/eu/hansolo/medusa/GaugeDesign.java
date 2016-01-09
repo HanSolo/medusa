@@ -16,7 +16,13 @@
 
 package eu.hansolo.medusa;
 
+import eu.hansolo.medusa.tools.ConicalGradient;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderImage;
+import javafx.scene.layout.BorderRepeat;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
@@ -24,6 +30,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 
 
@@ -31,59 +38,240 @@ import javafx.scene.paint.Stop;
  * Created by hansolo on 18.12.15.
  */
 public enum GaugeDesign {
-    STEEL_SERIES_METAL(0.08333333) {
-        public BorderStroke[] getBorderStrokes(final double SIZE) {
+    METAL(0.08333333) {
+        @Override public Border getBorder(final double SIZE) {
+            double fromX = 0;
+            double fromY = 0;
+            double toX   = 0;
+            double toY   = SIZE;
+            Stop[] stops = {
+                new Stop(0, Color.rgb(254, 254, 254)),
+                new Stop(0.07, Color.rgb(210, 210, 210)),
+                new Stop(0.12, Color.rgb(179,179,179)),
+                new Stop(1.0, Color.rgb(213,213,213))
+            };
             BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
-            BorderStroke innerBorder = new BorderStroke(new LinearGradient(0, 0, 0, SIZE, false, CycleMethod.NO_CYCLE,
-                                                                           new Stop(0, Color.rgb(254, 254, 254)),
-                                                                           new Stop(0.07, Color.rgb(210, 210, 210)),
-                                                                           new Stop(0.12, Color.rgb(179,179,179)),
-                                                                           new Stop(1.0, Color.rgb(213,213,213))),
+            BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
                                                         BorderStrokeStyle.SOLID,
                                                         new CornerRadii(1024),
                                                         BorderWidths.FULL,
                                                         new Insets(0.0037037 * SIZE));
             BorderStroke bodyStroke  = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
-            return new BorderStroke[] {outerBorder, innerBorder, bodyStroke };
+            return new Border(outerBorder, innerBorder, bodyStroke);
         }
     },
-    STEEL_SERIES_STEEL(0.08333333) {
-        public BorderStroke[] getBorderStrokes(final double SIZE) {
+    TILTED_GRAY(0.08333333) {
+        @Override public Border getBorder(final double SIZE) {
+            double fromX = 0.2336448598130841 * SIZE;
+            double fromY = 0.08411214953271028 * SIZE;
+            double toX   = (0.2336448598130841 + 0.5789369637935792) * SIZE;
+            double toY   = (0.08411214953271028 + 0.8268076708711319) * SIZE;
+            Stop[] stops = {
+                new Stop(0.0, Color.WHITE),
+                new Stop(0.07, Color.rgb(210, 210, 210)),
+                new Stop(0.16, Color.rgb(179, 179, 179)),
+                new Stop(0.33, Color.WHITE),
+                new Stop(0.55, Color.rgb(197, 197, 197)),
+                new Stop(0.79, Color.WHITE),
+                new Stop(1.0, Color.rgb(102, 102, 102))
+            };
             BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
-            BorderStroke innerBorder = new BorderStroke(new LinearGradient(0, 0, 0, SIZE, false, CycleMethod.NO_CYCLE,
-                                                                           new Stop(0, Color.rgb(231,237,237)),
-                                                                           new Stop(0.03, Color.rgb(189,199,198)),
-                                                                           new Stop(0.06, Color.rgb(192,201,200)),
-                                                                           new Stop(0.48, Color.rgb(23,31,33)),
-                                                                           new Stop(0.93, Color.rgb(196,205,204)),
-                                                                           new Stop(0.96, Color.rgb(194,204,203)),
-                                                                           new Stop(1.00, Color.rgb(189,201,199))),
+            BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
                                                         BorderStrokeStyle.SOLID,
                                                         new CornerRadii(1024),
                                                         BorderWidths.FULL,
                                                         new Insets(0.0037037 * SIZE));
             BorderStroke bodyStroke  = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
-            return new BorderStroke[] {outerBorder, innerBorder, bodyStroke };
+            return new Border(outerBorder, innerBorder, bodyStroke);
+        }
+    }, TILTED_BLACK(0.08333333) {
+        @Override public Border getBorder(final double SIZE) {
+            double fromX = 0.2336448598130841 * SIZE;
+            double fromY = 0.08411214953271028 * SIZE;
+            double toX   = (0.2336448598130841 + 0.5789369637935792) * SIZE;
+            double toY   = (0.08411214953271028 + 0.8268076708711319) * SIZE;
+            Stop[] stops = {
+                new Stop(0.0, Color.rgb(102, 102, 102)),
+                new Stop(0.21, Color.BLACK),
+                new Stop(0.47, Color.rgb(102, 102, 102)),
+                new Stop(1.0, Color.BLACK)
+            };
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
+            BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        BorderWidths.FULL,
+                                                        new Insets(0.0037037 * SIZE));
+            BorderStroke bodyStroke  = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
+            return new Border(outerBorder, innerBorder, bodyStroke);
+        }
+    },
+    STEEL(0.08333333) {
+        @Override public Border getBorder(final double SIZE) {
+            double fromX = 0;
+            double fromY = 0;
+            double toX   = 0;
+            double toY   = SIZE;
+            Stop[] stops = {
+                new Stop(0, Color.rgb(231,237,237)),
+                new Stop(0.03, Color.rgb(189,199,198)),
+                new Stop(0.06, Color.rgb(192,201,200)),
+                new Stop(0.48, Color.rgb(23,31,33)),
+                new Stop(0.93, Color.rgb(196,205,204)),
+                new Stop(0.96, Color.rgb(194,204,203)),
+                new Stop(1.00, Color.rgb(189,201,199))
+            };
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
+            BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        BorderWidths.FULL,
+                                                        new Insets(0.0037037 * SIZE));
+            BorderStroke bodyStroke  = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
+            return new Border(outerBorder, innerBorder, bodyStroke);
+        }
+    },
+    BRASS(0.08333333) {
+        @Override public Border getBorder(final double SIZE) {
+            double fromX = 0;
+            double fromY = 0;
+            double toX   = 0;
+            double toY   = SIZE;
+            Stop[] stops = {
+                new Stop(0, Color.rgb(249, 243, 155)),
+                new Stop(0.05, Color.rgb(246, 226, 101)),
+                new Stop(0.10, Color.rgb(240, 225, 132)),
+                new Stop(0.50, Color.rgb(90, 57, 22)),
+                new Stop(0.90, Color.rgb(249, 237, 139)),
+                new Stop(0.95, Color.rgb(243, 226, 108)),
+                new Stop(1.00, Color.rgb(202, 182, 113))
+            };
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
+            BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        BorderWidths.FULL,
+                                                        new Insets(0.0037037 * SIZE));
+            BorderStroke bodyStroke  = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
+            return new Border(outerBorder, innerBorder, bodyStroke);
+        }
+    },
+    GOLD(0.08333333) {
+        @Override public Border getBorder(final double SIZE) {
+            double fromX = 0;
+            double fromY = 0;
+            double toX   = 0;
+            double toY   = SIZE;
+            Stop[] stops = {
+                new Stop(0.00, Color.rgb(255, 255, 207)),
+                new Stop(0.15, Color.rgb(255, 237, 96)),
+                new Stop(0.22, Color.rgb(254, 199, 57)),
+                new Stop(0.30, Color.rgb(255, 249, 203)),
+                new Stop(0.38, Color.rgb(255, 199, 64)),
+                new Stop(0.44, Color.rgb(252, 194, 60)),
+                new Stop(0.51, Color.rgb(255, 204, 59)),
+                new Stop(0.60, Color.rgb(213, 134, 29)),
+                new Stop(0.68, Color.rgb(255, 201, 56)),
+                new Stop(0.75, Color.rgb(212, 135, 29)),
+                new Stop(1.00, Color.rgb(247, 238, 101))
+            };
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
+            BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        BorderWidths.FULL,
+                                                        new Insets(0.0037037 * SIZE));
+            BorderStroke bodyStroke  = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
+            return new Border(outerBorder, innerBorder, bodyStroke);
+        }
+    },
+    BLACK_METAL(0.08333333) {
+        @Override public Border getBorder(final double SIZE) {
+            Stop[] stops = {
+                new Stop(0.0, Color.rgb(254, 254, 254)),
+                new Stop(0.125, Color.rgb(0, 0, 0)),
+                new Stop(0.347222, Color.rgb(153, 153, 153)),
+                new Stop(0.5, Color.rgb(0, 0, 0)),
+                new Stop(0.6805555, Color.rgb(153, 153, 153)),
+                new Stop(0.875, Color.rgb(0, 0, 0)),
+                new Stop(1.0, Color.rgb(254, 254, 254))
+            };
+            ConicalGradient gradient = new ConicalGradient(new Point2D(SIZE * 0.5, SIZE * 0.5), stops);
+            Image        image       = gradient.getImage(SIZE, SIZE);
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132, 132, 132), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
+            BorderImage  innerBorder = new BorderImage(image, BorderWidths.FULL, new Insets(0.0037037 * SIZE), BorderWidths.DEFAULT, true, BorderRepeat.STRETCH, BorderRepeat.STRETCH);
+            BorderStroke bodyStroke = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
+            return new Border(new BorderImage[]{innerBorder});
         }
     },
     ENZO(0.04814815) {
-        public BorderStroke[] getBorderStrokes(final double SIZE) {
+        @Override public Border getBorder(final double SIZE) {
             BorderStroke outerBorder     = new BorderStroke(new LinearGradient(0, 0, 0, SIZE, false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(224,224,224)), new Stop(0.26, Color.rgb(133,133,133)), new Stop(1.0, Color.rgb(84,84,84))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
             BorderStroke highlightBorder = new BorderStroke(new LinearGradient(0, 0.02222222 * SIZE, 0, (SIZE - 0.04444444 * SIZE), false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(255,255,255)), new Stop(0.50, Color.rgb(146,146,147)), new Stop(1.0, Color.rgb(135,136,138))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0.02222222 * SIZE));
             BorderStroke innerBorder     = new BorderStroke(new LinearGradient(0, 0.02592593 * SIZE, 0, (SIZE - 0.05185186 * SIZE), false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(71,72,72)), new Stop(0.50, Color.rgb(110,106,107)), new Stop(1.0, Color.rgb(186,185,187))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0.02592593 * SIZE));
             BorderStroke bodyStroke      = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
-            return new BorderStroke[] {outerBorder, highlightBorder, innerBorder, bodyStroke };
+            return new Border(outerBorder, highlightBorder, innerBorder, bodyStroke);
         }
     };
 
     public enum GaugeBackground {
-        DARK_GRAY,
-        RETRO
+        DARK_GRAY() {
+            @Override public Paint getPaint(final double X1, final double Y1, final double X2, final double Y2) {
+                Stop[] stops = {
+                    new Stop(0, Color.BLACK),
+                    new Stop(0.40, Color.rgb(51, 51, 51)),
+                    new Stop(1.0, Color.rgb(153,153,153))
+                };
+                return new LinearGradient(0, Y1, 0, Y2, false, CycleMethod.NO_CYCLE, stops);
+            }
+        },
+        BEIGE() {
+            @Override public Paint getPaint(final double X1, final double Y1, final double X2, final double Y2) {
+                Stop[] stops = {
+                    new Stop(0, Color.rgb(178, 172, 150)),
+                    new Stop(0.40, Color.rgb(204, 205, 184)),
+                    new Stop(1.0, Color.rgb(231, 231, 214))
+                };
+                return new LinearGradient(0, Y1, 0, Y2, false, CycleMethod.NO_CYCLE, stops);
+            }
+        },
+        ANTHRACITE() {
+            @Override public Paint getPaint(final double X1, final double Y1, final double X2, final double Y2) {
+                Stop[] stops = {
+                    new Stop(0, Color.rgb(50, 50, 54)),
+                    new Stop(0.40, Color.rgb(47, 47, 51)),
+                    new Stop(1.0, Color.rgb(69, 69, 74))
+                };
+                return new LinearGradient(0, Y1, 0, Y2, false, CycleMethod.NO_CYCLE, stops);
+            }
+        },
+        LIGHT_GRAY() {
+            @Override public Paint getPaint(final double X1, final double Y1, final double X2, final double Y2) {
+                Stop[] stops = {
+                    new Stop(0, Color.rgb(130, 130, 130)),
+                    new Stop(0.40, Color.rgb(181, 181, 181)),
+                    new Stop(1.0, Color.rgb(253, 253, 253))
+                };
+                return new LinearGradient(0, Y1, 0, Y2, false, CycleMethod.NO_CYCLE, stops);
+            }
+        },
+        WHITE() {
+            @Override public Paint getPaint(final double X1, final double Y1, final double X2, final double Y2) {
+                return Color.WHITE;
+            }
+        },
+        BLACK() {
+            @Override public Paint getPaint(final double X1, final double Y1, final double X2, final double Y2) {
+                return Color.BLACK;
+            }
+        };
+
+        public abstract Paint getPaint(final double X1, final double Y1, final double X2, final double Y2);
     }
 
-    final public double     FRAME_FACTOR;
+    final public double FRAME_FACTOR;
 
-    public abstract BorderStroke[] getBorderStrokes(final double SIZE);
+    public abstract Border getBorder(final double SIZE);
 
     GaugeDesign(final double FRAME_FACTOR) {
         this.FRAME_FACTOR = FRAME_FACTOR;

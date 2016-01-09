@@ -48,8 +48,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 
-import java.math.BigDecimal;
-import java.util.Locale;
 import java.util.Random;
 
 
@@ -282,7 +280,7 @@ public class Demo extends Application {
 
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO);
 
-        framedGauge2 = new FGauge(gauge2, GaugeDesign.STEEL_SERIES_METAL);
+        framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {

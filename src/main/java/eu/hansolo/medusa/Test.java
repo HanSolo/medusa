@@ -17,11 +17,13 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Gauge.ButtonEvent;
+import eu.hansolo.medusa.Gauge.LcdFont;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
+import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import eu.hansolo.medusa.Marker.MarkerType;
 import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
@@ -68,30 +70,35 @@ public class Test extends Application {
     @Override public void init() {
         gauge = GaugeBuilder.create()
                             .prefSize(500,500)
-                            .zeroColor(Color.YELLOW)
-                            .tickMarkColor(Color.WHITE)
-                            .tickLabelColor(Color.WHITE)
-                            .titleColor(Color.WHITE)
-                            .unitColor(Color.WHITE)
-                            .valueColor(Color.WHITE)
-                            .majorTickMarkType(TickMarkType.TRIANGLE)
-                            .sectionsVisible(true)
+                            //.zeroColor(Color.YELLOW)
+                            //.tickMarkColor(Color.WHITE)
+                            //.tickLabelColor(Color.WHITE)
+                            //.titleColor(Color.WHITE)
+                            //.unitColor(Color.WHITE)
+                            //.valueColor(Color.WHITE)
+                            //.majorTickMarkType(TickMarkType.TRIANGLE)
+                            //.sectionsVisible(true)
                             .sections(new Section(70, 90, Color.rgb(200, 0, 0, 0.5)))
-                            .areasVisible(true)
+                            //.areasVisible(true)
                             .areas(new Section(90, 100, Color.rgb(200, 0, 0, 0.75)))
                             .thresholdVisible(true)
                             .threshold(50)
                             .checkThreshold(true)
                             .onThresholdExceeded(e -> gauge.setLedBlinking(true))
+                            .valueVisible(false)
                             .onThresholdUnderrun(e -> gauge.setLedBlinking(false))
-                            .lcdVisible(true)
+                            //.lcdVisible(true)
+                            //.lcdDesign(LcdDesign.WHITE)
+                            //.lcdFont(LcdFont.STANDARD)
                             .ledVisible(true)
+                            .ledColor(Color.ORANGE)
                             .shadowsEnabled(true)
                             .animated(true)
+                            .knobColor(Color.rgb(90, 90, 90))
+                            .needleColor(Color.ORANGE)
                             .build();
 
-        framedGauge = new FGauge(gauge, GaugeDesign.STEEL_SERIES_STEEL);
-
+        framedGauge = new FGauge(gauge, GaugeDesign.TILTED_BLACK, GaugeBackground.BEIGE);
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {

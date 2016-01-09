@@ -25,6 +25,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.DoubleProperty;
@@ -833,7 +834,7 @@ public class Gauge extends Control {
         } else {
             knobColor.set(COLOR);
         }
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(RESIZE_EVENT);
     }
     public ObjectProperty<Color> knobColorProperty() {
         if (null == knobColor) { knobColor = new SimpleObjectProperty<>(Gauge.this, "knobColor", _knobColor); }
@@ -1204,7 +1205,7 @@ public class Gauge extends Control {
         } else {
             lcdDesign.set(DESIGN);
         }
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(RESIZE_EVENT);
     }
     public ObjectProperty<LcdDesign> lcdDesignProperty() {
         if (null == lcdDesign) { lcdDesign = new SimpleObjectProperty<>(Gauge.this, "lcdDesign", _lcdDesign); }

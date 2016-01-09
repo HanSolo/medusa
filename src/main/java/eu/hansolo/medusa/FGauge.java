@@ -19,7 +19,6 @@ package eu.hansolo.medusa;
 import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.InnerShadow;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -135,44 +134,16 @@ public class FGauge extends Region {
             }
 
             frame.setPrefSize(size, size);
-            frame.setBorder(new Border(gaugeDesign.getBorderStrokes(size)));
+            frame.setBorder(gaugeDesign.getBorder(size));
 
             background.setCenterX(size * 0.5);
             background.setCenterY(size * 0.5);
             background.setRadius(size * 0.4375);
 
-            switch (gaugeBackground) {
-                case RETRO:
-
-                    break;
-                case DARK_GRAY:
-                default:
-                    background.setFill(new LinearGradient(0, background.getLayoutBounds().getMinY(), 0, background.getLayoutBounds().getMaxY(), false, CycleMethod.NO_CYCLE,
-                                                          new Stop(0, Color.BLACK), new Stop(0.39, Color.rgb(50,50,50)), new Stop(0.40, Color.rgb(51, 51, 51)), new Stop(1.0, Color.rgb(153,153,153))));
-                    break;
-            }
+            background.setFill(gaugeBackground.getPaint(background.getLayoutBounds().getMinX(), background.getLayoutBounds().getMinY(),
+                                                        background.getLayoutBounds().getMaxX(), background.getLayoutBounds().getMaxY()));
 
             switch(gaugeDesign) {
-                case STEEL_SERIES_METAL:
-                    innerShadow.setColor(Color.rgb(0, 0, 0, 0.65));
-                    innerShadow.setRadius(0.08 * size);
-                    innerShadow.setOffsetX(0);
-                    innerShadow.setOffsetY(0.0 * size);
-                    foreground.setFill(new RadialGradient(0, 0, size * 0.5, size * gaugeDesign.FRAME_FACTOR * 0.5, size * 0.4, false, CycleMethod.NO_CYCLE,
-                                                          new Stop(0, Color.rgb(255, 255, 255, 0.6)),
-                                                          new Stop(1, Color.rgb(255, 255, 255, 0))));
-                    foreground.setStroke(null);
-                    break;
-                case STEEL_SERIES_STEEL:
-                    innerShadow.setColor(Color.rgb(0, 0, 0, 0.65));
-                    innerShadow.setRadius(0.08 * size);
-                    innerShadow.setOffsetX(0);
-                    innerShadow.setOffsetY(0.0 * size);
-                    foreground.setFill(new RadialGradient(0, 0, size * 0.5, size * gaugeDesign.FRAME_FACTOR * 0.5, size * 0.4, false, CycleMethod.NO_CYCLE,
-                                                          new Stop(0, Color.rgb(255, 255, 255, 0.6)),
-                                                          new Stop(1, Color.rgb(255, 255, 255, 0))));
-                    foreground.setStroke(null);
-                    break;
                 case ENZO:
                     background.setFill(Color.rgb(240, 240, 240));
                     innerShadow.setRadius(0.07407407 * size);
@@ -180,6 +151,16 @@ public class FGauge extends Region {
                     innerShadow.setOffsetY(0.07407407 * size);
                     innerShadow.setColor(Color.rgb(0, 0, 0, 0.35));
                     foreground.setFill(Color.TRANSPARENT);
+                    foreground.setStroke(null);
+                    break;
+                default:
+                    innerShadow.setColor(Color.rgb(0, 0, 0, 0.65));
+                    innerShadow.setRadius(0.08 * size);
+                    innerShadow.setOffsetX(0);
+                    innerShadow.setOffsetY(0.0 * size);
+                    foreground.setFill(new RadialGradient(0, 0, size * 0.5, size * gaugeDesign.FRAME_FACTOR * 0.5, size * 0.4, false, CycleMethod.NO_CYCLE,
+                                                          new Stop(0, Color.rgb(255, 255, 255, 0.6)),
+                                                          new Stop(1, Color.rgb(255, 255, 255, 0))));
                     foreground.setStroke(null);
                     break;
             }

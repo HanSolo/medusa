@@ -272,6 +272,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         handleEvents("INTERACTIVITY");
 
+        handleEvents("VISIBILITY");
+
         needleRotate.angleProperty().addListener(observable -> handleEvents("ANGLE"));
     }
 
@@ -1251,6 +1253,30 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
 
 
+            if (getSkinnable().isLcdVisible()) {
+                LcdDesign lcdDesign = getSkinnable().getLcdDesign();
+                LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
+                                                                false, CycleMethod.NO_CYCLE,
+                                                                new Stop(0, lcdDesign.BG0),
+                                                                new Stop(0.03, lcdDesign.BG1),
+                                                                new Stop(0.5, lcdDesign.BG2),
+                                                                new Stop(0.5, lcdDesign.BG3),
+                                                                new Stop(1.0, lcdDesign.BG4));
+                Paint lcdFramePaint;
+                if (lcdDesign.name().startsWith("FLAT")) {
+                    lcdFramePaint = Color.WHITE;
+                } else {
+                    lcdFramePaint = new LinearGradient(0, 0, 0, lcd.getHeight(),
+                                                       false, CycleMethod.NO_CYCLE,
+                                                       new Stop(0.0, Color.rgb(26, 26, 26)),
+                                                       new Stop(0.01, Color.rgb(77, 77, 77)),
+                                                       new Stop(0.99, Color.rgb(77, 77, 77)),
+                                                       new Stop(1.0, Color.rgb(221, 221, 221)));
+                }
+                lcd.setFill(lcdGradient);
+                lcd.setStroke(lcdFramePaint);
+            }
+
             double needleWidth  = size * getSkinnable().getNeedleSize().FACTOR;
             double needleHeight = TickLabelLocation.OUTSIDE == getSkinnable().getTickLabelLocation() ? size * 0.3965 : size * 0.455;
 
@@ -1323,8 +1349,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        LcdDesign lcdDesign = getSkinnable().getLcdDesign();
-
         shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
 
         background.setStroke(getSkinnable().getBorderPaint());
@@ -1336,7 +1360,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         subTitleText.setFill(getSkinnable().getSubTitleColor());
 
-        valueText.setFill(getSkinnable().isLcdVisible() ? lcdDesign.FG : getSkinnable().getValueColor());
+        valueText.setFill(getSkinnable().isLcdVisible() ? getSkinnable().getLcdDesign().FG : getSkinnable().getValueColor());
 
         resizeText();
 
@@ -1352,28 +1376,5 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdTooltip.setText("Threshold\n(" + String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getThreshold()) + ")");
 
         if (getSkinnable().isLedVisible()) drawLed(led);
-
-        if (getSkinnable().isLcdVisible()) {
-            LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
-                                                            false, CycleMethod.NO_CYCLE,
-                                                            new Stop(0, lcdDesign.BG0),
-                                                            new Stop(0.03, lcdDesign.BG1),
-                                                            new Stop(0.5, lcdDesign.BG2),
-                                                            new Stop(0.5, lcdDesign.BG3),
-                                                            new Stop(1.0, lcdDesign.BG4));
-            Paint lcdFramePaint;
-            if (lcdDesign.name().startsWith("FLAT")) {
-                lcdFramePaint = Color.WHITE;
-            } else {
-                lcdFramePaint = new LinearGradient(0, 0, 0, lcd.getHeight(),
-                                                   false, CycleMethod.NO_CYCLE,
-                                                   new Stop(0.0, Color.rgb(26, 26, 26)),
-                                                   new Stop(0.01, Color.rgb(77, 77, 77)),
-                                                   new Stop(0.99, Color.rgb(77, 77, 77)),
-                                                   new Stop(1.0, Color.rgb(221, 221, 221)));
-            }
-            lcd.setFill(lcdGradient);
-            lcd.setStroke(lcdFramePaint);
-        }
     }
 }
