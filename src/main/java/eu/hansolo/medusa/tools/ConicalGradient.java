@@ -178,6 +178,47 @@ public class ConicalGradient {
         return RASTER;
     }
 
+    public Image getRoundImage(final double SIZE) {
+        int   size  = (int) SIZE  <= 0 ? 100 : (int) SIZE;
+        Color color = Color.TRANSPARENT;
+        final WritableImage RASTER       = new WritableImage(size, size);
+        final PixelWriter   PIXEL_WRITER = RASTER.getPixelWriter();
+        if (null == center) { center = new Point2D(size * 0.5, size * 0.5); }
+        double radius = size * 0.5;
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                double dx = x - center.getX();
+                double dy = y - center.getY();
+                double distance = Math.sqrt((dx * dx) + (dy * dy));
+                distance = Double.compare(distance, 0) == 0 ? 1 : distance;
+
+                double angle = Math.abs(Math.toDegrees(Math.acos(dx / distance)));
+
+                if (dx >= 0 && dy <= 0) {
+                    angle = 90.0 - angle;
+                } else if (dx >= 0 && dy >= 0) {
+                    angle += 90.0;
+                } else if (dx <= 0 && dy >= 0) {
+                    angle += 90.0;
+                } else if (dx <= 0 && dy <= 0) {
+                    angle = 450.0 - angle;
+                }
+                if (distance > radius) {
+                    color = Color.TRANSPARENT;
+                } else {
+                    for (int i = 0; i < (sortedStops.size() - 1); i++) {
+                        if (angle >= (sortedStops.get(i).getOffset() * 360) && angle < (sortedStops.get(i + 1).getOffset() * 360)) {
+                            double fraction = (angle - sortedStops.get(i).getOffset() * 360) / ((sortedStops.get(i + 1).getOffset() - sortedStops.get(i).getOffset()) * 360);
+                            color = (Color) Interpolator.LINEAR.interpolate(sortedStops.get(i).getColor(), sortedStops.get(i + 1).getColor(), fraction);
+                        }
+                    }
+                }
+                PIXEL_WRITER.setColor(x, y, color);
+            }
+        }
+        return RASTER;
+    }
+
     public ImagePattern apply(final Shape SHAPE) {
         double x      = SHAPE.getLayoutBounds().getMinX();
         double y      = SHAPE.getLayoutBounds().getMinY();
