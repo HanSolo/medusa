@@ -1330,12 +1330,12 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             knob.setCenterX(center);
             knob.setCenterY(center);
             knob.setRadius(size * 0.05);
-
+            
             knobOuterGradient = new LinearGradient(0, size * 0.468, 0, size * 0.532,
                                                    false, CycleMethod.NO_CYCLE,
-                                                   new Stop(0.0, getSkinnable().getKnobColor().brighter().brighter()),
-                                                   new Stop(0.52, getSkinnable().getKnobColor()),
-                                                   new Stop(1.0, getSkinnable().getKnobColor().darker().darker()));
+                                                   new Stop(0.0, Color.rgb(133, 133, 133).brighter().brighter()),
+                                                   new Stop(0.52, Color.rgb(133, 133, 133)),
+                                                   new Stop(1.0, Color.rgb(133, 133, 133).darker().darker()));
 
             knobInnerGradient = new LinearGradient(0, size * 0.473, 0, size * 0.527,
                                                    false, CycleMethod.NO_CYCLE,
