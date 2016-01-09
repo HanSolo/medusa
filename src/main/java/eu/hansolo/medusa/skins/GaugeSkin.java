@@ -333,6 +333,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             valueText.setManaged(getSkinnable().isValueVisible());
             valueText.setVisible(getSkinnable().isValueVisible());
 
+            lcd.setManaged(getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
+            lcd.setVisible(getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
+
             markerMap.values().forEach(shape -> {
                 shape.setManaged(getSkinnable().areMarkersVisible());
                 shape.setVisible(getSkinnable().areMarkersVisible());
@@ -1253,7 +1256,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
 
 
-            if (getSkinnable().isLcdVisible()) {
+            if (getSkinnable().isLcdVisible() && getSkinnable().isValueVisible()) {
                 LcdDesign lcdDesign = getSkinnable().getLcdDesign();
                 LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
                                                                 false, CycleMethod.NO_CYCLE,

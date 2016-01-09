@@ -85,20 +85,16 @@ public class Test extends Application {
                             .threshold(50)
                             .checkThreshold(true)
                             .onThresholdExceeded(e -> gauge.setLedBlinking(true))
-                            .valueVisible(false)
                             .onThresholdUnderrun(e -> gauge.setLedBlinking(false))
-                            //.lcdVisible(true)
-                            //.lcdDesign(LcdDesign.WHITE)
-                            //.lcdFont(LcdFont.STANDARD)
+                            .lcdVisible(true)
+                            .lcdDesign(LcdDesign.WHITE)
+                            .lcdFont(LcdFont.STANDARD)
                             .ledVisible(true)
-                            .ledColor(Color.ORANGE)
                             .shadowsEnabled(true)
                             .animated(true)
-                            .knobColor(Color.rgb(90, 90, 90))
-                            .needleColor(Color.ORANGE)
                             .build();
 
-        framedGauge = new FGauge(gauge, GaugeDesign.TILTED_BLACK, GaugeBackground.BEIGE);
+        framedGauge = new FGauge(gauge, GaugeDesign.METAL, GaugeBackground.WHITE);
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
