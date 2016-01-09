@@ -92,6 +92,7 @@ public class Gauge extends Control {
             this.FACTOR = FACTOR;
         }
     }
+    public enum KnobType { STANDARD, METAL }
     public enum TickLabelOrientation { ORTHOGONAL,  HORIZONTAL, TANGENT }
     public enum TickMarkType { LINE, DOT, TRIANGLE, DIAMOND, TICK_LABEL }
     public enum NumberFormat {
@@ -189,6 +190,8 @@ public class Gauge extends Control {
     private ObjectProperty<Paint>                foregroundPaint;
     private Color                                _knobColor;
     private ObjectProperty<Color>                knobColor;
+    private KnobType                             _knobType;
+    private ObjectProperty<KnobType>             knobType;
     private boolean                              _animated;
     private BooleanProperty                      animated;
     private long                                 animationDuration;
@@ -396,6 +399,7 @@ public class Gauge extends Control {
         _borderPaint                   = Color.TRANSPARENT;
         _foregroundPaint               = Color.TRANSPARENT;
         _knobColor                     = Color.rgb(133, 133, 133);
+        _knobType                      = KnobType.STANDARD;
         _animated                      = false;
         animationDuration              = 800;
         _startAngle                    = 320;
@@ -841,6 +845,20 @@ public class Gauge extends Control {
         return knobColor;
     }
 
+    public KnobType getKnobType() { return null == knobType ? _knobType : knobType.get(); }
+    public void setKnobType(final KnobType TYPE) {
+        if (null == knobType) {
+            _knobType = TYPE;
+        } else {
+            knobType.set(TYPE);
+        }
+        fireUpdateEvent(RESIZE_EVENT);
+    }
+    public ObjectProperty<KnobType> knobTypeProperty() {
+        if (null == knobType) { knobType = new SimpleObjectProperty<>(Gauge.this, "knobType", _knobType); }
+        return knobType;
+    }
+    
     public boolean isAnimated() { return null == animated ? _animated : animated.get(); }
     public void setAnimated(final boolean ANIMATED) {
         if (null == animated) {

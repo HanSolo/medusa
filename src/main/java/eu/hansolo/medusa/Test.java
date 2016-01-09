@@ -17,6 +17,7 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Gauge.ButtonEvent;
+import eu.hansolo.medusa.Gauge.KnobType;
 import eu.hansolo.medusa.Gauge.LcdFont;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
@@ -71,11 +72,11 @@ public class Test extends Application {
         gauge = GaugeBuilder.create()
                             .prefSize(500,500)
                             //.zeroColor(Color.YELLOW)
-                            //.tickMarkColor(Color.WHITE)
-                            //.tickLabelColor(Color.WHITE)
-                            //.titleColor(Color.WHITE)
-                            //.unitColor(Color.WHITE)
-                            //.valueColor(Color.WHITE)
+                            .tickMarkColor(Color.WHITE)
+                            .tickLabelColor(Color.WHITE)
+                            .titleColor(Color.WHITE)
+                            .unitColor(Color.WHITE)
+                            .valueColor(Color.WHITE)
                             //.majorTickMarkType(TickMarkType.TRIANGLE)
                             //.sectionsVisible(true)
                             .sections(new Section(70, 90, Color.rgb(200, 0, 0, 0.5)))
@@ -91,10 +92,11 @@ public class Test extends Application {
                             .lcdFont(LcdFont.STANDARD)
                             .ledVisible(true)
                             .shadowsEnabled(true)
+                            .knobType(KnobType.METAL)
                             .animated(true)
                             .build();
 
-        framedGauge = new FGauge(gauge, GaugeDesign.BLACK_METAL, GaugeBackground.BEIGE);
+        framedGauge = new FGauge(gauge, GaugeDesign.METAL, GaugeBackground.DARK_GRAY);
         framedGauge.setForegroundVisible(false);
 
         lastTimerCall = System.nanoTime();

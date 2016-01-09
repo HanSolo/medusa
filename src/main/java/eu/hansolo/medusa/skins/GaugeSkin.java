@@ -111,7 +111,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private CubicCurveTo             needleCubicCurveTo6;
     private ClosePath                needleClosePath7;
     private Rotate                   needleRotate;
-    private Circle                   knob;
+    //private Circle                   knob;
+    private Canvas                   knobCanvas;
+    private GraphicsContext          knob;
     private LinearGradient           knobOuterGradient;
     private LinearGradient           knobInnerGradient;
     private Group                    shadowGroup;
@@ -202,8 +204,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         buttonTooltip    = new Tooltip();
         buttonTooltip.setTextAlignment(TextAlignment.CENTER);
 
-        knob = new Circle();
-        knob.setPickOnBounds(false);
+        knobCanvas = new Canvas();
+        knob = knobCanvas.getGraphicsContext2D();
+        knobCanvas.setPickOnBounds(false);
 
         dropShadow = new DropShadow();
         dropShadow.setColor(Color.rgb(0, 0, 0, 0.25));
@@ -211,7 +214,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dropShadow.setRadius(0.015 * PREFERRED_WIDTH);
         dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
 
-        shadowGroup = new Group(needle, knob);
+        shadowGroup = new Group(needle, knobCanvas);
         shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
 
         titleText = new Text(getSkinnable().getTitle());
@@ -361,16 +364,16 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             redraw();
         } else if ("INTERACTIVITY".equals(EVENT_TYPE)) {
             if (getSkinnable().isInteractive()) {
-                knob.setOnMousePressed(mouseHandler);
-                knob.setOnMouseReleased(mouseHandler);
+                knobCanvas.setOnMousePressed(mouseHandler);
+                knobCanvas.setOnMouseReleased(mouseHandler);
                 if (!getSkinnable().getButtonTooltipText().isEmpty()) {
                     buttonTooltip.setText(getSkinnable().getButtonTooltipText());
-                    Tooltip.install(knob, buttonTooltip);
+                    Tooltip.install(knobCanvas, buttonTooltip);
                 }
             } else {
-                knob.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseHandler);
-                knob.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseHandler);
-                Tooltip.uninstall(knob, buttonTooltip);
+                knobCanvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseHandler);
+                knobCanvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseHandler);
+                Tooltip.uninstall(knobCanvas, buttonTooltip);
             }
         }
     }
@@ -1118,6 +1121,59 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         });
     }
 
+    private void drawKnob(final GraphicsContext CTX) {
+        double x = 0;
+        double y = 0;
+        double w = knobCanvas.getWidth();
+        double h = knobCanvas.getHeight();
+        CTX.clearRect(x, y, w, h);
+
+        x += 1;
+        y += 1;
+        w -= 2;
+        h -= 2;
+
+        switch (getSkinnable().getKnobType()) {
+            case METAL:
+                CTX.setFill(new LinearGradient(0, y, 0, h, false, CycleMethod.NO_CYCLE,
+                                               new Stop(0.0, Color.rgb(180,180,180)),
+                                               new Stop(0.46, Color.rgb(63,63,63)),
+                                               new Stop(1.0, Color.rgb(40,40,40))));
+                CTX.fillOval(x, y, w, h);
+
+                CTX.setFill(new LinearGradient(0, y, 0, h, false, CycleMethod.NO_CYCLE,
+                                               new Stop(0.0, Color.rgb(215,215,215)),
+                                               new Stop(0.01, Color.rgb(213,213,213)),
+                                               new Stop(0.5, Color.rgb(116,116,116)),
+                                               new Stop(0.51, Color.rgb(117,117,117)),
+                                               new Stop(1.0, Color.rgb(215,215,215))));
+                CTX.fillOval(x + w * 0.11764706, y + h * 0.11764706, w - w * 0.23529412, h - h * 0.23529412);
+
+                CTX.setFill(new RadialGradient(0, 0, x + 0.5 * w, y + 0.47 * h, w * 0.38, false, CycleMethod.NO_CYCLE,
+                                               new Stop(0, Color.TRANSPARENT),
+                                               new Stop(0.76, Color.TRANSPARENT),
+                                               new Stop(1.0, Color.rgb(0, 0, 0, 0.2))));
+                CTX.fillOval(x + w * 0.11764706, y + h * 0.11764706, w - w * 0.23529412, h - h * 0.23529412);
+                break;
+            case STANDARD:
+            default:
+                CTX.setFill(new LinearGradient(0, y, 0, h,
+                                                       false, CycleMethod.NO_CYCLE,
+                                                       new Stop(0.0, Color.rgb(133, 133, 133).brighter().brighter()),
+                                                       new Stop(0.52, Color.rgb(133, 133, 133)),
+                                                       new Stop(1.0, Color.rgb(133, 133, 133).darker().darker())));
+                CTX.fillOval(x, y, w, h);
+
+                CTX.setFill(new LinearGradient(0, y + size * 0.005, 0, h - size * 0.01,
+                                                       false, CycleMethod.NO_CYCLE,
+                                                       new Stop(0.0, getSkinnable().getKnobColor().brighter()),
+                                                       new Stop(0.45, getSkinnable().getKnobColor()),
+                                                       new Stop(1.0, getSkinnable().getKnobColor().darker())));
+                CTX.fillOval(y + size * 0.005, x + size * 0.005, w - size * 0.01, h - size * 0.01);
+                break;
+        }
+    }
+
     private double clamp(final double MIN_VALUE, final double MAX_VALUE, final double VALUE) {
         if (VALUE < MIN_VALUE) return MIN_VALUE;
         if (VALUE > MAX_VALUE) return MAX_VALUE;
@@ -1327,25 +1383,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
             needleRotate.setPivotY(needle.getLayoutBounds().getHeight());
 
-            knob.setCenterX(center);
-            knob.setCenterY(center);
-            knob.setRadius(size * 0.05);
-            
-            knobOuterGradient = new LinearGradient(0, size * 0.468, 0, size * 0.532,
-                                                   false, CycleMethod.NO_CYCLE,
-                                                   new Stop(0.0, Color.rgb(133, 133, 133).brighter().brighter()),
-                                                   new Stop(0.52, Color.rgb(133, 133, 133)),
-                                                   new Stop(1.0, Color.rgb(133, 133, 133).darker().darker()));
-
-            knobInnerGradient = new LinearGradient(0, size * 0.473, 0, size * 0.527,
-                                                   false, CycleMethod.NO_CYCLE,
-                                                   new Stop(0.0, getSkinnable().getKnobColor().brighter()),
-                                                   new Stop(0.45, getSkinnable().getKnobColor()),
-                                                   new Stop(1.0, getSkinnable().getKnobColor().darker()));
-
-            knob.setStrokeWidth(size * 0.005);
-            knob.setStroke(knobOuterGradient);
-            knob.setFill(knobInnerGradient);
+            knobCanvas.setWidth(size * 0.1);
+            knobCanvas.setHeight(size * 0.1);
+            knobCanvas.relocate(center - size * 0.05, center - size * 0.05);
 
             buttonTooltip.setText(getSkinnable().getButtonTooltipText());
         }
@@ -1374,6 +1414,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         drawTickMarks(ticksAndSections);
         ticksAndSectionsCanvas.setCache(true);
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
+
+        drawKnob(knob);
 
         drawMarkers();
         thresholdTooltip.setText("Threshold\n(" + String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getThreshold()) + ")");

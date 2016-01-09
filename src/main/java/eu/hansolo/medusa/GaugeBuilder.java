@@ -16,6 +16,7 @@
 
 package eu.hansolo.medusa;
 
+import eu.hansolo.medusa.Gauge.KnobType;
 import eu.hansolo.medusa.Gauge.LcdFont;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.NeedleType;
@@ -169,6 +170,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B knobColor(final Color COLOR) {
         properties.put("knobColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
+    public final B knobType(final KnobType TYPE) {
+        properties.put("knobType", new SimpleObjectProperty<>(TYPE));
         return (B)this;
     }
 
@@ -806,6 +812,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setForegroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
             } else if ("knobColor".equals(key)) {
                 CONTROL.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("knobType".equals(key)) {
+                CONTROL.setKnobType(((ObjectProperty<KnobType>) properties.get(key)).get());
             } else if("animated".equals(key)) {
                 CONTROL.setAnimated(((BooleanProperty) properties.get(key)).get());
             } else if("animationDuration".equals(key)) {
