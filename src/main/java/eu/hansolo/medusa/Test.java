@@ -19,6 +19,8 @@ package eu.hansolo.medusa;
 import eu.hansolo.medusa.Gauge.ButtonEvent;
 import eu.hansolo.medusa.Gauge.KnobType;
 import eu.hansolo.medusa.Gauge.LcdFont;
+import eu.hansolo.medusa.Gauge.LedType;
+import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.TickLabelLocation;
@@ -71,7 +73,10 @@ public class Test extends Application {
     @Override public void init() {
         gauge = GaugeBuilder.create()
                             .prefSize(500,500)
+                            .backgroundPaint(Color.rgb(90,90,90))
                             //.zeroColor(Color.YELLOW)
+                            .mediumTickMarksVisible(false)
+                            .minorTickMarksVisible(false)
                             .tickMarkColor(Color.WHITE)
                             .tickLabelColor(Color.WHITE)
                             .titleColor(Color.WHITE)
@@ -79,7 +84,7 @@ public class Test extends Application {
                             .valueColor(Color.WHITE)
                             .majorTickMarkType(TickMarkType.TRIANGLE)
                             .sectionsVisible(true)
-                            .sections(new Section(80, 100, Color.rgb(200, 0, 0, 0.5)))
+                            .sections(new Section(80, 100, Color.ORANGE))
                             //.areasVisible(true)
                             .areas(new Section(90, 100, Color.rgb(200, 0, 0, 0.75)))
                             .thresholdVisible(true)
@@ -88,18 +93,23 @@ public class Test extends Application {
                             .onThresholdExceeded(e -> gauge.setLedBlinking(true))
                             .onThresholdUnderrun(e -> gauge.setLedBlinking(false))
                             .lcdVisible(true)
-                            .lcdDesign(LcdDesign.WHITE)
+                            .lcdDesign(LcdDesign.FLAT_ORANGE)
                             .lcdFont(LcdFont.STANDARD)
                             .ledVisible(true)
-                            .shadowsEnabled(true)
-                            .knobType(KnobType.METAL)
+                            //.shadowsEnabled(true)
+                            .needleShape(NeedleShape.FLAT)
+                            .knobType(KnobType.FLAT)
+                            .knobColor(Color.ORANGE)
+                            .ledType(LedType.FLAT)
+                            .ledColor(Color.ORANGE)
                             .interactive(true)
                             .onButtonPressed(e -> System.out.println("Pressed"))
                             .onButtonReleased(e -> System.out.println("Released"))
                             .animated(true)
                             .build();
 
-        framedGauge = new FGauge(gauge, GaugeDesign.TILTED_GRAY, GaugeBackground.CARBON);
+        GaugeDesign.FLAT.frameColor = Color.ORANGE;
+        framedGauge = new FGauge(gauge, GaugeDesign.FLAT, GaugeBackground.TRANSPARENT);
         framedGauge.setForegroundVisible(false);
 
         lastTimerCall = System.nanoTime();
@@ -123,6 +133,8 @@ public class Test extends Application {
         stage.setTitle("Medusa");
         stage.setScene(scene);
         stage.show();
+
+        //gauge.setNeedleColor(Color.LIME);
 
         // Calculate number of nodes
         calcNoOfNodes(gauge);

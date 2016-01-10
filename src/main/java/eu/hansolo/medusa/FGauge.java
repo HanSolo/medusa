@@ -39,7 +39,7 @@ public class FGauge extends Region {
     public static final double MAXIMUM_HEIGHT   = 1024;
 
     // Model related
-    private Gauge                  gauge;
+    private Gauge           gauge;
 
     // View related
     private double          size;

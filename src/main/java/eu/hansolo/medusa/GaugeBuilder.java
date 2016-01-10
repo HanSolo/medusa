@@ -18,6 +18,8 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Gauge.KnobType;
 import eu.hansolo.medusa.Gauge.LcdFont;
+import eu.hansolo.medusa.Gauge.LedType;
+import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
@@ -208,6 +210,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B needleShape(final NeedleShape SHAPE) {
+        properties.put("needleShape", new SimpleObjectProperty<>(SHAPE));
+        return (B)this;
+    }
+
     public final B needleSize(final NeedleSize SIZE) {
         properties.put("needleSize", new SimpleObjectProperty<>(SIZE));
         return (B)this;
@@ -310,6 +317,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B ledColor(final Color COLOR) {
         properties.put("ledColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
+    public final B ledType(final LedType TYPE) {
+        properties.put("ledType", new SimpleObjectProperty<>(TYPE));
         return (B)this;
     }
 
@@ -824,6 +836,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setAngleRange(((DoubleProperty) properties.get(key)).get());
             } else if("needleType".equals(key)) {
                 CONTROL.setNeedleType(((ObjectProperty<NeedleType>) properties.get(key)).get());
+            } else if("needleShape".equals(key)) {
+                CONTROL.setNeedleShape(((ObjectProperty<NeedleShape>) properties.get(key)).get());
             } else if("needleSize".equals(key)) {
                 CONTROL.setNeedleSize(((ObjectProperty<NeedleSize>) properties.get(key)).get());
             } else if("needleColor".equals(key)) {
@@ -858,6 +872,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setStyle(((StringProperty) properties.get(key)).get());
             } else if("ledColor".equals(key)) {
                 CONTROL.setLedColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if("ledType".equals(key)) {
+                CONTROL.setLedType(((ObjectProperty<LedType>) properties.get(key)).get());
             } else if ("ledVisible".equals(key)) {
                 CONTROL.setLedVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("lcdVisible".equals(key)) {

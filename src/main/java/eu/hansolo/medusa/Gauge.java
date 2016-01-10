@@ -25,7 +25,6 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.DoubleProperty;
@@ -41,7 +40,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
@@ -71,19 +69,11 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 11.12.15.
  */
 public class Gauge extends Control {
-    public enum NeedleType {
-        STANDARD("needle-standard"),
-        NEEDLE_ONE("needle-one");
-
-        public final String  STYLE_CLASS;
-
-        NeedleType(final String STYLE_CLASS) {
-            this.STYLE_CLASS     = STYLE_CLASS;
-        }
-    }
+    public enum NeedleType { STANDARD }
+    public enum NeedleShape { ANGLED, ROUND, FLAT }
     public enum NeedleSize {
         THIN(0.015),
-        MEDIUM(0.025),
+        STANDARD(0.025),
         THICK(0.05);
 
         public final double FACTOR;
@@ -92,7 +82,8 @@ public class Gauge extends Control {
             this.FACTOR = FACTOR;
         }
     }
-    public enum KnobType { STANDARD, PLAIN, METAL }
+    public enum KnobType { STANDARD, PLAIN, METAL, FLAT }
+    public enum LedType { STANDARD, FLAT }
     public enum TickLabelOrientation { ORTHOGONAL,  HORIZONTAL, TANGENT }
     public enum TickMarkType { LINE, DOT, TRIANGLE, DIAMOND, TICK_LABEL }
     public enum NumberFormat {
@@ -233,6 +224,8 @@ public class Gauge extends Control {
     private IntegerProperty                      decimals;
     private NeedleType                           _needleType;
     private ObjectProperty<NeedleType>           needleType;
+    private NeedleShape                          _needleShape;
+    private ObjectProperty<NeedleShape>          needleShape;
     private NeedleSize                           _needleSize;
     private ObjectProperty<NeedleSize>           needleSize;
     private Color                                _needleColor;
@@ -245,6 +238,8 @@ public class Gauge extends Control {
     private ObjectProperty<LcdFont>              lcdFont;
     private Color                                _ledColor;
     private ObjectProperty<Color>                ledColor;
+    private LedType                              _ledType;
+    private ObjectProperty<LedType>              ledType;
     private Color                                _titleColor;
     private ObjectProperty<Color>                titleColor;
     private Color                                _subTitleColor;
@@ -421,12 +416,14 @@ public class Gauge extends Control {
         _numberFormat                  = NumberFormat.STANDARD;
         _decimals                      = 1;
         _needleType                    = NeedleType.STANDARD;
-        _needleSize                    = NeedleSize.MEDIUM;
+        _needleShape                   = NeedleShape.ANGLED;
+        _needleSize                    = NeedleSize.STANDARD;
         _needleColor                   = Color.rgb(200, 0, 0);
         _barColor                      = DARK_COLOR;
         _lcdDesign                     = LcdDesign.STANDARD;
         _lcdFont                       = LcdFont.DIGITAL_BOLD;
         _ledColor                      = Color.RED;
+        _ledType                       = LedType.STANDARD;
         _titleColor                    = DARK_COLOR;
         _subTitleColor                 = DARK_COLOR;
         _unitColor                     = DARK_COLOR;
@@ -1168,12 +1165,27 @@ public class Gauge extends Control {
         } else {
             needleType.set(TYPE);
         }
+        fireUpdateEvent(RESIZE_EVENT);
     }
     public ObjectProperty<NeedleType> needleTypeProperty() {
         if (null == needleType) { needleType = new SimpleObjectProperty<>(Gauge.this, "needleType", _needleType); }
         return needleType;
     }
 
+    public NeedleShape getNeedleShape() { return null == needleShape ? _needleShape : needleShape.get(); }
+    public void setNeedleShape(final NeedleShape SHAPE) {
+        if (null == needleShape) {
+            _needleShape = SHAPE;
+        } else {
+            needleShape.set(SHAPE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public ObjectProperty<NeedleShape> needleShapeProperty() {
+        if (null == needleShape) { needleShape = new SimpleObjectProperty<>(Gauge.this, "needleShape", _needleShape); }
+        return needleShape;
+    }
+    
     public NeedleSize getNeedleSize() { return null == needleSize ? _needleSize : needleSize.get(); }
     public void setNeedleSize(final NeedleSize SIZE) {
         if (null == needleSize) {
@@ -1258,6 +1270,20 @@ public class Gauge extends Control {
         return ledColor;
     }
 
+    public LedType getLedType() { return null == ledType ? _ledType : ledType.get(); }
+    public void setLedType(final LedType TYPE) {
+        if (null == ledType) {
+            _ledType = TYPE;
+        } else {
+            ledType.set(TYPE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public ObjectProperty<LedType> ledTypeProperty() {
+        if (null == ledType) { ledType = new SimpleObjectProperty<>(Gauge.this, "ledType", _ledType); }
+        return ledType;
+    }
+    
     public Color getTitleColor() { return null == titleColor ? _titleColor : titleColor.get(); }
     public void setTitleColor(final Color COLOR) {
         if (null == titleColor) {

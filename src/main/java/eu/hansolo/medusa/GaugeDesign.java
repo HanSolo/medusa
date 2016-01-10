@@ -231,6 +231,27 @@ public enum GaugeDesign {
             BorderStroke innerBorder     = new BorderStroke(new LinearGradient(0, 0.02592593 * SIZE, 0, (SIZE - 0.05185186 * SIZE), false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(71,72,72)), new Stop(0.50, Color.rgb(110,106,107)), new Stop(1.0, Color.rgb(186,185,187))), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(FRAME_FACTOR * SIZE), new Insets(0.02592593 * SIZE));
             return new Border(outerBorder, highlightBorder, innerBorder);
         }
+    },
+    FLAT(0.08333333) {
+        @Override public Border getBorder(final double SIZE) {
+            double fromX = 0;
+            double fromY = 0;
+            double toX   = 0;
+            double toY   = SIZE;
+
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1), new Insets(0));
+            BorderStroke innerBorder = new BorderStroke(frameColor,
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        new BorderWidths(FRAME_FACTOR * SIZE),
+                                                        new Insets(0.0037037 * SIZE));
+            return new Border(outerBorder, innerBorder);
+        }
+    },
+    TRANSPARENT(0) {
+        @Override public Border getBorder(final double SIZE) {
+            return Border.EMPTY;
+        }
     };
 
     public enum GaugeBackground {
@@ -299,10 +320,12 @@ public enum GaugeDesign {
     }
 
     public final double FRAME_FACTOR;
+    public       Color  frameColor;
 
     public abstract Border getBorder(final double SIZE);
 
     GaugeDesign(final double FRAME_FACTOR) {
         this.FRAME_FACTOR = FRAME_FACTOR;
+        frameColor        = Color.TRANSPARENT;
     }
 }

@@ -17,6 +17,7 @@
 package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
+import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
@@ -59,6 +60,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -93,10 +95,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double                   ledSize;
     private InnerShadow              ledOnShadow;
     private InnerShadow              ledOffShadow;
-    private LinearGradient           frameGradient;
-    private LinearGradient           ledOnGradient;
-    private LinearGradient           ledOffGradient;
-    private RadialGradient           highlightGradient;
+    private Paint                    ledFramePaint;
+    private Paint                    ledOnPaint;
+    private Paint                    ledOffPaint;
+    private Paint                    ledHighlightPaint;
     private Canvas                   ledCanvas;
     private GraphicsContext          led;
     private Pane                     markerPane;
@@ -111,6 +113,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private CubicCurveTo             needleCubicCurveTo6;
     private ClosePath                needleClosePath7;
     private Rotate                   needleRotate;
+    private Paint                    needlePaint;
     private Canvas                   knobCanvas;
     private GraphicsContext          knob;
     private Group                    shadowGroup;
@@ -197,6 +200,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle              = new Path(needleMoveTo1, needleCubicCurveTo2, needleCubicCurveTo3, needleCubicCurveTo4, needleLineTo5, needleCubicCurveTo6, needleClosePath7);
         needle.setFillRule(FillRule.EVEN_ODD);
         needle.getTransforms().setAll(needleRotate);
+        needle.setStrokeType(StrokeType.INSIDE);
+        needle.setStroke(Color.TRANSPARENT);
 
         buttonTooltip    = new Tooltip();
         buttonTooltip.setTextAlignment(TextAlignment.CENTER);
@@ -344,7 +349,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             threshold.setManaged(getSkinnable().isThresholdVisible());
             threshold.setVisible(getSkinnable().isThresholdVisible());
         } else if ("LED_BLINK".equals(EVENT_TYPE)) {
-            if (getSkinnable().isLedVisible()) { drawLed(led); }
+            if (getSkinnable().isLedVisible()) { drawLed(); }
         } else if ("RECALC".equals(EVENT_TYPE)) {
             if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             angleStep = getSkinnable().getAngleStep();
@@ -402,8 +407,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needleRotate.setAngle(targetAngle);
     }
 
-    private void drawTickMarks(final GraphicsContext CTX) {
-        CTX.setLineCap(StrokeLineCap.BUTT);
+    private void drawTickMarks() {
+        ticksAndSections.setLineCap(StrokeLineCap.BUTT);
         double               sinValue;
         double               cosValue;
         double               startAngle           = getSkinnable().getStartAngle();
@@ -690,69 +695,69 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
 
             // Set the general tickmark color
-            CTX.setStroke(tickMarkColor);
-            CTX.setFill(tickMarkColor);
+            ticksAndSections.setStroke(tickMarkColor);
+            ticksAndSections.setFill(tickMarkColor);
 
             if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
                 // Draw major tick mark
                 isNotZero = Double.compare(0d, counter) != 0;
                 TickMarkType tickMarkType = null;
                 if (majorTickMarksVisible) {
-                    CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
-                    CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
-                    CTX.setLineWidth(size * 0.0055);
+                    ticksAndSections.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
+                    ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
+                    ticksAndSections.setLineWidth(size * 0.0055);
                     tickMarkType = majorTickMarkType;
                 } else if (minorTickMarksVisible) {
-                    CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
-                    CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
-                    CTX.setLineWidth(size * 0.00225);
+                    ticksAndSections.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
+                    ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
+                    ticksAndSections.setLineWidth(size * 0.00225);
                     tickMarkType = minorTickMarkType;
                 }
                 if (fullRange && !isNotZero) {
-                    CTX.setFill(zeroColor);
-                    CTX.setStroke(zeroColor);
+                    ticksAndSections.setFill(zeroColor);
+                    ticksAndSections.setStroke(zeroColor);
                 }
 
                 switch (tickMarkType) {
                     case TRIANGLE:
                         if (majorTickMarksVisible) {
-                            drawTriangle(CTX, triangleMajorInnerPoint1X, triangleMajorInnerPoint1Y, triangleMajorInnerPoint2X, triangleMajorInnerPoint2Y,
+                            drawTriangle(ticksAndSections, triangleMajorInnerPoint1X, triangleMajorInnerPoint1Y, triangleMajorInnerPoint2X, triangleMajorInnerPoint2Y,
                                          triangleMajorOuterPoint1X, triangleMajorOuterPoint1Y, triangleMajorOuterPoint2X, triangleMajorOuterPoint2Y);
                         } else if (minorTickMarksVisible) {
-                            drawTriangle(CTX, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
+                            drawTriangle(ticksAndSections, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
                                          triangleMinorOuterPoint1X, triangleMinorOuterPoint1Y, triangleMinorOuterPoint2X, triangleMinorOuterPoint2Y);
                         }
                         break;
                     case DOT:
                         if (majorTickMarksVisible) {
-                            drawDot(CTX, dotCenterX - majorHalfDotSize, dotCenterY - majorHalfDotSize, majorDotSize);
+                            drawDot(ticksAndSections, dotCenterX - majorHalfDotSize, dotCenterY - majorHalfDotSize, majorDotSize);
                         } else if (minorTickMarksVisible) {
-                            drawDot(CTX, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
+                            drawDot(ticksAndSections, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
                         }
                         break;
                     case TICK_LABEL:
                         if (majorTickMarksVisible) {
-                            CTX.save();
-                            CTX.translate(tickLabelTickMarkX, tickLabelTickMarkY);
+                            ticksAndSections.save();
+                            ticksAndSections.translate(tickLabelTickMarkX, tickLabelTickMarkY);
 
-                            Helper.rotateContextForText(CTX, startAngle, angle, tickLabelOrientation);
+                            Helper.rotateContextForText(ticksAndSections, startAngle, angle, tickLabelOrientation);
 
-                            CTX.setFont(isNotZero ? tickMarkFont : tickMarkZeroFont);
-                            CTX.setTextAlign(TextAlignment.CENTER);
-                            CTX.setTextBaseline(VPos.CENTER);
-                            CTX.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
-                            CTX.restore();
+                            ticksAndSections.setFont(isNotZero ? tickMarkFont : tickMarkZeroFont);
+                            ticksAndSections.setTextAlign(TextAlignment.CENTER);
+                            ticksAndSections.setTextBaseline(VPos.CENTER);
+                            ticksAndSections.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
+                            ticksAndSections.restore();
                         }
                         break;
                     case LINE:
                     default:
                         if (majorTickMarksVisible) {
-                            drawLine(CTX, innerPointX, innerPointY, outerPointX, outerPointY);
+                            drawLine(ticksAndSections, innerPointX, innerPointY, outerPointX, outerPointY);
                         } else if (minorTickMarksVisible) {
                             if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
-                                drawLine(CTX, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
+                                drawLine(ticksAndSections, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
                             } else {
-                                drawLine(CTX, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
+                                drawLine(ticksAndSections, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
                             }
                         }
                         break;
@@ -760,65 +765,65 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
                 // Draw tick label text
                 if (tickLabelsVisible) {
-                    CTX.save();
-                    CTX.translate(textPointX, textPointY);
+                    ticksAndSections.save();
+                    ticksAndSections.translate(textPointX, textPointY);
 
-                    Helper.rotateContextForText(CTX, startAngle, angle, tickLabelOrientation);
-                    CTX.setFont(isNotZero ? tickLabelFont : tickLabelZeroFont);
-                    CTX.setTextAlign(TextAlignment.CENTER);
-                    CTX.setTextBaseline(VPos.CENTER);
+                    Helper.rotateContextForText(ticksAndSections, startAngle, angle, tickLabelOrientation);
+                    ticksAndSections.setFont(isNotZero ? tickLabelFont : tickLabelZeroFont);
+                    ticksAndSections.setTextAlign(TextAlignment.CENTER);
+                    ticksAndSections.setTextBaseline(VPos.CENTER);
                     if (isNotZero) {
-                        CTX.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
+                        ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
                     } else {
-                        if (fullRange) CTX.setFill(zeroColor);
+                        if (fullRange) ticksAndSections.setFill(zeroColor);
                     }
-                    CTX.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
-                    CTX.restore();
+                    ticksAndSections.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
+                    ticksAndSections.restore();
                 }
             } else if (mediumTickMarksVisible &&
                        Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0d) != 0d &&
                        Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0d) == 0d) {
                 // Draw medium tick mark
-                CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, mediumTickMarkColor) : mediumTickMarkColor);
-                CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, mediumTickMarkColor) : mediumTickMarkColor);
+                ticksAndSections.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, mediumTickMarkColor) : mediumTickMarkColor);
+                ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, mediumTickMarkColor) : mediumTickMarkColor);
                 switch(mediumTickMarkType) {
                     case TRIANGLE:
-                        drawTriangle(CTX, triangleMediumInnerPoint1X, triangleMediumInnerPoint1Y, triangleMediumInnerPoint2X, triangleMediumInnerPoint2Y,
+                        drawTriangle(ticksAndSections, triangleMediumInnerPoint1X, triangleMediumInnerPoint1Y, triangleMediumInnerPoint2X, triangleMediumInnerPoint2Y,
                                      triangleMediumOuterPoint1X, triangleMediumOuterPoint1Y, triangleMediumOuterPoint2X, triangleMediumOuterPoint2Y);
                         break;
                     case DOT:
-                        drawDot(CTX, dotMediumCenterX - mediumHalfDotSize, dotMediumCenterY - mediumHalfDotSize, mediumDotSize);
+                        drawDot(ticksAndSections, dotMediumCenterX - mediumHalfDotSize, dotMediumCenterY - mediumHalfDotSize, mediumDotSize);
                         break;
                     case LINE:
                     default:
-                        CTX.setLineWidth(size * 0.0035);
+                        ticksAndSections.setLineWidth(size * 0.0035);
                         if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
-                            drawLine(CTX, innerPointX, innerPointY, outerMediumPointX, outerMediumPointY);
+                            drawLine(ticksAndSections, innerPointX, innerPointY, outerMediumPointX, outerMediumPointY);
                         } else {
-                            drawLine(CTX, innerMediumPointX, innerMediumPointY, outerPointX, outerPointY);
+                            drawLine(ticksAndSections, innerMediumPointX, innerMediumPointY, outerPointX, outerPointY);
                         }
                     break;
                 }
             } else if (minorTickMarksVisible && Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0d) == 0) {
                 // Draw minor tick mark
                 if (TickMarkType.TICK_LABEL != majorTickMarkType) {
-                    CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
-                    CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
+                    ticksAndSections.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
+                    ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     switch (minorTickMarkType) {
                         case TRIANGLE:
-                            drawTriangle(CTX, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
+                            drawTriangle(ticksAndSections, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
                                          triangleMinorOuterPoint1X, triangleMinorOuterPoint1Y, triangleMinorOuterPoint2X, triangleMinorOuterPoint2Y);
                             break;
                         case DOT:
-                            drawDot(CTX, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
+                            drawDot(ticksAndSections, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
                             break;
                         case LINE:
                         default:
-                            CTX.setLineWidth(size * 0.00225);
+                            ticksAndSections.setLineWidth(size * 0.00225);
                             if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
-                                drawLine(CTX, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
+                                drawLine(ticksAndSections, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
                             } else {
-                                drawLine(CTX, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
+                                drawLine(ticksAndSections, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
                             }
                             break;
                     }
@@ -848,7 +853,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         CTX.strokeLine(P1X, P1Y, P2X, P2Y);
     }
 
-    private void drawSections(final GraphicsContext CTX) {
+    private void drawSections() {
         if (getSkinnable().getSections().isEmpty()) return;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         final double         xy              = TickLabelLocation.OUTSIDE == tickLabelLocation ? (size - 0.77 * size) * 0.5 : (size - 0.897 * size) * 0.5;
@@ -873,18 +878,18 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     } else {
                         SECTION_ANGLE_EXTEND = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (SECTION.getStop() - SECTION.getStart()) * angleStep : -(SECTION.getStop() - SECTION.getStart()) * angleStep;
                     }
-                    CTX.save();
-                    CTX.setStroke(SECTION.getColor());
-                    CTX.setLineWidth(size * 0.052);
-                    CTX.setLineCap(StrokeLineCap.BUTT);
-                    CTX.strokeArc(xy, xy, wh, wh, -(OFFSET + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
-                    CTX.restore();
+                    ticksAndSections.save();
+                    ticksAndSections.setStroke(SECTION.getColor());
+                    ticksAndSections.setLineWidth(size * 0.052);
+                    ticksAndSections.setLineCap(StrokeLineCap.BUTT);
+                    ticksAndSections.strokeArc(xy, xy, wh, wh, -(OFFSET + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
+                    ticksAndSections.restore();
                 }
             }
         );
     }
 
-    private void drawAreas(final GraphicsContext CTX) {
+    private void drawAreas() {
         if (getSkinnable().getAreas().isEmpty()) return;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         final double         xy              = TickLabelLocation.OUTSIDE == tickLabelLocation ? (size - 0.821 * size) * 0.5 : (size - 0.95 * size) * 0.5;
@@ -910,33 +915,47 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     } else {
                         AREA_ANGLE_EXTEND = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (AREA.getStop() - AREA.getStart()) * angleStep : -(AREA.getStop() - AREA.getStart()) * angleStep;
                     }
-                    CTX.save();
-                    CTX.setFill(AREA.getColor());
-                    CTX.fillArc(xy, xy, wh, wh, -(OFFSET + AREA_START_ANGLE), - AREA_ANGLE_EXTEND, ArcType.ROUND);
-                    CTX.restore();
+                    ticksAndSections.save();
+                    ticksAndSections.setFill(AREA.getColor());
+                    ticksAndSections.fillArc(xy, xy, wh, wh, -(OFFSET + AREA_START_ANGLE), - AREA_ANGLE_EXTEND, ArcType.ROUND);
+                    ticksAndSections.restore();
                 }
             }
                                                                                       );
     }
 
-    private void drawLed(final GraphicsContext CTX) {
-        CTX.clearRect(0, 0, ledSize, ledSize);
-        CTX.setFill(frameGradient);
-        CTX.fillOval(0, 0, ledSize, ledSize);
+    private void drawLed() {
+        led.clearRect(0, 0, ledSize, ledSize);
 
-        CTX.save();
-        if (getSkinnable().isLedOn()) {
-            CTX.setEffect(ledOnShadow);
-            CTX.setFill(ledOnGradient);
+        boolean isFlatLed = LedType.FLAT == getSkinnable().getLedType();
+
+        if (!isFlatLed) {
+            led.setFill(ledFramePaint);
+            led.fillOval(0, 0, ledSize, ledSize);
         } else {
-            CTX.setEffect(ledOffShadow);
-            CTX.setFill(ledOffGradient);
+            double lineWidth = 0.0037037 * size;
+            led.setStroke(ledFramePaint);
+            led.setLineWidth(lineWidth);
+            led.strokeOval(lineWidth, lineWidth, ledSize - 2 * lineWidth, ledSize - 2 * lineWidth);
         }
-        CTX.fillOval(0.14 * ledSize, 0.14 * ledSize, 0.72 * ledSize, 0.72 * ledSize);
-        CTX.restore();
 
-        CTX.setFill(highlightGradient);
-        CTX.fillOval(0.21 * ledSize, 0.21 * ledSize, 0.58 * ledSize, 0.58 * ledSize);
+        led.save();
+        if (getSkinnable().isLedOn()) {
+            led.setEffect(ledOnShadow);
+            led.setFill(ledOnPaint);
+        } else {
+            led.setEffect(ledOffShadow);
+            led.setFill(ledOffPaint);
+        }
+        if (isFlatLed) {
+            led.fillOval(0.2 * ledSize, 0.2 * ledSize, 0.6 * ledSize, 0.6 * ledSize);
+        } else {
+            led.fillOval(0.14 * ledSize, 0.14 * ledSize, 0.72 * ledSize, 0.72 * ledSize);
+        }
+        led.restore();
+
+        led.setFill(ledHighlightPaint);
+        led.fillOval(0.21 * ledSize, 0.21 * ledSize, 0.58 * ledSize, 0.58 * ledSize);
     }
 
     private void drawMarkers() {
@@ -1203,6 +1222,15 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                 new Stop(1.0, Color.rgb(50,52,56))));
                 knob.fillOval(0.29411765 * w, 0.29411765 * h, 0.41176471 * w, 0.41176471 * h);
                 break;
+            case FLAT:
+                double lineWidth = 0.00740741 * size;
+                double knobSize  = w - 2 * lineWidth;
+                knob.setFill(PRESSED ? knobColor.darker() : knobColor);
+                knob.setStroke(PRESSED ? Color.WHITE.darker() : Color.WHITE);
+                knob.setLineWidth(lineWidth);
+                knob.fillOval(lineWidth, lineWidth, knobSize, knobSize);
+                knob.strokeOval(lineWidth, lineWidth, knobSize, knobSize);
+                break;
             case STANDARD:
             default:
                 knob.setFill(new LinearGradient(0, 0, 0, h,
@@ -1283,45 +1311,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             markerPane.setPrefSize(size, size);
 
-            ledSize = 0.06 * size;
-            final Color LED_COLOR = getSkinnable().getLedColor();
-            frameGradient = new LinearGradient(0.14 * ledSize, 0.14 * ledSize,
-                                               0.84 * ledSize, 0.84 * ledSize,
-                                               false, CycleMethod.NO_CYCLE,
-                                               new Stop(0.0, Color.rgb(20, 20, 20, 0.65)),
-                                               new Stop(0.15, Color.rgb(20, 20, 20, 0.65)),
-                                               new Stop(0.26, Color.rgb(41, 41, 41, 0.65)),
-                                               new Stop(0.26, Color.rgb(41, 41, 41, 0.64)),
-                                               new Stop(0.85, Color.rgb(200, 200, 200, 0.41)),
-                                               new Stop(1.0, Color.rgb(200, 200, 200, 0.35)));
-
-            ledOnGradient = new LinearGradient(0.25 * ledSize, 0.25 * ledSize,
-                                               0.74 * ledSize, 0.74 * ledSize,
-                                               false, CycleMethod.NO_CYCLE,
-                                               new Stop(0.0, LED_COLOR.deriveColor(0d, 1d, 0.77, 1d)),
-                                               new Stop(0.49, LED_COLOR.deriveColor(0d, 1d, 0.5, 1d)),
-                                               new Stop(1.0, LED_COLOR));
-
-            ledOffGradient = new LinearGradient(0.25 * ledSize, 0.25 * ledSize,
-                                                0.74 * ledSize, 0.74 * ledSize,
-                                                false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, LED_COLOR.deriveColor(0d, 1d, 0.20, 1d)),
-                                                new Stop(0.49, LED_COLOR.deriveColor(0d, 1d, 0.13, 1d)),
-                                                new Stop(1.0, LED_COLOR.deriveColor(0d, 1d, 0.2, 1d)));
-
-            highlightGradient = new RadialGradient(0, 0,
-                                                   0.3 * ledSize, 0.3 * ledSize,
-                                                   0.29 * ledSize,
-                                                   false, CycleMethod.NO_CYCLE,
-                                                   new Stop(0.0, Color.WHITE),
-                                                   new Stop(1.0, Color.TRANSPARENT));
-
+            boolean isFlatLed = LedType.FLAT == getSkinnable().getLedType();
+            ledSize = isFlatLed ? 0.05 * size : 0.06 * size;
             ledCanvas.setWidth(ledSize);
             ledCanvas.setHeight(ledSize);
             ledCanvas.relocate(0.65 * size, 0.47 * size);
-            ledOffShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
-            ledOnShadow  = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
-            ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getLedColor(), 0.36 * ledSize, 0, 0, 0));
+            ledOffShadow = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
+            ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
+            if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getLedColor(), 0.36 * ledSize, 0, 0, 0));
 
             resizeText();
 
@@ -1361,32 +1358,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
                 valueText.setTranslateY(size * 0.65);
             }
-
-
-            if (getSkinnable().isLcdVisible() && getSkinnable().isValueVisible()) {
-                LcdDesign lcdDesign = getSkinnable().getLcdDesign();
-                LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
-                                                                false, CycleMethod.NO_CYCLE,
-                                                                new Stop(0, lcdDesign.BG0),
-                                                                new Stop(0.03, lcdDesign.BG1),
-                                                                new Stop(0.5, lcdDesign.BG2),
-                                                                new Stop(0.5, lcdDesign.BG3),
-                                                                new Stop(1.0, lcdDesign.BG4));
-                Paint lcdFramePaint;
-                if (lcdDesign.name().startsWith("FLAT")) {
-                    lcdFramePaint = Color.WHITE;
-                } else {
-                    lcdFramePaint = new LinearGradient(0, 0, 0, lcd.getHeight(),
-                                                       false, CycleMethod.NO_CYCLE,
-                                                       new Stop(0.0, Color.rgb(26, 26, 26)),
-                                                       new Stop(0.01, Color.rgb(77, 77, 77)),
-                                                       new Stop(0.99, Color.rgb(77, 77, 77)),
-                                                       new Stop(1.0, Color.rgb(221, 221, 221)));
-                }
-                lcd.setFill(lcdGradient);
-                lcd.setStroke(lcdFramePaint);
-            }
-
+            
             double needleWidth  = size * getSkinnable().getNeedleSize().FACTOR;
             double needleHeight = TickLabelLocation.OUTSIDE == getSkinnable().getTickLabelLocation() ? size * 0.3965 : size * 0.455;
 
@@ -1410,26 +1382,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleCubicCurveTo6.setControlX2(0.25 * needleWidth); needleCubicCurveTo6.setControlY2(0.025423728813559324 * needleHeight);
             needleCubicCurveTo6.setX(0.25 * needleWidth); needleCubicCurveTo6.setY(0.025423728813559324 * needleHeight);
 
-
-            LinearGradient needleGradient = new LinearGradient(needle.getLayoutBounds().getMinX(), 0,
-                                                               needle.getLayoutBounds().getMaxX(), 0,
-                                                               false, CycleMethod.NO_CYCLE,
-                                                               new Stop(0.0, getSkinnable().getNeedleColor()),
-                                                               new Stop(0.5, getSkinnable().getNeedleColor()),
-                                                               new Stop(0.5, getSkinnable().getNeedleColor().brighter()),
-                                                               new Stop(1.0, getSkinnable().getNeedleColor().brighter()));
-            /*
-            LinearGradient needleGradient = new LinearGradient(needle.getLayoutBounds().getMinX(), 0,
-                                                               needle.getLayoutBounds().getMaxX(), 0,
-                                                               false, CycleMethod.NO_CYCLE,
-                                                               new Stop(0.0, getSkinnable().getNeedleColor()),
-                                                               new Stop(0.5, getSkinnable().getNeedleColor().brighter().brighter()),
-                                                               new Stop(1.0, getSkinnable().getNeedleColor()));
-            */
-            needle.setFill(needleGradient);
-            needle.setStrokeWidth(0);
-            needle.setStroke(Color.TRANSPARENT);
-
             needle.relocate((size - needle.getLayoutBounds().getWidth()) * 0.5, center - needle.getLayoutBounds().getHeight());
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
             needleRotate.setPivotY(needle.getLayoutBounds().getHeight());
@@ -1445,32 +1397,141 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void redraw() {
         shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
 
+        // Background stroke and fill
         background.setStroke(getSkinnable().getBorderPaint());
         background.setFill(getSkinnable().getBackgroundPaint());
 
-        titleText.setFill(getSkinnable().getTitleColor());
-
-        unitText.setFill(getSkinnable().getUnitColor());
-
-        subTitleText.setFill(getSkinnable().getSubTitleColor());
-
-        valueText.setFill(getSkinnable().isLcdVisible() ? getSkinnable().getLcdDesign().FG : getSkinnable().getValueColor());
-
-        resizeText();
-
+        // Areas, Sections and Tick Marks
         ticksAndSectionsCanvas.setCache(false);
         ticksAndSections.clearRect(0, 0, size, size);
-        if (getSkinnable().areAreasVisible()) drawAreas(ticksAndSections);
-        if (getSkinnable().areSectionsVisible()) drawSections(ticksAndSections);
-        drawTickMarks(ticksAndSections);
+        if (getSkinnable().areAreasVisible()) drawAreas();
+        if (getSkinnable().areSectionsVisible()) drawSections();
+        drawTickMarks();
         ticksAndSectionsCanvas.setCache(true);
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
+        // LED
+        if (getSkinnable().isLedVisible()) {
+            final Color LED_COLOR = getSkinnable().getLedColor();
+            switch(getSkinnable().getLedType()) {
+                case FLAT:
+                    ledFramePaint = Color.WHITE;
+                    ledOnPaint = new LinearGradient(0, 0.25 * ledSize,
+                                                    0, 0.74 * ledSize,
+                                                    false, CycleMethod.NO_CYCLE,
+                                                    new Stop(0.0, LED_COLOR),
+                                                    new Stop(1.0, LED_COLOR.deriveColor(0d, 1d, 0.5, 1d)));
+                    ledOffPaint = new LinearGradient(0, 0.25 * ledSize,
+                                                     0, 0.74 * ledSize,
+                                                     false, CycleMethod.NO_CYCLE,
+                                                     new Stop(0.0, LED_COLOR.deriveColor(0d, 1d, 0.5, 1d)),
+                                                     new Stop(1.0, LED_COLOR.deriveColor(0d, 1d, 0.13, 1d)));
+                    ledHighlightPaint = Color.TRANSPARENT;
+                    break;
+                case STANDARD:
+                default:
+                    ledFramePaint = new LinearGradient(0.14 * ledSize, 0.14 * ledSize,
+                                                       0.84 * ledSize, 0.84 * ledSize,
+                                                       false, CycleMethod.NO_CYCLE,
+                                                       new Stop(0.0, Color.rgb(20, 20, 20, 0.65)),
+                                                       new Stop(0.15, Color.rgb(20, 20, 20, 0.65)),
+                                                       new Stop(0.26, Color.rgb(41, 41, 41, 0.65)),
+                                                       new Stop(0.26, Color.rgb(41, 41, 41, 0.64)),
+                                                       new Stop(0.85, Color.rgb(200, 200, 200, 0.41)),
+                                                       new Stop(1.0, Color.rgb(200, 200, 200, 0.35)));
+                    ledOnPaint = new LinearGradient(0.25 * ledSize, 0.25 * ledSize,
+                                                       0.74 * ledSize, 0.74 * ledSize,
+                                                    false, CycleMethod.NO_CYCLE,
+                                                    new Stop(0.0, LED_COLOR.deriveColor(0d, 1d, 0.77, 1d)),
+                                                    new Stop(0.49, LED_COLOR.deriveColor(0d, 1d, 0.5, 1d)),
+                                                    new Stop(1.0, LED_COLOR));
+                    ledOffPaint = new LinearGradient(0.25 * ledSize, 0.25 * ledSize,
+                                                        0.74 * ledSize, 0.74 * ledSize,
+                                                     false, CycleMethod.NO_CYCLE,
+                                                     new Stop(0.0, LED_COLOR.deriveColor(0d, 1d, 0.20, 1d)),
+                                                     new Stop(0.49, LED_COLOR.deriveColor(0d, 1d, 0.13, 1d)),
+                                                     new Stop(1.0, LED_COLOR.deriveColor(0d, 1d, 0.2, 1d)));
+                    ledHighlightPaint = new RadialGradient(0, 0,
+                                                           0.3 * ledSize, 0.3 * ledSize,
+                                                           0.29 * ledSize,
+                                                           false, CycleMethod.NO_CYCLE,
+                                                           new Stop(0.0, Color.WHITE),
+                                                           new Stop(1.0, Color.TRANSPARENT));
+                    break;
+            }
+            drawLed();
+        }
+
+        // LCD
+        if (getSkinnable().isLcdVisible() && getSkinnable().isValueVisible()) {
+            LcdDesign lcdDesign = getSkinnable().getLcdDesign();
+            LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
+                                                            false, CycleMethod.NO_CYCLE,
+                                                            new Stop(0, lcdDesign.BG0),
+                                                            new Stop(0.03, lcdDesign.BG1),
+                                                            new Stop(0.5, lcdDesign.BG2),
+                                                            new Stop(0.5, lcdDesign.BG3),
+                                                            new Stop(1.0, lcdDesign.BG4));
+            Paint lcdFramePaint;
+            if (lcdDesign.name().startsWith("FLAT")) {
+                lcdFramePaint = Color.WHITE;
+            } else {
+                lcdFramePaint = new LinearGradient(0, 0, 0, lcd.getHeight(),
+                                                   false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.rgb(26, 26, 26)),
+                                                   new Stop(0.01, Color.rgb(77, 77, 77)),
+                                                   new Stop(0.99, Color.rgb(77, 77, 77)),
+                                                   new Stop(1.0, Color.rgb(221, 221, 221)));
+            }
+            lcd.setFill(lcdGradient);
+            lcd.setStroke(lcdFramePaint);
+        }
+
+        // Text
+        titleText.setFill(getSkinnable().getTitleColor());
+        unitText.setFill(getSkinnable().getUnitColor());
+        subTitleText.setFill(getSkinnable().getSubTitleColor());
+        valueText.setFill(getSkinnable().isLcdVisible() ? getSkinnable().getLcdDesign().FG : getSkinnable().getValueColor());
+        resizeText();
+
+        // Needle
+        Color needleColor = getSkinnable().getNeedleColor();
+        switch(getSkinnable().getNeedleShape()) {
+            case ROUND:
+                needlePaint = new LinearGradient(needle.getLayoutBounds().getMinX(), 0,
+                                                 needle.getLayoutBounds().getMaxX(), 0,
+                                                 false, CycleMethod.NO_CYCLE,
+                                                 new Stop(0.0, needleColor.darker()),
+                                                 new Stop(0.5, needleColor.brighter().brighter()),
+                                                 new Stop(1.0, needleColor.darker()));
+                needle.setStrokeWidth(0);
+                needle.setStroke(Color.TRANSPARENT);
+                break;
+            case FLAT:
+                needlePaint = needleColor;
+                needle.setStrokeWidth(0.0037037 * size);
+                needle.setStroke(Color.WHITE);
+                break;
+            case ANGLED:
+            default:
+                needlePaint = new LinearGradient(needle.getLayoutBounds().getMinX(), 0,
+                                                 needle.getLayoutBounds().getMaxX(), 0,
+                                                 false, CycleMethod.NO_CYCLE,
+                                                 new Stop(0.0, needleColor.darker()),
+                                                 new Stop(0.5, needleColor.darker()),
+                                                 new Stop(0.5, needleColor.brighter()),
+                                                 new Stop(1.0, needleColor.brighter()));
+                needle.setStrokeWidth(0);
+                needle.setStroke(Color.TRANSPARENT);
+                break;
+        }
+        needle.setFill(needlePaint);
+
+        // Knob
         drawKnob(false);
 
+        // Markers
         drawMarkers();
         thresholdTooltip.setText("Threshold\n(" + String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getThreshold()) + ")");
-
-        if (getSkinnable().isLedVisible()) drawLed(led);
     }
 }
