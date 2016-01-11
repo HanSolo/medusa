@@ -30,6 +30,7 @@ import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.DoublePropertyBase;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.IntegerPropertyBase;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -1153,28 +1154,40 @@ public class Gauge extends Control {
     public int getDecimals() { return null == decimals ? _decimals : decimals.get(); }
     public void setDecimals(final int DECIMALS) {
         if (null == decimals) {
-            _decimals = DECIMALS;
+            _decimals = Helper.clamp(0, 3, DECIMALS);
         } else {
             decimals.set(DECIMALS);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public IntegerProperty decimalsProperty() {
-        if (null == decimals) { decimals = new SimpleIntegerProperty(Gauge.this, "decimals", _decimals); }
+        if (null == decimals) {
+            decimals = new IntegerPropertyBase(_decimals) {
+                @Override public void set(final int VALUE) { super.set(Helper.clamp(0, 3, VALUE)); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "decimals"; }
+            };
+        }
         return decimals;
     }
 
     public int getTickLabelDecimals() { return null == tickLabelDecimals ? _tickLabelDecimals : tickLabelDecimals.get(); }
     public void setTickLabelDecimals(final int DECIMALS) {
         if (null == tickLabelDecimals) {
-            _tickLabelDecimals = DECIMALS;
+            _tickLabelDecimals = Helper.clamp(0, 3, DECIMALS);
         } else {
             tickLabelDecimals.set(DECIMALS);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public IntegerProperty tickLabelDecimalsProperty() {
-        if (null == tickLabelDecimals) { tickLabelDecimals = new SimpleIntegerProperty(Gauge.this, "tickLabelDecimals", _tickLabelDecimals); }
+        if (null == tickLabelDecimals) {
+            tickLabelDecimals = new IntegerPropertyBase(_tickLabelDecimals) {
+                @Override public void set(final int VALUE) { super.set(Helper.clamp(0, 3, VALUE)); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "tickLabelDecimals"; }
+            };
+        }
         return tickLabelDecimals;
     }
 

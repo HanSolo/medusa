@@ -33,7 +33,6 @@ import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
-import eu.hansolo.medusa.tools.FlatUiColor;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ListChangeListener;
@@ -85,7 +84,7 @@ public class Test extends Application {
                             .valueColor(Color.WHITE)
                             .majorTickMarkType(TickMarkType.TRIANGLE)
                             .sectionsVisible(true)
-                            .sections(new Section(80, 100, FlatUiColor.ORANGE.get()))
+                            .sections(new Section(80, 100, Color.ORANGE))
                             //.areasVisible(true)
                             .areas(new Section(90, 100, Color.rgb(200, 0, 0, 0.75)))
                             .thresholdVisible(true)
@@ -94,21 +93,23 @@ public class Test extends Application {
                             .onThresholdExceeded(e -> gauge.setLedBlinking(true))
                             .onThresholdUnderrun(e -> gauge.setLedBlinking(false))
                             .lcdVisible(true)
-                            .lcdDesign(LcdDesign.FLAT_ORANGE)
+                            .lcdDesign(LcdDesign.FLAT_CUSTOM)
                             .lcdFont(LcdFont.STANDARD)
                             .ledVisible(true)
                             //.shadowsEnabled(true)
                             .needleShape(NeedleShape.FLAT)
                             .knobType(KnobType.FLAT)
-                            .knobColor(FlatUiColor.ORANGE.get())
+                            .knobColor(Color.ORANGE)
                             .ledType(LedType.FLAT)
-                            .ledColor(FlatUiColor.ORANGE.get())
+                            .ledColor(Color.ORANGE)
                             .interactive(true)
                             .onButtonPressed(e -> System.out.println("Pressed"))
                             .onButtonReleased(e -> System.out.println("Released"))
                             .animated(true)
                             .onlyFirstAndLastTickLabelVisible(true)
                             .build();
+
+        LcdDesign.FLAT_CUSTOM.lcdBackgroundColor = Color.ORANGE;
 
         GaugeDesign.FLAT.frameColor = Color.ORANGE;
         framedGauge = new FGauge(gauge, GaugeDesign.FLAT, GaugeBackground.TRANSPARENT);
