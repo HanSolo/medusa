@@ -303,15 +303,15 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawTickMarks(final GraphicsContext CTX) {
-        double  sinValue;
-        double  cosValue;
-        double  orthText            = Gauge.TickLabelOrientation.ORTHOGONAL == getSkinnable().getTickLabelOrientation() ? 0.51 : 0.52;
-        Point2D center              = new Point2D(width * 0.5, height * 0.77);
+        double     sinValue;
+        double     cosValue;
+        double     orthText         = Gauge.TickLabelOrientation.ORTHOGONAL == getSkinnable().getTickLabelOrientation() ? 0.51 : 0.52;
+        Point2D    center           = new Point2D(width * 0.5, height * 0.77);
         double     minorTickSpace   = getSkinnable().getMinorTickSpace();
         double     minValue         = getSkinnable().getMinValue();
         double     maxValue         = getSkinnable().getMaxValue();
         double     tmpAngleStep     = angleStep * minorTickSpace;
-        int        decimals         = Double.compare(Math.abs(getSkinnable().getRange()), 10d) < 0 ? 1 : 0;
+        int        decimals         = getSkinnable().getTickLabelDecimals();
         BigDecimal minorTickSpaceBD = BigDecimal.valueOf(minorTickSpace);
         BigDecimal majorTickSpaceBD = BigDecimal.valueOf(getSkinnable().getMajorTickSpace());
         BigDecimal mediumCheck2     = BigDecimal.valueOf(2 * minorTickSpace);

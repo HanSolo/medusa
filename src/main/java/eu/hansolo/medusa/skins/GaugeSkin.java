@@ -415,8 +415,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double               angleRange           = getSkinnable().getAngleRange();
         double               centerX              = size * 0.5;
         double               centerY              = size * 0.5;
-        int                  decimals             = Double.compare(Math.abs(getSkinnable().getRange()), 10d) < 0 ? 1 : 0;
+        int                  decimals             = getSkinnable().getTickLabelDecimals();
         double               minValue             = getSkinnable().getMinValue();
+        double               maxValue             = getSkinnable().getMaxValue();
         double               minorTickSpace       = getSkinnable().getMinorTickSpace();
         double               tmpAngleStep         = angleStep * minorTickSpace;
         TickLabelOrientation tickLabelOrientation = getSkinnable().getTickLabelOrientation();
@@ -428,25 +429,26 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         BigDecimal           counterBD            = BigDecimal.valueOf(minValue);
         double               counter              = minValue;
 
-        List<Section> tickMarkSections         = getSkinnable().getTickMarkSections();
-        List<Section> tickLabelSections        = getSkinnable().getTickLabelSections();
-        Color         tickMarkColor            = getSkinnable().getTickMarkColor();
-        Color         majorTickMarkColor       = getSkinnable().getMajorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMajorTickMarkColor();
-        Color         mediumTickMarkColor      = getSkinnable().getMediumTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMediumTickMarkColor();
-        Color         minorTickMarkColor       = getSkinnable().getMinorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMinorTickMarkColor();
-        Color         tickLabelColor           = getSkinnable().getTickLabelColor();
-        Color         zeroColor                = getSkinnable().getZeroColor();
-        boolean       isNotZero                = true;
-        TickMarkType  majorTickMarkType        = getSkinnable().getMajorTickMarkType();
-        TickMarkType  mediumTickMarkType       = getSkinnable().getMediumTickMarkType();
-        TickMarkType  minorTickMarkType        = getSkinnable().getMinorTickMarkType();
-        boolean       tickMarkSectionsVisible  = getSkinnable().areTickMarkSectionsVisible();
-        boolean       tickLabelSectionsVisible = getSkinnable().areTickLabelSectionsVisible();
-        boolean       majorTickMarksVisible    = getSkinnable().areMajorTickMarksVisible();
-        boolean       mediumTickMarksVisible   = getSkinnable().areMediumTickMarksVisible();
-        boolean       minorTickMarksVisible    = getSkinnable().areMinorTickMarksVisible();
-        boolean       tickLabelsVisible        = getSkinnable().areTickLabelsVisible();
-        double        textDisplacementFactor   = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
+        List<Section> tickMarkSections             = getSkinnable().getTickMarkSections();
+        List<Section> tickLabelSections            = getSkinnable().getTickLabelSections();
+        Color         tickMarkColor                = getSkinnable().getTickMarkColor();
+        Color         majorTickMarkColor           = getSkinnable().getMajorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMajorTickMarkColor();
+        Color         mediumTickMarkColor          = getSkinnable().getMediumTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMediumTickMarkColor();
+        Color         minorTickMarkColor           = getSkinnable().getMinorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMinorTickMarkColor();
+        Color         tickLabelColor               = getSkinnable().getTickLabelColor();
+        Color         zeroColor                    = getSkinnable().getZeroColor();
+        boolean       isNotZero                    = true;
+        TickMarkType  majorTickMarkType            = getSkinnable().getMajorTickMarkType();
+        TickMarkType  mediumTickMarkType           = getSkinnable().getMediumTickMarkType();
+        TickMarkType  minorTickMarkType            = getSkinnable().getMinorTickMarkType();
+        boolean       tickMarkSectionsVisible      = getSkinnable().areTickMarkSectionsVisible();
+        boolean       tickLabelSectionsVisible     = getSkinnable().areTickLabelSectionsVisible();
+        boolean       majorTickMarksVisible        = getSkinnable().areMajorTickMarksVisible();
+        boolean       mediumTickMarksVisible       = getSkinnable().areMediumTickMarksVisible();
+        boolean       minorTickMarksVisible        = getSkinnable().areMinorTickMarksVisible();
+        boolean       tickLabelsVisible            = getSkinnable().areTickLabelsVisible();
+        boolean       onlyFirstAndLastLabelVisible = getSkinnable().isOnlyFirstAndLastTickLabelVisible();
+        double        textDisplacementFactor       = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
         double        majorDotSize;
         double        majorHalfDotSize;
         double        mediumDotSize;
@@ -772,11 +774,25 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     ticksAndSections.setFont(isNotZero ? tickLabelFont : tickLabelZeroFont);
                     ticksAndSections.setTextAlign(TextAlignment.CENTER);
                     ticksAndSections.setTextBaseline(VPos.CENTER);
-                    if (isNotZero) {
-                        ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
+
+                    if (!onlyFirstAndLastLabelVisible) {
+                        if (isNotZero) {
+                            ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
+                        } else {
+                            if (fullRange) ticksAndSections.setFill(zeroColor);
+                        }
                     } else {
-                        if (fullRange) ticksAndSections.setFill(zeroColor);
+                        if ((Double.compare(counter, minValue) == 0 || Double.compare(counter, maxValue) == 0)) {
+                            if (isNotZero) {
+                                ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
+                            } else {
+                                if (fullRange) ticksAndSections.setFill(zeroColor);
+                            }
+                        } else {
+                            ticksAndSections.setFill(Color.TRANSPARENT);
+                        }
                     }
+
                     ticksAndSections.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
                     ticksAndSections.restore();
                 }

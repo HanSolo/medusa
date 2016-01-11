@@ -222,6 +222,8 @@ public class Gauge extends Control {
     private ObjectProperty<NumberFormat>         numberFormat;
     private int                                  _decimals;
     private IntegerProperty                      decimals;
+    private int                                  _tickLabelDecimals;
+    private IntegerProperty                      tickLabelDecimals;
     private NeedleType                           _needleType;
     private ObjectProperty<NeedleType>           needleType;
     private NeedleShape                          _needleShape;
@@ -282,6 +284,8 @@ public class Gauge extends Control {
     private BooleanProperty                      minorTickMarksVisible;
     private boolean                              _tickLabelsVisible;
     private BooleanProperty                      tickLabelsVisible;
+    private boolean                              _onlyFirstAndLastTickLabelVisible;
+    private BooleanProperty                      onlyFirstAndLastTickLabelVisible;
     private double                               _majorTickSpace;
     private DoubleProperty                       majorTickSpace;
     private double                               _minorTickSpace;
@@ -327,10 +331,9 @@ public class Gauge extends Control {
 
     // ******************** Initialization ************************************
     private void init() {
-        lastCall                       = Instant.now();
-        _minValue                      = 0;
-        _maxValue                      = 100;
-        value                          = new DoublePropertyBase(0) {
+        _minValue                         = 0;
+        _maxValue                         = 100;
+        value                             = new DoublePropertyBase(0) {
             @Override public void set(final double VALUE) {
                 oldValue.set(value.get());
                 double nValue = Helper.clamp(getMinValue(), getMaxValue(), VALUE).doubleValue();
@@ -352,7 +355,7 @@ public class Gauge extends Control {
             @Override public Object getBean() { return Gauge.this; }
             @Override public String getName() { return "value"; }
         };
-        currentValue                   = new DoublePropertyBase(value.get()) {
+        currentValue                      = new DoublePropertyBase(value.get()) {
             @Override public void set(final double VALUE) {
                 double formerValue = get();
                 super.set(VALUE);
@@ -370,97 +373,100 @@ public class Gauge extends Control {
             @Override public Object getBean() { return Gauge.this; }
             @Override public String getName() { return "currentValue";}
         };
-        oldValue                       = new SimpleDoubleProperty(Gauge.this, "oldValue");
-        _range                         = _maxValue - _minValue;
-        _threshold                     = _maxValue;
-        _title                         = "";
-        _subTitle                      = "";
-        _unit                          = "";
-        sections                       = FXCollections.observableArrayList();
-        areas                          = FXCollections.observableArrayList();
-        tickMarkSections               = FXCollections.observableArrayList();
-        tickLabelSections              = FXCollections.observableArrayList();
-        markers                        = FXCollections.observableArrayList();
+        oldValue                          = new SimpleDoubleProperty(Gauge.this, "oldValue");
+        _range                            = _maxValue - _minValue;
+        _threshold                        = _maxValue;
+        _title                            = "";
+        _subTitle                         = "";
+        _unit                             = "";
+        sections                          = FXCollections.observableArrayList();
+        areas                             = FXCollections.observableArrayList();
+        tickMarkSections                  = FXCollections.observableArrayList();
+        tickLabelSections                 = FXCollections.observableArrayList();
+        markers                           = FXCollections.observableArrayList();
 
-        _startFromZero                 = false;
-        _returnToZero                  = false;
-        _zeroColor                     = DARK_COLOR;
-        _minMeasuredValue              = _maxValue;
-        _maxMeasuredValue              = _minValue;
-        _minMeasuredValueVisible       = false;
-        _maxMeasuredValueVisible       = false;
-        _valueVisible                  = true;
-        _backgroundPaint               = Color.TRANSPARENT;
-        _borderPaint                   = Color.TRANSPARENT;
-        _foregroundPaint               = Color.TRANSPARENT;
-        _knobColor                     = Color.rgb(204, 204, 204);
-        _knobType                      = KnobType.STANDARD;
-        _animated                      = false;
-        animationDuration              = 800;
-        _startAngle                    = 320;
-        _angleRange                    = 280;
-        _angleStep                     = _angleRange / _range;
-        _autoScale                     = true;
-        _shadowsEnabled                = false;
-        _scaleDirection                = ScaleDirection.CLOCKWISE;
-        _tickLabelLocation             = TickLabelLocation.INSIDE;
-        _tickLabelOrientation          = TickLabelOrientation.HORIZONTAL;
-        _tickLabelColor                = DARK_COLOR;
-        _tickMarkColor                 = DARK_COLOR;
-        _majorTickMarkColor            = DARK_COLOR;
-        _mediumTickMarkColor           = DARK_COLOR;
-        _minorTickMarkColor            = DARK_COLOR;
-        _majorTickMarkType             = TickMarkType.LINE;
-        _mediumTickMarkType            = TickMarkType.LINE;
-        _minorTickMarkType             = TickMarkType.LINE;
-        _numberFormat                  = NumberFormat.STANDARD;
-        _decimals                      = 1;
-        _needleType                    = NeedleType.STANDARD;
-        _needleShape                   = NeedleShape.ANGLED;
-        _needleSize                    = NeedleSize.STANDARD;
-        _needleColor                   = Color.rgb(200, 0, 0);
-        _barColor                      = DARK_COLOR;
-        _lcdDesign                     = LcdDesign.STANDARD;
-        _lcdFont                       = LcdFont.DIGITAL_BOLD;
-        _ledColor                      = Color.RED;
-        _ledType                       = LedType.STANDARD;
-        _titleColor                    = DARK_COLOR;
-        _subTitleColor                 = DARK_COLOR;
-        _unitColor                     = DARK_COLOR;
-        _valueColor                    = DARK_COLOR;
-        _thresholdColor                = Color.CRIMSON;
-        _checkSectionsForValue         = false;
-        _checkAreasForValue            = false;
-        _checkThreshold                = false;
-        _innerShadowEnabled            = false;
-        _thresholdVisible              = false;
-        _sectionsVisible               = false;
-        _sectionTextVisible            = false;
-        _sectionIconsVisible           = false;
-        _areasVisible                  = false;
-        _tickMarkSectionsVisible       = false;
-        _tickLabelSectionsVisible      = false;
-        _markersVisible                = false;
-        _tickLabelsVisible             = true;
-        _majorTickMarksVisible         = true;
-        _mediumTickMarksVisible        = true;
-        _minorTickMarksVisible         = true;
-        _majorTickSpace                = 10;
-        _minorTickSpace                = 1;
-        _lcdVisible                    = false;
-        _ledVisible                    = false;
-        _ledOn                         = false;
-        _ledBlinking                   = false;
-        _orientation                   = Orientation.HORIZONTAL;
-        _colorGradientEnabled          = false;
-        _customTickLabelsEnabled       = false;
-        customTickLabels               = FXCollections.observableArrayList();
-        _interactive                   = false;
-        _buttonTooltipText             = "";
+        _startFromZero                    = false;
+        _returnToZero                     = false;
+        _zeroColor                        = DARK_COLOR;
+        _minMeasuredValue                 = _maxValue;
+        _maxMeasuredValue                 = _minValue;
+        _minMeasuredValueVisible          = false;
+        _maxMeasuredValueVisible          = false;
+        _valueVisible                     = true;
+        _backgroundPaint                  = Color.TRANSPARENT;
+        _borderPaint                      = Color.TRANSPARENT;
+        _foregroundPaint                  = Color.TRANSPARENT;
+        _knobColor                        = Color.rgb(204, 204, 204);
+        _knobType                         = KnobType.STANDARD;
+        _animated                         = false;
+        animationDuration                 = 800;
+        _startAngle                       = 320;
+        _angleRange                       = 280;
+        _angleStep                        = _angleRange / _range;
+        _autoScale                        = true;
+        _shadowsEnabled                   = false;
+        _scaleDirection                   = ScaleDirection.CLOCKWISE;
+        _tickLabelLocation                = TickLabelLocation.INSIDE;
+        _tickLabelOrientation             = TickLabelOrientation.HORIZONTAL;
+        _tickLabelColor                   = DARK_COLOR;
+        _tickMarkColor                    = DARK_COLOR;
+        _majorTickMarkColor               = DARK_COLOR;
+        _mediumTickMarkColor              = DARK_COLOR;
+        _minorTickMarkColor               = DARK_COLOR;
+        _majorTickMarkType                = TickMarkType.LINE;
+        _mediumTickMarkType               = TickMarkType.LINE;
+        _minorTickMarkType                = TickMarkType.LINE;
+        _numberFormat                     = NumberFormat.STANDARD;
+        _decimals                         = 1;
+        _tickLabelDecimals                = 0;
+        _needleType                       = NeedleType.STANDARD;
+        _needleShape                      = NeedleShape.ANGLED;
+        _needleSize                       = NeedleSize.STANDARD;
+        _needleColor                      = Color.rgb(200, 0, 0);
+        _barColor                         = DARK_COLOR;
+        _lcdDesign                        = LcdDesign.STANDARD;
+        _lcdFont                          = LcdFont.DIGITAL_BOLD;
+        _ledColor                         = Color.RED;
+        _ledType                          = LedType.STANDARD;
+        _titleColor                       = DARK_COLOR;
+        _subTitleColor                    = DARK_COLOR;
+        _unitColor                        = DARK_COLOR;
+        _valueColor                       = DARK_COLOR;
+        _thresholdColor                   = Color.CRIMSON;
+        _checkSectionsForValue            = false;
+        _checkAreasForValue               = false;
+        _checkThreshold                   = false;
+        _innerShadowEnabled               = false;
+        _thresholdVisible                 = false;
+        _sectionsVisible                  = false;
+        _sectionTextVisible               = false;
+        _sectionIconsVisible              = false;
+        _areasVisible                     = false;
+        _tickMarkSectionsVisible          = false;
+        _tickLabelSectionsVisible         = false;
+        _markersVisible                   = false;
+        _tickLabelsVisible                = true;
+        _onlyFirstAndLastTickLabelVisible = false;
+        _majorTickMarksVisible            = true;
+        _mediumTickMarksVisible           = true;
+        _minorTickMarksVisible            = true;
+        _majorTickSpace                   = 10;
+        _minorTickSpace                   = 1;
+        _lcdVisible                       = false;
+        _ledVisible                       = false;
+        _ledOn                            = false;
+        _ledBlinking                      = false;
+        _orientation                      = Orientation.HORIZONTAL;
+        _colorGradientEnabled             = false;
+        _customTickLabelsEnabled          = false;
+        customTickLabels                  = FXCollections.observableArrayList();
+        _interactive                      = false;
+        _buttonTooltipText                = "";
 
-        originalMinValue               = -Double.MAX_VALUE;
-        originalMaxValue               = Double.MAX_VALUE;
-        timeline                       = new Timeline();
+        originalMinValue                  = -Double.MAX_VALUE;
+        originalMaxValue                  = Double.MAX_VALUE;
+        lastCall                          = Instant.now();
+        timeline                          = new Timeline();
         timeline.setOnFinished(e -> {
             if (isReturnToZero() && Double.compare(currentValue.get(), 0d) != 0d) {
                 final KeyValue KEY_VALUE2 = new KeyValue(value, 0, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
@@ -1151,11 +1157,25 @@ public class Gauge extends Control {
         } else {
             decimals.set(DECIMALS);
         }
-        fireUpdateEvent(RESIZE_EVENT);
+        fireUpdateEvent(REDRAW_EVENT);
     }
     public IntegerProperty decimalsProperty() {
         if (null == decimals) { decimals = new SimpleIntegerProperty(Gauge.this, "decimals", _decimals); }
         return decimals;
+    }
+
+    public int getTickLabelDecimals() { return null == tickLabelDecimals ? _tickLabelDecimals : tickLabelDecimals.get(); }
+    public void setTickLabelDecimals(final int DECIMALS) {
+        if (null == tickLabelDecimals) {
+            _tickLabelDecimals = DECIMALS;
+        } else {
+            tickLabelDecimals.set(DECIMALS);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public IntegerProperty tickLabelDecimalsProperty() {
+        if (null == tickLabelDecimals) { tickLabelDecimals = new SimpleIntegerProperty(Gauge.this, "tickLabelDecimals", _tickLabelDecimals); }
+        return tickLabelDecimals;
     }
 
     public NeedleType getNeedleType() { return null == needleType ? _needleType : needleType.get(); }
@@ -1523,6 +1543,20 @@ public class Gauge extends Control {
     public BooleanProperty tickLabelsVisibleProperty() {
         if (null == tickLabelsVisible) { tickLabelsVisible = new SimpleBooleanProperty(Gauge.this, "tickLabelsVisible", _tickLabelsVisible); }
         return tickLabelsVisible;
+    }
+
+    public boolean isOnlyFirstAndLastTickLabelVisible() { return null == onlyFirstAndLastTickLabelVisible ? _onlyFirstAndLastTickLabelVisible : onlyFirstAndLastTickLabelVisible.get(); }
+    public void setOnlyFirstAndLastTickLabelVisible(final boolean VISIBLE) {
+        if (null == onlyFirstAndLastTickLabelVisible) {
+            _onlyFirstAndLastTickLabelVisible = VISIBLE;
+        } else {
+            onlyFirstAndLastTickLabelVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty onlyFirstAndLastTickLabelVisibleProperty() {
+        if (null == onlyFirstAndLastTickLabelVisible) { onlyFirstAndLastTickLabelVisible = new SimpleBooleanProperty(Gauge.this, "onlyFirstAndLastTickLabelVisible", _onlyFirstAndLastTickLabelVisible); }
+        return onlyFirstAndLastTickLabelVisible;
     }
 
     public boolean areMajorTickMarksVisible() { return null == majorTickMarksVisible ? _majorTickMarksVisible : majorTickMarksVisible.get(); }

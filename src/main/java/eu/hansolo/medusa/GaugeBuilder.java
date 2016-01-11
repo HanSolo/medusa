@@ -105,6 +105,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B) this;
     }
 
+    public final B tickLabelDecimals(final int DECIMALS) {
+        properties.put("tickLabelDecimals", new SimpleIntegerProperty(DECIMALS));
+        return (B)this;
+    }
+
     public final B title(final String TITLE) {
         properties.put("title", new SimpleStringProperty(TITLE));
         return (B)this;
@@ -485,6 +490,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B onlyFirstAndLastTickLabelVisible(final boolean VISIBLE) {
+        properties.put("onlyFirstAndLastTickLabelVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B majorTickMarksVisible(final boolean VISIBLE) {
         properties.put("majorTickMarksVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
@@ -796,6 +806,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setValue(((DoubleProperty) properties.get(key)).get());
             } else if("decimals".equals(key)) {
                 CONTROL.setDecimals(((IntegerProperty) properties.get(key)).get());
+            } else if ("tickLabelDecimals".equals(key)) {
+                CONTROL.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
             } else if("title".equals(key)) {
                 CONTROL.setTitle(((StringProperty) properties.get(key)).get());
             } else if("subTitle".equals(key)) {
@@ -918,6 +930,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("tickLabelsVisible".equals(key)) {
                 CONTROL.setTickLabelsVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("onlyFirstAndLastTickLabelVisible".equals(key)) {
+                CONTROL.setOnlyFirstAndLastTickLabelVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("majorTickMarksVisible".equals(key)) {
                 CONTROL.setMajorTickMarksVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("mediumTickMarksVisible".equals(key)) {

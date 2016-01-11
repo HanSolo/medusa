@@ -107,6 +107,7 @@ public class Test extends Application {
                             .onButtonPressed(e -> System.out.println("Pressed"))
                             .onButtonReleased(e -> System.out.println("Released"))
                             .animated(true)
+                            .onlyFirstAndLastTickLabelVisible(true)
                             .build();
 
         GaugeDesign.FLAT.frameColor = Color.ORANGE;

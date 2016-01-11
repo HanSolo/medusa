@@ -559,7 +559,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double               minValue               = getSkinnable().getMinValue();
         double               maxValue               = getSkinnable().getMaxValue();
         double               tmpAngleStep           = angleStep * minorTickSpace;
-        int                  decimals               = Double.compare(Math.abs(getSkinnable().getRange()), 10d) < 0 ? 1 : 0;
+        int                  decimals               = getSkinnable().getTickLabelDecimals();
         BigDecimal           minorTickSpaceBD       = BigDecimal.valueOf(minorTickSpace);
         BigDecimal           majorTickSpaceBD       = BigDecimal.valueOf(getSkinnable().getMajorTickSpace());
         BigDecimal           mediumCheck2           = BigDecimal.valueOf(2 * minorTickSpace);
