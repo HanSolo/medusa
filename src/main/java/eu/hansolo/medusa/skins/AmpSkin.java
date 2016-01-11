@@ -618,13 +618,14 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setFill(getSkinnable().getUnitColor());
         if (getSkinnable().isLcdVisible()) {
             LcdDesign lcdDesign = getSkinnable().getLcdDesign();
+            Color[] lcdColors = lcdDesign.getColors();
             LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
                                                             false, CycleMethod.NO_CYCLE,
-                                                            new Stop(0, lcdDesign.BG0),
-                                                            new Stop(0.03, lcdDesign.BG1),
-                                                            new Stop(0.5, lcdDesign.BG2),
-                                                            new Stop(0.5, lcdDesign.BG3),
-                                                            new Stop(1.0, lcdDesign.BG4));
+                                                            new Stop(0, lcdColors[0]),
+                                                            new Stop(0.03, lcdColors[1]),
+                                                            new Stop(0.5, lcdColors[2]),
+                                                            new Stop(0.5, lcdColors[3]),
+                                                            new Stop(1.0, lcdColors[4]));
             Paint lcdFramePaint;
             if (lcdDesign.name().startsWith("FLAT")) {
                 lcdFramePaint = Color.WHITE;
@@ -639,7 +640,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             lcd.setFill(lcdGradient);
             lcd.setStroke(lcdFramePaint);
 
-            lcdText.setTextFill(lcdDesign.FG);
+            lcdText.setTextFill(lcdColors[5]);
         }
 
         if (getSkinnable().isLedVisible()) drawLed(led);

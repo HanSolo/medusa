@@ -1463,15 +1463,16 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         // LCD
+        LcdDesign lcdDesign = getSkinnable().getLcdDesign();
+        Color[]   lcdColors = lcdDesign.getColors();
         if (getSkinnable().isLcdVisible() && getSkinnable().isValueVisible()) {
-            LcdDesign lcdDesign = getSkinnable().getLcdDesign();
             LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
                                                             false, CycleMethod.NO_CYCLE,
-                                                            new Stop(0, lcdDesign.BG0),
-                                                            new Stop(0.03, lcdDesign.BG1),
-                                                            new Stop(0.5, lcdDesign.BG2),
-                                                            new Stop(0.5, lcdDesign.BG3),
-                                                            new Stop(1.0, lcdDesign.BG4));
+                                                            new Stop(0, lcdColors[0]),
+                                                            new Stop(0.03, lcdColors[1]),
+                                                            new Stop(0.5, lcdColors[2]),
+                                                            new Stop(0.5, lcdColors[3]),
+                                                            new Stop(1.0, lcdColors[4]));
             Paint lcdFramePaint;
             if (lcdDesign.name().startsWith("FLAT")) {
                 lcdFramePaint = Color.WHITE;
@@ -1491,7 +1492,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setFill(getSkinnable().getTitleColor());
         unitText.setFill(getSkinnable().getUnitColor());
         subTitleText.setFill(getSkinnable().getSubTitleColor());
-        valueText.setFill(getSkinnable().isLcdVisible() ? getSkinnable().getLcdDesign().FG : getSkinnable().getValueColor());
+        valueText.setFill(getSkinnable().isLcdVisible() ? lcdColors[5] : getSkinnable().getValueColor());
         resizeText();
 
         // Needle

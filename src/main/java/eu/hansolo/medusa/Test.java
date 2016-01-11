@@ -33,6 +33,7 @@ import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
+import eu.hansolo.medusa.tools.FlatUiColor;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ListChangeListener;
@@ -84,7 +85,7 @@ public class Test extends Application {
                             .valueColor(Color.WHITE)
                             .majorTickMarkType(TickMarkType.TRIANGLE)
                             .sectionsVisible(true)
-                            .sections(new Section(80, 100, Color.ORANGE))
+                            .sections(new Section(80, 100, FlatUiColor.ORANGE.get()))
                             //.areasVisible(true)
                             .areas(new Section(90, 100, Color.rgb(200, 0, 0, 0.75)))
                             .thresholdVisible(true)
@@ -99,9 +100,9 @@ public class Test extends Application {
                             //.shadowsEnabled(true)
                             .needleShape(NeedleShape.FLAT)
                             .knobType(KnobType.FLAT)
-                            .knobColor(Color.ORANGE)
+                            .knobColor(FlatUiColor.ORANGE.get())
                             .ledType(LedType.FLAT)
-                            .ledColor(Color.ORANGE)
+                            .ledColor(FlatUiColor.ORANGE.get())
                             .interactive(true)
                             .onButtonPressed(e -> System.out.println("Pressed"))
                             .onButtonReleased(e -> System.out.println("Released"))

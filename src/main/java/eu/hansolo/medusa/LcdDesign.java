@@ -16,6 +16,7 @@
 
 package eu.hansolo.medusa;
 
+import eu.hansolo.medusa.tools.FlatUiColor;
 import javafx.scene.paint.Color;
 
 
@@ -23,78 +24,77 @@ import javafx.scene.paint.Color;
  * Created by hansolo on 30.12.15.
  */
 public enum LcdDesign {
-    BEIGE(Color.rgb(200, 200, 177), Color.rgb(241, 237, 207), Color.rgb(234, 230, 194), Color.rgb(225, 220, 183), Color.rgb(237, 232, 191), Color.rgb(0, 0, 0), Color.rgb(0, 0, 0, 0.1)),
-    BLUE(Color.rgb(255, 255, 255), Color.rgb(231, 246, 255), Color.rgb(170, 224, 255), Color.rgb(136, 212, 255), Color.rgb(192, 232, 255), Color.rgb(18, 69, 100), Color.rgb(18, 69, 100, 0.1)),
-    ORANGE(Color.rgb(255, 255, 255), Color.rgb(255, 245, 225), Color.rgb(255, 217, 147), Color.rgb(255, 201, 104), Color.rgb(255, 227, 173), Color.rgb(80, 55, 0), Color.rgb(80, 55, 0, 0.1)),
-    RED(Color.rgb(255, 255, 255), Color.rgb(255, 225, 225), Color.rgb(252, 114, 115), Color.rgb(252, 114, 115), Color.rgb(254, 178, 178), Color.rgb(79, 12, 14), Color.rgb(79, 12, 14, 0.1)),
-    YELLOW(Color.rgb(255, 255, 255), Color.rgb(245, 255, 186), Color.rgb(158, 205, 0), Color.rgb(158, 205, 0), Color.rgb(210, 255, 0), Color.rgb(64, 83, 0), Color.rgb(64, 83, 0, 0.1)),
-    WHITE(Color.rgb(255, 255, 255), Color.rgb(255, 255, 255), Color.rgb(241, 246, 242), Color.rgb(229, 239, 244), Color.rgb(255, 255, 255), Color.rgb(0, 0, 0), Color.rgb(0, 0, 0, 0.1)),
-    GRAY(Color.rgb(65, 65, 65), Color.rgb(117, 117, 117), Color.rgb(87, 87, 87), Color.rgb(65, 65, 65), Color.rgb(81, 81, 81), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    BLACK(Color.rgb(65, 65, 65), Color.rgb(102, 102, 102), Color.rgb(51, 51, 51), Color.rgb(0, 0, 0), Color.rgb(51, 51, 51), Color.rgb(204, 204, 204), Color.rgb(204, 204, 204, 0.1)),
-    GREEN(Color.rgb(33, 67, 67), Color.rgb(33, 67, 67), Color.rgb(29, 58, 58), Color.rgb(28, 57, 57), Color.rgb(23, 46, 46), Color.rgb(0, 185, 165), Color.rgb(0, 185, 165, 0.1)),
-    GREEN_DARKGREEN(Color.rgb(27, 41, 17), Color.rgb(70, 84, 58), Color.rgb(36, 60, 14), Color.rgb(24, 50, 1), Color.rgb(8, 10, 7), Color.rgb(152, 255, 74), Color.rgb(152, 255, 74, 0.1)),
-    BLUE2(Color.rgb(0, 68, 103), Color.rgb(8, 109, 165), Color.rgb(0, 72, 117), Color.rgb(0, 72, 117), Color.rgb(0, 68, 103), Color.rgb(111, 182, 228), Color.rgb(111, 182, 228, 0.1)),
-    BLUE_BLACK(Color.rgb(22, 125, 212), Color.rgb(3, 162, 254), Color.rgb(3, 162, 254), Color.rgb(3, 162, 254), Color.rgb(11, 172, 244), Color.rgb(0, 0, 0), Color.rgb(0, 0, 0, 0.1)),
-    BLUE_DARKBLUE(Color.rgb(18, 33, 88), Color.rgb(18, 33, 88), Color.rgb(19, 30, 90), Color.rgb(17, 31, 94), Color.rgb(21, 25, 90), Color.rgb(23, 99, 221), Color.rgb(23, 99, 221, 0.1)),
-    BLUE_LIGHTBLUE(Color.rgb(88, 107, 132), Color.rgb(53, 74, 104), Color.rgb(27, 37, 65), Color.rgb(5, 12, 40), Color.rgb(32, 47, 79), Color.rgb(71, 178, 254), Color.rgb(71, 178, 254, 0.1)),
-    BLUE_GRAY(Color.rgb(135, 174, 255), Color.rgb(101, 159, 255), Color.rgb(44, 93, 255), Color.rgb(27, 65, 254), Color.rgb(12, 50, 255), Color.rgb(178, 180, 237), Color.rgb(178, 180, 237, 0.1)),
-    STANDARD(Color.rgb(131, 133, 119), Color.rgb(176, 183, 167), Color.rgb(165, 174, 153), Color.rgb(166, 175, 156), Color.rgb(175, 184, 165), Color.rgb(35, 42, 52), Color.rgb(35, 42, 52, 0.1)),
-    LIGHTGREEN(Color.rgb(194, 212, 188), Color.rgb(212, 234, 206), Color.rgb(205, 224, 194), Color.rgb(206, 225, 194), Color.rgb(214, 233, 206), Color.rgb(0, 12, 6), Color.rgb(0, 12, 6, 0.1)),
-    STANDARD_GREEN(Color.rgb(255, 255, 255), Color.rgb(219, 230, 220), Color.rgb(179, 194, 178), Color.rgb(153, 176, 151), Color.rgb(114, 138, 109), Color.rgb(0, 12, 6), Color.rgb(0, 12, 6, 0.1)),
-    BLUE_BLUE(Color.rgb(100, 168, 253), Color.rgb(100, 168, 253), Color.rgb(95, 160, 250), Color.rgb(80, 144, 252), Color.rgb(74, 134, 255), Color.rgb(0, 44, 187), Color.rgb(0, 44, 187, 0.1)),
-    RED_DARKRED(Color.rgb(72, 36, 50), Color.rgb(185, 111, 110), Color.rgb(148, 66, 72), Color.rgb(83, 19, 20), Color.rgb(7, 6, 14), Color.rgb(254, 139, 146), Color.rgb(254, 139, 146, 0.1)),
-    DARKBLUE(Color.rgb(14, 24, 31), Color.rgb(46, 105, 144), Color.rgb(19, 64, 96), Color.rgb(6, 20, 29), Color.rgb(8, 9, 10), Color.rgb(61, 179, 255), Color.rgb(61, 179, 255, 0.1)),
-    PURPLE(Color.rgb(175, 164, 255), Color.rgb(188, 168, 253), Color.rgb(176, 159, 255), Color.rgb(174, 147, 252), Color.rgb(168, 136, 233), Color.rgb(7, 97, 72), Color.rgb(7, 97, 72, 0.1)),
-    BLACK_RED(Color.rgb(8, 12, 11), Color.rgb(10, 11, 13), Color.rgb(11, 10, 15), Color.rgb(7, 13, 9), Color.rgb(9, 13, 14), Color.rgb(181, 0, 38), Color.rgb(181, 0, 38, 0.1)),
-    DARKGREEN(Color.rgb(25, 85, 0), Color.rgb(47, 154, 0), Color.rgb(30, 101, 0), Color.rgb(30, 101, 0), Color.rgb(25, 85, 0), Color.rgb(35, 49, 35), Color.rgb(35, 49, 35, 0.1)),
-    AMBER(Color.rgb(182, 71, 0), Color.rgb(236, 155, 25), Color.rgb(212, 93, 5), Color.rgb(212, 93, 5), Color.rgb(182, 71, 0), Color.rgb(89, 58, 10), Color.rgb(89, 58, 10, 0.1)),
-    LIGHTBLUE(Color.rgb(125, 146, 184), Color.rgb(197, 212, 231), Color.rgb(138, 155, 194), Color.rgb(138, 155, 194), Color.rgb(125, 146, 184), Color.rgb(9, 0, 81), Color.rgb(9, 0, 81, 0.1)),
-    GREEN_BLACK(Color.rgb(1, 47, 0), Color.rgb(20, 106, 61), Color.rgb(33, 125, 84), Color.rgb(33, 125, 84), Color.rgb(33, 109, 63), Color.rgb(3, 15, 11), Color.rgb(3, 15, 11, 0.1)),
-    YELLOW_BLACK(Color.rgb(223, 248, 86), Color.rgb(222, 255, 28), Color.rgb(213, 245, 24), Color.rgb(213, 245, 24), Color.rgb(224, 248, 88), Color.rgb(9, 19, 0), Color.rgb(9, 19, 0, 0.1)),
-    BLACK_YELLOW(Color.rgb(43, 3, 3), Color.rgb(29, 0, 0), Color.rgb(26, 2, 2), Color.rgb(31, 5, 8), Color.rgb(30, 1, 3), Color.rgb(255, 254, 24), Color.rgb(255, 254, 24, 0.1)),
-    LIGHTGREEN_BLACK(Color.rgb(79, 121, 19), Color.rgb(96, 169, 0), Color.rgb(120, 201, 2), Color.rgb(118, 201, 0), Color.rgb(105, 179, 4), Color.rgb(0, 35, 0), Color.rgb(0, 35, 0, 0.1)),
-    DARKPURPLE(Color.rgb(35, 24, 75), Color.rgb(42, 20, 111), Color.rgb(40, 22, 103), Color.rgb(40, 22, 103), Color.rgb(41, 21, 111), Color.rgb(158, 167, 210), Color.rgb(158, 167, 210, 0.1)),
-    DARKAMBER(Color.rgb(134, 39, 17), Color.rgb(120, 24, 0), Color.rgb(83, 15, 12), Color.rgb(83, 15, 12), Color.rgb(120, 24, 0), Color.rgb(233, 140, 44), Color.rgb(233, 140, 44, 0.1)),
-    BLUE_LIGHTBLUE2(Color.rgb(15, 84, 151), Color.rgb(60, 103, 198), Color.rgb(67, 109, 209), Color.rgb(67, 109, 209), Color.rgb(64, 101, 190), Color.rgb(193, 253, 254), Color.rgb(193, 253, 254, 0.1)),
-    GRAY_PURPLE(Color.rgb(153, 164, 161), Color.rgb(203, 215, 213), Color.rgb(202, 212, 211), Color.rgb(202, 212, 211), Color.rgb(198, 209, 213), Color.rgb(99, 124, 204), Color.rgb(99, 124, 204, 0.1)),
-    SECTIONS(Color.web("#B2B2B2"), Color.web("#FFFFFF"), Color.web("#C4C4C4"), Color.web("#C4C4C4"), Color.web("#B2B2B2"), Color.web("#000000"), Color.rgb(0, 0, 0, 0.1)),
-    YOCTOPUCE(Color.web("#0E181F"), Color.web("#232341"), Color.web("#1E1E3C"), Color.web("#1E1E3C"), Color.web("#191937"), Color.web("#99E5FF"), Color.rgb(153,229,255, 0.1)),
-    FLAT_TURQOISE(Color.rgb(31, 188, 156), Color.rgb(31, 188, 156), Color.rgb(31, 188, 156), Color.rgb(31, 188, 156), Color.rgb(31, 188, 156), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_GREEN_SEA(Color.rgb(26, 160, 133), Color.rgb(26, 160, 133), Color.rgb(26, 160, 133), Color.rgb(26, 160, 133), Color.rgb(26, 160, 133), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_EMERLAND(Color.rgb(46, 204, 113), Color.rgb(46, 204, 113), Color.rgb(46, 204, 113), Color.rgb(46, 204, 113), Color.rgb(46, 204, 113), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_NEPHRITIS(Color.rgb(39, 174, 96), Color.rgb(39, 174, 96), Color.rgb(39, 174, 96), Color.rgb(39, 174, 96), Color.rgb(39, 174, 96), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_PETER_RIVER(Color.rgb(52, 152, 219), Color.rgb(52, 152, 219), Color.rgb(52, 152, 219), Color.rgb(52, 152, 219), Color.rgb(52, 152, 219), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_BELIZE_HOLE(Color.rgb(41, 128, 185), Color.rgb(41, 128, 185), Color.rgb(41, 128, 185), Color.rgb(41, 128, 185), Color.rgb(41, 128, 185), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_AMETHYST(Color.rgb(155, 89, 182), Color.rgb(155, 89, 182), Color.rgb(155, 89, 182), Color.rgb(155, 89, 182), Color.rgb(155, 89, 182), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_WISTERIA(Color.rgb(142, 68, 173), Color.rgb(142, 68, 173), Color.rgb(142, 68, 173), Color.rgb(142, 68, 173), Color.rgb(142, 68, 173), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_SUNFLOWER(Color.rgb(241, 196, 15), Color.rgb(241, 196, 15), Color.rgb(241, 196, 15), Color.rgb(241, 196, 15), Color.rgb(241, 196, 15), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_ORANGE(Color.rgb(243, 156, 18), Color.rgb(243, 156, 18), Color.rgb(243, 156, 18), Color.rgb(243, 156, 18), Color.rgb(243, 156, 18), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_CARROT(Color.rgb(230, 126, 34), Color.rgb(230, 126, 34), Color.rgb(230, 126, 34), Color.rgb(230, 126, 34), Color.rgb(230, 126, 34), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_PUMPKIN(Color.rgb(211, 84, 0), Color.rgb(211, 84, 0), Color.rgb(211, 84, 0), Color.rgb(211, 84, 0), Color.rgb(211, 84, 0), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_ALIZARIN(Color.rgb(231, 76, 60), Color.rgb(231, 76, 60), Color.rgb(231, 76, 60), Color.rgb(231, 76, 60), Color.rgb(231, 76, 60), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_POMEGRANATE(Color.rgb(192, 57, 43), Color.rgb(192, 57, 43), Color.rgb(192, 57, 43), Color.rgb(192, 57, 43), Color.rgb(192, 57, 43), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_CLOUDS(Color.rgb(236, 240, 241), Color.rgb(236, 240, 241), Color.rgb(236, 240, 241), Color.rgb(236, 240, 241), Color.rgb(236, 240, 241), Color.rgb(0, 0, 0), Color.rgb(0, 0, 0, 0.1)),
-    FLAT_SILVER(Color.rgb(189, 195, 199), Color.rgb(189, 195, 199), Color.rgb(189, 195, 199), Color.rgb(189, 195, 199), Color.rgb(189, 195, 199), Color.rgb(0, 0, 0), Color.rgb(0, 0, 0, 0.1)),
-    FLAT_CONCRETE(Color.rgb(149, 165, 166), Color.rgb(149, 165, 166), Color.rgb(149, 165, 166), Color.rgb(149, 165, 166), Color.rgb(149, 165, 166), Color.rgb(0, 0, 0), Color.rgb(0, 0, 0, 0.1)),
-    FLAT_ASBESTOS(Color.rgb(127, 140, 141), Color.rgb(127, 140, 141), Color.rgb(127, 140, 141), Color.rgb(127, 140, 141), Color.rgb(127, 140, 141), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_WET_ASPHALT(Color.rgb(52, 73, 94), Color.rgb(52, 73, 94), Color.rgb(52, 73, 94), Color.rgb(52, 73, 94), Color.rgb(52, 73, 94), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1)),
-    FLAT_MIDNIGHT_BLUE(Color.rgb(44, 62, 80), Color.rgb(44, 62, 80), Color.rgb(44, 62, 80), Color.rgb(44, 62, 80), Color.rgb(44, 62, 80), Color.rgb(255, 255, 255), Color.rgb(255, 255, 255, 0.1));
+    BEIGE(Color.rgb(200, 200, 177), Color.rgb(241, 237, 207), Color.rgb(234, 230, 194), Color.rgb(225, 220, 183), Color.rgb(237, 232, 191), Color.BLACK, Color.rgb(0, 0, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    BLUE(Color.WHITE, Color.rgb(231, 246, 255), Color.rgb(170, 224, 255), Color.rgb(136, 212, 255), Color.rgb(192, 232, 255), Color.rgb(18, 69, 100), Color.rgb(18, 69, 100, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    ORANGE(Color.WHITE, Color.rgb(255, 245, 225), Color.rgb(255, 217, 147), Color.rgb(255, 201, 104), Color.rgb(255, 227, 173), Color.rgb(80, 55, 0), Color.rgb(80, 55, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    RED(Color.WHITE, Color.rgb(255, 225, 225), Color.rgb(252, 114, 115), Color.rgb(252, 114, 115), Color.rgb(254, 178, 178), Color.rgb(79, 12, 14), Color.rgb(79, 12, 14, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    YELLOW(Color.WHITE, Color.rgb(245, 255, 186), Color.rgb(158, 205, 0), Color.rgb(158, 205, 0), Color.rgb(210, 255, 0), Color.rgb(64, 83, 0), Color.rgb(64, 83, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    WHITE(Color.WHITE, Color.WHITE, Color.rgb(241, 246, 242), Color.rgb(229, 239, 244), Color.WHITE, Color.BLACK, Color.rgb(0, 0, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    GRAY(Color.rgb(65, 65, 65), Color.rgb(117, 117, 117), Color.rgb(87, 87, 87), Color.rgb(65, 65, 65), Color.rgb(81, 81, 81), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    BLACK(Color.rgb(65, 65, 65), Color.rgb(102, 102, 102), Color.rgb(51, 51, 51), Color.BLACK, Color.rgb(51, 51, 51), Color.rgb(204, 204, 204), Color.rgb(204, 204, 204, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    GREEN(Color.rgb(33, 67, 67), Color.rgb(33, 67, 67), Color.rgb(29, 58, 58), Color.rgb(28, 57, 57), Color.rgb(23, 46, 46), Color.rgb(0, 185, 165), Color.rgb(0, 185, 165, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    GREEN_DARKGREEN(Color.rgb(27, 41, 17), Color.rgb(70, 84, 58), Color.rgb(36, 60, 14), Color.rgb(24, 50, 1), Color.rgb(8, 10, 7), Color.rgb(152, 255, 74), Color.rgb(152, 255, 74, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    BLUE2(Color.rgb(0, 68, 103), Color.rgb(8, 109, 165), Color.rgb(0, 72, 117), Color.rgb(0, 72, 117), Color.rgb(0, 68, 103), Color.rgb(111, 182, 228), Color.rgb(111, 182, 228, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    BLUE_BLACK(Color.rgb(22, 125, 212), Color.rgb(3, 162, 254), Color.rgb(3, 162, 254), Color.rgb(3, 162, 254), Color.rgb(11, 172, 244), Color.BLACK, Color.rgb(0, 0, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    BLUE_DARKBLUE(Color.rgb(18, 33, 88), Color.rgb(18, 33, 88), Color.rgb(19, 30, 90), Color.rgb(17, 31, 94), Color.rgb(21, 25, 90), Color.rgb(23, 99, 221), Color.rgb(23, 99, 221, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    BLUE_LIGHTBLUE(Color.rgb(88, 107, 132), Color.rgb(53, 74, 104), Color.rgb(27, 37, 65), Color.rgb(5, 12, 40), Color.rgb(32, 47, 79), Color.rgb(71, 178, 254), Color.rgb(71, 178, 254, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    BLUE_GRAY(Color.rgb(135, 174, 255), Color.rgb(101, 159, 255), Color.rgb(44, 93, 255), Color.rgb(27, 65, 254), Color.rgb(12, 50, 255), Color.rgb(178, 180, 237), Color.rgb(178, 180, 237, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    STANDARD(Color.rgb(131, 133, 119), Color.rgb(176, 183, 167), Color.rgb(165, 174, 153), Color.rgb(166, 175, 156), Color.rgb(175, 184, 165), Color.rgb(35, 42, 52), Color.rgb(35, 42, 52, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    LIGHTGREEN(Color.rgb(194, 212, 188), Color.rgb(212, 234, 206), Color.rgb(205, 224, 194), Color.rgb(206, 225, 194), Color.rgb(214, 233, 206), Color.rgb(0, 12, 6), Color.rgb(0, 12, 6, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    STANDARD_GREEN(Color.WHITE, Color.rgb(219, 230, 220), Color.rgb(179, 194, 178), Color.rgb(153, 176, 151), Color.rgb(114, 138, 109), Color.rgb(0, 12, 6), Color.rgb(0, 12, 6, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    BLUE_BLUE(Color.rgb(100, 168, 253), Color.rgb(100, 168, 253), Color.rgb(95, 160, 250), Color.rgb(80, 144, 252), Color.rgb(74, 134, 255), Color.rgb(0, 44, 187), Color.rgb(0, 44, 187, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    RED_DARKRED(Color.rgb(72, 36, 50), Color.rgb(185, 111, 110), Color.rgb(148, 66, 72), Color.rgb(83, 19, 20), Color.rgb(7, 6, 14), Color.rgb(254, 139, 146), Color.rgb(254, 139, 146, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    DARKBLUE(Color.rgb(14, 24, 31), Color.rgb(46, 105, 144), Color.rgb(19, 64, 96), Color.rgb(6, 20, 29), Color.rgb(8, 9, 10), Color.rgb(61, 179, 255), Color.rgb(61, 179, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    PURPLE(Color.rgb(175, 164, 255), Color.rgb(188, 168, 253), Color.rgb(176, 159, 255), Color.rgb(174, 147, 252), Color.rgb(168, 136, 233), Color.rgb(7, 97, 72), Color.rgb(7, 97, 72, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    BLACK_RED(Color.rgb(8, 12, 11), Color.rgb(10, 11, 13), Color.rgb(11, 10, 15), Color.rgb(7, 13, 9), Color.rgb(9, 13, 14), Color.rgb(181, 0, 38), Color.rgb(181, 0, 38, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    DARKGREEN(Color.rgb(25, 85, 0), Color.rgb(47, 154, 0), Color.rgb(30, 101, 0), Color.rgb(30, 101, 0), Color.rgb(25, 85, 0), Color.rgb(35, 49, 35), Color.rgb(35, 49, 35, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    AMBER(Color.rgb(182, 71, 0), Color.rgb(236, 155, 25), Color.rgb(212, 93, 5), Color.rgb(212, 93, 5), Color.rgb(182, 71, 0), Color.rgb(89, 58, 10), Color.rgb(89, 58, 10, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    LIGHTBLUE(Color.rgb(125, 146, 184), Color.rgb(197, 212, 231), Color.rgb(138, 155, 194), Color.rgb(138, 155, 194), Color.rgb(125, 146, 184), Color.rgb(9, 0, 81), Color.rgb(9, 0, 81, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    GREEN_BLACK(Color.rgb(1, 47, 0), Color.rgb(20, 106, 61), Color.rgb(33, 125, 84), Color.rgb(33, 125, 84), Color.rgb(33, 109, 63), Color.rgb(3, 15, 11), Color.rgb(3, 15, 11, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    YELLOW_BLACK(Color.rgb(223, 248, 86), Color.rgb(222, 255, 28), Color.rgb(213, 245, 24), Color.rgb(213, 245, 24), Color.rgb(224, 248, 88), Color.rgb(9, 19, 0), Color.rgb(9, 19, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    BLACK_YELLOW(Color.rgb(43, 3, 3), Color.rgb(29, 0, 0), Color.rgb(26, 2, 2), Color.rgb(31, 5, 8), Color.rgb(30, 1, 3), Color.rgb(255, 254, 24), Color.rgb(255, 254, 24, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    LIGHTGREEN_BLACK(Color.rgb(79, 121, 19), Color.rgb(96, 169, 0), Color.rgb(120, 201, 2), Color.rgb(118, 201, 0), Color.rgb(105, 179, 4), Color.rgb(0, 35, 0), Color.rgb(0, 35, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    DARKPURPLE(Color.rgb(35, 24, 75), Color.rgb(42, 20, 111), Color.rgb(40, 22, 103), Color.rgb(40, 22, 103), Color.rgb(41, 21, 111), Color.rgb(158, 167, 210), Color.rgb(158, 167, 210, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    DARKAMBER(Color.rgb(134, 39, 17), Color.rgb(120, 24, 0), Color.rgb(83, 15, 12), Color.rgb(83, 15, 12), Color.rgb(120, 24, 0), Color.rgb(233, 140, 44), Color.rgb(233, 140, 44, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    BLUE_LIGHTBLUE2(Color.rgb(15, 84, 151), Color.rgb(60, 103, 198), Color.rgb(67, 109, 209), Color.rgb(67, 109, 209), Color.rgb(64, 101, 190), Color.rgb(193, 253, 254), Color.rgb(193, 253, 254, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    GRAY_PURPLE(Color.rgb(153, 164, 161), Color.rgb(203, 215, 213), Color.rgb(202, 212, 211), Color.rgb(202, 212, 211), Color.rgb(198, 209, 213), Color.rgb(99, 124, 204), Color.rgb(99, 124, 204, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    SECTIONS(Color.web("#B2B2B2"), Color.web("#FFFFFF"), Color.web("#C4C4C4"), Color.web("#C4C4C4"), Color.web("#B2B2B2"), Color.web("#000000"), Color.rgb(0, 0, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    YOCTOPUCE(Color.web("#0E181F"), Color.web("#232341"), Color.web("#1E1E3C"), Color.web("#1E1E3C"), Color.web("#191937"), Color.web("#99E5FF"), Color.rgb(153,229,255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_TURQOISE(FlatUiColor.TURQOISE.get(), FlatUiColor.TURQOISE.get(), FlatUiColor.TURQOISE.get(), FlatUiColor.TURQOISE.get(), FlatUiColor.TURQOISE.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_GREEN_SEA(FlatUiColor.GREEN_SEA.get(), FlatUiColor.GREEN_SEA.get(), FlatUiColor.GREEN_SEA.get(), FlatUiColor.GREEN_SEA.get(), FlatUiColor.GREEN_SEA.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_EMERLAND(FlatUiColor.EMERLAND.get(), FlatUiColor.EMERLAND.get(), FlatUiColor.EMERLAND.get(), FlatUiColor.EMERLAND.get(), FlatUiColor.EMERLAND.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_NEPHRITIS(FlatUiColor.NEPHRITIS.get(), FlatUiColor.NEPHRITIS.get(), FlatUiColor.NEPHRITIS.get(), FlatUiColor.NEPHRITIS.get(), FlatUiColor.NEPHRITIS.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_PETER_RIVER(FlatUiColor.PETER_RIVER.get(), FlatUiColor.PETER_RIVER.get(), FlatUiColor.PETER_RIVER.get(), FlatUiColor.PETER_RIVER.get(), FlatUiColor.PETER_RIVER.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_BELIZE_HOLE(FlatUiColor.BELIZE_HOLE.get(), FlatUiColor.BELIZE_HOLE.get(), FlatUiColor.BELIZE_HOLE.get(), FlatUiColor.BELIZE_HOLE.get(), FlatUiColor.BELIZE_HOLE.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_AMETHYST(FlatUiColor.AMETHYST.get(), FlatUiColor.AMETHYST.get(), FlatUiColor.AMETHYST.get(), FlatUiColor.AMETHYST.get(), FlatUiColor.AMETHYST.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_WISTERIA(FlatUiColor.WISTERIA.get(), FlatUiColor.WISTERIA.get(), FlatUiColor.WISTERIA.get(), FlatUiColor.WISTERIA.get(), FlatUiColor.WISTERIA.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_SUNFLOWER(FlatUiColor.SUNFLOWER.get(), FlatUiColor.SUNFLOWER.get(), FlatUiColor.SUNFLOWER.get(), FlatUiColor.SUNFLOWER.get(), FlatUiColor.SUNFLOWER.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_ORANGE(FlatUiColor.ORANGE.get(), FlatUiColor.ORANGE.get(), FlatUiColor.ORANGE.get(), FlatUiColor.ORANGE.get(), FlatUiColor.ORANGE.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_CARROT(FlatUiColor.CARROT.get(), FlatUiColor.CARROT.get(), FlatUiColor.CARROT.get(), FlatUiColor.CARROT.get(), FlatUiColor.CARROT.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_PUMPKIN(FlatUiColor.PUMPKIN.get(), FlatUiColor.PUMPKIN.get(), FlatUiColor.PUMPKIN.get(), FlatUiColor.PUMPKIN.get(), FlatUiColor.PUMPKIN.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_ALIZARIN(FlatUiColor.ALIZARIN.get(), FlatUiColor.ALIZARIN.get(), FlatUiColor.ALIZARIN.get(), FlatUiColor.ALIZARIN.get(), FlatUiColor.ALIZARIN.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_POMEGRANATE(FlatUiColor.POMEGRANATE.get(), FlatUiColor.POMEGRANATE.get(), FlatUiColor.POMEGRANATE.get(), FlatUiColor.POMEGRANATE.get(), FlatUiColor.POMEGRANATE.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_CLOUDS(FlatUiColor.CLOUDS.get(), FlatUiColor.CLOUDS.get(), FlatUiColor.CLOUDS.get(), FlatUiColor.CLOUDS.get(), FlatUiColor.CLOUDS.get(), Color.BLACK, Color.rgb(0, 0, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_SILVER(FlatUiColor.SILVER.get(), FlatUiColor.SILVER.get(), FlatUiColor.SILVER.get(), FlatUiColor.SILVER.get(), FlatUiColor.SILVER.get(), Color.BLACK, Color.rgb(0, 0, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_CONCRETE(FlatUiColor.CONCRETE.get(), FlatUiColor.CONCRETE.get(), FlatUiColor.CONCRETE.get(), FlatUiColor.CONCRETE.get(), FlatUiColor.CONCRETE.get(), Color.BLACK, Color.rgb(0, 0, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_ASBESTOS(FlatUiColor.ASBESTOS.get(), FlatUiColor.ASBESTOS.get(), FlatUiColor.ASBESTOS.get(), FlatUiColor.ASBESTOS.get(), FlatUiColor.ASBESTOS.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_WET_ASPHALT(FlatUiColor.WET_ASPHALT.get(), FlatUiColor.WET_ASPHALT.get(), FlatUiColor.WET_ASPHALT.get(), FlatUiColor.WET_ASPHALT.get(), FlatUiColor.WET_ASPHALT.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_MIDNIGHT_BLUE(FlatUiColor.MIDNIGHT_BLUE.get(), FlatUiColor.MIDNIGHT_BLUE.get(), FlatUiColor.MIDNIGHT_BLUE.get(), FlatUiColor.MIDNIGHT_BLUE.get(), FlatUiColor.MIDNIGHT_BLUE.get(), Color.WHITE, Color.rgb(255, 255, 255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
+    FLAT_CUSTOM(null, null, null, null, null, null, null) { @Override public Color[] getColors() {
+        return new Color[] {lcdBackgroundColor, lcdBackgroundColor, lcdBackgroundColor, lcdBackgroundColor, lcdBackgroundColor,
+                            lcdForegroundColor, Color.color(lcdForegroundColor.getRed(), lcdForegroundColor.getGreen(), lcdForegroundColor.getBlue(), 0.1)};
+    } };
 
-    public final Color BG0;
-    public final Color BG1;
-    public final Color BG2;
-    public final Color BG3;
-    public final Color BG4;
-    public final Color FG;
-    public final Color FGT;
+
+    protected final Color[] COLORS;
+    public        Color     lcdForegroundColor;
+    public        Color     lcdBackgroundColor;
+
+    public abstract Color[] getColors();
 
     LcdDesign(final Color BG0, final Color BG1, final Color BG2, final Color BG3, final Color BG4, final Color FG, final Color FGT) {
-        this.BG0   = BG0;
-        this.BG1   = BG1;
-        this.BG2   = BG2;
-        this.BG3   = BG3;
-        this.BG4   = BG4;
-        this.FG    = FG;
-        this.FGT   = FGT;
+        COLORS             = new Color[] {BG0, BG1, BG2, BG3, BG4, FG, FGT};
+        lcdForegroundColor = Color.WHITE;
+        lcdBackgroundColor = Color.TRANSPARENT;
     }
 }
