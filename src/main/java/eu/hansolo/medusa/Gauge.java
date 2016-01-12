@@ -840,14 +840,20 @@ public class Gauge extends Control {
     public KnobType getKnobType() { return null == knobType ? _knobType : knobType.get(); }
     public void setKnobType(final KnobType TYPE) {
         if (null == knobType) {
-            _knobType = TYPE;
+            _knobType = null == TYPE ? KnobType.STANDARD : TYPE;
         } else {
             knobType.set(TYPE);
         }
         fireUpdateEvent(RESIZE_EVENT);
     }
     public ObjectProperty<KnobType> knobTypeProperty() {
-        if (null == knobType) { knobType = new SimpleObjectProperty<>(Gauge.this, "knobType", _knobType); }
+        if (null == knobType) {
+            knobType = new ObjectPropertyBase<KnobType>(_knobType) {
+                @Override public void set(final KnobType TYPE) { super.set(null == TYPE ? KnobType.STANDARD : TYPE); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "knobType"; }
+            };
+        }
         return knobType;
     }
     
@@ -973,42 +979,60 @@ public class Gauge extends Control {
     public ScaleDirection getScaleDirection() { return null == scaleDirection ? _scaleDirection : scaleDirection.get(); }
     public void setScaleDirection(final ScaleDirection DIRECTION) {
         if (null == scaleDirection) {
-            _scaleDirection = DIRECTION;
+            _scaleDirection = null == DIRECTION ? ScaleDirection.CLOCKWISE : DIRECTION;
         } else {
             scaleDirection.set(DIRECTION);
         }
         fireUpdateEvent(RESIZE_EVENT);
     }
     public ObjectProperty<ScaleDirection> scaleDirectionProperty() {
-        if (null == scaleDirection) { scaleDirection = new SimpleObjectProperty<>(Gauge.this, "scaleDirection", _scaleDirection); }
+        if (null == scaleDirection) {
+            scaleDirection = new ObjectPropertyBase<ScaleDirection>(_scaleDirection) {
+                @Override public void set(final ScaleDirection DIRECTION) { super.set(null == DIRECTION ? ScaleDirection.CLOCKWISE : DIRECTION); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "scaleDirection"; }
+            };
+        }
         return scaleDirection;
     }
 
     public TickLabelLocation getTickLabelLocation() { return null == tickLabelLocation ? _tickLabelLocation : tickLabelLocation.get(); }
     public void setTickLabelLocation(final TickLabelLocation LOCATION) {
         if (null == tickLabelLocation) {
-            _tickLabelLocation = LOCATION;
+            _tickLabelLocation = null == LOCATION ? TickLabelLocation.INSIDE : LOCATION;
         } else {
             tickLabelLocation.set(LOCATION);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public ObjectProperty<TickLabelLocation> tickLabelLocationProperty() {
-        if (null == tickLabelLocation) { tickLabelLocation = new SimpleObjectProperty<>(Gauge.this, "tickLabelLocation", _tickLabelLocation); }
+        if (null == tickLabelLocation) {
+            tickLabelLocation = new ObjectPropertyBase<TickLabelLocation>() {
+                @Override public void set(final TickLabelLocation LOCATION) { super.set(null == LOCATION ? TickLabelLocation.INSIDE : LOCATION); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "tickLabelLocation"; }
+            };
+        }
         return tickLabelLocation;
     }
 
     public TickLabelOrientation getTickLabelOrientation() { return null == tickLabelOrientation ? _tickLabelOrientation : tickLabelOrientation.get(); }
     public void setTickLabelOrientation(final TickLabelOrientation ORIENTATION) {
         if (null == tickLabelOrientation) {
-            _tickLabelOrientation = ORIENTATION;
+            _tickLabelOrientation = null == ORIENTATION ? TickLabelOrientation.HORIZONTAL : ORIENTATION;
         } else {
             tickLabelOrientation.set(ORIENTATION);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public ObjectProperty<TickLabelOrientation> tickLabelOrientationProperty() {
-        if (null == tickLabelOrientation) { tickLabelOrientation = new SimpleObjectProperty<>(Gauge.this, "tickLabelOrientation", _tickLabelOrientation); }
+        if (null == tickLabelOrientation) {
+            tickLabelOrientation = new ObjectPropertyBase<TickLabelOrientation>(_tickLabelOrientation) {
+                @Override public void set(final TickLabelOrientation ORIENTATION) { super.set(null == ORIENTATION ? TickLabelOrientation.HORIZONTAL : ORIENTATION); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "tickLabelOrientation"; }
+            };
+        }
         return tickLabelOrientation;
     }
 
@@ -1147,14 +1171,20 @@ public class Gauge extends Control {
     public NumberFormat getNumberFormat() { return null == numberFormat ? _numberFormat : numberFormat.get(); }
     public void setNumberFormat(final NumberFormat FORMAT) {
         if (null == numberFormat) {
-            _numberFormat = FORMAT;
+            _numberFormat = null == FORMAT ? NumberFormat.STANDARD : FORMAT;
         } else {
             numberFormat.set(FORMAT);
         }
         fireUpdateEvent(RESIZE_EVENT);
     }
     public ObjectProperty<NumberFormat> numberFormatProperty() {
-        if (null == numberFormat) { numberFormat = new SimpleObjectProperty<>(Gauge.this, "numberFormat", _numberFormat); }
+        if (null == numberFormat) {
+            numberFormat = new ObjectPropertyBase<NumberFormat>(_numberFormat) {
+                @Override public void set(final NumberFormat FORMAT) { super.set(null == FORMAT ? NumberFormat.STANDARD : FORMAT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "numberFormat"; }
+            };
+        }
         return numberFormat;
     }
 
@@ -1201,42 +1231,60 @@ public class Gauge extends Control {
     public NeedleType getNeedleType() { return null == needleType ? _needleType : needleType.get(); }
     public void setNeedleType(final NeedleType TYPE) {
         if (null == needleType) {
-            _needleType = TYPE;
+            _needleType = TYPE == null ? NeedleType.STANDARD : TYPE;
         } else {
             needleType.set(TYPE);
         }
         fireUpdateEvent(RESIZE_EVENT);
     }
     public ObjectProperty<NeedleType> needleTypeProperty() {
-        if (null == needleType) { needleType = new SimpleObjectProperty<>(Gauge.this, "needleType", _needleType); }
+        if (null == needleType) {
+            needleType = new ObjectPropertyBase<NeedleType>(_needleType) {
+                @Override public void set(final NeedleType TYPE) { super.set(null == TYPE ? NeedleType.STANDARD : TYPE); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "needleType"; }
+            };
+        }
         return needleType;
     }
 
     public NeedleShape getNeedleShape() { return null == needleShape ? _needleShape : needleShape.get(); }
     public void setNeedleShape(final NeedleShape SHAPE) {
         if (null == needleShape) {
-            _needleShape = SHAPE;
+            _needleShape = null == SHAPE ? NeedleShape.ANGLED : SHAPE;
         } else {
             needleShape.set(SHAPE);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public ObjectProperty<NeedleShape> needleShapeProperty() {
-        if (null == needleShape) { needleShape = new SimpleObjectProperty<>(Gauge.this, "needleShape", _needleShape); }
+        if (null == needleShape) {
+            needleShape = new ObjectPropertyBase<NeedleShape>(_needleShape) {
+                @Override public void set(final NeedleShape SHAPE) { super.set(null == SHAPE ? NeedleShape.ANGLED : SHAPE); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "needleShape"; }
+            };
+        }
         return needleShape;
     }
     
     public NeedleSize getNeedleSize() { return null == needleSize ? _needleSize : needleSize.get(); }
     public void setNeedleSize(final NeedleSize SIZE) {
         if (null == needleSize) {
-            _needleSize = SIZE;
+            _needleSize = null == SIZE ? NeedleSize.STANDARD : SIZE;
         } else {
             needleSize.set(SIZE);
         }
         fireUpdateEvent(RESIZE_EVENT);
     }
     public ObjectProperty<NeedleSize> needleSizeProperty() {
-        if (null == needleSize) { needleSize = new SimpleObjectProperty<>(Gauge.this, "needleSize", _needleSize); }
+        if (null == needleSize) {
+            needleSize = new ObjectPropertyBase<NeedleSize>(_needleSize) {
+                @Override public void set(final NeedleSize SIZE) { super.set(null == SIZE ? NeedleSize.STANDARD : SIZE); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "needleSize"; }
+            };
+        }
         return needleSize;
     }
 
@@ -1271,28 +1319,41 @@ public class Gauge extends Control {
     public LcdDesign getLcdDesign() { return null == lcdDesign ? _lcdDesign : lcdDesign.get(); }
     public void setLcdDesign(final LcdDesign DESIGN) {
         if (null == lcdDesign) {
-            _lcdDesign = DESIGN;
+            _lcdDesign = DESIGN == null ? LcdDesign.STANDARD : DESIGN;
         } else {
             lcdDesign.set(DESIGN);
         }
         fireUpdateEvent(RESIZE_EVENT);
     }
     public ObjectProperty<LcdDesign> lcdDesignProperty() {
-        if (null == lcdDesign) { lcdDesign = new SimpleObjectProperty<>(Gauge.this, "lcdDesign", _lcdDesign); }
+        if (null == lcdDesign) {
+            lcdDesign = new ObjectPropertyBase<LcdDesign>(_lcdDesign) {
+                @Override public void set(final LcdDesign DESIGN) { super.set(DESIGN == null ? LcdDesign.STANDARD : DESIGN); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "lcdDesign"; }
+            };
+        }
         return lcdDesign;
     }
 
     public LcdFont getLcdFont() { return null == lcdFont ? _lcdFont : lcdFont.get(); }
     public void setLcdFont(final LcdFont FONT) {
         if (null == lcdFont) {
-            _lcdFont = FONT;
+            _lcdFont = null == FONT ? LcdFont.DIGITAL_BOLD : FONT;
         } else {
             lcdFont.set(FONT);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public ObjectProperty<LcdFont> lcdFontProperty() {
-        if (null == lcdFont) { lcdFont = new SimpleObjectProperty<>(Gauge.this, "lcdFont", _lcdFont); }
+        if (null == lcdFont) {
+            lcdFont = new SimpleObjectProperty<>(Gauge.this, "lcdFont", _lcdFont);
+            lcdFont = new ObjectPropertyBase<LcdFont>(_lcdFont) {
+                @Override public void set(final LcdFont FONT) { super.set(null == FONT ? LcdFont.DIGITAL_BOLD : FONT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "lcdFont"; }
+            };
+        }
         return lcdFont;
     }
 
@@ -1313,14 +1374,20 @@ public class Gauge extends Control {
     public LedType getLedType() { return null == ledType ? _ledType : ledType.get(); }
     public void setLedType(final LedType TYPE) {
         if (null == ledType) {
-            _ledType = TYPE;
+            _ledType = null == TYPE ? LedType.STANDARD : TYPE;
         } else {
             ledType.set(TYPE);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public ObjectProperty<LedType> ledTypeProperty() {
-        if (null == ledType) { ledType = new SimpleObjectProperty<>(Gauge.this, "ledType", _ledType); }
+        if (null == ledType) {
+            ledType = new ObjectPropertyBase<LedType>(_ledType) {
+                @Override public void set(final LedType TYPE) { super.set(null == TYPE ? LedType.STANDARD : TYPE); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "ledType"; }
+            };
+        }
         return ledType;
     }
     
