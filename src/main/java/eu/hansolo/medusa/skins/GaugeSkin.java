@@ -786,7 +786,11 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                             if (isNotZero) {
                                 ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
                             } else {
-                                if (fullRange) ticksAndSections.setFill(zeroColor);
+                                if (fullRange) {
+                                    ticksAndSections.setFill(zeroColor);
+                                } else {
+                                    ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
+                                };
                             }
                         } else {
                             ticksAndSections.setFill(Color.TRANSPARENT);
