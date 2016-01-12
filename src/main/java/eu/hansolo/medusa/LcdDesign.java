@@ -16,7 +16,6 @@
 
 package eu.hansolo.medusa;
 
-import eu.hansolo.medusa.tools.FlatUiColor;
 import javafx.scene.paint.Color;
 
 
