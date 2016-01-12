@@ -25,20 +25,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.BooleanPropertyBase;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.DoublePropertyBase;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.IntegerPropertyBase;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -108,31 +95,31 @@ public class Gauge extends Control {
     public enum LcdFont { STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA }
     public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE }
 
-    public  static final Color                 DARK_COLOR           = Color.rgb(36, 36, 36);
-    public  static final Color                 BRIGHT_COLOR         = Color.rgb(223, 223, 223);
-    private static final long                  LED_BLINK_INTERVAL   = 500l;
+    public  static final Color                   DARK_COLOR           = Color.rgb(36, 36, 36);
+    public  static final Color                   BRIGHT_COLOR         = Color.rgb(223, 223, 223);
+    private static final long                    LED_BLINK_INTERVAL   = 500l;
 
-    public         final ButtonEvent           BUTTON_PRESSED_EVENT = new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_PRESSED);
-    public         final ButtonEvent           BUTTON_RELEASED_EVENT= new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_RELEASED);
-    private        final ThresholdEvent        EXCEEDED_EVENT       = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_EXCEEDED);
-    private        final ThresholdEvent        UNDERRUN_EVENT       = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_UNDERRUN);
-    private        final UpdateEvent           RECALC_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
-    private        final UpdateEvent           REDRAW_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
-    private        final UpdateEvent           RESIZE_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
-    private        final UpdateEvent           LED_BLINK_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED_BLINK);
-    private        final UpdateEvent           VISIBILITY_EVENT     = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
-    private        final UpdateEvent           INTERACTIVITY_EVENT  = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
+    public         final ButtonEvent             BUTTON_PRESSED_EVENT = new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_PRESSED);
+    public         final ButtonEvent             BUTTON_RELEASED_EVENT= new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_RELEASED);
+    private        final ThresholdEvent          EXCEEDED_EVENT       = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_EXCEEDED);
+    private        final ThresholdEvent          UNDERRUN_EVENT       = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_UNDERRUN);
+    private        final UpdateEvent             RECALC_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
+    private        final UpdateEvent             REDRAW_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
+    private        final UpdateEvent             RESIZE_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
+    private        final UpdateEvent             LED_BLINK_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED_BLINK);
+    private        final UpdateEvent             VISIBILITY_EVENT     = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
+    private        final UpdateEvent             INTERACTIVITY_EVENT  = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
 
-    private static volatile Future             blinkFuture;
-    private static ScheduledExecutorService    blinkService         = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
-    private static volatile Callable<Void>     blinkTask;
+    private static volatile Future               blinkFuture;
+    private static ScheduledExecutorService      blinkService         = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
+    private static volatile Callable<Void>       blinkTask;
 
     // Update events
-    private List<UpdateEventListener>          listenerList        = new CopyOnWriteArrayList();
-    private List<EventHandler<ButtonEvent>>    pressedHandlerList  = new CopyOnWriteArrayList<>();
-    private List<EventHandler<ButtonEvent>>    releasedHandlerList = new CopyOnWriteArrayList<>();
-    private List<EventHandler<ThresholdEvent>> exceededHandlerList = new CopyOnWriteArrayList<>();
-    private List<EventHandler<ThresholdEvent>> underrunHandlerList = new CopyOnWriteArrayList<>();
+    private List<UpdateEventListener>            listenerList         = new CopyOnWriteArrayList();
+    private List<EventHandler<ButtonEvent>>      pressedHandlerList   = new CopyOnWriteArrayList<>();
+    private List<EventHandler<ButtonEvent>>      releasedHandlerList  = new CopyOnWriteArrayList<>();
+    private List<EventHandler<ThresholdEvent>>   exceededHandlerList  = new CopyOnWriteArrayList<>();
+    private List<EventHandler<ThresholdEvent>>   underrunHandlerList  = new CopyOnWriteArrayList<>();
 
     // Data related
     private DoubleProperty                       value;
@@ -666,6 +653,7 @@ public class Gauge extends Control {
     // ******************** UI related methods ********************************
     public void setForegroundBaseColor(final Color COLOR) {
         if (null == titleColor)          { _titleColor     = COLOR;      } else { titleColor.set(COLOR); }
+        if (null == subTitleColor)       { _subTitleColor  = COLOR;      } else { subTitleColor.set(COLOR); }
         if (null == unitColor)           { _unitColor      = COLOR;      } else { unitColor.set(COLOR); }
         if (null == valueColor)          { _valueColor     = COLOR;      } else { valueColor.set(COLOR); }
         if (null == tickLabelColor)      { _tickLabelColor = COLOR;      } else { tickLabelColor.set(COLOR); }
@@ -870,7 +858,6 @@ public class Gauge extends Control {
         } else {
             animated.set(ANIMATED);
         }
-        fireUpdateEvent(REDRAW_EVENT);
     }
     public BooleanProperty animatedProperty() {
         if (null == animated) { animated = new SimpleBooleanProperty(Gauge.this, "animated", _animated); }
@@ -1098,42 +1085,62 @@ public class Gauge extends Control {
     public TickMarkType getMajorTickMarkType() { return null == majorTickMarkType ? _majorTickMarkType : majorTickMarkType.get(); }
     public void setMajorTickMarkType(final TickMarkType TYPE) {
         if (null == majorTickMarkType) {
-            _majorTickMarkType = TYPE;
+            _majorTickMarkType = null == TYPE ? TickMarkType.LINE : TYPE;
         } else {
             majorTickMarkType.set(TYPE);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public ObjectProperty<TickMarkType> majorTickMarkTypeProperty() {
-        if (null == majorTickMarkType) { majorTickMarkType = new SimpleObjectProperty<>(Gauge.this, "majorTickMarkType", _majorTickMarkType); }
+        if (null == majorTickMarkType) {
+            majorTickMarkType = new ObjectPropertyBase<TickMarkType>(_majorTickMarkType) {
+                @Override public void set(final TickMarkType TYPE) { super.set(null == TYPE ? TickMarkType.LINE : TYPE); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "majorTickMarkType"; }
+            };
+        }
         return majorTickMarkType;
     }
 
     public TickMarkType getMediumTickMarkType() { return null == mediumTickMarkType ? _mediumTickMarkType : mediumTickMarkType.get(); }
     public void setMediumTickMarkType(final TickMarkType TYPE) {
         if (null == mediumTickMarkType) {
-            _mediumTickMarkType = TYPE;
+            _mediumTickMarkType = null == TYPE ? TickMarkType.LINE : TYPE;
         } else {
             mediumTickMarkType.set(TYPE);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public ObjectProperty<TickMarkType> mediumTickMarkTypeProperty() {
-        if (null == mediumTickMarkType) { mediumTickMarkType = new SimpleObjectProperty<>(Gauge.this, "mediumTickMarkType", _mediumTickMarkType); }
+        if (null == mediumTickMarkType) {
+            mediumTickMarkType = new ObjectPropertyBase<TickMarkType>(_mediumTickMarkType) {
+                @Override public void set(final TickMarkType TYPE) { super.set(null == TYPE ? TickMarkType.LINE : TYPE); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "mediumTickMarkType"; }
+            };
+        }
         return mediumTickMarkType;
     }
     
     public TickMarkType getMinorTickMarkType() { return null == minorTickMarkType ? _minorTickMarkType : minorTickMarkType.get(); }
     public void setMinorTickMarkType(final TickMarkType TYPE) {
         if (null == minorTickMarkType) {
-            _minorTickMarkType = TYPE;
+            _minorTickMarkType = null == TYPE ? TickMarkType.LINE : TYPE;
         } else {
             minorTickMarkType.set(TYPE);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public ObjectProperty<TickMarkType> minorTickMarkTypeProperty() {
-        if (null == minorTickMarkType) { minorTickMarkType = new SimpleObjectProperty<>(Gauge.this, "minorTickMarkType", _minorTickMarkType); }
+        if (null == minorTickMarkType) {
+            minorTickMarkType = new SimpleObjectProperty<>(Gauge.this, "minorTickMarkType", _minorTickMarkType);
+            minorTickMarkType = new ObjectPropertyBase<TickMarkType>(_minorTickMarkType) {
+                @Override public void set(final TickMarkType TYPE) { super.set(null == TYPE ? TickMarkType.LINE : TYPE); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "minorTickMarkType"; }
+            };
+
+        }
         return minorTickMarkType;
     }
 
@@ -1697,7 +1704,7 @@ public class Gauge extends Control {
             blinkFuture.cancel(true);
             setLedOn(false);
         }
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(LED_BLINK_EVENT);
     }
     public BooleanProperty ledBlinkingProperty() {
         if (null == ledBlinking) { ledBlinking = new SimpleBooleanProperty(Gauge.this, "ledBlinking", _ledBlinking); }
