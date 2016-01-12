@@ -92,6 +92,7 @@ public class FGauge extends Region {
         background.setEffect(innerShadow);
 
         foreground = new Circle();
+        foreground.setMouseTransparent(true);
 
         getChildren().setAll(frame, background, gauge, foreground);
     }

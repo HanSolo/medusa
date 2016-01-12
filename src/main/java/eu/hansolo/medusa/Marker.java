@@ -19,6 +19,7 @@ package eu.hansolo.medusa;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -81,7 +82,7 @@ public class Marker {
         _value       = VALUE;
         _text        = TEXT;
         _color       = COLOR;
-        _markerType  = TYPE;
+        _markerType  = null == TYPE ? MarkerType.STANDARD : TYPE;
         checkedValue = -Double.MAX_VALUE;
     }
 
@@ -132,14 +133,20 @@ public class Marker {
     public MarkerType getMarkerType() { return null == markerType ? _markerType : markerType.get(); }
     public void setMarkerType(final MarkerType TYPE) {
         if (null == markerType) {
-            _markerType = TYPE;
+            _markerType = null == TYPE ? MarkerType.STANDARD : TYPE;
         } else {
             markerType.set(TYPE);
         }
         fireMarkerEvent(TYPE_CHANGED_EVENT);
     }
     public ObjectProperty<MarkerType> markerTypeProperty() {
-        if (null == markerType) { markerType = new SimpleObjectProperty<>(Marker.this, "markerType", _markerType); }
+        if (null == markerType) {
+            markerType = new ObjectPropertyBase<MarkerType>(_markerType) {
+                @Override public void set(final MarkerType TYPE) { super.set(null == TYPE ? MarkerType.STANDARD : TYPE); }
+                @Override public Object getBean() { return Marker.this; }
+                @Override public String getName() { return "markerType"; }
+            };
+        }
         return markerType;
     }
     

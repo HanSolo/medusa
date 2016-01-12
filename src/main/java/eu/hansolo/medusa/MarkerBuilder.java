@@ -77,6 +77,16 @@ public class MarkerBuilder {
         return this;
     }
 
+    public final MarkerBuilder onMarkerExceeded(final EventHandler<Marker.MarkerEvent> HANDLER) {
+        properties.put("onMarkerExceeded", new SimpleObjectProperty<>(HANDLER));
+        return this;
+    }
+
+    public final MarkerBuilder onMarkerUnderrun(final EventHandler<Marker.MarkerEvent> HANDLER) {
+        properties.put("onMarkerUnderrun", new SimpleObjectProperty<>(HANDLER));
+        return this;
+    }
+
     public final Marker build() {
         final Marker MARKER = new Marker();
         for (String key : properties.keySet()) {
@@ -92,6 +102,10 @@ public class MarkerBuilder {
                 MARKER.setOnMarkerPressed(((ObjectProperty<EventHandler>) properties.get(key)).get());
             } else if ("onMarkerReleased".equals(key)) {
                 MARKER.setOnMarkerReleased(((ObjectProperty<EventHandler>) properties.get(key)).get());
+            } else if ("onMarkerExceeded".equals(key)) {
+                MARKER.setOnMarkerExceeded(((ObjectProperty<EventHandler>) properties.get(key)).get());
+            } else if ("onMarkerUnderrun".equals(key)) {
+                MARKER.setOnMarkerUnderrun(((ObjectProperty<EventHandler>) properties.get(key)).get());
             }
         }
         return MARKER;

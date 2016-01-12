@@ -16,6 +16,8 @@
 
 package eu.hansolo.medusa;
 
+import eu.hansolo.medusa.Marker.MarkerEvent;
+import eu.hansolo.medusa.Section.SectionEvent;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
@@ -23,6 +25,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.event.EventHandler;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
@@ -35,8 +38,10 @@ import java.util.HashMap;
 public class SectionBuilder {
     private HashMap<String, Property> properties = new HashMap<>();
 
+
     // ******************** Constructors **************************************
     protected SectionBuilder() {}
+
 
     // ******************** Methods *******************************************
     public static final SectionBuilder create() {
@@ -73,6 +78,16 @@ public class SectionBuilder {
         return this;
     }
 
+    public final SectionBuilder onSectionEntered(final EventHandler<SectionEvent> HANDLER) {
+        properties.put("onSectionEntered", new SimpleObjectProperty<>(HANDLER));
+        return this;
+    }
+
+    public final SectionBuilder onSectionLeft(final EventHandler<SectionEvent> HANDLER) {
+        properties.put("onSectionLeft", new SimpleObjectProperty<>(HANDLER));
+        return this;
+    }
+
     public final Section build() {
         final Section SECTION = new Section();
         for (String key : properties.keySet()) {
@@ -88,6 +103,10 @@ public class SectionBuilder {
                 SECTION.setColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("textColor".equals(key)) {
                 SECTION.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("onSectionEntered".equals(key)) {
+                SECTION.setOnSectionEntered(((ObjectProperty<EventHandler>) properties.get(key)).get());
+            } else if ("onSectionLeft".equals(key)) {
+                SECTION.setOnSectionLeft(((ObjectProperty<EventHandler>) properties.get(key)).get());
             }
         }
         return SECTION;

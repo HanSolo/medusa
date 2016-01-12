@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 by Gerrit Grunwald
+ * Copyright (c) 2016 by Gerrit Grunwald
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package eu.hansolo.medusa;
+package eu.hansolo.medusa.demos;
 
+import eu.hansolo.medusa.FGauge;
+import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LcdFont;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
+import eu.hansolo.medusa.GaugeBuilder;
+import eu.hansolo.medusa.GaugeDesign;
+import eu.hansolo.medusa.LcdDesign;
+import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Marker.MarkerType;
+import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.skins.AmpSkin;
 import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.DashboardSkin;
@@ -54,23 +61,23 @@ import java.util.Random;
 /**
  * Created by hansolo on 11.12.15.
  */
-public class Demo extends Application {
+public class OverviewDemo extends Application {
     private static final Random         RND       = new Random();
     private static       int            noOfNodes = 0;
-    private              FGauge         framedGauge1;
-    private              Gauge          gauge1;
-    private              FGauge         framedGauge2;
-    private              Gauge          gauge2;
-    private              Gauge          gauge3;
-    private              Gauge          gauge4;
-    private              Gauge          gauge5;
-    private              Gauge          gauge6;
-    private              Gauge          gauge7;
-    private              Gauge          gauge8;
-    private              Gauge          gauge9;
-    private              Gauge          gauge10;
-    private              long           lastTimerCall;
-    private              AnimationTimer timer;
+    private FGauge         framedGauge1;
+    private Gauge          gauge1;
+    private FGauge         framedGauge2;
+    private Gauge          gauge2;
+    private Gauge          gauge3;
+    private Gauge          gauge4;
+    private Gauge          gauge5;
+    private Gauge          gauge6;
+    private Gauge          gauge7;
+    private Gauge          gauge8;
+    private Gauge          gauge9;
+    private Gauge          gauge10;
+    private long           lastTimerCall;
+    private AnimationTimer timer;
 
     @Override public void init() {
         gauge1 = GaugeBuilder.create()

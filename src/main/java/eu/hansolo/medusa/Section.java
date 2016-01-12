@@ -34,9 +34,8 @@ import javafx.scene.paint.Color;
  * Created by hansolo on 11.12.15.
  */
 public class Section {
-    public final SectionEvent ENTERED_EVENT = new SectionEvent(this, null, SectionEvent.ENTERED_SECTION);
-    public final SectionEvent INSIDE_EVENT  = new SectionEvent(this, null, SectionEvent.INSIDE_SECTION);
-    public final SectionEvent LEFT_EVENT    = new SectionEvent(this, null, SectionEvent.LEFT_SECTION);
+    public final SectionEvent ENTERED_EVENT = new SectionEvent(this, null, SectionEvent.SECTION_ENTERED);
+    public final SectionEvent LEFT_EVENT    = new SectionEvent(this, null, SectionEvent.SECTION_LEFT);
     private double                _start;
     private DoubleProperty        start;
     private double                _stop;
@@ -169,8 +168,6 @@ public class Section {
         boolean isInSection  = contains(VALUE);
         if (!wasInSection && isInSection) {
             fireSectionEvent(ENTERED_EVENT);
-        } else if(wasInSection && isInSection) {
-            fireSectionEvent(INSIDE_EVENT);
         } else if (wasInSection && !isInSection) {
             fireSectionEvent(LEFT_EVENT);
         }
@@ -195,23 +192,23 @@ public class Section {
 
 
     // ******************** Event handling ************************************
-    public final ObjectProperty<EventHandler<SectionEvent>> onEnteringSectionProperty() { return onEnteringSection; }
-    public final void setOnEnteringSection(EventHandler<SectionEvent> value) { onEnteringSectionProperty().set(value); }
-    public final EventHandler<SectionEvent> getOnEnteringSection() { return onEnteringSectionProperty().get(); }
-    private ObjectProperty<EventHandler<SectionEvent>> onEnteringSection = new SimpleObjectProperty<>(this, "onEnteringSection");
+    public final ObjectProperty<EventHandler<SectionEvent>> onSectionEnteredProperty() { return onSectionEntered; }
+    public final void setOnSectionEntered(EventHandler<SectionEvent> value) { onSectionEnteredProperty().set(value); }
+    public final EventHandler<SectionEvent> getOnSectionEntered() { return onSectionEnteredProperty().get(); }
+    private ObjectProperty<EventHandler<SectionEvent>> onSectionEntered = new SimpleObjectProperty<>(this, "onSectionEntered");
 
-    public final ObjectProperty<EventHandler<SectionEvent>> onLeavingSectionProperty() { return onLeavingSection; }
-    public final void setOnLeavingSection(EventHandler<SectionEvent> value) { onLeavingSectionProperty().set(value); }
-    public final EventHandler<SectionEvent> getOnLeavingSection() { return onLeavingSectionProperty().get(); }
-    private ObjectProperty<EventHandler<SectionEvent>> onLeavingSection = new SimpleObjectProperty<>(this, "onLeavingSection");
+    public final ObjectProperty<EventHandler<SectionEvent>> onSectionLeftProperty() { return onSectionLeft; }
+    public final void setOnSectionLeft(EventHandler<SectionEvent> value) { onSectionLeftProperty().set(value); }
+    public final EventHandler<SectionEvent> getOnSectionLeft() { return onSectionLeftProperty().get(); }
+    private ObjectProperty<EventHandler<SectionEvent>> onSectionLeft = new SimpleObjectProperty<>(this, "onSectionLeft");
 
     public void fireSectionEvent(final SectionEvent EVENT) {
         final EventHandler<SectionEvent> HANDLER;
         final EventType                  TYPE = EVENT.getEventType();
-        if (SectionEvent.ENTERED_SECTION == TYPE) {
-            HANDLER = getOnEnteringSection();
-        } else if (SectionEvent.LEFT_SECTION == TYPE) {
-            HANDLER = getOnLeavingSection();
+        if (SectionEvent.SECTION_ENTERED == TYPE) {
+            HANDLER = getOnSectionEntered();
+        } else if (SectionEvent.SECTION_LEFT == TYPE) {
+            HANDLER = getOnSectionLeft();
         } else {
             HANDLER = null;
         }
@@ -224,9 +221,8 @@ public class Section {
 
     // ******************** Inner Classes *************************************
     public static class SectionEvent extends Event {
-        public static final EventType<SectionEvent> ENTERED_SECTION = new EventType(ANY, "ENTERED_SECTION");
-        public static final EventType<SectionEvent> INSIDE_SECTION  = new EventType(ANY, "INSIDE_SECTION");
-        public static final EventType<SectionEvent> LEFT_SECTION    = new EventType(ANY, "LEFT_SECTION");
+        public static final EventType<SectionEvent> SECTION_ENTERED = new EventType(ANY, "SECTION_ENTERED");
+        public static final EventType<SectionEvent> SECTION_LEFT    = new EventType(ANY, "SECTION_LEFT");
 
         // ******************** Constructors **************************************
         public SectionEvent(final Object SOURCE, final EventTarget TARGET, EventType<SectionEvent> TYPE) {

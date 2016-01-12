@@ -871,7 +871,7 @@ public class Gauge extends Control {
     }
 
     public long getAnimationDuration() { return animationDuration; }
-    public void setAnimationDuration(final long ANIMATION_DURATION) { animationDuration = Helper.clamp(20l, 5000l, ANIMATION_DURATION); }
+    public void setAnimationDuration(final long ANIMATION_DURATION) { animationDuration = Helper.clamp(10l, 10000l, ANIMATION_DURATION); }
 
     public double getStartAngle() { return null == startAngle ? _startAngle : startAngle.get(); }
     public void setStartAngle(final double ANGLE) {
@@ -1768,7 +1768,7 @@ public class Gauge extends Control {
         if (BLINKING) {
             startBlinkExecutorService();
         } else {
-            blinkFuture.cancel(true);
+            if (null != blinkFuture) blinkFuture.cancel(true);
             setLedOn(false);
         }
         fireUpdateEvent(LED_BLINK_EVENT);

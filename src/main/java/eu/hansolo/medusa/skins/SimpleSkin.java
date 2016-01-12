@@ -19,6 +19,7 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Section.SectionEvent;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Point2D;
@@ -184,7 +185,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             // Check sections
             for (Section section : getSkinnable().getSections()) {
                 if (section.contains(currentValue)) {
-                    section.fireSectionEvent(new Section.SectionEvent(section, null, Section.SectionEvent.ENTERED_SECTION));
+                    section.fireSectionEvent(new Section.SectionEvent(section, null, SectionEvent.SECTION_ENTERED));
                     break;
                 }
             }

@@ -31,6 +31,7 @@ import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
 import eu.hansolo.medusa.tools.GradientLookup;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -570,6 +571,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B onValueChanged(final InvalidationListener LISTENER) {
+        properties.put("onValueChanged", new SimpleObjectProperty<>(LISTENER));
+        return (B)this;
+    }
+
     public final B onButtonPressed(final EventHandler<Gauge.ButtonEvent> HANDLER) {
         properties.put("onButtonPressed", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
@@ -958,6 +964,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setCheckAreasForValue(((BooleanProperty) properties.get(key)).get());
             } else if ("checkThreshold".equals(key)) {
                 CONTROL.setCheckThreshold(((BooleanProperty) properties.get(key)).get());
+            } else if ("onValueChanged".equals(key)) {
+                CONTROL.currentValueProperty().addListener(((ObjectProperty<InvalidationListener>) properties.get(key)).get());
             } else if ("onButtonPressed".equals(key)) {
                 CONTROL.setOnButtonPressed(((ObjectProperty<EventHandler>) properties.get(key)).get());
             } else if ("onButtonReleased".equals(key)) {
