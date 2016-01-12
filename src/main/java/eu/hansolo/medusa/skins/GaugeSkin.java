@@ -877,10 +877,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         List<Stop>              stops               = getSkinnable().getGradientLookupStops();
         Map<Double, Color>      stopAngleMap        = new HashMap<>(stops.size());
 
-        System.out.println("StartAngle  : " + START_ANGLE);
-        System.out.println("AngleRange  : " + ANGLE_RANGE);
-        System.out.println("offsetFactor: " + (260 - START_ANGLE));
-
         stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
         double                  offsetFactor        = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (START_ANGLE - 90) : (START_ANGLE + 180);
         AngleConicalGradient    gradient            = new AngleConicalGradient(size * 0.5, size * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());

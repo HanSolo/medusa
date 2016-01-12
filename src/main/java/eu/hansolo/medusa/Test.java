@@ -49,12 +49,15 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
 
 import java.awt.*;
 import java.util.Random;
+
+import static javafx.scene.paint.Color.RED;
 
 
 /**
@@ -73,15 +76,16 @@ public class Test extends Application {
     @Override public void init() {
         gauge = GaugeBuilder.create()
                             .prefSize(500,500)
-                            .backgroundPaint(Color.rgb(90,90,90))
+                            //.backgroundPaint(Color.rgb(90,90,90))
                             //.zeroColor(Color.YELLOW)
                             .mediumTickMarksVisible(false)
                             .minorTickMarksVisible(false)
-                            .tickMarkColor(Color.WHITE)
-                            .tickLabelColor(Color.WHITE)
-                            .titleColor(Color.WHITE)
-                            .unitColor(Color.WHITE)
-                            .valueColor(Color.WHITE)
+                            .foregroundBaseColor(Color.WHITE)
+                            //.tickMarkColor(Color.WHITE)
+                            //.tickLabelColor(Color.WHITE)
+                            //.titleColor(Color.WHITE)
+                            //.unitColor(Color.WHITE)
+                            //.valueColor(Color.WHITE)
                             .majorTickMarkType(TickMarkType.TRIANGLE)
                             .sectionsVisible(true)
                             .sections(new Section(80, 100, Color.ORANGE))
@@ -99,19 +103,27 @@ public class Test extends Application {
                             //.shadowsEnabled(true)
                             .needleShape(NeedleShape.FLAT)
                             .knobType(KnobType.FLAT)
-                            .knobColor(Color.ORANGE)
+                            //.knobColor(Color.ORANGE)
                             .ledType(LedType.FLAT)
-                            .ledColor(Color.ORANGE)
+                            //.ledColor(Color.ORANGE)
                             .interactive(true)
                             .onButtonPressed(e -> System.out.println("Pressed"))
                             .onButtonReleased(e -> System.out.println("Released"))
                             .animated(true)
-                            .onlyFirstAndLastTickLabelVisible(true)
+                            .startAngle(40)
+                            .angleRange(280)
+                            .scaleDirection(ScaleDirection.COUNTER_CLOCKWISE)
+                            .colorGradientEnabled(true)
+                            .gradientLookupStops(new Stop(0.0, Color.BLUE),
+                                                 new Stop(0.3, Color.LIME),
+                                                 new Stop(0.5, Color.MAGENTA),
+                                                 new Stop(0.7, Color.YELLOW),
+                                                 new Stop(1.0, Color.RED))
                             .build();
 
-        LcdDesign.FLAT_CUSTOM.lcdBackgroundColor = Color.ORANGE;
-
-        GaugeDesign.FLAT.frameColor = Color.ORANGE;
+        //LcdDesign.FLAT_CUSTOM.lcdBackgroundColor = Color.ORANGE;
+        //LcdDesign.FLAT_CUSTOM.lcdForegroundColor = Gauge.DARK_COLOR;
+        //GaugeDesign.FLAT.frameColor = Color.ORANGE;
         framedGauge = new FGauge(gauge, GaugeDesign.FLAT, GaugeBackground.TRANSPARENT);
         framedGauge.setForegroundVisible(false);
 
@@ -129,7 +141,7 @@ public class Test extends Application {
     @Override public void start(Stage stage) {
         StackPane pane = new StackPane(framedGauge);
         pane.setPadding(new Insets(10));
-        //pane.setBackground(new Background(new BackgroundFill(Color.rgb(50, 50, 50), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBackground(new Background(new BackgroundFill(Color.rgb(50, 50, 50), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
 
