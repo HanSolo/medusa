@@ -203,11 +203,10 @@ public class ConicalGradient {
                 } else if (dx <= 0 && dy <= 0) {
                     angle = 450.0 - angle;
                 }
-
-                double radiusMinus05 = radius - 0.5d;
-                double radiusMinus10 = radius - 1d;
-                double radiusMinus15 = radius - 1.5d;
-                double radiusMinus20 = radius - 2d;
+                double radiusMinus05 = radius - 0.25;
+                double radiusMinus10 = radius - 0.5;
+                double radiusMinus15 = radius - 1.0;
+                double radiusMinus20 = radius - 1.5;
 
                 if (distance > radius) {
                     color = Color.TRANSPARENT;
@@ -218,13 +217,13 @@ public class ConicalGradient {
                             color = (Color) Interpolator.LINEAR.interpolate(sortedStops.get(i).getColor(), sortedStops.get(i + 1).getColor(), fraction);
 
                             if (distance > radiusMinus05) {
-                                color = Color.color(color.getRed(), color.getGreen(), color.getBlue(), 0.15);
+                                color = color.deriveColor(0.0, 1.0, 1.0, 0.25);
                             } else if (distance > radiusMinus10) {
-                                color = Color.color(color.getRed(), color.getGreen(), color.getBlue(), 0.35);
+                                color = color.deriveColor(0.0, 1.0, 1.0, 0.45);
                             } else if (distance > radiusMinus15) {
-                                color = Color.color(color.getRed(), color.getGreen(), color.getBlue(), 0.55);
+                                color = color.deriveColor(0.0, 1.0, 1.0, 0.65);
                             } else if (distance > radiusMinus20) {
-                                color = Color.color(color.getRed(), color.getGreen(), color.getBlue(), 0.75);
+                                color = color.deriveColor(0.0, 1.0, 1.0, 0.85);
                             }
                         }
                     }
