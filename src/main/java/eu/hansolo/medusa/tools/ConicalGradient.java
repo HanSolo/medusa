@@ -85,14 +85,13 @@ public class ConicalGradient {
 
         sortedStops = calculate(stops, offset);
 
-
+        // Reverse the Stops for CCW direction
         if (ScaleDirection.COUNTER_CLOCKWISE == scaleDirection) {
             List<Stop> sortedStops3 = new ArrayList<>();
             Collections.reverse(sortedStops);
             sortedStops.forEach(stop -> sortedStops3.add(new Stop(1d - stop.getOffset(), stop.getColor())));
             sortedStops = sortedStops3;
         }
-
     }
 
 
