@@ -775,22 +775,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         if (isNotZero) {
                             ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
                         } else {
-                            if (fullRange) {
-                                ticksAndSections.setFill(zeroColor);
-                            } else {
-                                ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
-                            };
+                            ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : fullRange ? zeroColor : tickLabelColor);
                         }
                     } else {
                         if ((Double.compare(counter, minValue) == 0 || Double.compare(counter, maxValue) == 0)) {
                             if (isNotZero) {
                                 ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
                             } else {
-                                if (fullRange) {
-                                    ticksAndSections.setFill(zeroColor);
-                                } else {
-                                    ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
-                                };
+                                ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : fullRange ? zeroColor : tickLabelColor);
                             }
                         } else {
                             ticksAndSections.setFill(Color.TRANSPARENT);
