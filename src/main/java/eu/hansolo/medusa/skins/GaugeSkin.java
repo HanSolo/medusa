@@ -870,14 +870,19 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         final double            xy                  = TickLabelLocation.OUTSIDE == TICK_LABEL_LOCATION ? 0.115 * size : 0.0515 * size;
         final double            wh                  = TickLabelLocation.OUTSIDE == TICK_LABEL_LOCATION ? size * 0.77 : size * 0.897;
         final double            START_ANGLE         = getSkinnable().getStartAngle();
+        final double            ANGLE_RANGE         = getSkinnable().getAngleRange();
         final double            MIN_VALUE           = getSkinnable().getMinValue();
         final double            OFFSET              = 90 - START_ANGLE;
         final ScaleDirection    SCALE_DIRECTION     = getSkinnable().getScaleDirection();
         List<Stop>              stops               = getSkinnable().getGradientLookupStops();
         Map<Double, Color>      stopAngleMap        = new HashMap<>(stops.size());
-        double                  angleRange          = getSkinnable().getAngleRange();
-        stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()));
-        double                  offsetFactor        = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (START_ANGLE - 90) : (270d - START_ANGLE);
+
+        System.out.println("StartAngle  : " + START_ANGLE);
+        System.out.println("AngleRange  : " + ANGLE_RANGE);
+        System.out.println("offsetFactor: " + (260 - START_ANGLE));
+
+        stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
+        double                  offsetFactor        = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (START_ANGLE - 90) : (START_ANGLE + 180);
         AngleConicalGradient    gradient            = new AngleConicalGradient(size * 0.5, size * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
 
         final double BAR_START_ANGLE  = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? -MIN_VALUE * angleStep : MIN_VALUE * angleStep;
