@@ -471,9 +471,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             minorHalfDotSize  = minorDotSize * 0.5;
         };
 
-        boolean fullRange  = (minValue < 0 && getSkinnable().getMaxValue() > 0);
-        double  tickLabelFontSize = decimals == 0 ? 0.054 * size : 0.051 * size;
-        double  tickMarkFontSize  = decimals == 0 ? 0.047 * size: 0.044 * size;
+        boolean fullRange                  = (minValue < 0 && getSkinnable().getMaxValue() > 0);
+        double  tickLabelFontSize          = decimals == 0 ? 0.054 * size : 0.051 * size;
+        double  tickMarkFontSize           = decimals == 0 ? 0.047 * size: 0.044 * size;
         double  tickLabelOrientationFactor = TickLabelOrientation.HORIZONTAL == tickLabelOrientation ? 0.9 : 1.0;
 
         Font tickLabelFont     = Fonts.robotoCondensedRegular(tickLabelFontSize * tickLabelOrientationFactor);
@@ -775,7 +775,11 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         if (isNotZero) {
                             ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
                         } else {
-                            if (fullRange) ticksAndSections.setFill(zeroColor);
+                            if (fullRange) {
+                                ticksAndSections.setFill(zeroColor);
+                            } else {
+                                ticksAndSections.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
+                            };
                         }
                     } else {
                         if ((Double.compare(counter, minValue) == 0 || Double.compare(counter, maxValue) == 0)) {
