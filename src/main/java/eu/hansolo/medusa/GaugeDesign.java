@@ -16,14 +16,10 @@
 
 package eu.hansolo.medusa;
 
+import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.tools.ConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderImage;
@@ -34,7 +30,6 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
@@ -197,7 +192,7 @@ public enum GaugeDesign {
                 new Stop(0.875, Color.rgb(0, 0, 0)),
                 new Stop(1.0, Color.rgb(254, 254, 254))
             };
-            ConicalGradient gradient = new ConicalGradient(new Point2D(SIZE * 0.5, SIZE * 0.5), stops);
+            ConicalGradient gradient = new ConicalGradient(SIZE * 0.5, SIZE * 0.5, ScaleDirection.CLOCKWISE, stops);
             Image        image       = gradient.getRoundImage(SIZE);
             BorderStroke outerBorder = new BorderStroke(Color.rgb(132, 132, 132), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1), new Insets(0));
             BorderImage  innerBorder = new BorderImage(image, BorderWidths.DEFAULT, new Insets(0.0037037 * SIZE), BorderWidths.EMPTY, true, BorderRepeat.STRETCH, BorderRepeat.STRETCH);
@@ -217,7 +212,7 @@ public enum GaugeDesign {
                 new Stop(0.875, Color.rgb(179, 179, 179)),
                 new Stop(1.0, Color.rgb(254, 254, 254))
             };
-            ConicalGradient gradient = new ConicalGradient(new Point2D(SIZE * 0.5, SIZE * 0.5), stops);
+            ConicalGradient gradient = new ConicalGradient(SIZE * 0.5, SIZE * 0.5, ScaleDirection.CLOCKWISE, stops);
             Image        image       = gradient.getRoundImage(SIZE);
             BorderStroke outerBorder = new BorderStroke(Color.rgb(132, 132, 132), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1), new Insets(0));
             BorderImage  innerBorder = new BorderImage(image, new BorderWidths(1), new Insets(0.0037037 * SIZE), BorderWidths.EMPTY, true, BorderRepeat.STRETCH, BorderRepeat.STRETCH);
