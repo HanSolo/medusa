@@ -16,14 +16,16 @@
 
 package eu.hansolo.medusa.tools;
 
+import eu.hansolo.medusa.Gauge.ScaleDirection;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,27 +36,31 @@ import java.util.Map;
 public class AngleConicalGradient {
     private ConicalGradient gradient;
 
-    public AngleConicalGradient(final Map<Double, Color> ANGLE_STOP_MAP) {
-        this(null, ANGLE_STOP_MAP);
+    public AngleConicalGradient(final Map<Double, Color> ANGLE_STOP_MAP, final ScaleDirection DIRECTION) {
+        this(0, 0, ANGLE_STOP_MAP, DIRECTION);
     }
-    public AngleConicalGradient(final Point2D CENTER, final Map<Double, Color> ANGLE_STOP_MAP) {
-        this(CENTER, 0.0, ANGLE_STOP_MAP);
+    public AngleConicalGradient(final double CENTER_X, final double CENTER_Y, final Map<Double, Color> ANGLE_STOP_MAP, final ScaleDirection DIRECTION) {
+        this(CENTER_X, CENTER_Y, 0.0, ANGLE_STOP_MAP, DIRECTION);
     }
-    public AngleConicalGradient(final Point2D CENTER, final double OFFSET_ANGLE, final Map<Double, Color> ANGLE_STOP_MAP) {
+    public AngleConicalGradient(final double CENTER_X, final double CENTER_Y, final double OFFSET_ANGLE, final Map<Double, Color> ANGLE_STOP_MAP, final ScaleDirection DIRECTION) {
         final double ANGLE_FACTOR = 1d / 360d;
-        double offset = Helper.clamp(0d, 1d, (OFFSET_ANGLE % 360) * ANGLE_FACTOR);
-        List<Stop> stops = new LinkedList<>();
-        ANGLE_STOP_MAP.keySet().forEach(fraction -> stops.add(new Stop(Helper.clamp(0d, 1d, (fraction % 360) * ANGLE_FACTOR), ANGLE_STOP_MAP.get(fraction))));
-        gradient = new ConicalGradient(CENTER, offset, stops);
+        double       offset       = Helper.clamp(0d, 1d, (OFFSET_ANGLE % 360d) * ANGLE_FACTOR);
+        List<Stop>   stops        = new ArrayList<>();
+        ANGLE_STOP_MAP.keySet().forEach(fraction -> stops.add(new Stop(Helper.clamp(0d, 1d, (fraction % 360d) * ANGLE_FACTOR), ANGLE_STOP_MAP.get(fraction))));
+        gradient = new ConicalGradient(CENTER_X, CENTER_Y, offset, DIRECTION, stops);
     }
 
     public void recalculateWithAngle(final double ANGLE) { gradient.recalculateWithAngle(ANGLE); }
 
     public List<Stop> getStops() { return gradient.getStops(); }
 
-    public Point2D getCenter() { return gradient.getCenter(); }
+    public double[] getCenter() { return gradient.getCenter(); }
+    public Point2D getCenterPoint() { return gradient.getCenterPoint(); }
 
     public Image getImage(final double WIDTH, final double HEIGHT) { return gradient.getImage(WIDTH, HEIGHT); }
+    public Image getRoundImage(final double SIZE) { return gradient.getRoundImage(SIZE); }
 
     public ImagePattern apply(final Shape SHAPE) { return gradient.apply(SHAPE); }
+
+    public ImagePattern getImagePattern(final Rectangle BOUNDS) { return gradient.getImagePattern(BOUNDS); }
 }
