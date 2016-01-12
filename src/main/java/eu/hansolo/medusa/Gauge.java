@@ -1319,7 +1319,7 @@ public class Gauge extends Control {
     public LcdDesign getLcdDesign() { return null == lcdDesign ? _lcdDesign : lcdDesign.get(); }
     public void setLcdDesign(final LcdDesign DESIGN) {
         if (null == lcdDesign) {
-            _lcdDesign = DESIGN == null ? LcdDesign.STANDARD : DESIGN;
+            _lcdDesign = null == DESIGN ? LcdDesign.STANDARD : DESIGN;
         } else {
             lcdDesign.set(DESIGN);
         }
@@ -1328,7 +1328,7 @@ public class Gauge extends Control {
     public ObjectProperty<LcdDesign> lcdDesignProperty() {
         if (null == lcdDesign) {
             lcdDesign = new ObjectPropertyBase<LcdDesign>(_lcdDesign) {
-                @Override public void set(final LcdDesign DESIGN) { super.set(DESIGN == null ? LcdDesign.STANDARD : DESIGN); }
+                @Override public void set(final LcdDesign DESIGN) { super.set(null == DESIGN ? LcdDesign.STANDARD : DESIGN); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "lcdDesign"; }
             };
