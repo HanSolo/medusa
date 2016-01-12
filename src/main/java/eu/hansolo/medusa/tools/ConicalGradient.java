@@ -98,12 +98,12 @@ public class ConicalGradient {
     // ******************** Methods *******************************************
     private List<Stop> calculate(final List<Stop> STOPS, final double OFFSET) {
         List<Stop> stops = new ArrayList<>(STOPS.size());
-        final BigDecimal STEP = new BigDecimal(0.000001);
+        final BigDecimal STEP = new BigDecimal(Double.MIN_VALUE);
         for (Stop stop : STOPS) {
             BigDecimal newOffsetBD = new BigDecimal(stop.getOffset() + OFFSET).remainder(BigDecimal.ONE);
             if(Double.compare(newOffsetBD.doubleValue(), 0d) == 0) {
                 newOffsetBD = BigDecimal.ONE;
-                stops.add(new Stop(0.000001, stop.getColor()));
+                stops.add(new Stop(Double.MIN_VALUE, stop.getColor()));
             } else if (stop.getOffset() + OFFSET > 1d) {
                 newOffsetBD = newOffsetBD.subtract(STEP);
             }
@@ -203,6 +203,12 @@ public class ConicalGradient {
                 } else if (dx <= 0 && dy <= 0) {
                     angle = 450.0 - angle;
                 }
+
+                double radiusMinus05 = radius - 0.5d;
+                double radiusMinus10 = radius - 1d;
+                double radiusMinus15 = radius - 1.5d;
+                double radiusMinus20 = radius - 2d;
+
                 if (distance > radius) {
                     color = Color.TRANSPARENT;
                 } else {
@@ -210,6 +216,16 @@ public class ConicalGradient {
                         if (angle >= (sortedStops.get(i).getOffset() * 360) && angle < (sortedStops.get(i + 1).getOffset() * 360)) {
                             double fraction = (angle - sortedStops.get(i).getOffset() * 360) / ((sortedStops.get(i + 1).getOffset() - sortedStops.get(i).getOffset()) * 360);
                             color = (Color) Interpolator.LINEAR.interpolate(sortedStops.get(i).getColor(), sortedStops.get(i + 1).getColor(), fraction);
+
+                            if (distance > radiusMinus05) {
+                                color = Color.color(color.getRed(), color.getGreen(), color.getBlue(), 0.15);
+                            } else if (distance > radiusMinus10) {
+                                color = Color.color(color.getRed(), color.getGreen(), color.getBlue(), 0.35);
+                            } else if (distance > radiusMinus15) {
+                                color = Color.color(color.getRed(), color.getGreen(), color.getBlue(), 0.55);
+                            } else if (distance > radiusMinus20) {
+                                color = Color.color(color.getRed(), color.getGreen(), color.getBlue(), 0.75);
+                            }
                         }
                     }
                 }
