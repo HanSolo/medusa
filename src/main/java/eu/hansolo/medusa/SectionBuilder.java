@@ -35,7 +35,7 @@ import java.util.HashMap;
 /**
  * Created by hansolo on 20.12.15.
  */
-public class SectionBuilder {
+public class SectionBuilder<B extends SectionBuilder<B>> {
     private HashMap<String, Property> properties = new HashMap<>();
 
 
@@ -48,44 +48,44 @@ public class SectionBuilder {
         return new SectionBuilder();
     }
 
-    public final SectionBuilder start(final double VALUE) {
+    public final B start(final double VALUE) {
         properties.put("start", new SimpleDoubleProperty(VALUE));
-        return this;
+        return (B)this;
     }
 
-    public final SectionBuilder stop(final double VALUE) {
+    public final B stop(final double VALUE) {
         properties.put("stop", new SimpleDoubleProperty(VALUE));
-        return this;
+        return (B)this;
     }
 
-    public final SectionBuilder text(final String TEXT) {
+    public final B text(final String TEXT) {
         properties.put("text", new SimpleStringProperty(TEXT));
-        return this;
+        return (B)this;
     }
 
-    public final SectionBuilder icon(final Image IMAGE) {
+    public final B icon(final Image IMAGE) {
         properties.put("icon", new SimpleObjectProperty<>(IMAGE));
-        return this;
+        return (B)this;
     }
 
-    public final SectionBuilder color(final Color COLOR) {
+    public final B color(final Color COLOR) {
         properties.put("color", new SimpleObjectProperty<>(COLOR));
-        return this;
+        return (B)this;
     }
 
-    public final SectionBuilder textColor(final Color COLOR) {
+    public final B textColor(final Color COLOR) {
         properties.put("textColor", new SimpleObjectProperty<>(COLOR));
-        return this;
+        return (B)this;
     }
 
-    public final SectionBuilder onSectionEntered(final EventHandler<SectionEvent> HANDLER) {
+    public final B onSectionEntered(final EventHandler<SectionEvent> HANDLER) {
         properties.put("onSectionEntered", new SimpleObjectProperty<>(HANDLER));
-        return this;
+        return (B)this;
     }
 
-    public final SectionBuilder onSectionLeft(final EventHandler<SectionEvent> HANDLER) {
+    public final B onSectionLeft(final EventHandler<SectionEvent> HANDLER) {
         properties.put("onSectionLeft", new SimpleObjectProperty<>(HANDLER));
-        return this;
+        return (B)this;
     }
 
     public final Section build() {

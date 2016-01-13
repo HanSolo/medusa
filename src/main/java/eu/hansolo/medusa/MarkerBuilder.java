@@ -25,7 +25,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
-import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.util.HashMap;
@@ -34,7 +33,7 @@ import java.util.HashMap;
 /**
  * Created by hansolo on 05.01.16.
  */
-public class MarkerBuilder {
+public class MarkerBuilder<B extends MarkerBuilder<B>> {
     private HashMap<String, Property> properties = new HashMap<>();
 
 
@@ -47,44 +46,44 @@ public class MarkerBuilder {
         return new MarkerBuilder();
     }
 
-    public final MarkerBuilder value(final double VALUE) {
+    public final B value(final double VALUE) {
         properties.put("value", new SimpleDoubleProperty(VALUE));
-        return this;
+        return (B)this;
     }
 
-    public final MarkerBuilder text(final String TEXT) {
+    public final B text(final String TEXT) {
         properties.put("text", new SimpleStringProperty(TEXT));
-        return this;
+        return (B)this;
     }
 
-    public final MarkerBuilder color(final Color COLOR) {
+    public final B color(final Color COLOR) {
         properties.put("color", new SimpleObjectProperty<>(COLOR));
-        return this;
+        return (B)this;
     }
 
-    public final MarkerBuilder markerType(final MarkerType TYPE) {
+    public final B markerType(final MarkerType TYPE) {
         properties.put("markerType", new SimpleObjectProperty<>(TYPE));
-        return this;
+        return (B)this;
     }
 
-    public final MarkerBuilder onMarkerPressed(final EventHandler<Marker.MarkerEvent> HANDLER) {
+    public final B onMarkerPressed(final EventHandler<Marker.MarkerEvent> HANDLER) {
         properties.put("onMarkerPressed", new SimpleObjectProperty<>(HANDLER));
-        return this;
+        return (B)this;
     }
 
-    public final MarkerBuilder onMarkerReleased(final EventHandler<Marker.MarkerEvent> HANDLER) {
+    public final B onMarkerReleased(final EventHandler<Marker.MarkerEvent> HANDLER) {
         properties.put("onMarkerReleased", new SimpleObjectProperty<>(HANDLER));
-        return this;
+        return (B)this;
     }
 
-    public final MarkerBuilder onMarkerExceeded(final EventHandler<Marker.MarkerEvent> HANDLER) {
+    public final B onMarkerExceeded(final EventHandler<Marker.MarkerEvent> HANDLER) {
         properties.put("onMarkerExceeded", new SimpleObjectProperty<>(HANDLER));
-        return this;
+        return (B)this;
     }
 
-    public final MarkerBuilder onMarkerUnderrun(final EventHandler<Marker.MarkerEvent> HANDLER) {
+    public final B onMarkerUnderrun(final EventHandler<Marker.MarkerEvent> HANDLER) {
         properties.put("onMarkerUnderrun", new SimpleObjectProperty<>(HANDLER));
-        return this;
+        return (B)this;
     }
 
     public final Marker build() {
