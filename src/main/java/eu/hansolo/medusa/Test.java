@@ -118,6 +118,7 @@ public class Test extends Application {
         System.exit(0);
     }
 
+
     // ******************** Misc **********************************************
     private static void calcNoOfNodes(Node node) {
         if (node instanceof Parent) {
