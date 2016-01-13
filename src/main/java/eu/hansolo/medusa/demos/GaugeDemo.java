@@ -217,6 +217,7 @@ public class GaugeDemo extends Application {
     @Override public void start(Stage stage) {
         HBox pane = new HBox(gauge, button);
         pane.setPadding(new Insets(10));
+        pane.setSpacing(20);
 
         Scene scene = new Scene(pane);
 

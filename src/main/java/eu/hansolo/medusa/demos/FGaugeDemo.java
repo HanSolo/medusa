@@ -17,6 +17,7 @@
 package eu.hansolo.medusa.demos;
 
 import eu.hansolo.medusa.FGauge;
+import eu.hansolo.medusa.FGaugeBuilder;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.KnobType;
 import eu.hansolo.medusa.Gauge.LcdFont;
@@ -223,8 +224,13 @@ public class FGaugeDemo extends Application {
          *  - CARBON
          *  - TRANSPARENT
          */
-        fGauge = new FGauge(gauge, GaugeDesign.METAL, GaugeBackground.DARK_GRAY);
-        fGauge.setForegroundVisible(true);
+        fGauge = FGaugeBuilder.create()
+                              .prefSize(500, 500)
+                              .gauge(gauge)
+                              .gaugeDesign(GaugeDesign.METAL)
+                              .gaugeBackground(GaugeBackground.CARBON)
+                              .foregroundVisible(true)
+                              .build();
 
         button = new Button("Set Value");
         button.setOnMousePressed(event -> gauge.setValue(RND.nextDouble() * gauge.getRange() + gauge.getMinValue()));
@@ -233,6 +239,7 @@ public class FGaugeDemo extends Application {
     @Override public void start(Stage stage) {
         HBox pane = new HBox(fGauge, button);
         pane.setPadding(new Insets(10));
+        pane.setSpacing(20);
 
         Scene scene = new Scene(pane);
 
