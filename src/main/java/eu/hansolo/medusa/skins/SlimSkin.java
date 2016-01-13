@@ -150,7 +150,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setText(getSkinnable().getUnit());
         resizeTitleAndUnitText();
 
-        bar.setStroke(getSkinnable().getBarBackgroundColor());
+        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
         bar.setStroke(getSkinnable().getBarColor());
         titleText.setFill(getSkinnable().getTitleColor());
         valueText.setFill(getSkinnable().getValueColor());
