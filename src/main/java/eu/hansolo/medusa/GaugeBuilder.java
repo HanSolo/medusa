@@ -29,6 +29,7 @@ import eu.hansolo.medusa.skins.AmpSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
+import eu.hansolo.medusa.skins.SlimSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
 import eu.hansolo.medusa.tools.GradientLookup;
 import javafx.beans.InvalidationListener;
@@ -710,6 +711,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setUnitColor(Gauge.DARK_COLOR);
                 CONTROL.setBorderPaint(Color.rgb(208, 208, 208));
                 CONTROL.setDecimals(0);
+            } else if (skinClass == SlimSkin.class) {
+                CONTROL.setDecimals(2);
+                CONTROL.setBarColor(Color.rgb(93,190,205));
+                CONTROL.setValueColor(Color.rgb(228,231,238));
+                CONTROL.setUnitColor(Color.rgb(142,147,151));
             }
         }
 
