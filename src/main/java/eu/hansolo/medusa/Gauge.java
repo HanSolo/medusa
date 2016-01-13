@@ -647,15 +647,16 @@ public class Gauge extends Control {
 
     // ******************** UI related methods ********************************
     public void setForegroundBaseColor(final Color COLOR) {
-        if (null == titleColor)          { _titleColor     = COLOR;      } else { titleColor.set(COLOR); }
-        if (null == subTitleColor)       { _subTitleColor  = COLOR;      } else { subTitleColor.set(COLOR); }
-        if (null == unitColor)           { _unitColor      = COLOR;      } else { unitColor.set(COLOR); }
-        if (null == valueColor)          { _valueColor     = COLOR;      } else { valueColor.set(COLOR); }
-        if (null == tickLabelColor)      { _tickLabelColor = COLOR;      } else { tickLabelColor.set(COLOR); }
-        if (null == tickMarkColor)       { _tickMarkColor  = COLOR;      } else { tickMarkColor.set(COLOR); }
-        if (null == majorTickMarkColor)  { _majorTickMarkColor = COLOR;  } else { majorTickMarkColor.set(COLOR); }
+        if (null == titleColor)          { _titleColor          = COLOR; } else { titleColor.set(COLOR); }
+        if (null == subTitleColor)       { _subTitleColor       = COLOR; } else { subTitleColor.set(COLOR); }
+        if (null == unitColor)           { _unitColor           = COLOR; } else { unitColor.set(COLOR); }
+        if (null == valueColor)          { _valueColor          = COLOR; } else { valueColor.set(COLOR); }
+        if (null == tickLabelColor)      { _tickLabelColor      = COLOR; } else { tickLabelColor.set(COLOR); }
+        if (null == zeroColor)           { _zeroColor           = COLOR; } else { zeroColor.set(COLOR); }
+        if (null == tickMarkColor)       { _tickMarkColor       = COLOR; } else { tickMarkColor.set(COLOR); }
+        if (null == majorTickMarkColor)  { _majorTickMarkColor  = COLOR; } else { majorTickMarkColor.set(COLOR); }
         if (null == mediumTickMarkColor) { _mediumTickMarkColor = COLOR; } else { mediumTickMarkColor.set(COLOR); }
-        if (null == minorTickMarkColor)  { _minorTickMarkColor = COLOR;  } else { minorTickMarkColor.set(COLOR); }
+        if (null == minorTickMarkColor)  { _minorTickMarkColor  = COLOR; } else { minorTickMarkColor.set(COLOR); }
         fireUpdateEvent(REDRAW_EVENT);
     }
 
