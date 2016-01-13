@@ -144,7 +144,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         barBackground.getElements().add(barBackgroundLineToInnerArc);
         barBackground.getElements().add(barBackgroundInnerArc);
         barBackground.getElements().add(new ClosePath());
-        barBackground.setFill(getSkinnable().getBackgroundPaint());
+        barBackground.setFill(getSkinnable().getBarBackgroundColor());
         barBackground.setStroke(getSkinnable().getBorderPaint());
         barBackground.setEffect(getSkinnable().areShadowsEnabled() ? innerShadow : null);
 
@@ -216,7 +216,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        barBackground.setFill(getSkinnable().getBackgroundPaint());
+        barBackground.setFill(getSkinnable().getBarBackgroundColor());
+        barBackground.setEffect(getSkinnable().areShadowsEnabled() ? innerShadow : null);
 
         if (getSkinnable().isColorGradientEnabled() && !getSkinnable().getGradientLookup().getStops().isEmpty()) {
             dataBar.setFill(getSkinnable().getGradientLookup().getColorAt(getSkinnable().getCurrentValue() / range));
@@ -232,7 +233,6 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         unitText.setFill(getSkinnable().getUnitColor());
 
-        barBackground.setEffect(getSkinnable().areShadowsEnabled() ? innerShadow : null);
         dataBar.setEffect(getSkinnable().areShadowsEnabled() ? innerShadow : null);
     }
 

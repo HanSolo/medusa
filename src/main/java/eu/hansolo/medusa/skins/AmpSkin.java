@@ -587,8 +587,8 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
             needleRotate.setPivotY(needle.getLayoutBounds().getHeight());
 
-            lightEffect.setRadius(0.00769231 * height);
-            lightEffect.setOffsetY(0.00769231 * height);
+            lightEffect.setRadius(Helper.clamp(0.5, 1.5, 0.00769231 * height));
+            lightEffect.setOffsetY(Helper.clamp(0.5, 1.5, 0.00769231 * height));
             foreground.setScaleX(width / PREFERRED_WIDTH);
             foreground.setScaleY(height / PREFERRED_HEIGHT);
             foreground.setTranslateX((width - PREFERRED_WIDTH) * 0.5);
@@ -599,14 +599,15 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        Color backgroundColor = getSkinnable().getBackgroundPaint() instanceof Color ? (Color) getSkinnable().getBackgroundPaint() : Color.WHITE;
         ticksAndSectionsCanvas.setCache(false);
         ticksAndSections.clearRect(0, 0, width, height);
         ticksAndSections.setFill(new LinearGradient(0, 0, 0, height, false, CycleMethod.NO_CYCLE,
                                                     new Stop(0.0, Color.TRANSPARENT),
-                                                    new Stop(0.07692308, Color.rgb(180,180,180)),
-                                                    new Stop(0.08461538, Color.rgb(235,235,235)),
-                                                    new Stop(0.56923077, Color.rgb(255,255,255)),
-                                                    new Stop(0.57692308, Color.rgb(180,180,180)),
+                                                    new Stop(0.07692308, backgroundColor.deriveColor(0.0, 1.0, 0.706, 1.0)),
+                                                    new Stop(0.08461538, backgroundColor.deriveColor(0.0, 1.0, 0.921, 1.0)),
+                                                    new Stop(0.56923077, backgroundColor),
+                                                    new Stop(0.579, backgroundColor.deriveColor(0.0, 1.0, 0.706, 1.0)),
                                                     new Stop(1.0, Color.TRANSPARENT)));
 
         ticksAndSections.fillRect(0, 0, width, height);

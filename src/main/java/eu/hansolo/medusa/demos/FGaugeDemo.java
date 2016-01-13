@@ -224,13 +224,14 @@ public class FGaugeDemo extends Application {
          *  - CARBON
          *  - TRANSPARENT
          */
-        fGauge = FGaugeBuilder.create()
-                              .prefSize(500, 500)
-                              .gauge(gauge)
-                              .gaugeDesign(GaugeDesign.METAL)
-                              .gaugeBackground(GaugeBackground.CARBON)
-                              .foregroundVisible(true)
-                              .build();
+        FGauge fGauge = FGaugeBuilder
+            .create()
+            .prefSize(500, 500)
+            .gauge(gauge)
+            .gaugeDesign(GaugeDesign.METAL)
+            .gaugeBackground(GaugeBackground.CARBON)
+            .foregroundVisible(true)
+            .build();
 
         button = new Button("Set Value");
         button.setOnMousePressed(event -> gauge.setValue(RND.nextDouble() * gauge.getRange() + gauge.getMinValue()));

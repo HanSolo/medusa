@@ -28,7 +28,9 @@ import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
 import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import eu.hansolo.medusa.Marker.MarkerType;
+import eu.hansolo.medusa.skins.AmpSkin;
 import eu.hansolo.medusa.skins.BulletChartSkin;
+import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
@@ -75,12 +77,14 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(SlimSkin.class)
+                            .skin(BulletChartSkin.class)
                             .prefSize(500,500)
+
                             .animated(true)
-                            .maxValue(10000)
+                            .threshold(85)
                             .decimals(0)
-                            .unit("STEPS")
+                            .title("TITLE")
+                            .unit("UNIT")
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -105,7 +109,7 @@ public class Test extends Application {
         stage.setScene(scene);
         stage.show();
 
-        gauge.setValue(5201);
+        gauge.setValue(42);
 
         // Calculate number of nodes
         calcNoOfNodes(gauge);

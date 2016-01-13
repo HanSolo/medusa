@@ -27,6 +27,7 @@ import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
 import eu.hansolo.medusa.skins.AmpSkin;
 import eu.hansolo.medusa.skins.BulletChartSkin;
+import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
@@ -699,6 +700,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             } else if (skinClass == AmpSkin.class) {
                 CONTROL.setTitleColor(Color.WHITE);
                 CONTROL.setLedVisible(true);
+                CONTROL.setBackgroundPaint(Color.WHITE);
                 CONTROL.setForegroundPaint(Color.BLACK);
                 CONTROL.setLcdVisible(true);
                 CONTROL.setShadowsEnabled(true);
@@ -727,6 +729,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setTitleColor(Color.rgb(142,147,151));
                 CONTROL.setValueColor(Color.rgb(228,231,238));
                 CONTROL.setUnitColor(Color.rgb(142,147,151));
+            } else if (skinClass == DashboardSkin.class) {
+                CONTROL.setDecimals(0);
+                CONTROL.setBarBackgroundColor(Color.LIGHTGRAY);
+                CONTROL.setBarColor(Color.rgb(93,190,205));
             }
         }
 
