@@ -714,6 +714,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             } else if (skinClass == SlimSkin.class) {
                 CONTROL.setDecimals(2);
                 CONTROL.setBarColor(Color.rgb(93,190,205));
+                CONTROL.setTitleColor(Color.rgb(142,147,151));
                 CONTROL.setValueColor(Color.rgb(228,231,238));
                 CONTROL.setUnitColor(Color.rgb(142,147,151));
             }

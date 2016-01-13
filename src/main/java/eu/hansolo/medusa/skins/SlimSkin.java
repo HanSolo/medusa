@@ -45,6 +45,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double size;
     private Arc    barBackground;
     private Arc    bar;
+    private Text   titleText;
     private Text   valueText;
     private Text   unitText;
     private Pane   pane;
@@ -95,15 +96,16 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         bar.setStrokeLineCap(StrokeLineCap.ROUND);
         bar.setFill(null);
 
+        titleText = new Text(getSkinnable().getTitle());
+        titleText.setFill(getSkinnable().getTitleColor());
+
         valueText = new Text(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getCurrentValue()));
-        valueText.setFont(Fonts.robotoRegular(PREFERRED_WIDTH * 0.27333));
         valueText.setFill(getSkinnable().getValueColor());
 
         unitText = new Text(getSkinnable().getUnit());
-        unitText.setFont(Fonts.robotoLight(PREFERRED_WIDTH * 0.08));
         unitText.setFill(getSkinnable().getUnitColor());
 
-        pane = new Pane(barBackground, bar, valueText, unitText);
+        pane = new Pane(barBackground, bar, titleText, valueText, unitText);
 
         getChildren().setAll(pane);
     }
@@ -145,10 +147,12 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Resizing ******************************************
     private void redraw() {
+        titleText.setText(getSkinnable().getTitle());
         unitText.setText(getSkinnable().getUnit());
-        resizeUnitText();
+        resizeTitleAndUnitText();
 
         bar.setStroke(getSkinnable().getBarColor());
+        titleText.setFill(getSkinnable().getTitleColor());
         valueText.setFill(getSkinnable().getValueColor());
         unitText.setFill(getSkinnable().getUnitColor());
     }
@@ -159,9 +163,13 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, 0.3056391, size); }
         valueText.relocate((size - valueText.getLayoutBounds().getWidth()) * 0.5, (size - valueText.getLayoutBounds().getHeight()) * 0.5);
     }
-    private void resizeUnitText() {
+    private void resizeTitleAndUnitText() {
         double maxWidth = 0.69548872 * size;
-        unitText.setFont(Fonts.latoBold(size * 0.08082707));
+        double fontSize = size * 0.08082707;
+        titleText.setFont(Fonts.latoBold(fontSize));
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, 0.13082707, size); }
+        titleText.relocate((size - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.22180451);
+        unitText.setFont(Fonts.latoBold(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, 0.13082707, size); }
         unitText.relocate((size - unitText.getLayoutBounds().getWidth()) * 0.5, size * 0.68984962);
     }
@@ -187,8 +195,8 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setRadiusY(size * 0.48590226);
             bar.setStrokeWidth(size * 0.02819549);
 
+            resizeTitleAndUnitText();
             resizeValueText();
-            resizeUnitText();
         }
     }
 }
