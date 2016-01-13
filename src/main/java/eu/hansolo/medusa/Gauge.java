@@ -98,6 +98,7 @@ public class Gauge extends Control {
     public  static final Color                   DARK_COLOR           = Color.rgb(36, 36, 36);
     public  static final Color                   BRIGHT_COLOR         = Color.rgb(223, 223, 223);
     private static final long                    LED_BLINK_INTERVAL   = 500l;
+    private static final int                     MAX_NO_OF_DECIMALS   = 3;
 
     public         final ButtonEvent             BUTTON_PRESSED_EVENT = new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_PRESSED);
     public         final ButtonEvent             BUTTON_RELEASED_EVENT= new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_RELEASED);
@@ -324,20 +325,19 @@ public class Gauge extends Control {
         value                             = new DoublePropertyBase(0) {
             @Override public void set(final double VALUE) {
                 oldValue.set(value.get());
-                double nValue = Helper.clamp(getMinValue(), getMaxValue(), VALUE).doubleValue();
-                super.set(nValue);
+                super.set(VALUE);
                 withinSpeedLimit = !(Instant.now().minusMillis(getAnimationDuration()).isBefore(lastCall));
                 lastCall         = Instant.now();
                 if (withinSpeedLimit && isAnimated()) {
                     long animationDuration = isReturnToZero() ? (long) (0.5 * getAnimationDuration()) : getAnimationDuration();
                     timeline.stop();
 
-                    final KeyValue KEY_VALUE = new KeyValue(currentValue, nValue, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
+                    final KeyValue KEY_VALUE = new KeyValue(currentValue, VALUE, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
                     final KeyFrame KEY_FRAME = new KeyFrame(Duration.millis(animationDuration), KEY_VALUE);
                     timeline.getKeyFrames().setAll(KEY_FRAME);
                     timeline.play();
                 } else {
-                    currentValue.set(nValue);
+                    currentValue.set(VALUE);
                 }
             }
             @Override public Object getBean() { return Gauge.this; }
@@ -485,10 +485,7 @@ public class Gauge extends Control {
             if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = _minValue;
             setValue(isStartFromZero() ? 0 : _minValue);
         } else {
-            minValue.set(Helper.clamp(-Double.MAX_VALUE, getMaxValue(), VALUE).doubleValue());
-            setRange(getMaxValue() - getMinValue());
-            if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = minValue.get();
-            setValue(isStartFromZero() ? 0 : minValue.get());
+            minValue.set(VALUE);
         }
         fireUpdateEvent(RECALC_EVENT);
     }
@@ -515,9 +512,7 @@ public class Gauge extends Control {
             setRange(_maxValue - getMinValue());
             if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = _maxValue;
         } else {
-            maxValue.set(Helper.clamp(getMinValue(), Double.MAX_VALUE, VALUE).doubleValue());
-            setRange(maxValue.get() - getMinValue());
-            if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = maxValue.get();
+            maxValue.set(VALUE);
         }
         fireUpdateEvent(RECALC_EVENT);
     }
@@ -1191,7 +1186,7 @@ public class Gauge extends Control {
     public int getDecimals() { return null == decimals ? _decimals : decimals.get(); }
     public void setDecimals(final int DECIMALS) {
         if (null == decimals) {
-            _decimals = Helper.clamp(0, 3, DECIMALS);
+            _decimals = Helper.clamp(0, MAX_NO_OF_DECIMALS, DECIMALS);
         } else {
             decimals.set(DECIMALS);
         }
@@ -1200,7 +1195,7 @@ public class Gauge extends Control {
     public IntegerProperty decimalsProperty() {
         if (null == decimals) {
             decimals = new IntegerPropertyBase(_decimals) {
-                @Override public void set(final int VALUE) { super.set(Helper.clamp(0, 3, VALUE)); }
+                @Override public void set(final int VALUE) { super.set(Helper.clamp(0, MAX_NO_OF_DECIMALS, VALUE)); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "decimals"; }
             };
@@ -1211,7 +1206,7 @@ public class Gauge extends Control {
     public int getTickLabelDecimals() { return null == tickLabelDecimals ? _tickLabelDecimals : tickLabelDecimals.get(); }
     public void setTickLabelDecimals(final int DECIMALS) {
         if (null == tickLabelDecimals) {
-            _tickLabelDecimals = Helper.clamp(0, 3, DECIMALS);
+            _tickLabelDecimals = Helper.clamp(0, MAX_NO_OF_DECIMALS, DECIMALS);
         } else {
             tickLabelDecimals.set(DECIMALS);
         }
@@ -1220,7 +1215,7 @@ public class Gauge extends Control {
     public IntegerProperty tickLabelDecimalsProperty() {
         if (null == tickLabelDecimals) {
             tickLabelDecimals = new IntegerPropertyBase(_tickLabelDecimals) {
-                @Override public void set(final int VALUE) { super.set(Helper.clamp(0, 3, VALUE)); }
+                @Override public void set(final int VALUE) { super.set(Helper.clamp(0, MAX_NO_OF_DECIMALS, VALUE)); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickLabelDecimals"; }
             };
