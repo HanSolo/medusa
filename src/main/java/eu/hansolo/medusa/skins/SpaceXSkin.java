@@ -121,7 +121,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void initGraphics() {
         barColor                 = getSkinnable().getBarColor();
         thresholdColor           = getSkinnable().getThresholdColor();
-        barBackgroundColor       = Color.color(barColor.getRed(), barColor.getGreen(), barColor.getBlue(), 0.25);
+        barBackgroundColor       = getSkinnable().getBarBackgroundColor();
         thresholdBackgroundColor = Color.color(thresholdColor.getRed(), thresholdColor.getGreen(), thresholdColor.getBlue(), 0.25);
 
         unitText = new Text(getSkinnable().getUnit());
@@ -265,7 +265,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void redraw() {
         barColor                 = getSkinnable().getBarColor();
         thresholdColor           = getSkinnable().getThresholdColor();
-        barBackgroundColor       = Color.color(barColor.getRed(), barColor.getGreen(), barColor.getBlue(), 0.25);
+        barBackgroundColor       = getSkinnable().getBarBackgroundColor();
         thresholdBackgroundColor = Color.color(thresholdColor.getRed(), thresholdColor.getGreen(), thresholdColor.getBlue(), 0.25);
         barBackground.setFill(barBackgroundColor);
         thresholdBar.setFill(thresholdBackgroundColor);

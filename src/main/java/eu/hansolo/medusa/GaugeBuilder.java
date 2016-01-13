@@ -26,6 +26,7 @@ import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
 import eu.hansolo.medusa.skins.AmpSkin;
+import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
@@ -234,6 +235,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B barColor(final Color COLOR) {
         properties.put("barColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
+    public final B barBackgroundColor(final Color COLOR) {
+        properties.put("barBackgroundColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
@@ -684,6 +690,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             } else if (skinClass == SpaceXSkin.class) {
                 CONTROL.setDecimals(0);
                 CONTROL.setThresholdColor(Color.rgb(180, 0, 0));
+                CONTROL.setBarBackgroundColor(Color.rgb(169, 169, 169, 0.25));
                 CONTROL.setBarColor(Color.rgb(169, 169, 169));
                 CONTROL.setBackgroundPaint(Color.rgb(169, 169, 169, 0.3));
                 CONTROL.setTitleColor(Color.WHITE);
@@ -703,6 +710,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setNeedleColor(Color.web("#5a615f"));
                 CONTROL.setValueColor(Color.WHITE);
                 CONTROL.setTitleColor(Color.WHITE);
+            } else if (skinClass == BulletChartSkin.class) {
+                CONTROL.setBarColor(Color.BLACK);
             } else if (skinClass == FlatSkin.class) {
                 CONTROL.setBarColor(Color.CYAN);
                 CONTROL.setBackgroundPaint(Color.WHITE);
@@ -713,6 +722,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setDecimals(0);
             } else if (skinClass == SlimSkin.class) {
                 CONTROL.setDecimals(2);
+                CONTROL.setBarBackgroundColor(Color.rgb(62, 67, 73));
                 CONTROL.setBarColor(Color.rgb(93,190,205));
                 CONTROL.setTitleColor(Color.rgb(142,147,151));
                 CONTROL.setValueColor(Color.rgb(228,231,238));
@@ -869,6 +879,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("barColor".equals(key)) {
                 CONTROL.setBarColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("barBackgroundColor".equals(key)) {
+                CONTROL.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("tickLabelOrientation".equals(key)) {
                 CONTROL.setTickLabelOrientation(((ObjectProperty<Gauge.TickLabelOrientation>) properties.get(key)).get());
             } else if("tickLabelLocation".equals(key)) {

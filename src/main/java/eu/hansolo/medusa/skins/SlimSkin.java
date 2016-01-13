@@ -22,7 +22,6 @@ import eu.hansolo.medusa.tools.Helper;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.StrokeLineCap;
@@ -84,7 +83,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void initGraphics() {
         barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.48590226, PREFERRED_HEIGHT * 0.48590226, 90, 360);
         barBackground.setType(ArcType.OPEN);
-        barBackground.setStroke(Color.rgb(62, 67, 73));
+        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
         barBackground.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
         barBackground.setStrokeLineCap(StrokeLineCap.ROUND);
         barBackground.setFill(null);
@@ -151,6 +150,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setText(getSkinnable().getUnit());
         resizeTitleAndUnitText();
 
+        bar.setStroke(getSkinnable().getBarBackgroundColor());
         bar.setStroke(getSkinnable().getBarColor());
         titleText.setFill(getSkinnable().getTitleColor());
         valueText.setFill(getSkinnable().getValueColor());

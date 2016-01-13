@@ -223,6 +223,8 @@ public class Gauge extends Control {
     private ObjectProperty<Color>                needleColor;
     private Color                                _barColor;
     private ObjectProperty<Color>                barColor;
+    private Color                                _barBackgroundColor;
+    private ObjectProperty<Color>                barBackgroundColor;
     private LcdDesign                            _lcdDesign;
     private ObjectProperty<LcdDesign>            lcdDesign;
     private LcdFont                              _lcdFont;
@@ -411,7 +413,8 @@ public class Gauge extends Control {
         _needleShape                      = NeedleShape.ANGLED;
         _needleSize                       = NeedleSize.STANDARD;
         _needleColor                      = Color.rgb(200, 0, 0);
-        _barColor                         = DARK_COLOR;
+        _barColor                         = BRIGHT_COLOR;
+        _barBackgroundColor               = DARK_COLOR;
         _lcdDesign                        = LcdDesign.STANDARD;
         _lcdFont                          = LcdFont.DIGITAL_BOLD;
         _ledColor                         = Color.RED;
@@ -1310,6 +1313,20 @@ public class Gauge extends Control {
     public ObjectProperty<Color> barColorProperty() {
         if (null == barColor) { barColor = new SimpleObjectProperty<>(Gauge.this, "barColor", _barColor); }
         return barColor;
+    }
+
+    public Color getBarBackgroundColor() { return null == barBackgroundColor ? _barBackgroundColor : barBackgroundColor.get(); }
+    public void setBarBackgroundColor(final Color COLOR) {
+        if (null == barBackgroundColor) {
+            _barBackgroundColor = COLOR;
+        } else {
+            barBackgroundColor.set(COLOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public ObjectProperty<Color> barBackgroundColorProperty() {
+        if (null == barBackgroundColor) { barBackgroundColor = new SimpleObjectProperty<>(Gauge.this, "barBackgroundColor", _barBackgroundColor); }
+        return barBackgroundColor;
     }
 
     public LcdDesign getLcdDesign() { return null == lcdDesign ? _lcdDesign : lcdDesign.get(); }

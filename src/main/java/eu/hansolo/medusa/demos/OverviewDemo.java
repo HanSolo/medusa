@@ -36,6 +36,7 @@ import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
+import eu.hansolo.medusa.skins.SlimSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -76,6 +77,7 @@ public class OverviewDemo extends Application {
     private Gauge          gauge8;
     private Gauge          gauge9;
     private Gauge          gauge10;
+    private Gauge          gauge11;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -291,6 +293,14 @@ public class OverviewDemo extends Application {
                               .animated(true)
                               .build();
 
+        gauge11 = GaugeBuilder.create()
+                              .skin(SlimSkin.class)
+                              .animated(true)
+                              .maxValue(10000)
+                              .decimals(0)
+                              .unit("STEPS")
+                              .build();
+
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO);
 
         framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
@@ -309,6 +319,7 @@ public class OverviewDemo extends Application {
                     gauge8.setValue(RND.nextDouble() * gauge8.getRange() + gauge8.getMinValue());
                     gauge9.setValue(RND.nextDouble() * gauge9.getRange() + gauge9.getMinValue());
                     gauge10.setValue(RND.nextDouble() * gauge10.getRange() + gauge10.getMinValue());
+                    gauge11.setValue(RND.nextDouble() * gauge11.getRange() + gauge11.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -327,6 +338,7 @@ public class OverviewDemo extends Application {
         pane.add(gauge8, 1, 2);
         pane.add(gauge9, 2, 2);
         pane.add(gauge10, 0, 3);
+        pane.add(gauge11, 1, 3);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));
