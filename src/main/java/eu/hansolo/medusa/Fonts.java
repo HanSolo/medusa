@@ -35,7 +35,9 @@ public class Fonts {
     private static final String ROBOTO_LIGHT_CONDENSED_NAME;
     private static final String ROBOTO_REGULAR_CONDENSED_NAME;
     private static final String ROBOTO_BOLD_CONDENSED_NAME;
+    private static final String LATO_LIGHT_NAME;
     private static final String LATO_REGULAR_NAME;
+    private static final String LATO_BOLD_NAME;
 
     private static String digitalName;
     private static String digitalReadoutName;
@@ -52,7 +54,9 @@ public class Fonts {
     private static String robotoRegularCondensedName;
     private static String robotoBoldCondensedName;
 
+    private static String latoLightName;
     private static String latoRegularName;
+    private static String latoBoldName;
 
 
     static {
@@ -69,7 +73,9 @@ public class Fonts {
             robotoLightCondensedName   = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/RobotoCondensed-Light.ttf"), 10).getName();
             robotoRegularCondensedName = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/RobotoCondensed-Regular.ttf"), 10).getName();
             robotoBoldCondensedName    = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/RobotoCondensed-Bold.ttf"), 10).getName();
-            latoRegularName            = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Lato-Reg.ttf"), 10).getName();
+            latoLightName              = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Lato-Lig.otf"), 10).getName();
+            latoRegularName            = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Lato-Reg.otf"), 10).getName();
+            latoRegularName            = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Lato-Bol.otf"), 10).getName();
         } catch (Exception exception) { }
         DIGITAL_NAME                  = digitalName;
         DIGITAL_READOUT_NAME          = digitalReadoutName;
@@ -83,7 +89,9 @@ public class Fonts {
         ROBOTO_LIGHT_CONDENSED_NAME   = robotoLightCondensedName;
         ROBOTO_REGULAR_CONDENSED_NAME = robotoRegularCondensedName;
         ROBOTO_BOLD_CONDENSED_NAME    = robotoBoldCondensedName;
+        LATO_LIGHT_NAME               = latoLightName;
         LATO_REGULAR_NAME             = latoRegularName;
+        LATO_BOLD_NAME                = latoBoldName;
     }
 
 
@@ -105,5 +113,7 @@ public class Fonts {
     public static Font robotoCondensedRegular(final double SIZE) { return new Font(ROBOTO_REGULAR_CONDENSED_NAME, SIZE); }
     public static Font robotoCondensedBold(final double SIZE) { return new Font(ROBOTO_BOLD_CONDENSED_NAME, SIZE); }
 
+    public static Font latoLight(final double SIZE) { return new Font(LATO_LIGHT_NAME, SIZE); }
     public static Font latoRegular(final double SIZE) { return new Font(LATO_REGULAR_NAME, SIZE); }
+    public static Font latoBold(final double SIZE) { return new Font(LATO_BOLD_NAME, SIZE); }
 }
