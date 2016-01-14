@@ -57,6 +57,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text          valueText;
     private Text          unitText;
     private Pane          pane;
+    private double        minValue;
     private double        range;
     private double        angleStep;
     private boolean       colorGradientEnabled;
@@ -68,6 +69,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public FlatSkin(Gauge gauge) {
         super(gauge);
+        minValue             = gauge.getMinValue();
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;
         colorGradientEnabled = gauge.isColorGradientEnabled();
@@ -78,6 +80,8 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         init();
         initGraphics();
         registerListeners();
+
+        setBar(gauge.getCurrentValue());
     }
 
 
@@ -151,6 +155,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
+            minValue  = getSkinnable().getMinValue();
             range     = getSkinnable().getRange();
             angleStep = ANGLE_RANGE / range;
             redraw();
@@ -158,15 +163,10 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void setBar(final double VALUE) {
-        double minValue = getSkinnable().getMinValue();
         if (minValue > 0) {
-            bar.setLength(((VALUE - minValue) * (-1)) * angleStep);
+            bar.setLength((minValue - VALUE) * angleStep);
         } else {
-            if (VALUE < 0) {
-                bar.setLength((-VALUE + minValue) * angleStep);
-            } else {
-                bar.setLength(((minValue - VALUE) * angleStep));
-            }
+            bar.setLength(-VALUE * angleStep);
         }
         setBarColor(VALUE);
         valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
@@ -177,7 +177,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setStroke(getSkinnable().getBarColor());
             colorRing.setStroke(getSkinnable().getBarColor());
         } else if (colorGradientEnabled && noOfGradientStops > 1) {
-            Color dynamicColor = getSkinnable().getGradientLookup().getColorAt(VALUE / range);
+            Color dynamicColor = getSkinnable().getGradientLookup().getColorAt((VALUE - minValue) / range);
             bar.setStroke(dynamicColor);
             colorRing.setStroke(dynamicColor);
         } else {
