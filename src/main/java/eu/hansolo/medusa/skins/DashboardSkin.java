@@ -18,6 +18,7 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.VPos;
 import javafx.scene.control.Skin;
@@ -35,6 +36,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.List;
 import java.util.Locale;
 
 
@@ -51,34 +53,36 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double ASPECT_RATIO     = 0.74;
     private static final double ANGLE_RANGE      = 180;
 
-    private double      size;
-    private double      width;
-    private double      height;
-    private double      centerX;
-    private double      currentValueAngle;
-    private Pane        pane;
-    private Text        unitText;
-    private Text        titleText;
-    private Text        valueText;
-    private Text        minText;
-    private Text        maxText;
-    private Path        barBackground;
-    private MoveTo      barBackgroundStart;
-    private ArcTo       barBackgroundOuterArc;
-    private LineTo      barBackgroundLineToInnerArc;
-    private ArcTo       barBackgroundInnerArc;
-    private Path        dataBar;
-    private MoveTo      dataBarStart;
-    private ArcTo       dataBarOuterArc;
-    private LineTo      dataBarLineToInnerArc;
-    private ArcTo       dataBarInnerArc;
-    private InnerShadow innerShadow;
-    private Font        smallFont;
-    private Font        bigFont;
-    private double      range;
-    private double      angleStep;
-    private boolean     colorGradientEnabled;
-    private int         noOfGradientStops;
+    private double        size;
+    private double        width;
+    private double        height;
+    private double        centerX;
+    private double        currentValueAngle;
+    private Pane          pane;
+    private Text          unitText;
+    private Text          titleText;
+    private Text          valueText;
+    private Text          minText;
+    private Text          maxText;
+    private Path          barBackground;
+    private MoveTo        barBackgroundStart;
+    private ArcTo         barBackgroundOuterArc;
+    private LineTo        barBackgroundLineToInnerArc;
+    private ArcTo         barBackgroundInnerArc;
+    private Path          dataBar;
+    private MoveTo        dataBarStart;
+    private ArcTo         dataBarOuterArc;
+    private LineTo        dataBarLineToInnerArc;
+    private ArcTo         dataBarInnerArc;
+    private InnerShadow   innerShadow;
+    private Font          smallFont;
+    private Font          bigFont;
+    private double        range;
+    private double        angleStep;
+    private boolean       colorGradientEnabled;
+    private int           noOfGradientStops;
+    private boolean       sectionsVisible;
+    private List<Section> sections;
 
 
     // ******************** Constructors **************************************
@@ -88,6 +92,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep            = ANGLE_RANGE / range;
         colorGradientEnabled = gauge.isColorGradientEnabled();
         noOfGradientStops    = gauge.getGradientLookupStops().size();
+        sectionsVisible      = gauge.areSectionsVisible();
+        sections             = gauge.getSections();
         currentValueAngle    = 0;
 
         init();
@@ -213,23 +219,35 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarOuterArc.setY(centerX + (0.675 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
         dataBarLineToInnerArc.setX(centerX + (0.3 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
         dataBarLineToInnerArc.setY(centerX + (0.3 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
-        if (colorGradientEnabled && noOfGradientStops > 1) dataBar.setFill(getSkinnable().getGradientLookup().getColorAt(VALUE / range));
+        setBarColor(VALUE);
         valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.62 * height);
+    }
+    private void setBarColor(final double VALUE) {
+        if (!sectionsVisible && !colorGradientEnabled) {
+            dataBar.setFill(getSkinnable().getBarColor());
+        } else if (colorGradientEnabled && noOfGradientStops > 1) {
+            dataBar.setFill(getSkinnable().getGradientLookup().getColorAt(VALUE / range));
+        } else {
+            for (Section section : sections) {
+                if (section.contains(VALUE)) {
+                    dataBar.setFill(section.getColor());
+                    break;
+                }
+            }
+        }
     }
 
     private void redraw() {
         colorGradientEnabled = getSkinnable().isColorGradientEnabled();
         noOfGradientStops    = getSkinnable().getGradientLookupStops().size();
+        sectionsVisible      = getSkinnable().areSectionsVisible();
+        sections             = getSkinnable().getSections();
 
         barBackground.setFill(getSkinnable().getBarBackgroundColor());
         barBackground.setEffect(getSkinnable().areShadowsEnabled() ? innerShadow : null);
 
-        if (colorGradientEnabled && noOfGradientStops > 1) {
-            dataBar.setFill(getSkinnable().getGradientLookup().getColorAt(getSkinnable().getCurrentValue() / range));
-        } else {
-            dataBar.setFill(getSkinnable().getBarColor());
-        }
+        setBarColor(getSkinnable().getCurrentValue());
 
         titleText.setFill(getSkinnable().getTitleColor());
 

@@ -18,6 +18,7 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
@@ -27,6 +28,7 @@ import javafx.scene.shape.ArcType;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 
+import java.util.List;
 import java.util.Locale;
 
 
@@ -41,17 +43,19 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double MAXIMUM_WIDTH    = 1024;
     private static final double MAXIMUM_HEIGHT   = 1024;
     private static final double ANGLE_RANGE      = 360;
-    private double  size;
-    private Arc     barBackground;
-    private Arc     bar;
-    private Text    titleText;
-    private Text    valueText;
-    private Text    unitText;
-    private Pane    pane;
-    private double  range;
-    private double  angleStep;
-    private boolean colorGradientEnabled;
-    private int     noOfGradientStops;
+    private double        size;
+    private Arc           barBackground;
+    private Arc           bar;
+    private Text          titleText;
+    private Text          valueText;
+    private Text          unitText;
+    private Pane          pane;
+    private double        range;
+    private double        angleStep;
+    private boolean       colorGradientEnabled;
+    private int           noOfGradientStops;
+    private boolean       sectionsVisible;
+    private List<Section> sections;
 
 
     // ******************** Constructors **************************************
@@ -61,6 +65,8 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep            = ANGLE_RANGE / range;
         colorGradientEnabled = gauge.isColorGradientEnabled();
         noOfGradientStops    = gauge.getGradientLookupStops().size();
+        sectionsVisible      = gauge.areSectionsVisible();
+        sections             = gauge.getSections();
 
         init();
         initGraphics();
@@ -147,9 +153,23 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 bar.setLength(((minValue - VALUE) * angleStep));
             }
         }
-        if (colorGradientEnabled && noOfGradientStops > 1) bar.setStroke(getSkinnable().getGradientLookup().getColorAt(VALUE / range));
+        setBarColor(VALUE);
         valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
         resizeValueText();
+    }
+    private void setBarColor(final double VALUE) {
+        if (!sectionsVisible && !colorGradientEnabled) {
+            bar.setStroke(getSkinnable().getBarColor());
+        } else if (colorGradientEnabled && noOfGradientStops > 1) {
+            bar.setStroke(getSkinnable().getGradientLookup().getColorAt(VALUE / range));
+        } else {
+            for (Section section : sections) {
+                if (section.contains(VALUE)) {
+                    bar.setStroke(section.getColor());
+                    break;
+                }
+            }
+        }
     }
 
 
@@ -157,17 +177,15 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void redraw() {
         colorGradientEnabled = getSkinnable().isColorGradientEnabled();
         noOfGradientStops    = getSkinnable().getGradientLookupStops().size();
+        sectionsVisible      = getSkinnable().areSectionsVisible();
+        sections             = getSkinnable().getSections();
 
         titleText.setText(getSkinnable().getTitle());
         unitText.setText(getSkinnable().getUnit());
         resizeTitleAndUnitText();
 
         barBackground.setStroke(getSkinnable().getBarBackgroundColor());
-        if (colorGradientEnabled && noOfGradientStops > 1) {
-            bar.setStroke(getSkinnable().getGradientLookup().getColorAt(getSkinnable().getCurrentValue() / range));
-        } else {
-            bar.setStroke(getSkinnable().getBarColor());
-        }
+        setBarColor(getSkinnable().getCurrentValue());
         titleText.setFill(getSkinnable().getTitleColor());
         valueText.setFill(getSkinnable().getValueColor());
         unitText.setFill(getSkinnable().getUnitColor());

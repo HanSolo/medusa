@@ -18,6 +18,7 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
@@ -31,6 +32,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 
+import java.util.List;
 import java.util.Locale;
 
 
@@ -46,19 +48,21 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double MAXIMUM_HEIGHT   = 1024;
     private static final double ANGLE_RANGE      = 360;
 
-    private double              size;
-    private Circle              colorRing;
-    private Arc                 bar;
-    private Line                separator;
-    private Circle              background;
-    private Text                titleText;
-    private Text                valueText;
-    private Text                unitText;
-    private Pane                pane;
-    private double              range;
-    private double              angleStep;
-    private boolean             colorGradientEnabled;
-    private int                 noOfGradientStops;
+    private double        size;
+    private Circle        colorRing;
+    private Arc           bar;
+    private Line          separator;
+    private Circle        background;
+    private Text          titleText;
+    private Text          valueText;
+    private Text          unitText;
+    private Pane          pane;
+    private double        range;
+    private double        angleStep;
+    private boolean       colorGradientEnabled;
+    private int           noOfGradientStops;
+    private boolean       sectionsVisible;
+    private List<Section> sections;
 
 
     // ******************** Constructors **************************************
@@ -68,6 +72,8 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep            = ANGLE_RANGE / range;
         colorGradientEnabled = gauge.isColorGradientEnabled();
         noOfGradientStops    = gauge.getGradientLookupStops().size();
+        sectionsVisible      = gauge.areSectionsVisible();
+        sections             = gauge.getSections();
 
         init();
         initGraphics();
@@ -162,13 +168,27 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 bar.setLength(((minValue - VALUE) * angleStep));
             }
         }
-        if (colorGradientEnabled && noOfGradientStops > 1) {
+        setBarColor(VALUE);
+        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
+        resizeValueText();
+    }
+    private void setBarColor(final double VALUE) {
+        if (!sectionsVisible && !colorGradientEnabled) {
+            bar.setStroke(getSkinnable().getBarColor());
+            colorRing.setStroke(getSkinnable().getBarColor());
+        } else if (colorGradientEnabled && noOfGradientStops > 1) {
             Color dynamicColor = getSkinnable().getGradientLookup().getColorAt(VALUE / range);
             bar.setStroke(dynamicColor);
             colorRing.setStroke(dynamicColor);
+        } else {
+            for (Section section : sections) {
+                if (section.contains(VALUE)) {
+                    bar.setStroke(section.getColor());
+                    colorRing.setStroke(section.getColor());
+                    break;
+                }
+            }
         }
-        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
-        resizeValueText();
     }
 
 
@@ -176,6 +196,8 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void redraw() {
         colorGradientEnabled = getSkinnable().isColorGradientEnabled();
         noOfGradientStops    = getSkinnable().getGradientLookupStops().size();
+        sectionsVisible      = getSkinnable().areSectionsVisible();
+        sections             = getSkinnable().getSections();
 
         titleText.setText(getSkinnable().getTitle());
         resizeTitleText();
@@ -183,14 +205,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setText(getSkinnable().getUnit());
         resizeUnitText();
 
-        if (colorGradientEnabled && noOfGradientStops > 1) {
-            Color dynamicColor = getSkinnable().getGradientLookup().getColorAt(getSkinnable().getCurrentValue() / range);
-            bar.setStroke(dynamicColor);
-            colorRing.setStroke(dynamicColor);
-        } else {
-            bar.setStroke(getSkinnable().getBarColor());
-            colorRing.setStroke(getSkinnable().getBarColor());
-        }
+        setBarColor(getSkinnable().getCurrentValue());
         background.setFill(getSkinnable().getBackgroundPaint());
         valueText.setFill(getSkinnable().getValueColor());
         unitText.setFill(getSkinnable().getUnitColor());
@@ -241,7 +256,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             separator.setStartX(size * 0.5);
             separator.setStartY(size * 0.0275);
             separator.setEndX(size * 0.5);
-            separator.setEndY(size * 0.138);
+            separator.setEndY(size * 0.145);
 
             background.setCenterX(size * 0.5);
             background.setCenterY(size * 0.5);
