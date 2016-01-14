@@ -264,21 +264,15 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void registerListeners() {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().getSections().addListener((ListChangeListener<Section>) c -> redraw());
-        getSkinnable().getAreas().addListener((ListChangeListener<Section>) c -> redraw());
-        getSkinnable().getTickMarkSections().addListener((ListChangeListener<Section>) c -> redraw());
-        getSkinnable().getTickLabelSections().addListener((ListChangeListener<Section>) c -> redraw());
         getSkinnable().getMarkers().addListener((ListChangeListener<Marker>) c -> {
             updateMarkers();
             redraw();
         });
 
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-
         getSkinnable().currentValueProperty().addListener(e -> rotateNeedle());
 
         handleEvents("INTERACTIVITY");
-
         handleEvents("VISIBILITY");
 
         needleRotate.angleProperty().addListener(observable -> handleEvents("ANGLE"));
