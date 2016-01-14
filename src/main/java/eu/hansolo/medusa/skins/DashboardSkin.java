@@ -18,6 +18,7 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.VPos;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
@@ -48,12 +49,12 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double MAXIMUM_WIDTH    = 1024;
     private static final double MAXIMUM_HEIGHT   = 1024;
     private static final double ASPECT_RATIO     = 0.74;
+    private static final double ANGLE_RANGE      = 180;
+
     private double      size;
     private double      width;
     private double      height;
     private double      centerX;
-    private double      range;
-    private double      angleStep;
     private double      currentValueAngle;
     private Pane        pane;
     private Text        unitText;
@@ -74,14 +75,20 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private InnerShadow innerShadow;
     private Font        smallFont;
     private Font        bigFont;
+    private double      range;
+    private double      angleStep;
+    private boolean     colorGradientEnabled;
+    private int         noOfGradientStops;
 
 
     // ******************** Constructors **************************************
     public DashboardSkin(Gauge gauge) {
         super(gauge);
-        range             = getSkinnable().getRange();
-        angleStep         = 180d / range;
-        currentValueAngle = 0;
+        range                = gauge.getRange();
+        angleStep            = ANGLE_RANGE / range;
+        colorGradientEnabled = gauge.isColorGradientEnabled();
+        noOfGradientStops    = gauge.getGradientLookupStops().size();
+        currentValueAngle    = 0;
 
         init();
         initGraphics();
@@ -180,7 +187,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().widthProperty().addListener(o -> resize());
         getSkinnable().heightProperty().addListener(o -> resize());
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> updateBar());
+        getSkinnable().currentValueProperty().addListener(o -> setBar(getSkinnable().getCurrentValue()));
     }
 
 
@@ -188,38 +195,37 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     protected void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
+        } else if ("REDRAW".equals(EVENT_TYPE)) {
+            redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             range     = getSkinnable().getRange();
-            angleStep = 180d / range;
+            angleStep = ANGLE_RANGE / range;
             resize();
-        } else if ("ANGLE".equals(EVENT_TYPE)) {
-            double currentValue = dataBarOuterArc.getXAxisRotation() / angleStep + getSkinnable().getMinValue();
-            valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue));
-            valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         }
     }
 
 
     // ******************** Private Methods ***********************************
-    private void updateBar() {
-        double currentValue = getSkinnable().getCurrentValue();
-        currentValueAngle = (currentValue + Math.abs(getSkinnable().getMinValue())) * angleStep + 90;
+    private void setBar(final double VALUE) {
+        currentValueAngle = Helper.clamp(90d, 270d, (VALUE + Math.abs(getSkinnable().getMinValue())) * angleStep + 90d);
         dataBarOuterArc.setX(centerX + (0.675 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
         dataBarOuterArc.setY(centerX + (0.675 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
         dataBarLineToInnerArc.setX(centerX + (0.3 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
         dataBarLineToInnerArc.setY(centerX + (0.3 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
-        if (getSkinnable().isColorGradientEnabled() && getSkinnable().getGradientLookup().getStops().size() > 1) dataBar.setFill(getSkinnable().getGradientLookup().getColorAt(currentValue / range));
-        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue));
+        if (colorGradientEnabled && noOfGradientStops > 1) dataBar.setFill(getSkinnable().getGradientLookup().getColorAt(VALUE / range));
+        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.62 * height);
     }
 
     private void redraw() {
+        colorGradientEnabled = getSkinnable().isColorGradientEnabled();
+        noOfGradientStops    = getSkinnable().getGradientLookupStops().size();
+
         barBackground.setFill(getSkinnable().getBarBackgroundColor());
         barBackground.setEffect(getSkinnable().areShadowsEnabled() ? innerShadow : null);
 
-        if (getSkinnable().isColorGradientEnabled() && !getSkinnable().getGradientLookup().getStops().isEmpty()) {
+        if (colorGradientEnabled && noOfGradientStops > 1) {
             dataBar.setFill(getSkinnable().getGradientLookup().getColorAt(getSkinnable().getCurrentValue() / range));
         } else {
             dataBar.setFill(getSkinnable().getBarColor());

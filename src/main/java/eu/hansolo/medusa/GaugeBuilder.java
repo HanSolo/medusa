@@ -716,7 +716,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setBarColor(Color.BLACK);
             } else if (skinClass == FlatSkin.class) {
                 CONTROL.setBarColor(Color.CYAN);
-                CONTROL.setBackgroundPaint(Color.WHITE);
+                CONTROL.setBackgroundPaint(Color.TRANSPARENT);
                 CONTROL.setTitleColor(Gauge.DARK_COLOR);
                 CONTROL.setValueColor(Gauge.DARK_COLOR);
                 CONTROL.setUnitColor(Gauge.DARK_COLOR);

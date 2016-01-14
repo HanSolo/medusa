@@ -41,20 +41,26 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double MAXIMUM_WIDTH    = 1024;
     private static final double MAXIMUM_HEIGHT   = 1024;
     private static final double ANGLE_RANGE      = 360;
-    private double size;
-    private Arc    barBackground;
-    private Arc    bar;
-    private Text   titleText;
-    private Text   valueText;
-    private Text   unitText;
-    private Pane   pane;
-    private double angleStep;
+    private double  size;
+    private Arc     barBackground;
+    private Arc     bar;
+    private Text    titleText;
+    private Text    valueText;
+    private Text    unitText;
+    private Pane    pane;
+    private double  range;
+    private double  angleStep;
+    private boolean colorGradientEnabled;
+    private int     noOfGradientStops;
 
 
     // ******************** Constructors **************************************
     public SlimSkin(Gauge gauge) {
         super(gauge);
-        angleStep = ANGLE_RANGE / gauge.getRange();
+        range                = gauge.getRange();
+        angleStep            = ANGLE_RANGE / range;
+        colorGradientEnabled = gauge.isColorGradientEnabled();
+        noOfGradientStops    = gauge.getGradientLookupStops().size();
 
         init();
         initGraphics();
@@ -124,7 +130,9 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            angleStep = ANGLE_RANGE / getSkinnable().getRange();
+            range     = getSkinnable().getRange();
+            angleStep = ANGLE_RANGE / range;
+            redraw();
         }
     }
 
@@ -139,6 +147,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 bar.setLength(((minValue - VALUE) * angleStep));
             }
         }
+        if (colorGradientEnabled && noOfGradientStops > 1) bar.setStroke(getSkinnable().getGradientLookup().getColorAt(VALUE / range));
         valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
         resizeValueText();
     }
@@ -146,12 +155,19 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Resizing ******************************************
     private void redraw() {
+        colorGradientEnabled = getSkinnable().isColorGradientEnabled();
+        noOfGradientStops    = getSkinnable().getGradientLookupStops().size();
+
         titleText.setText(getSkinnable().getTitle());
         unitText.setText(getSkinnable().getUnit());
         resizeTitleAndUnitText();
 
         barBackground.setStroke(getSkinnable().getBarBackgroundColor());
-        bar.setStroke(getSkinnable().getBarColor());
+        if (colorGradientEnabled && noOfGradientStops > 1) {
+            bar.setStroke(getSkinnable().getGradientLookup().getColorAt(getSkinnable().getCurrentValue() / range));
+        } else {
+            bar.setStroke(getSkinnable().getBarColor());
+        }
         titleText.setFill(getSkinnable().getTitleColor());
         valueText.setFill(getSkinnable().getValueColor());
         unitText.setFill(getSkinnable().getUnitColor());

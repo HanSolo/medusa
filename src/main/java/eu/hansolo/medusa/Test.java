@@ -77,15 +77,21 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(BulletChartSkin.class)
+                            .skin(DashboardSkin.class)
                             .prefSize(500,500)
-
                             .animated(true)
                             .threshold(85)
                             .decimals(0)
+                            .colorGradientEnabled(true)
+                            .gradientLookupStops(new Stop(0.0, Color.GREEN),
+                                                 new Stop(0.5, Color.YELLOW),
+                                                 new Stop(1.0, Color.RED))
                             .title("TITLE")
                             .unit("UNIT")
                             .build();
+
+        System.out.println(gauge.getMinValue() + " - " + gauge.getMaxValue());
+        System.out.println(gauge.getRange());
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -101,7 +107,7 @@ public class Test extends Application {
     @Override public void start(Stage stage) {
         StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(10));
-        pane.setBackground(new Background(new BackgroundFill(Color.rgb(39,44,50), CornerRadii.EMPTY, Insets.EMPTY)));
+        //pane.setBackground(new Background(new BackgroundFill(Color.rgb(39,44,50), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
 
@@ -109,13 +115,11 @@ public class Test extends Application {
         stage.setScene(scene);
         stage.show();
 
-        gauge.setValue(42);
-
         // Calculate number of nodes
         calcNoOfNodes(gauge);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        //timer.start();
+        timer.start();
     }
 
     @Override public void stop() {
