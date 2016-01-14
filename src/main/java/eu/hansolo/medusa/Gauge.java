@@ -613,39 +613,109 @@ public class Gauge extends Control {
     }
 
     public ObservableList<Section> getSections() { return sections; }
-    public void setSections(final List<Section> SECTIONS) { sections.setAll(SECTIONS); }
+    public void setSections(final List<Section> SECTIONS) {
+        sections.setAll(SECTIONS);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
     public void setSections(final Section... SECTIONS) { setSections(Arrays.asList(SECTIONS)); }
-    public void addSection(final Section SECTION) { sections.add(SECTION); }
-    public void removeSection(final Section SECTION) { sections.remove(SECTION); }
-    public void clearSections() { sections.clear(); }
+    public void addSection(final Section SECTION) {
+        if (null == SECTION) return;
+        sections.add(SECTION);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void removeSection(final Section SECTION) {
+        if (null == SECTION) return;
+        sections.remove(SECTION);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void clearSections() {
+        sections.clear();
+        fireUpdateEvent(REDRAW_EVENT);
+    }
 
     public ObservableList<Section> getAreas() { return areas; }
-    public void setAreas(final List<Section> AREAS) { areas.setAll(AREAS); }
+    public void setAreas(final List<Section> AREAS) {
+        areas.setAll(AREAS);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
     public void setAreas(final Section... AREAS) { setAreas(Arrays.asList(AREAS)); }
-    public void addArea(final Section AREA) { areas.add(AREA); }
-    public void removeArea(final Section AREA) { areas.remove(AREA); }
-    public void clearAreas() { areas.clear(); }
+    public void addArea(final Section AREA) {
+        if (null == AREA) return;
+        areas.add(AREA);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void removeArea(final Section AREA) {
+        if (null == AREA) return;
+        areas.remove(AREA);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void clearAreas() {
+        areas.clear();
+        fireUpdateEvent(REDRAW_EVENT);
+    }
 
     public ObservableList<Section> getTickMarkSections() { return tickMarkSections; }
-    public void setTickMarkSections(final List<Section> SECTIONS) { tickMarkSections.setAll(SECTIONS); }
+    public void setTickMarkSections(final List<Section> SECTIONS) {
+        tickMarkSections.setAll(SECTIONS);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
     public void setTickMarkSections(final Section... SECTIONS) { setTickMarkSections(Arrays.asList(SECTIONS)); }
-    public void addTickMarkSection(final Section SECTION) { tickMarkSections.add(SECTION); }
-    public void removeTickMarkSection(final Section SECTION) { tickMarkSections.remove(SECTION); }
-    public void clearTickMarkSections() { tickMarkSections.clear(); }
+    public void addTickMarkSection(final Section SECTION) {
+        if (null == SECTION) return;
+        tickMarkSections.add(SECTION);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void removeTickMarkSection(final Section SECTION) {
+        if (null == SECTION) return;
+        tickMarkSections.remove(SECTION);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void clearTickMarkSections() {
+        tickMarkSections.clear();
+        fireUpdateEvent(REDRAW_EVENT);
+    }
 
     public ObservableList<Section> getTickLabelSections() { return tickLabelSections; }
-    public void setTickLabelSections(final List<Section> SECTIONS) { tickLabelSections.setAll(SECTIONS); }
+    public void setTickLabelSections(final List<Section> SECTIONS) {
+        tickLabelSections.setAll(SECTIONS);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
     public void setTickLabelSections(final Section... SECTIONS) { setTickLabelSections(Arrays.asList(SECTIONS)); }
-    public void addTickLabelSection(final Section SECTION) { tickLabelSections.add(SECTION); }
-    public void removeTickLabelSection(final Section SECTION) { tickLabelSections.remove(SECTION); }
-    public void clearTickLabelSections() { tickLabelSections.clear(); }
+    public void addTickLabelSection(final Section SECTION) {
+        if (null == SECTION) return;
+        tickLabelSections.add(SECTION);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void removeTickLabelSection(final Section SECTION) {
+        if (null == SECTION) return;
+        tickLabelSections.remove(SECTION);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void clearTickLabelSections() {
+        tickLabelSections.clear();
+        fireUpdateEvent(REDRAW_EVENT);
+    }
 
     public ObservableList<Marker> getMarkers() { return markers; }
-    public void setMarkers(final List<Marker> MARKERS) { markers.setAll(MARKERS); }
+    public void setMarkers(final List<Marker> MARKERS) {
+        markers.setAll(MARKERS);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
     public void setMarkers(final Marker... MARKERS) { setMarkers(Arrays.asList(MARKERS)); }
-    public void addMarker(final Marker MARKER) { markers.add(MARKER); }
-    public void removeMarker(final Marker MARKER) { markers.remove(MARKER); }
-    public void clearMarkers() { markers.clear(); }
+    public void addMarker(final Marker MARKER) {
+        if (null == MARKER) return;
+        markers.add(MARKER);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void removeMarker(final Marker MARKER) {
+        if (null == MARKER) return;
+        markers.remove(MARKER);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void clearMarkers() {
+        markers.clear();
+        fireUpdateEvent(REDRAW_EVENT);
+    }
 
 
     // ******************** UI related methods ********************************
@@ -1823,10 +1893,16 @@ public class Gauge extends Control {
         if (null == gradientLookup) { gradientLookup = new GradientLookup(); }
         return gradientLookup;
     }
-    public void setGradientLookup(final GradientLookup GRADIENT_LOOKUP) { gradientLookup = GRADIENT_LOOKUP; }
+    public void setGradientLookup(final GradientLookup GRADIENT_LOOKUP) {
+        gradientLookup = GRADIENT_LOOKUP;
+        fireUpdateEvent(REDRAW_EVENT);
+    }
     public List<Stop> getGradientLookupStops() { return getGradientLookup().getStops(); }
-    public void setGradientLookupStops(final Stop... STOPS) { getGradientLookup().setStops(STOPS);}
-    public void setGradientLookupStops(final List<Stop> STOPS) { getGradientLookup().setStops(STOPS);}
+    public void setGradientLookupStops(final Stop... STOPS) { setGradientLookupStops(Arrays.asList(STOPS)); }
+    public void setGradientLookupStops(final List<Stop> STOPS) {
+        getGradientLookup().setStops(STOPS);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
 
     public boolean areCustomTickLabelsEnabled() { return null == customTickLabelsEnabled ? _customTickLabelsEnabled : customTickLabelsEnabled.get(); }
     public void setCustomTickLabelsEnabled(final boolean ENABLED) {
@@ -1843,11 +1919,25 @@ public class Gauge extends Control {
     }
 
     public List<String> getCustomTickLabels() { return customTickLabels; }
-    public void setCustomTickLabels(final List<String> TICK_LABELS) { customTickLabels.setAll(TICK_LABELS); }
-    public void setCustomTickLabels(final String... TICK_LABELS) { customTickLabels.setAll(Arrays.asList(TICK_LABELS)); }
-    public void addCustomTickLabel(final String TICK_LABEL) { if (!customTickLabels.contains(TICK_LABEL)) customTickLabels.add(TICK_LABEL); }
-    public void removeCustomTickLabel(final String TICK_LABEL) { if (customTickLabels.contains(TICK_LABEL)) customTickLabels.remove(TICK_LABEL); }
-    public void clearCustomTickLabels() { customTickLabels.clear(); }
+    public void setCustomTickLabels(final List<String> TICK_LABELS) {
+        customTickLabels.setAll(TICK_LABELS);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void setCustomTickLabels(final String... TICK_LABELS) { setCustomTickLabels(Arrays.asList(TICK_LABELS)); }
+    public void addCustomTickLabel(final String TICK_LABEL) {
+        if (null == TICK_LABEL) return;
+        if (!customTickLabels.contains(TICK_LABEL)) customTickLabels.add(TICK_LABEL);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void removeCustomTickLabel(final String TICK_LABEL) {
+        if (null == TICK_LABEL) return;
+        if (customTickLabels.contains(TICK_LABEL)) customTickLabels.remove(TICK_LABEL);
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public void clearCustomTickLabels() {
+        customTickLabels.clear();
+        fireUpdateEvent(REDRAW_EVENT);
+    }
 
     public boolean isInteractive() { return null == interactive ? _interactive : interactive.get(); }
     public void setInteractive(final boolean INTERACTIVE) {
