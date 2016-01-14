@@ -969,10 +969,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setMediumTickMarksVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("minorTickMarksVisible".equals(key)) {
                 CONTROL.setMinorTickMarksVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("ledOn".equals(key)) {
-                CONTROL.setLedOn(((BooleanProperty) properties.get(key)).get());
             } else if ("ledBlinking".equals(key)) {
                 CONTROL.setLedBlinking(((BooleanProperty) properties.get(key)).get());
+            } else if ("ledOn".equals(key)) {
+                CONTROL.setLedOn(((BooleanProperty) properties.get(key)).get());
             } else if ("orientation".equals(key)) {
                 CONTROL.setOrientation(((ObjectProperty<Orientation>) properties.get(key)).get());
             } else if("colorGradientEnabled".equals(key)) {

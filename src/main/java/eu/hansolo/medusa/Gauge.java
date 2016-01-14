@@ -1849,7 +1849,7 @@ public class Gauge extends Control {
         } else {
             ledOn.set(ON);
         }
-        fireUpdateEvent(LED_BLINK_EVENT);
+        fireUpdateEvent(REDRAW_EVENT);
     }
     public BooleanProperty ledOnProperty() {
         if (null == ledOn) { ledOn = new SimpleBooleanProperty(Gauge.this, "ledOn", _ledOn); }
