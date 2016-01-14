@@ -135,11 +135,11 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
 
-        minText = new Text(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getMinValue()));
+        minText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
         minText.setTextOrigin(VPos.CENTER);
         minText.setFill(getSkinnable().getValueColor());
 
-        maxText = new Text(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getMaxValue()));
+        maxText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
         maxText.setTextOrigin(VPos.CENTER);
         maxText.setFill(getSkinnable().getValueColor());
 
@@ -221,7 +221,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarLineToInnerArc.setY(centerX + (0.3 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
         setBarColor(VALUE);
         valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
-        valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.62 * height);
+        if (valueText.getLayoutBounds().getWidth() > 0.28 * width) Helper.adjustTextSize(valueText, 0.28 * width, size * 0.24);
+        valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
     }
     private void setBarColor(final double VALUE) {
         if (!sectionsVisible && !colorGradientEnabled) {
@@ -282,15 +283,21 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             unitText.setFont(smallFont);
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.5 * height);
 
+            double maxWidth = 0.95 * width;
             titleText.setFont(smallFont);
-            titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.87 * height);
+            if (titleText.getLayoutBounds().getWidth() > maxWidth) Helper.adjustTextSize(titleText, maxWidth, size * 0.12);
+            titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.88 * height);
 
+            maxWidth = 0.28 * width;
             valueText.setFont(bigFont);
-            valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.62 * height);
+            if (valueText.getLayoutBounds().getWidth() > maxWidth) Helper.adjustTextSize(valueText, maxWidth, size * 0.24);
+            valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
 
+            minText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
             minText.setFont(smallFont);
             minText.relocate(((0.27778 * width) - minText.getLayoutBounds().getWidth()) * 0.5, 0.7 * height);
 
+            maxText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
             maxText.setFont(smallFont);
             maxText.relocate(((0.27778 * width) - maxText.getLayoutBounds().getWidth()) * 0.5 + 0.72222 * width, 0.7 * height);
 

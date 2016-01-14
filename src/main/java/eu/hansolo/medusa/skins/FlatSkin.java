@@ -216,19 +216,19 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void resizeTitleText() {
         double maxWidth = 0.56667 * size;
         titleText.setFont(Fonts.robotoLight(size * 0.08));
-        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, 0.13, size); }
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, size * 0.08); }
         titleText.relocate((size - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.225);
     }
     private void resizeValueText() {
         double maxWidth = 0.5 * size;
         valueText.setFont(Fonts.robotoRegular(size * 0.3));
-        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, 0.35, size); }
+        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, size * 0.3); }
         valueText.relocate((size - valueText.getLayoutBounds().getWidth()) * 0.5, (size - valueText.getLayoutBounds().getHeight()) * 0.5);
     }
     private void resizeUnitText() {
         double maxWidth = 0.56667 * size;
         unitText.setFont(Fonts.robotoLight(size * 0.08));
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, 0.13, size); }
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, size * 0.08); }
         unitText.relocate((size - unitText.getLayoutBounds().getWidth()) * 0.5, size * 0.66);
     }
 

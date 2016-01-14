@@ -65,6 +65,7 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextBoundsType;
 import javafx.scene.transform.Rotate;
 
 import java.math.BigDecimal;
@@ -541,20 +542,11 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         // Main loop
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
-        BigDecimal tmpStepBD = new BigDecimal(tmpAngleStep);
+        BigDecimal     tmpStepBD      = new BigDecimal(tmpAngleStep);
         tmpStepBD = tmpStepBD.setScale(3, BigDecimal.ROUND_HALF_UP);
         double tmpStep = tmpStepBD.doubleValue();
         double angle   = 0;
         for (double i = 0 ; Double.compare(-angleRange - tmpStep, i) <= 0 ; i -= tmpStep) {
-            /*
-            switch (scaleDirection) {
-                case CLOCKWISE        : if (Double.compare(-angleRange - tmpAngleStep, angle) < 0) break;
-                    break;
-                case COUNTER_CLOCKWISE: if (Double.compare(angleRange + tmpAngleStep, angle) > 0) break;
-                    break;
-            }
-            */
-
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
 
@@ -1295,26 +1287,23 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void resizeText() {
-        double maxWidth = 0.3 * size;
+        double maxWidth = 0.4 * size;
 
         titleText.setFont(Fonts.robotoMedium(size * 0.06));
         titleText.setText(getSkinnable().getTitle());
-        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, 0.065, size); }
-        titleText.setTranslateX((size - titleText.getLayoutBounds().getWidth()) * 0.5);
-        titleText.setTranslateY(size * 0.26);
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, size * 0.06); }
+        titleText.relocate((size - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.26);
 
         unitText.setFont(Fonts.robotoRegular(size * 0.05));
         unitText.setText(getSkinnable().getUnit());
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, 0.055, size); }
-        unitText.setTranslateX((size - unitText.getLayoutBounds().getWidth()) * 0.5);
-        unitText.setTranslateY(size * 0.35);
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, size * 0.05); }
+        unitText.relocate((size - unitText.getLayoutBounds().getWidth()) * 0.5, size * 0.35);
 
         maxWidth = 0.25 * size;
         subTitleText.setFont(Fonts.robotoRegular(size * 0.05));
         subTitleText.setText(getSkinnable().getSubTitle());
-        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, 0.055, size); }
-        subTitleText.setTranslateX((size - subTitleText.getLayoutBounds().getWidth()) * 0.5);
-        subTitleText.setTranslateY(size * 0.76);
+        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, size * 0.05); }
+        subTitleText.relocate((size - subTitleText.getLayoutBounds().getWidth()) * 0.5, size * 0.76);
     }
 
     private void resize() {

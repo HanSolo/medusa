@@ -655,29 +655,30 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         valueText.setFont(Fonts.latoRegular(size * 0.22));
         valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue));
-        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, 0.15, size); }
+        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, size * 0.22); }
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
 
         titleText.setFont(Fonts.robotoCondensedRegular(size * 0.062));
         titleText.setText(getSkinnable().getTitle());
-        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, 0.067, size); }
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, size * 0.062); }
         titleText.setTranslateX((size - titleText.getLayoutBounds().getWidth()) * 0.5);
 
+        maxWidth = 0.28 * size;
         subTitleText.setFont(Fonts.robotoCondensedLight(size * 0.047));
         subTitleText.setText(getSkinnable().getSubTitle());
-        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, 0.052, size); }
+        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, size * 0.047); }
         subTitleText.setTranslateX((size - subTitleText.getLayoutBounds().getWidth()) * 0.5);
 
         unitText.setFont(Fonts.robotoCondensedRegular(size * 0.047));
         unitText.setText(getSkinnable().getUnit());
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, 0.052, size); }
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, size * 0.047); }
         unitText.setTranslateX((size - unitText.getLayoutBounds().getWidth()) * 0.5);
     }
 
     private void placeTextVerticaly() {
         valueText.setTranslateY(size * 0.5);
 
-        titleText.setTranslateY(size * 0.85);
+        titleText.setTranslateY(size * 0.83);
 
         subTitleText.setTranslateY(size * 0.35);
 

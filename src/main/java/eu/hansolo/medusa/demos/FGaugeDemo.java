@@ -224,7 +224,7 @@ public class FGaugeDemo extends Application {
          *  - CARBON
          *  - TRANSPARENT
          */
-        FGauge fGauge = FGaugeBuilder
+        fGauge = FGaugeBuilder
             .create()
             .prefSize(500, 500)
             .gauge(gauge)

@@ -194,17 +194,17 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void resizeValueText() {
         double maxWidth = 0.86466165 * size;
         valueText.setFont(Fonts.latoLight(size * 0.2556391));
-        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, 0.3056391, size); }
+        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, size * 0.2556391); }
         valueText.relocate((size - valueText.getLayoutBounds().getWidth()) * 0.5, (size - valueText.getLayoutBounds().getHeight()) * 0.5);
     }
     private void resizeTitleAndUnitText() {
         double maxWidth = 0.69548872 * size;
         double fontSize = size * 0.08082707;
         titleText.setFont(Fonts.latoBold(fontSize));
-        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, 0.13082707, size); }
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate((size - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.22180451);
         unitText.setFont(Fonts.latoBold(fontSize));
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, 0.13082707, size); }
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
         unitText.relocate((size - unitText.getLayoutBounds().getWidth()) * 0.5, size * 0.68984962);
     }
 

@@ -130,11 +130,11 @@ public class Helper {
         }
     }
 
-    public static final void adjustTextSize(final Text TEXT, final double MAX_WIDTH, final double DECREMENT_FACTOR, final double SIZE) {
-        double decrement = 0d;
-        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && TEXT.getFont().getSize() > 0) {
-            TEXT.setFont(new Font(TEXT.getFont().getName(), SIZE * (DECREMENT_FACTOR - decrement)));
-            decrement += 0.01;
+    public static final void adjustTextSize(final Text TEXT, final double MAX_WIDTH, double fontSize) {
+        final String FONT_NAME = TEXT.getFont().getName();
+        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH | fontSize < 0) {
+            fontSize -= 0.005;
+            TEXT.setFont(new Font(FONT_NAME, fontSize));
         }
     }
 
