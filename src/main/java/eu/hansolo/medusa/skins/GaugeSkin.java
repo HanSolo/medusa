@@ -546,12 +546,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double tmpStep = tmpStepBD.doubleValue();
         double angle   = 0;
         for (double i = 0 ; Double.compare(-angleRange - tmpStep, i) <= 0 ; i -= tmpStep) {
+            /*
             switch (scaleDirection) {
                 case CLOCKWISE        : if (Double.compare(-angleRange - tmpAngleStep, angle) < 0) break;
                     break;
                 case COUNTER_CLOCKWISE: if (Double.compare(angleRange + tmpAngleStep, angle) > 0) break;
                     break;
             }
+            */
 
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
@@ -837,6 +839,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
             counterBD = counterBD.add(minorTickSpaceBD);
             counter   = counterBD.doubleValue();
+            if (counter > maxValue) break;
             angle     = ScaleDirection.CLOCKWISE == scaleDirection ? (angle - tmpAngleStep) : (angle + tmpAngleStep);
         }
     }
