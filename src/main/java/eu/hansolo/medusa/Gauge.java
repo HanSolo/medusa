@@ -486,7 +486,7 @@ public class Gauge extends Control {
             _minValue = Helper.clamp(-Double.MAX_VALUE, getMaxValue(), VALUE).doubleValue();
             setRange(getMaxValue() - _minValue);
             if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = _minValue;
-            setValue(isStartFromZero() ? 0 : _minValue);
+            setValue(isStartFromZero() && _minValue < 0 ? 0 : _minValue);
         } else {
             minValue.set(VALUE);
         }
@@ -499,7 +499,7 @@ public class Gauge extends Control {
                     super.set(Helper.clamp(-Double.MAX_VALUE, getMaxValue(), VALUE).doubleValue());
                     setRange(getMaxValue() - get());
                     if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = get();
-                    setValue(get());
+                    Gauge.this.setValue(isStartFromZero() && get() < 0 ? 0 : get());
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minValue";}
@@ -544,9 +544,7 @@ public class Gauge extends Control {
         setAngleStep(getAngleRange() / RANGE);
     }
     public ReadOnlyDoubleProperty rangeProperty() {
-        if (null == range) {
-            range = new SimpleDoubleProperty(Gauge.this, "range", getMaxValue() - getMinValue());
-        }
+        if (null == range) { range = new SimpleDoubleProperty(Gauge.this, "range", getMaxValue() - getMinValue()); }
         return range;
     }
 
@@ -734,30 +732,47 @@ public class Gauge extends Control {
     }
 
     public boolean isStartFromZero() { return null == startFromZero ? _startFromZero : startFromZero.get(); }
-    public void setStartFromZero(final boolean START) {
+    public void setStartFromZero(final boolean IS_TRUE) {
         if (null == startFromZero) {
-            _startFromZero = START;
+            _startFromZero = IS_TRUE;
+            setValue(IS_TRUE && getMinValue() < 0 ? 0 : getMinValue());
         } else {
-            startFromZero.set(START);
+            startFromZero.set(IS_TRUE);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public BooleanProperty startFromZeroProperty() {
-        if (null == startFromZero) { startFromZero = new SimpleBooleanProperty(Gauge.this, "startFromZero", _startFromZero); }
+        if (null == startFromZero) {
+            startFromZero = new BooleanPropertyBase(_startFromZero) {
+                @Override public void set(final boolean IS_TRUE) {
+                    super.set(IS_TRUE);
+                    Gauge.this.setValue(IS_TRUE && getMinValue() < 0 ? 0 : getMinValue());
+                }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "startFromZero"; }
+            };
+        }
         return startFromZero;
     }
 
     public boolean isReturnToZero() { return null == returnToZero ? _returnToZero : returnToZero.get(); }
-    public void setReturnToZero(final boolean RETURN) {
+    public void setReturnToZero(final boolean IS_TRUE) {
         if (null == returnToZero) {
-            _returnToZero = RETURN;
+            _returnToZero = Double.compare(getMinValue(), 0d) <= 0 ? IS_TRUE : false;
         } else {
-            returnToZero.set(RETURN);
+            returnToZero.set(IS_TRUE);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
     public BooleanProperty returnToZeroProperty() {
-        if (null == returnToZero) { returnToZero = new SimpleBooleanProperty(Gauge.this, "returnToZero", _returnToZero); }
+        if (null == returnToZero) {
+            returnToZero = new SimpleBooleanProperty(Gauge.this, "returnToZero", _returnToZero);
+            returnToZero = new BooleanPropertyBase(_returnToZero) {
+                @Override public void set(final boolean IS_TRUE) { super.set(Double.compare(getMinValue(), 0d) <= 0 ? IS_TRUE : false); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "returnToZero"; }
+            };
+        }
         return returnToZero;
     }
 
