@@ -18,6 +18,7 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.VPos;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
@@ -38,58 +39,61 @@ import java.util.Locale;
  * Created by hansolo on 29.12.15.
  */
 public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double         PREFERRED_WIDTH  = 250;
-    private static final double         PREFERRED_HEIGHT = 290;
-    private static final double         MINIMUM_WIDTH    = 50;
-    private static final double         MINIMUM_HEIGHT   = 50;
-    private static final double         MAXIMUM_WIDTH    = 1024;
-    private static final double         MAXIMUM_HEIGHT   = 1024;
-    private static final double         ASPECT_RATIO     = 1.1625;
-    private              double         size;
-    private              double         width;
-    private              double         height;
-    private              double         centerX;
-    private              double         centerY;
-    private              double         range;
-    private              double         angleStep;
-    private              double         currentValueAngle;
-    private              double         thresholdAngle;
-    private              double         barWidth;
-    private              Pane           pane;
-    private              Text           unitText;
-    private              Text           titleText;
-    private              Text           valueText;
-    private              Path           barBackground;
-    private              MoveTo         barBackgroundStart;
-    private              ArcTo          barBackgroundOuterArc;
-    private              LineTo         barBackgroundLineToInnerArc;
-    private              ArcTo          barBackgroundInnerArc;
-    private              Path           thresholdBar;
-    private              MoveTo         thresholdBarStart;
-    private              ArcTo          thresholdBarOuterArc;
-    private              LineTo         thresholdBarLineToInnerArc;
-    private              ArcTo          thresholdBarInnerArc;
-    private              Path           dataBar;
-    private              MoveTo         dataBarStart;
-    private              ArcTo          dataBarOuterArc;
-    private              LineTo         dataBarLineToInnerArc;
-    private              ArcTo          dataBarInnerArc;
-    private              Path           dataBarThreshold;
-    private              MoveTo         dataBarThresholdStart;
-    private              ArcTo          dataBarThresholdOuterArc;
-    private              LineTo         dataBarThresholdLineToInnerArc;
-    private              ArcTo          dataBarThresholdInnerArc;
-    private              Color          barColor;
-    private              Color          thresholdColor;
-    private              Color          barBackgroundColor;
-    private              Color          thresholdBackgroundColor;
+    private static final double          PREFERRED_WIDTH  = 250;
+    private static final double          PREFERRED_HEIGHT = 290;
+    private static final double          MINIMUM_WIDTH    = 50;
+    private static final double          MINIMUM_HEIGHT   = 50;
+    private static final double          MAXIMUM_WIDTH    = 1024;
+    private static final double          MAXIMUM_HEIGHT   = 1024;
+    private static final double          ASPECT_RATIO     = 1.1625;
+    private static final double          ANGLE_RANGE      = 270;
+    private              double          size;
+    private              double          width;
+    private              double          height;
+    private              double          centerX;
+    private              double          centerY;
+    private              double          range;
+    private              double          angleStep;
+    private              double          currentValueAngle;
+    private              double          thresholdAngle;
+    private              double          barWidth;
+    private              Pane            pane;
+    private              Text            unitText;
+    private              Text            titleText;
+    private              Text            valueText;
+    private              Path            barBackground;
+    private              MoveTo          barBackgroundStart;
+    private              ArcTo           barBackgroundOuterArc;
+    private              LineTo          barBackgroundLineToInnerArc;
+    private              ArcTo           barBackgroundInnerArc;
+    private              Path            thresholdBar;
+    private              MoveTo          thresholdBarStart;
+    private              ArcTo           thresholdBarOuterArc;
+    private              LineTo          thresholdBarLineToInnerArc;
+    private              ArcTo           thresholdBarInnerArc;
+    private              Path            dataBar;
+    private              MoveTo          dataBarStart;
+    private              ArcTo           dataBarOuterArc;
+    private              LineTo          dataBarLineToInnerArc;
+    private              ArcTo           dataBarInnerArc;
+    private              Path            dataBarThreshold;
+    private              MoveTo          dataBarThresholdStart;
+    private              ArcTo           dataBarThresholdOuterArc;
+    private              LineTo          dataBarThresholdLineToInnerArc;
+    private              ArcTo           dataBarThresholdInnerArc;
+    private              Color           barColor;
+    private              Color           thresholdColor;
+    private              Color           barBackgroundColor;
+    private              Color           thresholdBackgroundColor;
+    private              double          minValue;
 
 
     // ******************** Constructors **************************************
     public SpaceXSkin(Gauge gauge) {
         super(gauge);
-        range             = getSkinnable().getRange();
-        angleStep         = 270d / range;
+        range             = gauge.getRange();
+        angleStep         = ANGLE_RANGE / range;
+        minValue          = gauge.getMinValue();
         currentValueAngle = 0;
 
         init();
@@ -212,7 +216,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().widthProperty().addListener(o -> resize());
         getSkinnable().heightProperty().addListener(o -> resize());
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> updateBar());
+        getSkinnable().currentValueProperty().addListener(o -> setBar(getSkinnable().getCurrentValue()));
     }
 
 
@@ -220,27 +224,23 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     protected void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
+        } else if ("REDRAW".equals(EVENT_TYPE)) {
+            redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             range     = getSkinnable().getRange();
-            angleStep = 270d / range;
-            //currentValue.set(getSkinnable().getMinValue());
+            angleStep = ANGLE_RANGE / range;
+            minValue  = getSkinnable().getMinValue();
             resize();
-        } else if ("ANGLE".equals(EVENT_TYPE)) {
-            double currentValue = dataBarOuterArc.getXAxisRotation() / angleStep + getSkinnable().getMinValue();
-            valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue));
-            valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         }
     }
 
 
     // ******************** Private Methods ***********************************
-    private void updateBar() {
-        thresholdAngle    = (getSkinnable().getThreshold() + Math.abs(getSkinnable().getMinValue())) * angleStep;
-        currentValueAngle = (getSkinnable().getCurrentValue() + Math.abs(getSkinnable().getMinValue())) * angleStep;
+    private void setBar(final double VALUE) {
+        currentValueAngle = (VALUE - minValue) * angleStep;
+        thresholdAngle    = (getSkinnable().getThreshold() - minValue) * angleStep;
         double valueAngle = currentValueAngle > thresholdAngle ? thresholdAngle : currentValueAngle;
-
         dataBarOuterArc.setLargeArcFlag(valueAngle > 180);
         dataBarInnerArc.setLargeArcFlag(valueAngle > 180);
 
@@ -249,7 +249,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarLineToInnerArc.setX(centerX + (centerX - barWidth) * Math.sin(-Math.toRadians(valueAngle)));
         dataBarLineToInnerArc.setY(centerY + (centerX - barWidth) * Math.cos(-Math.toRadians(valueAngle)));
 
-        double dataBarThresholdAngle = getSkinnable().getCurrentValue() > getSkinnable().getThreshold() ? currentValueAngle : thresholdAngle;
+        double dataBarThresholdAngle = VALUE > getSkinnable().getThreshold() ? currentValueAngle : thresholdAngle;
 
         dataBarThresholdOuterArc.setX(centerX + centerX * Math.sin(-Math.toRadians(dataBarThresholdAngle)));
         dataBarThresholdOuterArc.setY(centerY + centerX * Math.cos(-Math.toRadians(dataBarThresholdAngle)));
@@ -258,7 +258,8 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarThresholdInnerArc.setX(centerX + (centerX - barWidth) * Math.sin(-Math.toRadians(thresholdAngle)));
         dataBarThresholdInnerArc.setY(centerY + (centerX - barWidth) * Math.cos(-Math.toRadians(thresholdAngle)));
 
-        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getCurrentValue()));
+        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
+        if (valueText.getLayoutBounds().getWidth() > 0.64 * width) Helper.adjustTextSize(valueText, width, 0.21 * width);
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
     }
 
@@ -297,17 +298,25 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barWidth = 0.125 * width;
 
             titleText.setFont(Fonts.robotoMedium(0.13 * width));
+            if (titleText.getLayoutBounds().getWidth() > width) Helper.adjustTextSize(titleText, width, 0.13 * width);
             titleText.relocate(0, 0);
 
             valueText.setFont(Fonts.robotoRegular(0.21 * width));
+            if (valueText.getLayoutBounds().getWidth() > 0.64 * width) Helper.adjustTextSize(valueText, width, 0.21 * width);
             valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
 
             unitText.setFont(Fonts.robotoLight(0.11 * width));
+            if (unitText.getLayoutBounds().getWidth() > 0.4 * width) Helper.adjustTextSize(unitText, width, 0.11 * width);
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()), 0.8 * height);
 
-            thresholdAngle    = (getSkinnable().getThreshold() + Math.abs(getSkinnable().getMinValue())) * angleStep;
-            currentValueAngle = (getSkinnable().getCurrentValue() + Math.abs(getSkinnable().getMinValue())) * angleStep;
+            thresholdAngle    = (getSkinnable().getThreshold() - minValue) * angleStep;
+            currentValueAngle = (getSkinnable().getCurrentValue() - minValue) * angleStep;
             currentValueAngle = currentValueAngle > thresholdAngle ? thresholdAngle : currentValueAngle;
+
+            thresholdAngle    = (getSkinnable().getThreshold() - minValue) * angleStep;
+            currentValueAngle = (getSkinnable().getCurrentValue() - minValue) * angleStep;
+            barBackgroundOuterArc.setLargeArcFlag(thresholdAngle > 180);
+            barBackgroundInnerArc.setLargeArcFlag(thresholdAngle > 180);
 
             barBackgroundStart.setX(centerX);
             barBackgroundStart.setY(height);
