@@ -243,7 +243,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Set initial value
         angleStep          = getSkinnable().getAngleStep();
         double targetAngle = 180 - getSkinnable().getStartAngle() + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
-        targetAngle        = clamp(180 - getSkinnable().getStartAngle(), 180 - getSkinnable().getStartAngle() + getSkinnable().getAngleRange(), targetAngle);
+        targetAngle        = Helper.clamp(180 - getSkinnable().getStartAngle(), 180 - getSkinnable().getStartAngle() + getSkinnable().getAngleRange(), targetAngle);
         needleRotate.setAngle(targetAngle);
 
         // Add all nodes
@@ -390,10 +390,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double targetAngle;
         if (ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection()) {
             targetAngle = startAngle + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
-            targetAngle = clamp(startAngle, startAngle + getSkinnable().getAngleRange(), targetAngle);
+            targetAngle = Helper.clamp(startAngle, startAngle + getSkinnable().getAngleRange(), targetAngle);
         } else {
             targetAngle = startAngle - (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
-            targetAngle = clamp(startAngle - getSkinnable().getAngleRange(), startAngle, targetAngle);
+            targetAngle = Helper.clamp(startAngle - getSkinnable().getAngleRange(), startAngle, targetAngle);
         }
         needleRotate.setAngle(targetAngle);
     }
@@ -1107,7 +1107,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             } else {
                 thresholdAngle = startAngle + (getSkinnable().getThreshold() - getSkinnable().getMinValue()) * angleStep;
             }
-            double thresholdSize = clamp(3, 3.5, 0.01 * size);
+            double thresholdSize = Helper.clamp(3d, 3.5, 0.01 * size);
             double sinValue      = Math.sin(Math.toRadians(thresholdAngle));
             double cosValue      = Math.cos(Math.toRadians(thresholdAngle));
             switch (tickLabelLocation) {
@@ -1278,12 +1278,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
         knobCanvas.setCache(true);
         knobCanvas.setCacheHint(CacheHint.QUALITY);
-    }
-
-    private double clamp(final double MIN_VALUE, final double MAX_VALUE, final double VALUE) {
-        if (VALUE < MIN_VALUE) return MIN_VALUE;
-        if (VALUE > MAX_VALUE) return MAX_VALUE;
-        return VALUE;
     }
 
     private void resizeText() {
