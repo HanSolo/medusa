@@ -32,6 +32,7 @@ import eu.hansolo.medusa.skins.AmpSkin;
 import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
+import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SlimSkin;
@@ -77,25 +78,13 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(SlimSkin.class)
+                            .skin(KpiSkin.class)
                             .prefSize(500,500)
                             .animated(true)
                             .minValue(0)
                             .maxValue(100)
-                            .threshold(85)
-                            .decimals(0)
-                            .colorGradientEnabled(true)
-                            .gradientLookupStops(new Stop(0.0, Color.BLUE),
-                                                 new Stop(0.33, Color.LIGHTBLUE),
-                                                 new Stop(0.5, Color.YELLOW),
-                                                 new Stop(1.0, Color.RED))
-                            .sectionsVisible(false)
-                            .sections(new Section(0, 25, Color.GREEN),
-                                      new Section(25, 50, Color.LIME),
-                                      new Section(50, 75, Color.YELLOW),
-                                      new Section(75, 100, Color.RED))
+                            .threshold(75)
                             .title("TITLE")
-                            .unit("UNIT")
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -112,7 +101,8 @@ public class Test extends Application {
     @Override public void start(Stage stage) {
         StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(10));
-        pane.setBackground(new Background(new BackgroundFill(Color.rgb(39,44,50), CornerRadii.EMPTY, Insets.EMPTY)));
+        //pane.setBackground(new Background(new BackgroundFill(Color.rgb(39,44,50), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
 
@@ -123,6 +113,8 @@ public class Test extends Application {
         // Calculate number of nodes
         calcNoOfNodes(gauge);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
+
+        //gauge.setValue(50);
 
         timer.start();
     }
