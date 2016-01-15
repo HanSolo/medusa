@@ -20,8 +20,12 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
@@ -52,7 +56,6 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Circle        colorRing;
     private Arc           bar;
     private Line          separator;
-    private Circle        background;
     private Text          titleText;
     private Text          valueText;
     private Text          unitText;
@@ -120,9 +123,6 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         separator.setStroke(getSkinnable().getBorderPaint());
         separator.setFill(Color.TRANSPARENT);
 
-        background = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.363);
-        background.setFill(getSkinnable().getBackgroundPaint());
-
         titleText = new Text(getSkinnable().getTitle());
         titleText.setFont(Fonts.robotoLight(PREFERRED_WIDTH * 0.08));
         titleText.setFill(getSkinnable().getTitleColor());
@@ -135,7 +135,8 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setFont(Fonts.robotoLight(PREFERRED_WIDTH * 0.08));
         unitText.setFill(getSkinnable().getUnitColor());
 
-        pane = new Pane(colorRing, bar, separator, background, titleText, valueText, unitText);
+        pane = new Pane(colorRing, bar, separator, titleText, valueText, unitText);
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
@@ -199,36 +200,39 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sectionsVisible      = getSkinnable().areSectionsVisible();
         sections             = getSkinnable().getSections();
 
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        setBarColor(getSkinnable().getCurrentValue());
+        valueText.setFill(getSkinnable().getValueColor());
+        unitText.setFill(getSkinnable().getUnitColor());
+        titleText.setFill(getSkinnable().getTitleColor());
+        separator.setStroke(getSkinnable().getBorderPaint());
+
         titleText.setText(getSkinnable().getTitle());
         resizeTitleText();
 
         unitText.setText(getSkinnable().getUnit());
         resizeUnitText();
-
-        setBarColor(getSkinnable().getCurrentValue());
-        background.setFill(getSkinnable().getBackgroundPaint());
-        valueText.setFill(getSkinnable().getValueColor());
-        unitText.setFill(getSkinnable().getUnitColor());
-        titleText.setFill(getSkinnable().getTitleColor());
-        separator.setStroke(getSkinnable().getBorderPaint());
     }
 
     private void resizeTitleText() {
         double maxWidth = 0.56667 * size;
-        titleText.setFont(Fonts.robotoLight(size * 0.08));
-        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, size * 0.08); }
+        double fontSize = 0.08 * size;
+        titleText.setFont(Fonts.robotoLight(fontSize));
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate((size - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.225);
     }
     private void resizeValueText() {
         double maxWidth = 0.5 * size;
-        valueText.setFont(Fonts.robotoRegular(size * 0.3));
-        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, size * 0.3); }
+        double fontSize = 0.3 * size;
+        valueText.setFont(Fonts.robotoRegular(fontSize));
+        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
         valueText.relocate((size - valueText.getLayoutBounds().getWidth()) * 0.5, (size - valueText.getLayoutBounds().getHeight()) * 0.5);
     }
     private void resizeUnitText() {
         double maxWidth = 0.56667 * size;
-        unitText.setFont(Fonts.robotoLight(size * 0.08));
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, size * 0.08); }
+        double fontSize = 0.08 * size;
+        unitText.setFont(Fonts.robotoLight(fontSize));
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
         unitText.relocate((size - unitText.getLayoutBounds().getWidth()) * 0.5, size * 0.66);
     }
 
@@ -257,10 +261,6 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             separator.setStartY(size * 0.0275);
             separator.setEndX(size * 0.5);
             separator.setEndY(size * 0.145);
-
-            background.setCenterX(size * 0.5);
-            background.setCenterY(size * 0.5);
-            background.setRadius(size * 0.363);
 
             resizeTitleText();
             resizeValueText();
