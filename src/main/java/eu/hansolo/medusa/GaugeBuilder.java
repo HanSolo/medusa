@@ -29,6 +29,7 @@ import eu.hansolo.medusa.skins.AmpSkin;
 import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
+import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SlimSkin;
@@ -733,6 +734,13 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setDecimals(0);
                 CONTROL.setBarBackgroundColor(Color.LIGHTGRAY);
                 CONTROL.setBarColor(Color.rgb(93,190,205));
+            } else if (skinClass == KpiSkin.class) {
+                CONTROL.setDecimals(0);
+                CONTROL.setForegroundBaseColor(Color.rgb(126,126,127));
+                CONTROL.setBarColor(Color.rgb(168,204,254));
+                CONTROL.setThresholdVisible(true);
+                CONTROL.setThresholdColor(Color.rgb(45,86,184));
+                CONTROL.setNeedleColor(Color.rgb(74,74,74));
             }
         }
 
