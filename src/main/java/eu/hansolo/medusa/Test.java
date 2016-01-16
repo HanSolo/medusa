@@ -32,6 +32,7 @@ import eu.hansolo.medusa.skins.AmpSkin;
 import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
+import eu.hansolo.medusa.skins.IndicatorSkin;
 import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
@@ -78,13 +79,13 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(KpiSkin.class)
-                            .prefSize(500,500)
+                            .skin(IndicatorSkin.class)
+                            //.prefSize(500,500)
                             .animated(true)
-                            .minValue(0)
-                            .maxValue(100)
-                            .threshold(75)
-                            .title("TITLE")
+                            .colorGradientEnabled(false)
+                            .gradientLookupStops(new Stop(0, Color.rgb(34,180,11)),
+                                                 new Stop(0.5, Color.rgb(255,146,0)),
+                                                 new Stop(1.0, Color.rgb(255,0,39)))
                             .build();
 
         lastTimerCall = System.nanoTime();
