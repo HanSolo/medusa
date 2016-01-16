@@ -34,6 +34,7 @@ import eu.hansolo.medusa.skins.AmpSkin;
 import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
+import eu.hansolo.medusa.skins.IndicatorSkin;
 import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
@@ -80,6 +81,7 @@ public class OverviewDemo extends Application {
     private Gauge          gauge10;
     private Gauge          gauge11;
     private Gauge          gauge12;
+    private Gauge          gauge13;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -313,6 +315,11 @@ public class OverviewDemo extends Application {
                               .title("TITLE")
                               .build();
 
+        gauge13 = GaugeBuilder.create()
+                              .skin(IndicatorSkin.class)
+                              .animated(true)
+                              .build();
+
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO);
 
         framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
@@ -333,6 +340,7 @@ public class OverviewDemo extends Application {
                     gauge10.setValue(RND.nextDouble() * gauge10.getRange() + gauge10.getMinValue());
                     gauge11.setValue(RND.nextDouble() * gauge11.getRange() + gauge11.getMinValue());
                     gauge12.setValue(RND.nextDouble() * gauge12.getRange() + gauge12.getMinValue());
+                    gauge13.setValue(RND.nextDouble() * gauge13.getRange() + gauge13.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -344,22 +352,24 @@ public class OverviewDemo extends Application {
         pane.add(framedGauge1, 0, 0);
         pane.add(framedGauge2, 1, 0);
         pane.add(gauge3, 2, 0);
-        pane.add(gauge4, 0, 1);
-        pane.add(gauge5, 1, 1);
-        pane.add(gauge6, 2, 1);
-        pane.add(gauge7, 0, 2);
-        pane.add(gauge8, 1, 2);
-        pane.add(gauge9, 2, 2);
-        pane.add(gauge10, 0, 3);
-        pane.add(gauge11, 1, 3);
-        pane.add(gauge12, 2, 3);
+        pane.add(gauge4, 3, 0);
+        pane.add(gauge5, 4, 0);
+        pane.add(gauge6, 0, 1);
+        pane.add(gauge7, 1, 1);
+        pane.add(gauge8, 2, 1);
+        pane.add(gauge9, 3, 1);
+        pane.add(gauge10, 4, 1);
+        pane.add(gauge11, 0, 2);
+        pane.add(gauge12, 1, 2);
+        pane.add(gauge13, 2, 2);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));
         pane.getColumnConstraints().add(new ColumnConstraints(200));
         pane.getColumnConstraints().add(new ColumnConstraints(200));
         pane.getColumnConstraints().add(new ColumnConstraints(200));
-        pane.getRowConstraints().add(new RowConstraints(200));
+        pane.getColumnConstraints().add(new ColumnConstraints(200));
+        pane.getColumnConstraints().add(new ColumnConstraints(200));
         pane.getRowConstraints().add(new RowConstraints(200));
         pane.getRowConstraints().add(new RowConstraints(200));
         pane.getRowConstraints().add(new RowConstraints(200));
