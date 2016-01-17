@@ -716,6 +716,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setTitleColor(Color.WHITE);
             } else if (skinClass == BulletChartSkin.class) {
                 CONTROL.setBarColor(Color.BLACK);
+                CONTROL.setThresholdColor(Color.BLACK);
             } else if (skinClass == FlatSkin.class) {
                 CONTROL.setBarColor(Color.CYAN);
                 CONTROL.setBackgroundPaint(Color.TRANSPARENT);
