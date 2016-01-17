@@ -110,6 +110,7 @@ public class Gauge extends Control {
     private        final UpdateEvent             LED_BLINK_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED_BLINK);
     private        final UpdateEvent             VISIBILITY_EVENT     = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
     private        final UpdateEvent             INTERACTIVITY_EVENT  = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
+    private        final UpdateEvent             FINISHED_EVENT       = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
 
     private static volatile Future               blinkFuture;
     private static ScheduledExecutorService      blinkService         = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
@@ -331,7 +332,7 @@ public class Gauge extends Control {
                 withinSpeedLimit = !(Instant.now().minusMillis(getAnimationDuration()).isBefore(lastCall));
                 lastCall         = Instant.now();
                 if (withinSpeedLimit && isAnimated()) {
-                    long animationDuration = isReturnToZero() ? (long) (0.5 * getAnimationDuration()) : getAnimationDuration();
+                    long animationDuration = isReturnToZero() ? (long) (0.2 * getAnimationDuration()) : getAnimationDuration();
                     timeline.stop();
 
                     final KeyValue KEY_VALUE = new KeyValue(currentValue, VALUE, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
@@ -340,6 +341,7 @@ public class Gauge extends Control {
                     timeline.play();
                 } else {
                     currentValue.set(VALUE);
+                    fireUpdateEvent(FINISHED_EVENT);
                 }
             }
             @Override public Object getBean() { return Gauge.this; }
@@ -461,10 +463,11 @@ public class Gauge extends Control {
         timeline.setOnFinished(e -> {
             if (isReturnToZero() && Double.compare(currentValue.get(), 0d) != 0d) {
                 final KeyValue KEY_VALUE2 = new KeyValue(value, 0, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
-                final KeyFrame KEY_FRAME2 = new KeyFrame(Duration.millis(animationDuration), KEY_VALUE2);
+                final KeyFrame KEY_FRAME2 = new KeyFrame(Duration.millis((long) (0.8 * getAnimationDuration())), KEY_VALUE2);
                 timeline.getKeyFrames().setAll(KEY_FRAME2);
                 timeline.play();
             }
+            fireUpdateEvent(FINISHED_EVENT);
         });
     }
 
