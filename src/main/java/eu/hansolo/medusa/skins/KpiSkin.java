@@ -163,6 +163,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         thresholdText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
         thresholdText.setFill(getSkinnable().getTitleColor());
+        thresholdText.setVisible(Double.compare(getSkinnable().getThreshold(), getSkinnable().getMinValue()) != 0 && Double.compare(getSkinnable().getThreshold(), getSkinnable().getMaxValue()) != 0);
 
         pane = new Pane(barBackground, thresholdBar, needle, titleText, valueText, minValueText, maxValueText, thresholdText);
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
@@ -222,6 +223,8 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxValueText.setFill(getSkinnable().getTitleColor());
         thresholdText.setFill(getSkinnable().getTitleColor());
         valueText.setFill(getSkinnable().getValueColor());
+
+        thresholdText.setVisible(Double.compare(getSkinnable().getThreshold(), getSkinnable().getMinValue()) != 0 && Double.compare(getSkinnable().getThreshold(), getSkinnable().getMaxValue()) != 0);
     }
 
     private void resizeValueText() {
