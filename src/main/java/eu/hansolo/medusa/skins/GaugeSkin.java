@@ -69,6 +69,7 @@ import javafx.scene.text.TextBoundsType;
 import javafx.scene.transform.Rotate;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -287,7 +288,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             double currentValue = getSkinnable().getCurrentValue();
-
             // Check min- and maxMeasuredValue
             if (currentValue < getSkinnable().getMinMeasuredValue()) {
                 getSkinnable().setMinMeasuredValue(currentValue);
@@ -333,7 +333,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             threshold.setManaged(getSkinnable().isThresholdVisible());
             threshold.setVisible(getSkinnable().isThresholdVisible());
-        } else if ("LED_BLINK".equals(EVENT_TYPE)) {
+        } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }
         } else if ("RECALC".equals(EVENT_TYPE)) {
             if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
@@ -1556,6 +1556,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         // Markers
         drawMarkers();
-        thresholdTooltip.setText("Threshold\n(" + String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getThreshold()) + ")");
+        thresholdTooltip.setText("Threshold\n(" + String.format(Locale.US, formatString, getSkinnable().getThreshold()) + ")");
     }
 }

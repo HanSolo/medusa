@@ -99,7 +99,7 @@ public class OverviewDemo extends Application {
                              .shadowsEnabled(true)
                              //.tickLabelColor(Color.rgb(0, 175, 248))
                              //.ledColor(Color.rgb(0, 175, 248))
-                             .ledVisible(false)
+                             .ledVisible(true)
                              .ledBlinking(true)
                              .sectionsVisible(true)
                              .sections(new Section(0.5, 0.75, Color.rgb(139, 195, 102, 0.5)))
@@ -139,7 +139,6 @@ public class OverviewDemo extends Application {
                              .autoScale(true)
                              .shadowsEnabled(true)
                              .ledColor(Color.rgb(250, 50, 0))
-                             .ledVisible(true)
                              .colorGradientEnabled(true)
                              .gradientLookupStops(new Stop(0.0, Color.rgb(0, 0, 255, 0.7)),
                                                   new Stop(0.5, Color.rgb(0, 200, 255, 0.7)),

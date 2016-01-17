@@ -23,7 +23,7 @@ import java.util.EventObject;
  * Created by hansolo on 05.01.16.
  */
 public class UpdateEvent extends EventObject {
-    public static enum EventType { RECALC, REDRAW, RESIZE, LED_BLINK, VISIBILITY, INTERACTIVITY, FINISHED };
+    public static enum EventType { RECALC, REDRAW, RESIZE, LED, VISIBILITY, INTERACTIVITY, FINISHED };
     public final EventType eventType;
 
     public UpdateEvent(final Object SRC, final EventType EVENT_TYPE) {

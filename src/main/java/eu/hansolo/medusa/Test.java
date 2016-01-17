@@ -79,17 +79,66 @@ public class Test extends Application {
     private              AnimationTimer timer;
 
     @Override public void init() {
+        /*
         gauge = GaugeBuilder.create()
                             .skin(IndicatorSkin.class)
                             //.prefSize(500,500)
-                            .animated(false)
-                            .valueVisible(true)
+                            .animated(true)
+                            //.valueVisible(true)
                             .colorGradientEnabled(false)
                             .sectionsVisible(true)
                             .sections(new Section(0, 33, Color.rgb(34,180,11)),
                                       new Section(33, 66, Color.rgb(255,146,0)),
                                       new Section(66, 100, Color.rgb(255,0,39)))
                             .build();
+        */
+
+        gauge = GaugeBuilder.create()
+                             .minValue(0)
+                             .maxValue(1)
+                             .tickLabelDecimals(1)
+                             .decimals(2)
+                             .autoScale(true)
+                             .animated(true)
+                             .returnToZero(true)
+                             //.backgroundPaint(Color.TRANSPARENT)
+                             //.borderPaint(Color.LIGHTGRAY)
+                             //.knobColor(Color.rgb(0, 90, 120))
+                             .shadowsEnabled(true)
+                             //.tickLabelColor(Color.rgb(0, 175, 248))
+                             //.ledColor(Color.rgb(0, 175, 248))
+                             .ledVisible(true)
+                             .ledBlinking(true)
+                             .sectionsVisible(true)
+                             .sections(new Section(0.5, 0.75, Color.rgb(139, 195, 102, 0.5)))
+                             .areasVisible(true)
+                             .areas(new Section(0.75, 1.0, Color.rgb(234, 83, 79, 0.5)))
+                             .majorTickMarkColor(Color.MAGENTA)
+                             //.minorTickMarkColor(Color.rgb(0, 175, 248))
+                             .majorTickMarkType(TickMarkType.TRIANGLE)
+                             .mediumTickMarkType(TickMarkType.DOT)
+                             .minorTickMarkType(TickMarkType.LINE)
+                             .tickLabelOrientation(TickLabelOrientation.ORTHOGONAL)
+                             .tickMarkSections(new Section(0.25, 0.5, Color.rgb(241, 161, 71)))
+                             .tickMarkSectionsVisible(true)
+                             .markers(new Marker(0.5, "", Color.CYAN, MarkerType.TRIANGLE))
+                             .markersVisible(true)
+                             //.majorTickMarksVisible(true)
+                             //.minorTickMarksVisible(true)
+                             .tickLabelLocation(TickLabelLocation.INSIDE)
+                             //.tickLabelsVisible(true)
+                             .tickLabelSections(new Section(0.1, 0.3, Color.rgb(0, 175, 248)))
+                             //.tickLabelSectionsVisible(true)
+                             .title("Title")
+                             //.titleColor(Color.rgb(223, 223, 223))
+                             .unit("Unit")
+                             .lcdDesign(LcdDesign.SECTIONS)
+                             .lcdVisible(true)
+                             .lcdFont(LcdFont.STANDARD)
+                             //.unitColor(Color.rgb(223, 223, 223))
+                             //.valueColor(Color.rgb(223, 223, 223))
+                             .needleSize(NeedleSize.THICK)
+                             .build();
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {

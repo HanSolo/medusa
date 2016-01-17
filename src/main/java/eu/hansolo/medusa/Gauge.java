@@ -107,7 +107,7 @@ public class Gauge extends Control {
     private        final UpdateEvent             RECALC_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
     private        final UpdateEvent             REDRAW_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
     private        final UpdateEvent             RESIZE_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
-    private        final UpdateEvent             LED_BLINK_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED_BLINK);
+    private        final UpdateEvent             LED_EVENT            = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED);
     private        final UpdateEvent             VISIBILITY_EVENT     = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
     private        final UpdateEvent             INTERACTIVITY_EVENT  = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
     private        final UpdateEvent             FINISHED_EVENT       = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
@@ -1856,7 +1856,7 @@ public class Gauge extends Control {
         } else {
             ledOn.set(ON);
         }
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(LED_EVENT);
     }
     public BooleanProperty ledOnProperty() {
         if (null == ledOn) { ledOn = new SimpleBooleanProperty(Gauge.this, "ledOn", _ledOn); }
@@ -1876,7 +1876,6 @@ public class Gauge extends Control {
             if (null != blinkFuture) blinkFuture.cancel(true);
             setLedOn(false);
         }
-        fireUpdateEvent(LED_BLINK_EVENT);
     }
     public BooleanProperty ledBlinkingProperty() {
         if (null == ledBlinking) { ledBlinking = new SimpleBooleanProperty(Gauge.this, "ledBlinking", _ledBlinking); }
