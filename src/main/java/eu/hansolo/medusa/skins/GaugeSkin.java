@@ -130,6 +130,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private EventHandler<MouseEvent> mouseHandler;
     private Tooltip                  buttonTooltip;
     private Tooltip                  thresholdTooltip;
+    private String                   formatString;
 
 
     // ******************** Constructors **************************************
@@ -138,6 +139,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep    = gauge.getAngleRange() / (gauge.getMaxValue() - gauge.getMinValue());
         oldValue     = gauge.getValue();
         limitString  = "";
+        formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
         mouseHandler = event -> handleMouseEvent(event);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         updateMarkers();
@@ -176,7 +178,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ledCanvas = new Canvas();
         led = ledCanvas.getGraphicsContext2D();
 
-        thresholdTooltip = new Tooltip("Threshold\n(" + String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getThreshold()) + ")");
+        thresholdTooltip = new Tooltip("Threshold\n(" + String.format(Locale.US, formatString, getSkinnable().getThreshold()) + ")");
         thresholdTooltip.setTextAlignment(TextAlignment.CENTER);
 
         threshold = new Path();
@@ -235,7 +237,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setTextOrigin(VPos.CENTER);
         unitText.setMouseTransparent(true);
 
-        valueText = new Text(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getValue()));
+        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getValue()));
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setMouseTransparent(true);
@@ -271,12 +273,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         });
 
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle());
+        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle(getSkinnable().getCurrentValue()));
 
         handleEvents("INTERACTIVITY");
         handleEvents("VISIBILITY");
-
-        needleRotate.angleProperty().addListener(observable -> handleEvents("ANGLE"));
     }
 
 
@@ -285,14 +285,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
             redraw();
-        } else if ("ANGLE".equals(EVENT_TYPE)) {
+        } else if ("FINISHED".equals(EVENT_TYPE)) {
             double currentValue = getSkinnable().getCurrentValue();
-            valueText.setText(limitString + String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue));
-            if (getSkinnable().isLcdVisible()) {
-                valueText.setTranslateX((0.691 * size - valueText.getLayoutBounds().getWidth()));
-            } else {
-                valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
-            }
 
             // Check min- and maxMeasuredValue
             if (currentValue < getSkinnable().getMinMeasuredValue()) {
@@ -384,18 +378,24 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Private Methods ***********************************
-    private void rotateNeedle() {
+    private void rotateNeedle(final double VALUE) {
         angleStep          = getSkinnable().getAngleStep();
         double startAngle  = 180 - getSkinnable().getStartAngle();
         double targetAngle;
         if (ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection()) {
-            targetAngle = startAngle + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
+            targetAngle = startAngle + (VALUE - getSkinnable().getMinValue()) * angleStep;
             targetAngle = Helper.clamp(startAngle, startAngle + getSkinnable().getAngleRange(), targetAngle);
         } else {
-            targetAngle = startAngle - (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
+            targetAngle = startAngle - (VALUE - getSkinnable().getMinValue()) * angleStep;
             targetAngle = Helper.clamp(startAngle - getSkinnable().getAngleRange(), startAngle, targetAngle);
         }
         needleRotate.setAngle(targetAngle);
+        valueText.setText(limitString + String.format(Locale.US, formatString, VALUE));
+        if (getSkinnable().isLcdVisible()) {
+            valueText.setTranslateX((0.691 * size - valueText.getLayoutBounds().getWidth()));
+        } else {
+            valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
+        }
     }
 
     private void drawTickMarks() {
@@ -1413,6 +1413,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
 
         // Background stroke and fill

@@ -20,9 +20,11 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -37,6 +39,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
 import java.util.List;
@@ -81,6 +84,8 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private int           noOfGradientStops;
     private boolean       sectionsVisible;
     private List<Section> sections;
+    private Tooltip       needleTooltip;
+    private String        formatString;
 
 
     // ******************** Constructors **************************************
@@ -94,6 +99,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         noOfGradientStops    = gauge.getGradientLookupStops().size();
         sectionsVisible      = gauge.areSectionsVisible();
         sections             = gauge.getSections();
+        formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
         init();
         initGraphics();
@@ -154,6 +160,10 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setStrokeWidth(1);
         needle.setStroke(getSkinnable().getBackgroundPaint());
 
+        needleTooltip = new Tooltip(String.format(Locale.US, formatString, getSkinnable().getValue()));
+        needleTooltip.setTextAlignment(TextAlignment.CENTER);
+        Tooltip.install(needle, needleTooltip);
+
         minValueText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
         minValueText.setFill(getSkinnable().getTitleColor());
         minValueText.setVisible(getSkinnable().areTickLabelsVisible());
@@ -187,6 +197,20 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             range     = getSkinnable().getRange();
             angleStep = ANGLE_RANGE / range;
             redraw();
+        } else if ("FINISHED".equals(EVENT_TYPE)) {
+            needleTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getValue()));
+            if (getSkinnable().isValueVisible()) {
+                Bounds bounds        = pane.localToScreen(pane.getBoundsInLocal());
+                double value         = getSkinnable().getValue();
+                double xFactor       = value > getSkinnable().getRange() * 0.8 ? 0.0 : 0.25;
+                double tooltipAngle  = value * angleStep;
+                double sinValue      = Math.sin(Math.toRadians(180 + ANGLE_RANGE * 0.5 - tooltipAngle));
+                double cosValue      = Math.cos(Math.toRadians(180 + ANGLE_RANGE * 0.5 - tooltipAngle));
+                double needleTipX    = bounds.getMinX() + width * 0.5 + height * sinValue;
+                double needleTipY    = bounds.getMinY() + height * 0.72 + height * cosValue;
+                needleTooltip.show(needle, needleTipX, needleTipY);
+                needleTooltip.setAnchorX(needleTooltip.getX() - needleTooltip.getWidth() * xFactor);
+            }
         }
     }
 
@@ -218,6 +242,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void redraw() {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
+        formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         colorGradientEnabled = getSkinnable().isColorGradientEnabled();
         noOfGradientStops    = getSkinnable().getGradientLookupStops().size();
         sectionsVisible      = getSkinnable().areSectionsVisible();

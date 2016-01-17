@@ -76,12 +76,14 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text                valueText;
     private Text                titleText;
     private double              angleStep;
+    private String              formatString;
 
 
     // ******************** Constructors **************************************
     public SimpleSkin(Gauge gauge) {
         super(gauge);
-        angleStep        = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
+        angleStep    = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
+        formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
         init();
         initGraphics();
@@ -117,8 +119,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         angleStep          = ANGLE_RANGE / (getSkinnable().getRange());
         double targetAngle = 180 - START_ANGLE + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep;
-        targetAngle        = Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle);
-        setRotationAngle(targetAngle);
+        needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
 
         needleMoveTo1       = new MoveTo();
         needleCubicCurveTo2 = new CubicCurveTo();
@@ -137,7 +138,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setStrokeLineCap(StrokeLineCap.ROUND);
         needle.setStrokeLineJoin(StrokeLineJoin.BEVEL);
 
-        valueText = new Text(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getMinValue()) + getSkinnable().getUnit());
+        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
@@ -162,9 +163,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().getSections().addListener((ListChangeListener<Section>) change -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(event -> handleEvents(event.eventType.name()));
 
-        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle());
-
-        needleRotate.angleProperty().addListener(o -> handleEvents("ANGLE"));
+        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle(getSkinnable().getCurrentValue()));
     }
 
 
@@ -177,17 +176,10 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needle.setStroke(getSkinnable().getBorderPaint());
             titleText.setFill(getSkinnable().getTitleColor());
             valueText.setFill(getSkinnable().getValueColor());
-        } else if ("ANGLE".equals(EVENT_TYPE)) {
-            double currentValue = getSkinnable().getCurrentValue();
-            valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue) + getSkinnable().getUnit());
-            valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
-            if (valueText.getLayoutBounds().getWidth() > 0.395 * size) { resizeText(); }
-            // Check sections
-            for (Section section : getSkinnable().getSections()) {
-                if (section.contains(currentValue)) {
-                    section.fireSectionEvent(new Section.SectionEvent(section, null, SectionEvent.SECTION_ENTERED));
-                    break;
-                }
+        } else if ("FINISHED".equals(EVENT_TYPE)) {
+            if (getSkinnable().getCheckSectionsForValue()) {
+                double currentValue = getSkinnable().getCurrentValue();
+                for (Section section : getSkinnable().getSections()) { section.checkForValue(currentValue); }
             }
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
@@ -200,15 +192,13 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Private Methods ***********************************
-    private void setRotationAngle(final double ANGLE) {
-        needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, ANGLE));
-    }
-
-    private void rotateNeedle() {
+    private void rotateNeedle(final double VALUE) {
         angleStep          = ANGLE_RANGE / (getSkinnable().getRange());
-        double targetAngle = 180 - START_ANGLE + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
-        targetAngle        = Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle);
-        setRotationAngle(targetAngle);
+        double targetAngle = 180 - START_ANGLE + (VALUE - getSkinnable().getMinValue()) * angleStep;
+        needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
+        valueText.setText(String.format(Locale.US, formatString, VALUE) + getSkinnable().getUnit());
+        valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
+        if (valueText.getLayoutBounds().getWidth() > 0.395 * size) { resizeText(); }
     }
 
     private void drawSections() {
@@ -350,6 +340,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         titleText.setText(getSkinnable().getTitle());
         titleText.setFill(getSkinnable().getTitleColor());
         valueText.setFill(getSkinnable().getValueColor());

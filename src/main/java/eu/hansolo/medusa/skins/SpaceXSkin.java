@@ -86,6 +86,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Color           barBackgroundColor;
     private              Color           thresholdBackgroundColor;
     private              double          minValue;
+    private              String          formatString;
 
 
     // ******************** Constructors **************************************
@@ -95,6 +96,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep         = ANGLE_RANGE / range;
         minValue          = gauge.getMinValue();
         currentValueAngle = 0;
+        formatString      = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
         init();
         initGraphics();
@@ -136,7 +138,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setFill(getSkinnable().getTitleColor());
 
-        valueText = new Text(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getValue()));
+        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getValue()));
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
 
@@ -258,12 +260,13 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarThresholdInnerArc.setX(centerX + (centerX - barWidth) * Math.sin(-Math.toRadians(thresholdAngle)));
         dataBarThresholdInnerArc.setY(centerY + (centerX - barWidth) * Math.cos(-Math.toRadians(thresholdAngle)));
 
-        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
+        valueText.setText(String.format(Locale.US, formatString, VALUE));
         if (valueText.getLayoutBounds().getWidth() > 0.64 * width) Helper.adjustTextSize(valueText, width, 0.21 * width);
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
     }
 
     private void redraw() {
+        formatString             = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         barColor                 = getSkinnable().getBarColor();
         thresholdColor           = getSkinnable().getThresholdColor();
         barBackgroundColor       = getSkinnable().getBarBackgroundColor();

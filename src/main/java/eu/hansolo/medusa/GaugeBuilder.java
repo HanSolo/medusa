@@ -743,6 +743,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setThresholdColor(Color.rgb(45,86,184));
                 CONTROL.setNeedleColor(Color.rgb(74,74,74));
             } else if (skinClass == IndicatorSkin.class) {
+                CONTROL.setValueVisible(false);
+                CONTROL.setColorGradientEnabled(false);
+                CONTROL.setGradientLookupStops(new Stop(0.0, Color.rgb(34,180,11)),
+                                               new Stop(0.5, Color.rgb(255,146,0)),
+                                               new Stop(1.0, Color.rgb(255,0,39)));
                 CONTROL.setTickLabelsVisible(false);
                 CONTROL.setNeedleColor(Color.rgb(71,71,71));
                 CONTROL.setBarBackgroundColor(Color.rgb(232,231,223));

@@ -78,15 +78,17 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double       minValue;
     private double       range;
     private double       angleStep;
+    private String       formatString;
 
 
     // ******************** Constructors **************************************
     public KpiSkin(Gauge gauge) {
         super(gauge);
-        oldValue  = gauge.getValue();
-        minValue  = gauge.getMinValue();
-        range     = gauge.getRange();
-        angleStep = ANGLE_RANGE / range;
+        oldValue     = gauge.getValue();
+        minValue     = gauge.getMinValue();
+        range        = gauge.getRange();
+        angleStep    = ANGLE_RANGE / range;
+        formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
         init();
         initGraphics();
@@ -150,7 +152,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText = new Text(getSkinnable().getTitle());
         titleText.setFill(getSkinnable().getTitleColor());
 
-        valueText = new Text(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
         valueText.setFill(getSkinnable().getValueColor());
 
         minValueText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
@@ -195,7 +197,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double targetAngle = (VALUE - minValue) * angleStep - needleStartAngle;
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + ANGLE_RANGE, targetAngle);
         needleRotate.setAngle(targetAngle);
-        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
+        valueText.setText(String.format(Locale.US, formatString, VALUE));
         resizeValueText();
     }
 
@@ -203,6 +205,8 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Resizing ******************************************
     private void redraw() {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+
+        formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
 
         titleText.setText(getSkinnable().getTitle());
         minValueText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));

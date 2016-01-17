@@ -110,6 +110,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Label           lcdText;
     private double          angleStep;
     private String          limitString;
+    private String          formatString;
 
 
     // ******************** Constructors **************************************
@@ -118,6 +119,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep        = gauge.getAngleRange() / gauge.getRange();
         oldValue         = gauge.getValue();
         limitString      = "";
+        formatString     = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
         if (gauge.isAutoScale()) gauge.calcAutoScale();
 
@@ -237,7 +239,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     protected void handleEvents(final String EVENT_TYPE) {
         if ("ANGLE".equals(EVENT_TYPE)) {
             double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + getSkinnable().getMinValue();
-            lcdText.setText((limitString + String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue)));
+            lcdText.setText((limitString + String.format(Locale.US, formatString, currentValue)));
             lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
@@ -599,6 +601,8 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+
         Color backgroundColor = getSkinnable().getBackgroundPaint() instanceof Color ? (Color) getSkinnable().getBackgroundPaint() : Color.WHITE;
         ticksAndSectionsCanvas.setCache(false);
         ticksAndSections.clearRect(0, 0, width, height);

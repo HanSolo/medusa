@@ -83,6 +83,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private int           noOfGradientStops;
     private boolean       sectionsVisible;
     private List<Section> sections;
+    private String        formatString;
+    private double        minValue;
 
 
     // ******************** Constructors **************************************
@@ -95,6 +97,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sectionsVisible      = gauge.areSectionsVisible();
         sections             = gauge.getSections();
         currentValueAngle    = 0;
+        formatString         = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
         init();
         initGraphics();
@@ -131,11 +134,12 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setFill(getSkinnable().getTitleColor());
 
-        valueText = new Text(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getValue()));
+        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getValue()));
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
 
-        minText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
+        minValue = getSkinnable().getMinValue();
+        minText  = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", minValue));
         minText.setTextOrigin(VPos.CENTER);
         minText.setFill(getSkinnable().getValueColor());
 
@@ -206,6 +210,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("RECALC".equals(EVENT_TYPE)) {
             range     = getSkinnable().getRange();
             angleStep = ANGLE_RANGE / range;
+            minValue  = getSkinnable().getMinValue();
             resize();
             redraw();
         }
@@ -214,13 +219,13 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Private Methods ***********************************
     private void setBar(final double VALUE) {
-        currentValueAngle = Helper.clamp(90d, 270d, (VALUE + Math.abs(getSkinnable().getMinValue())) * angleStep + 90d);
+        currentValueAngle = Helper.clamp(90d, 270d, (VALUE + Math.abs(minValue)) * angleStep + 90d);
         dataBarOuterArc.setX(centerX + (0.675 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
         dataBarOuterArc.setY(centerX + (0.675 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
         dataBarLineToInnerArc.setX(centerX + (0.3 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
         dataBarLineToInnerArc.setY(centerX + (0.3 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
         setBarColor(VALUE);
-        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
+        valueText.setText(String.format(Locale.US, formatString, VALUE));
         if (valueText.getLayoutBounds().getWidth() > 0.28 * width) Helper.adjustTextSize(valueText, 0.28 * width, size * 0.24);
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
     }
@@ -240,6 +245,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         colorGradientEnabled = getSkinnable().isColorGradientEnabled();
         noOfGradientStops    = getSkinnable().getGradientLookupStops().size();
         sectionsVisible      = getSkinnable().areSectionsVisible();
@@ -293,7 +299,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (valueText.getLayoutBounds().getWidth() > maxWidth) Helper.adjustTextSize(valueText, maxWidth, size * 0.24);
             valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
 
-            minText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
+            minText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", minValue));
             minText.setFont(smallFont);
             minText.relocate(((0.27778 * width) - minText.getLayoutBounds().getWidth()) * 0.5, 0.7 * height);
 
@@ -319,7 +325,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barBackgroundInnerArc.setX(0.27778 * width);
             barBackgroundInnerArc.setY(0.675 * height);
 
-            currentValueAngle = (getSkinnable().getCurrentValue() + Math.abs(getSkinnable().getMinValue())) * angleStep + 90;
+            currentValueAngle = (getSkinnable().getCurrentValue() + Math.abs(minValue)) * angleStep + 90;
             dataBarStart.setX(0);
             dataBarStart.setY(0.675 * height);
             dataBarOuterArc.setRadiusX(0.675 * height);

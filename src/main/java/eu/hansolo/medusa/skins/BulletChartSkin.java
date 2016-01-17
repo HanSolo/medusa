@@ -68,6 +68,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              double          stepSize;
     private              Tooltip         barTooltip;
     private              Tooltip         thresholdTooltip;
+    private              String          formatString;
 
 
 
@@ -75,9 +76,10 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     public BulletChartSkin(Gauge gauge) {
         super(gauge);
 
-        orientation      = getSkinnable().getOrientation();
+        orientation      = gauge.getOrientation();
         barTooltip       = new Tooltip();
         thresholdTooltip = new Tooltip();
+        formatString     = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
         if (Orientation.VERTICAL == orientation) {
             preferredWidth  = 64;
@@ -86,7 +88,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             preferredWidth  = 400;
             preferredHeight = 64;
         }
-        getSkinnable().setPrefSize(preferredWidth, preferredHeight);
+        gauge.setPrefSize(preferredWidth, preferredHeight);
 
         init();
         initGraphics();
@@ -194,6 +196,8 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 stepSize = (0.79699248 * width) / getSkinnable().getRange();
             }
             redraw();
+        } else if ("FINISHED".equals(EVENT_TYPE)) {
+            barTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getValue()));
         }
     }
 
@@ -313,7 +317,6 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void updateBar() {
         double currentValue = getSkinnable().getCurrentValue();
-        barTooltip.setText(String.format(Locale.US, "%.0f", currentValue));
         if (Orientation.VERTICAL == orientation) {
             barRect.setY(height - 0.06 * width - currentValue * stepSize);
             barRect.setHeight(currentValue * stepSize);
@@ -338,6 +341,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
 
         double currentValue = getSkinnable().getCurrentValue();
+        formatString        = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
 
         orientation = getSkinnable().getOrientation();
         if (Orientation.VERTICAL == orientation) {
@@ -414,7 +418,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         drawTickMarks(tickMarksCtx);
         drawSections(sectionsCtx);
         thresholdRect.setFill(getSkinnable().getThresholdColor());
-        thresholdTooltip.setText(String.format(Locale.US, "%.0f", getSkinnable().getThreshold()));
+        thresholdTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getThreshold()));
         barRect.setFill(getSkinnable().getBarColor());
         titleText.setFill(getSkinnable().getTitleColor());
         unitText.setFill(getSkinnable().getUnitColor());

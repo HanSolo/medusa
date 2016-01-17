@@ -23,6 +23,7 @@ import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
+import eu.hansolo.medusa.Gauge.ThresholdEvent;
 import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
@@ -81,11 +82,13 @@ public class Test extends Application {
         gauge = GaugeBuilder.create()
                             .skin(IndicatorSkin.class)
                             //.prefSize(500,500)
-                            .animated(true)
+                            .animated(false)
+                            .valueVisible(true)
                             .colorGradientEnabled(false)
-                            .gradientLookupStops(new Stop(0, Color.rgb(34,180,11)),
-                                                 new Stop(0.5, Color.rgb(255,146,0)),
-                                                 new Stop(1.0, Color.rgb(255,0,39)))
+                            .sectionsVisible(true)
+                            .sections(new Section(0, 33, Color.rgb(34,180,11)),
+                                      new Section(33, 66, Color.rgb(255,146,0)),
+                                      new Section(66, 100, Color.rgb(255,0,39)))
                             .build();
 
         lastTimerCall = System.nanoTime();

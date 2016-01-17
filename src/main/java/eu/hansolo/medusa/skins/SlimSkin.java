@@ -61,6 +61,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private int           noOfGradientStops;
     private boolean       sectionsVisible;
     private List<Section> sections;
+    private String        formatString;
 
 
     // ******************** Constructors **************************************
@@ -73,6 +74,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         noOfGradientStops    = gauge.getGradientLookupStops().size();
         sectionsVisible      = gauge.areSectionsVisible();
         sections             = gauge.getSections();
+        formatString         = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
         init();
         initGraphics();
@@ -118,7 +120,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText = new Text(getSkinnable().getTitle());
         titleText.setFill(getSkinnable().getTitleColor());
 
-        valueText = new Text(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
         valueText.setFill(getSkinnable().getValueColor());
 
         unitText = new Text(getSkinnable().getUnit());
@@ -159,7 +161,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setLength(-VALUE * angleStep);
         }
         setBarColor(VALUE);
-        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
+        valueText.setText(String.format(Locale.US, formatString, VALUE));
         resizeValueText();
     }
     private void setBarColor(final double VALUE) {
@@ -181,7 +183,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Resizing ******************************************
     private void redraw() {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-
+        formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         colorGradientEnabled = getSkinnable().isColorGradientEnabled();
         noOfGradientStops    = getSkinnable().getGradientLookupStops().size();
         sectionsVisible      = getSkinnable().areSectionsVisible();

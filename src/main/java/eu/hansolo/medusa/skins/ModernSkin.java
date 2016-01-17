@@ -109,6 +109,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double                   angleStep;
     private EventHandler<MouseEvent> mouseHandler;
     private Tooltip                  buttonTooltip;
+    private String                   formatString;
 
 
     // ******************** Constructors **************************************
@@ -117,6 +118,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep     = ANGLE_RANGE / (gauge.getRange());
         mouseHandler  = event -> handleMouseEvent(event);
         buttonTooltip = new Tooltip();
+        formatString  = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
         if (gauge.isAutoScale()) gauge.calcAutoScale();
 
@@ -177,8 +179,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needleRotate = new Rotate(180 - START_ANGLE);
 
         double targetAngle = 180 - START_ANGLE + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
-        targetAngle        = Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle);
-        setRotationAngle(targetAngle);
+        needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
 
         glow1   = new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getBarColor(), 0.085 * PREFERRED_WIDTH, 0, 0, 0);
         glow2   = new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getBarColor(), 0.085 * PREFERRED_WIDTH, 0, 0, 0);
@@ -231,7 +232,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setEffect(glow1);
         unitText.setMouseTransparent(true);
 
-        valueText = new Text(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getMinValue()) + getSkinnable().getUnit());
+        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
@@ -262,11 +263,9 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().setOnButtonPressed(e -> handleButtonEvent(e));
         getSkinnable().setOnButtonReleased(e -> handleButtonEvent(e));
 
-        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle());
+        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle(getSkinnable().getCurrentValue()));
 
         handleEvents("INTERACTIVITY");
-
-        needleRotate.angleProperty().addListener(o -> handleEvents("ANGLE"));
     }
 
 
@@ -276,22 +275,6 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resize();
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
-        } else if ("ANGLE".equals(EVENT_TYPE)) {
-            double currentValue = getSkinnable().getCurrentValue();
-            valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue));
-            valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
-            if (valueText.getLayoutBounds().getWidth() > 0.395 * size) {
-                resizeText();
-                placeTextVerticaly();
-            }
-            if (currentValue > getSkinnable().getThreshold()) {
-                glow2.setColor(getSkinnable().getThresholdColor());
-                bigGlow.setColor(getSkinnable().getThresholdColor());
-            } else {
-                glow2.setColor(getSkinnable().getBarColor());
-                bigGlow.setColor(getSkinnable().getBarColor());
-            }
-            highlightValue(tickMarkCtx, currentValue);
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             if (getSkinnable().getTitle().isEmpty()) {
                 titleText.setVisible(false);
@@ -374,15 +357,24 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Private Methods ***********************************
-    private void setRotationAngle(final double ANGLE) {
-        needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, ANGLE));
-    }
-
-    private void rotateNeedle() {
+    private void rotateNeedle(final double VALUE) {
         angleStep          = ANGLE_RANGE / getSkinnable().getRange();
-        double targetAngle = 180 - START_ANGLE + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
-        targetAngle        = Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle);
-        setRotationAngle(targetAngle);
+        double targetAngle = 180 - START_ANGLE + (VALUE - getSkinnable().getMinValue()) * angleStep;
+        needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
+        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
+        if (valueText.getLayoutBounds().getWidth() > 0.395 * size) {
+            resizeText();
+            placeTextVerticaly();
+        }
+        if (VALUE > getSkinnable().getThreshold()) {
+            glow2.setColor(getSkinnable().getThresholdColor());
+            bigGlow.setColor(getSkinnable().getThresholdColor());
+        } else {
+            glow2.setColor(getSkinnable().getBarColor());
+            bigGlow.setColor(getSkinnable().getBarColor());
+        }
+        highlightValue(tickMarkCtx, VALUE);
     }
 
     private void highlightValue(final GraphicsContext CTX, final double CURRENT_VALUE) {
@@ -800,6 +792,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         needle.setFill(getSkinnable().getNeedleColor());
         titleText.setFill(getSkinnable().getTitleColor());
         subTitleText.setFill(getSkinnable().getSubTitleColor());

@@ -67,6 +67,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private int           noOfGradientStops;
     private boolean       sectionsVisible;
     private List<Section> sections;
+    private String        formatString;
 
 
     // ******************** Constructors **************************************
@@ -79,6 +80,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         noOfGradientStops    = gauge.getGradientLookupStops().size();
         sectionsVisible      = gauge.areSectionsVisible();
         sections             = gauge.getSections();
+        formatString         = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
         init();
         initGraphics();
@@ -127,7 +129,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setFont(Fonts.robotoLight(PREFERRED_WIDTH * 0.08));
         titleText.setFill(getSkinnable().getTitleColor());
 
-        valueText = new Text(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
         valueText.setFont(Fonts.robotoRegular(PREFERRED_WIDTH * 0.27333));
         valueText.setFill(getSkinnable().getValueColor());
 
@@ -170,7 +172,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setLength(-VALUE * angleStep);
         }
         setBarColor(VALUE);
-        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", VALUE));
+        valueText.setText(String.format(Locale.US, formatString, VALUE));
         resizeValueText();
     }
     private void setBarColor(final double VALUE) {
@@ -195,6 +197,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Resizing ******************************************
     private void redraw() {
+        formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         colorGradientEnabled = getSkinnable().isColorGradientEnabled();
         noOfGradientStops    = getSkinnable().getGradientLookupStops().size();
         sectionsVisible      = getSkinnable().areSectionsVisible();
