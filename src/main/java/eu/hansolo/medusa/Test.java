@@ -23,6 +23,7 @@ import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
+import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.Gauge.ThresholdEvent;
 import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
