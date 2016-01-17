@@ -51,7 +51,11 @@ public enum GaugeDesign {
                 new Stop(0.12, Color.rgb(179,179,179)),
                 new Stop(1.0, Color.rgb(213,213,213))
             };
-            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1), new Insets(0));
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        new BorderWidths(1),
+                                                        Insets.EMPTY);
             BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
                                                         BorderStrokeStyle.SOLID,
                                                         new CornerRadii(1024),
@@ -75,7 +79,11 @@ public enum GaugeDesign {
                 new Stop(0.79, Color.WHITE),
                 new Stop(1.0, Color.rgb(102, 102, 102))
             };
-            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        BorderWidths.FULL,
+                                                        Insets.EMPTY);
             BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
                                                         BorderStrokeStyle.SOLID,
                                                         new CornerRadii(1024),
@@ -96,7 +104,11 @@ public enum GaugeDesign {
                 new Stop(0.47, Color.rgb(102, 102, 102)),
                 new Stop(1.0, Color.BLACK)
             };
-            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1), new Insets(0));
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        new BorderWidths(1),
+                                                        Insets.EMPTY);
             BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
                                                         BorderStrokeStyle.SOLID,
                                                         new CornerRadii(1024),
@@ -120,7 +132,11 @@ public enum GaugeDesign {
                 new Stop(0.96, Color.rgb(194,204,203)),
                 new Stop(1.00, Color.rgb(189,201,199))
             };
-            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1), new Insets(0));
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        new BorderWidths(1),
+                                                        Insets.EMPTY);
             BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
                                                         BorderStrokeStyle.SOLID,
                                                         new CornerRadii(1024),
@@ -144,7 +160,11 @@ public enum GaugeDesign {
                 new Stop(0.95, Color.rgb(243, 226, 108)),
                 new Stop(1.00, Color.rgb(202, 182, 113))
             };
-            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1), new Insets(0));
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        new BorderWidths(1),
+                                                        Insets.EMPTY);
             BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
                                                         BorderStrokeStyle.SOLID,
                                                         new CornerRadii(1024),
@@ -172,7 +192,11 @@ public enum GaugeDesign {
                 new Stop(0.75, Color.rgb(212, 135, 29)),
                 new Stop(1.00, Color.rgb(247, 238, 101))
             };
-            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1), new Insets(0));
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        new BorderWidths(1),
+                                                        Insets.EMPTY);
             BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
                                                         BorderStrokeStyle.SOLID,
                                                         new CornerRadii(1024),
@@ -194,8 +218,17 @@ public enum GaugeDesign {
             };
             ConicalGradient gradient = new ConicalGradient(SIZE * 0.5, SIZE * 0.5, ScaleDirection.CLOCKWISE, stops);
             Image        image       = gradient.getRoundImage(SIZE);
-            BorderStroke outerBorder = new BorderStroke(Color.rgb(132, 132, 132), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1), new Insets(0));
-            BorderImage  innerBorder = new BorderImage(image, BorderWidths.DEFAULT, new Insets(0.0037037 * SIZE), BorderWidths.EMPTY, true, BorderRepeat.STRETCH, BorderRepeat.STRETCH);
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132, 132, 132),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        new BorderWidths(1),
+                                                        Insets.EMPTY);
+            BorderImage  innerBorder = new BorderImage(image,
+                                                       BorderWidths.DEFAULT,
+                                                       new Insets(0.0037037 * SIZE),
+                                                       BorderWidths.EMPTY, true,
+                                                       BorderRepeat.STRETCH,
+                                                       BorderRepeat.STRETCH);
             return new Border(new BorderStroke[]{outerBorder}, new BorderImage[]{innerBorder});
         }
     },
@@ -214,16 +247,49 @@ public enum GaugeDesign {
             };
             ConicalGradient gradient = new ConicalGradient(SIZE * 0.5, SIZE * 0.5, ScaleDirection.CLOCKWISE, stops);
             Image        image       = gradient.getRoundImage(SIZE);
-            BorderStroke outerBorder = new BorderStroke(Color.rgb(132, 132, 132), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1), new Insets(0));
-            BorderImage  innerBorder = new BorderImage(image, new BorderWidths(1), new Insets(0.0037037 * SIZE), BorderWidths.EMPTY, true, BorderRepeat.STRETCH, BorderRepeat.STRETCH);
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132, 132, 132),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        new BorderWidths(1),
+                                                        Insets.EMPTY);
+            BorderImage  innerBorder = new BorderImage(image,
+                                                       new BorderWidths(1),
+                                                       new Insets(0.0037037 * SIZE),
+                                                       BorderWidths.EMPTY,
+                                                       true,
+                                                       BorderRepeat.STRETCH,
+                                                       BorderRepeat.STRETCH);
             return new Border(new BorderStroke[]{outerBorder}, new BorderImage[]{innerBorder});
         }
     },
     ENZO(0.04814815) {
         @Override public Border getBorder(final double SIZE) {
-            BorderStroke outerBorder     = new BorderStroke(new LinearGradient(0, 0, 0, SIZE, false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(224,224,224)), new Stop(0.26, Color.rgb(133,133,133)), new Stop(1.0, Color.rgb(84,84,84))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0));
-            BorderStroke highlightBorder = new BorderStroke(new LinearGradient(0, 0.02222222 * SIZE, 0, (SIZE - 0.04444444 * SIZE), false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(255,255,255)), new Stop(0.50, Color.rgb(146,146,147)), new Stop(1.0, Color.rgb(135,136,138))), BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(0.02222222 * SIZE));
-            BorderStroke innerBorder     = new BorderStroke(new LinearGradient(0, 0.02592593 * SIZE, 0, (SIZE - 0.05185186 * SIZE), false, CycleMethod.NO_CYCLE, new Stop(0, Color.rgb(71,72,72)), new Stop(0.50, Color.rgb(110,106,107)), new Stop(1.0, Color.rgb(186,185,187))), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(FRAME_FACTOR * SIZE), new Insets(0.02592593 * SIZE));
+            BorderStroke outerBorder     = new BorderStroke(new LinearGradient(0, 0, 0, SIZE, false, CycleMethod.NO_CYCLE,
+                                                                               new Stop(0, Color.rgb(224,224,224)),
+                                                                               new Stop(0.26, Color.rgb(133,133,133)),
+                                                                               new Stop(1.0, Color.rgb(84,84,84))),
+                                                                               BorderStrokeStyle.SOLID,
+                                                                               new CornerRadii(1024),
+                                                                               new BorderWidths(FRAME_FACTOR * SIZE),
+                                                                               Insets.EMPTY);
+            BorderStroke highlightBorder = new BorderStroke(new LinearGradient(0, 0.02222222 * SIZE, 0, (SIZE - 0.04444444 * SIZE),
+                                                                               false, CycleMethod.NO_CYCLE,
+                                                                               new Stop(0, Color.rgb(255,255,255)),
+                                                                               new Stop(0.50, Color.rgb(146,146,147)),
+                                                                               new Stop(1.0, Color.rgb(135,136,138))),
+                                                                               BorderStrokeStyle.SOLID,
+                                                                               new CornerRadii(1024),
+                                                                               new BorderWidths(FRAME_FACTOR * SIZE),
+                                                                               new Insets(0.02222222 * SIZE));
+            BorderStroke innerBorder     = new BorderStroke(new LinearGradient(0, 0.02592593 * SIZE, 0, (SIZE - 0.05185186 * SIZE),
+                                                                               false, CycleMethod.NO_CYCLE,
+                                                                               new Stop(0, Color.rgb(71,72,72)),
+                                                                               new Stop(0.50, Color.rgb(110,106,107)),
+                                                                               new Stop(1.0, Color.rgb(186,185,187))),
+                                                                               BorderStrokeStyle.SOLID,
+                                                                               new CornerRadii(1024),
+                                                                               new BorderWidths(FRAME_FACTOR * SIZE),
+                                                                               new Insets(0.02592593 * SIZE));
             return new Border(outerBorder, highlightBorder, innerBorder);
         }
     },
@@ -234,7 +300,11 @@ public enum GaugeDesign {
             double toX   = 0;
             double toY   = SIZE;
 
-            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1), new Insets(0));
+            BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132),
+                                                        BorderStrokeStyle.SOLID,
+                                                        new CornerRadii(1024),
+                                                        new BorderWidths(1),
+                                                        Insets.EMPTY);
             BorderStroke innerBorder = new BorderStroke(frameColor,
                                                         BorderStrokeStyle.SOLID,
                                                         new CornerRadii(1024),
