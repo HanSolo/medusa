@@ -34,6 +34,7 @@ import eu.hansolo.medusa.skins.AmpSkin;
 import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
+import eu.hansolo.medusa.skins.GaugeSkin;
 import eu.hansolo.medusa.skins.IndicatorSkin;
 import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
@@ -78,18 +79,13 @@ public class Test extends Application {
     private static final Random         RND = new Random();
     private static       int            noOfNodes = 0;
     private              Gauge          gauge;
+    private              FGauge         fGauge;
     private              long           lastTimerCall;
     private              AnimationTimer timer;
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(SpaceXSkin.class)
-                            .prefSize(500,500)
-                            .title("TITLE")
-                            .unit("UNIT")
-                            .animated(true)
-                            .threshold(75)
-                            .backgroundPaint(Color.rgb(90, 90, 90))
+                            .skin(QuarterSkin.class)
                             .build();
 
         lastTimerCall = System.nanoTime();
