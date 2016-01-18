@@ -19,6 +19,7 @@ package eu.hansolo.medusa;
 import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import eu.hansolo.medusa.Marker.MarkerEvent;
 import eu.hansolo.medusa.Marker.MarkerType;
+import eu.hansolo.medusa.skins.GaugeSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -30,6 +31,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
+import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 
 import java.util.HashMap;
@@ -142,6 +144,11 @@ public class FGaugeBuilder<B extends FGaugeBuilder<B>> {
         Gauge           gauge      = null == properties.get("gauge") ? new Gauge() : ((ObjectProperty<Gauge>) properties.get("gauge")).get();
         GaugeDesign     design     = null == properties.get("gaugeDesign") ? GaugeDesign.METAL : ((ObjectProperty<GaugeDesign>) properties.get("gaugeDesign")).get();
         GaugeBackground background = null == properties.get("gaugeBackground") ? GaugeBackground.DARK_GRAY : ((ObjectProperty<GaugeBackground>) properties.get("gaugeBackground")).get();
+
+        Skin skin = gauge.getSkin();
+        if (null != skin && gauge.getSkin().getClass() != GaugeSkin.class) {
+            throw new RuntimeException("Please change Skin to GaugeSkin.");
+        }
 
         final FGauge CONTROL = new FGauge(gauge, design, background);
         for (String key : properties.keySet()) {
