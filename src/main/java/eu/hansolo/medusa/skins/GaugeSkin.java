@@ -134,6 +134,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text                     unitText;
     private Text                     valueText;
     private double                   angleStep;
+    private double                   startAngle;
+    private double                   angleRange;
     private String                   limitString;
     private EventHandler<MouseEvent> mouseHandler;
     private Tooltip                  buttonTooltip;
@@ -144,7 +146,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public GaugeSkin(Gauge gauge) {
         super(gauge);
-        angleStep    = gauge.getAngleRange() / gauge.getRange();
+        startAngle   = gauge.getStartAngle();
+        angleRange   = gauge.getAngleRange();
+        angleStep    = gauge.getAngleStep();
         oldValue     = gauge.getValue();
         limitString  = "";
         formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
@@ -200,7 +204,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         lcd.setManaged(getSkinnable().isLcdVisible());
         lcd.setVisible(getSkinnable().isLcdVisible());
 
-        needleRotate = new Rotate(180 - getSkinnable().getStartAngle());
+        needleRotate = new Rotate(180 - startAngle);
         needleRotate.setAngle(needleRotate.getAngle() + (getSkinnable().getValue() - oldValue - getSkinnable().getMinValue()) * angleStep);
         needleMoveTo1       = new MoveTo();
         needleCubicCurveTo2 = new CubicCurveTo();
@@ -250,8 +254,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setMouseTransparent(true);
 
         // Set initial value
-        double targetAngle = 180 - getSkinnable().getStartAngle() + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
-        targetAngle        = Helper.clamp(180 - getSkinnable().getStartAngle(), 180 - getSkinnable().getStartAngle() + getSkinnable().getAngleRange(), targetAngle);
+        double targetAngle = 180 - startAngle + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
+        targetAngle        = Helper.clamp(180 - startAngle, 180 - startAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
 
         // Add all nodes
@@ -343,8 +347,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (getSkinnable().isLedVisible()) { drawLed(); }
         } else if ("RECALC".equals(EVENT_TYPE)) {
             if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
-            angleStep = getSkinnable().getAngleStep();
-            needleRotate.setAngle((180 - getSkinnable().getStartAngle()) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
+            startAngle = getSkinnable().getStartAngle();
+            angleRange = getSkinnable().getAngleRange();
+            angleStep  = getSkinnable().getAngleStep();
+            needleRotate.setAngle((180 - startAngle) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
             if (getSkinnable().getValue() < getSkinnable().getMinValue()) {
                 getSkinnable().setValue(getSkinnable().getMinValue());
                 oldValue = getSkinnable().getMinValue();
@@ -385,14 +391,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Private Methods ***********************************
     private void rotateNeedle(final double VALUE) {
-        double startAngle  = 180 - getSkinnable().getStartAngle();
+        double startOffsetAngle = 180 - startAngle;
         double targetAngle;
         if (ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection()) {
-            targetAngle = startAngle + (VALUE - getSkinnable().getMinValue()) * angleStep;
-            targetAngle = Helper.clamp(startAngle, startAngle + getSkinnable().getAngleRange(), targetAngle);
+            targetAngle = startOffsetAngle + (VALUE - getSkinnable().getMinValue()) * angleStep;
+            targetAngle = Helper.clamp(startOffsetAngle, startOffsetAngle + angleRange, targetAngle);
         } else {
-            targetAngle = startAngle - (VALUE - getSkinnable().getMinValue()) * angleStep;
-            targetAngle = Helper.clamp(startAngle - getSkinnable().getAngleRange(), startAngle, targetAngle);
+            targetAngle = startOffsetAngle - (VALUE - getSkinnable().getMinValue()) * angleStep;
+            targetAngle = Helper.clamp(startOffsetAngle - angleRange, startOffsetAngle, targetAngle);
         }
         needleRotate.setAngle(targetAngle);
         valueText.setText(limitString + String.format(Locale.US, formatString, VALUE));
@@ -407,8 +413,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ticksAndSections.setLineCap(StrokeLineCap.BUTT);
         double               sinValue;
         double               cosValue;
-        double               startAngle           = getSkinnable().getStartAngle();
-        double               angleRange           = getSkinnable().getAngleRange();
         double               centerX              = size * 0.5;
         double               centerY              = size * 0.5;
         int                  decimals             = getSkinnable().getTickLabelDecimals();
@@ -863,16 +867,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         final TickLabelLocation TICK_LABEL_LOCATION = getSkinnable().getTickLabelLocation();
         final double            xy                  = TickLabelLocation.OUTSIDE == TICK_LABEL_LOCATION ? 0.115 * size : 0.0515 * size;
         final double            wh                  = TickLabelLocation.OUTSIDE == TICK_LABEL_LOCATION ? size * 0.77 : size * 0.897;
-        final double            START_ANGLE         = getSkinnable().getStartAngle();
-        final double            ANGLE_RANGE         = getSkinnable().getAngleRange();
         final double            MIN_VALUE           = getSkinnable().getMinValue();
-        final double            OFFSET              = 90 - START_ANGLE;
+        final double            OFFSET              = 90 - startAngle;
         final ScaleDirection    SCALE_DIRECTION     = getSkinnable().getScaleDirection();
         List<Stop>              stops               = getSkinnable().getGradientLookupStops();
         Map<Double, Color>      stopAngleMap        = new HashMap<>(stops.size());
 
-        stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
-        double                  offsetFactor        = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (START_ANGLE - 90) : (START_ANGLE + 180);
+        stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()));
+        double                  offsetFactor        = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (startAngle - 90) : (startAngle + 180);
         AngleConicalGradient    gradient            = new AngleConicalGradient(size * 0.5, size * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
 
         final double BAR_START_ANGLE  = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? -MIN_VALUE * angleStep : MIN_VALUE * angleStep;
@@ -892,7 +894,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         final double         wh               = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
         final double         MIN_VALUE        = getSkinnable().getMinValue();
         final double         MAX_VALUE        = getSkinnable().getMaxValue();
-        final double         OFFSET           = 90 - getSkinnable().getStartAngle();
+        final double         OFFSET           = 90 - startAngle;
         final ScaleDirection SCALE_DIRECTION  = getSkinnable().getScaleDirection();
         IntStream.range(0, getSkinnable().getSections().size()).parallel().forEachOrdered(
             i -> {
@@ -928,7 +930,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         final double         wh              = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.821 : size * 0.95;
         final double         MIN_VALUE       = getSkinnable().getMinValue();
         final double         MAX_VALUE       = getSkinnable().getMaxValue();
-        final double         OFFSET          = 90 - getSkinnable().getStartAngle();
+        final double         OFFSET          = 90 - startAngle;
         final ScaleDirection SCALE_DIRECTION = getSkinnable().getScaleDirection();
 
         IntStream.range(0, getSkinnable().getAreas().size()).parallel().forEachOrdered(
@@ -996,7 +998,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double         markerSize     = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0125 * size : 0.015 * size;
         double         pathHalf       = markerSize * 0.3;
-        double         startAngle     = getSkinnable().getStartAngle();
         double         centerX        = size * 0.5;
         double         centerY        = size * 0.5;
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
