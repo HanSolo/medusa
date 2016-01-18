@@ -2087,20 +2087,20 @@ public class Gauge extends Control {
                 setForegroundPaint(Color.BLACK);
                 setLcdVisible(true);
                 setShadowsEnabled(true);
-                super.setSkin(new AmpSkin(this));
+                super.setSkin(new AmpSkin(Gauge.this));
                 break;
             case BULLET_CHART:
                 setKnobPosition(Pos.CENTER);
                 setBarColor(Color.BLACK);
                 setThresholdColor(Color.BLACK);
-                super.setSkin(new BulletChartSkin(this));
+                super.setSkin(new BulletChartSkin(Gauge.this));
                 break;
             case DASHBOARD   :
                 setKnobPosition(Pos.BOTTOM_CENTER);
                 setDecimals(0);
                 setBarBackgroundColor(Color.LIGHTGRAY);
                 setBarColor(Color.rgb(93,190,205));
-                super.setSkin(new DashboardSkin(this));
+                super.setSkin(new DashboardSkin(Gauge.this));
                 break;
             case FLAT        :
                 setKnobPosition(Pos.CENTER);
@@ -2111,7 +2111,7 @@ public class Gauge extends Control {
                 setUnitColor(Gauge.DARK_COLOR);
                 setBorderPaint(Color.rgb(208, 208, 208));
                 setDecimals(0);
-                super.setSkin(new FlatSkin(this));
+                super.setSkin(new FlatSkin(Gauge.this));
                 break;
             case INDICATOR   :
                 setKnobPosition(Pos.BOTTOM_CENTER);
@@ -2124,7 +2124,7 @@ public class Gauge extends Control {
                 setNeedleColor(Color.rgb(71,71,71));
                 setBarBackgroundColor(Color.rgb(232,231,223));
                 setBarColor(Color.rgb(255,0,39));
-                super.setSkin(new IndicatorSkin(this));
+                super.setSkin(new IndicatorSkin(Gauge.this));
                 break;
             case KPI         :
                 setKnobPosition(Pos.BOTTOM_CENTER);
@@ -2134,7 +2134,7 @@ public class Gauge extends Control {
                 setThresholdVisible(true);
                 setThresholdColor(Color.rgb(45,86,184));
                 setNeedleColor(Color.rgb(74,74,74));
-                super.setSkin(new KpiSkin(this));
+                super.setSkin(new KpiSkin(Gauge.this));
                 break;
             case MODERN      :
                 setKnobPosition(Pos.CENTER);
@@ -2149,7 +2149,7 @@ public class Gauge extends Control {
                 setTickLabelColor(Color.rgb(151, 151, 151));
                 setTickMarkColor(Color.BLACK);
                 setTickLabelOrientation(TickLabelOrientation.ORTHOGONAL);
-                super.setSkin(new ModernSkin(this));
+                super.setSkin(new ModernSkin(Gauge.this));
                 break;
             case SIMPLE      :
                 setKnobPosition(Pos.CENTER);
@@ -2160,7 +2160,7 @@ public class Gauge extends Control {
                 setNeedleColor(Color.web("#5a615f"));
                 setValueColor(Color.WHITE);
                 setTitleColor(Color.WHITE);
-                super.setSkin(new SimpleSkin(this));
+                super.setSkin(new SimpleSkin(Gauge.this));
                 break;
             case SLIM        :
                 setKnobPosition(Pos.CENTER);
@@ -2170,7 +2170,7 @@ public class Gauge extends Control {
                 setTitleColor(Color.rgb(142,147,151));
                 setValueColor(Color.rgb(228,231,238));
                 setUnitColor(Color.rgb(142,147,151));
-                super.setSkin(new SlimSkin(this));
+                super.setSkin(new SlimSkin(Gauge.this));
                 break;
             case SPACE_X     :
                 setKnobPosition(Pos.CENTER);
@@ -2182,13 +2182,13 @@ public class Gauge extends Control {
                 setTitleColor(Color.WHITE);
                 setValueColor(Color.WHITE);
                 setUnitColor(Color.WHITE);
-                super.setSkin(new SpaceXSkin(this));
+                super.setSkin(new SpaceXSkin(Gauge.this));
                 break;
             case QUARTER     :
                 setKnobPosition(Pos.BOTTOM_RIGHT);
                 break;
             case GAUGE       :
-            default          : super.setSkin(new GaugeSkin(this)); break;
+            default          : super.setSkin(new GaugeSkin(Gauge.this)); break;
         }
     }
 
