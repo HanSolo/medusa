@@ -85,7 +85,7 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(QuarterSkin.class)
+                            //.skin(QuarterSkin.class)
                             .build();
 
         lastTimerCall = System.nanoTime();
