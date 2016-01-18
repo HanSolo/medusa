@@ -37,6 +37,7 @@ import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.IndicatorSkin;
 import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
+import eu.hansolo.medusa.skins.QuarterSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SlimSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
@@ -46,6 +47,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.Background;
@@ -81,13 +83,19 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(IndicatorSkin.class)
+                            .skin(QuarterSkin.class)
                             //.prefSize(500,500)
                             .animated(true)
+                            .title("TITLE")
+                            .unit("UNIT")
+                            .subTitle("SUBTITLE")
                             //.valueVisible(true)
+                            .knobPosition(Pos.TOP_LEFT)
+                            //.tickLabelLocation(TickLabelLocation.OUTSIDE)
                             .colorGradientEnabled(false)
-                            .sectionsVisible(true)
-                            .sections(new Section(0, 33, Color.rgb(34,180,11)),
+                            .ledVisible(true)
+                            //.areasVisible(true)
+                            .areas(new Section(0, 33, Color.rgb(34,180,11)),
                                       new Section(33, 66, Color.rgb(255,146,0)),
                                       new Section(66, 100, Color.rgb(255,0,39)))
                             .build();
