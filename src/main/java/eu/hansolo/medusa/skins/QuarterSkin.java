@@ -258,8 +258,8 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         // Add all nodes
         pane = new Pane();
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
         pane.getChildren().setAll(ticksAndSectionsCanvas,
                                   markerPane,
                                   ledCanvas,
@@ -1604,8 +1604,8 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
 
         // Background stroke and fill
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         // Areas, Sections and Tick Marks
         ticksAndSectionsCanvas.setCache(false);

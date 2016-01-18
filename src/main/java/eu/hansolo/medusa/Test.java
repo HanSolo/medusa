@@ -83,21 +83,13 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(QuarterSkin.class)
-                            //.prefSize(500,500)
-                            .animated(true)
+                            .skin(SpaceXSkin.class)
+                            .prefSize(500,500)
                             .title("TITLE")
                             .unit("UNIT")
-                            .subTitle("SUBTITLE")
-                            //.valueVisible(true)
-                            .knobPosition(Pos.TOP_LEFT)
-                            //.tickLabelLocation(TickLabelLocation.OUTSIDE)
-                            .colorGradientEnabled(false)
-                            .ledVisible(true)
-                            //.areasVisible(true)
-                            .areas(new Section(0, 33, Color.rgb(34,180,11)),
-                                      new Section(33, 66, Color.rgb(255,146,0)),
-                                      new Section(66, 100, Color.rgb(255,0,39)))
+                            .animated(true)
+                            .threshold(75)
+                            .backgroundPaint(Color.rgb(90, 90, 90))
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -126,8 +118,6 @@ public class Test extends Application {
         // Calculate number of nodes
         calcNoOfNodes(gauge);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
-
-        //gauge.setValue(50);
 
         timer.start();
     }

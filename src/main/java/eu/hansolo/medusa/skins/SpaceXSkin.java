@@ -19,9 +19,17 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcTo;
@@ -203,6 +211,8 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarThreshold.setStroke(getSkinnable().getBorderPaint());
 
         pane = new Pane();
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
         pane.getChildren().setAll(titleText,
                                   valueText,
                                   unitText,
@@ -267,6 +277,8 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void redraw() {
         formatString             = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
         barColor                 = getSkinnable().getBarColor();
         thresholdColor           = getSkinnable().getThresholdColor();
         barBackgroundColor       = getSkinnable().getBarBackgroundColor();
@@ -310,7 +322,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             unitText.setFont(Fonts.robotoLight(0.11 * width));
             if (unitText.getLayoutBounds().getWidth() > 0.4 * width) Helper.adjustTextSize(unitText, width, 0.11 * width);
-            unitText.relocate((width - unitText.getLayoutBounds().getWidth()), 0.8 * height);
+            unitText.relocate((width - unitText.getLayoutBounds().getWidth()), 0.79 * height);
 
             thresholdAngle    = (getSkinnable().getThreshold() - minValue) * angleStep;
             currentValueAngle = (getSkinnable().getCurrentValue() - minValue) * angleStep;
