@@ -43,6 +43,7 @@ import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
@@ -104,7 +105,7 @@ public class Gauge extends Control {
     public enum TickLabelLocation { INSIDE, OUTSIDE }
     public enum LcdFont { STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA }
     public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE }
-    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI, MODERN, SIMPLE, SLIM, SPACE_X }
+    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI, MODERN, SIMPLE, SLIM, SPACE_X, QUARTER }
 
     public  static final Color                   DARK_COLOR           = Color.rgb(36, 36, 36);
     public  static final Color                   BRIGHT_COLOR         = Color.rgb(223, 223, 223);
@@ -185,6 +186,8 @@ public class Gauge extends Control {
     private ObjectProperty<Color>                knobColor;
     private KnobType                             _knobType;
     private ObjectProperty<KnobType>             knobType;
+    private Pos                                  _knobPosition;
+    private ObjectProperty<Pos>                 knobPosition;
     private boolean                              _animated;
     private BooleanProperty                      animated;
     private long                                 animationDuration;
@@ -403,6 +406,7 @@ public class Gauge extends Control {
         _foregroundPaint                  = Color.TRANSPARENT;
         _knobColor                        = Color.rgb(204, 204, 204);
         _knobType                         = KnobType.STANDARD;
+        _knobPosition                     = Pos.CENTER;
         _animated                         = false;
         animationDuration                 = 800;
         _startAngle                       = 320;
@@ -960,7 +964,36 @@ public class Gauge extends Control {
         }
         return knobType;
     }
-    
+
+    public Pos getKnobPosition() { return null == knobPosition ? _knobPosition : knobPosition.get(); }
+    public void setKnobPosition(final Pos POSITION) {
+        if (null == knobPosition) {
+            _knobPosition = POSITION;
+        } else {
+            knobPosition.set(POSITION);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public ObjectProperty<Pos> knobPositionProperty() {
+        if (null == knobPosition) {
+            knobPosition = new ObjectPropertyBase<Pos>(_knobPosition) {
+                @Override public void set(final Pos POSITION) {
+                    if (null == POSITION) {
+                        switch(getSkinType()) {
+                            case QUARTER: super.set(Pos.BOTTOM_RIGHT); break;
+                            default     : super.set(Pos.CENTER);
+                        }
+                    } else {
+                        super.set(POSITION);
+                    }
+                }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "knobPosition"; }
+            };
+        }
+        return knobPosition;
+    }
+
     public boolean isAnimated() { return null == animated ? _animated : animated.get(); }
     public void setAnimated(final boolean ANIMATED) {
         if (null == animated) {
@@ -2047,6 +2080,7 @@ public class Gauge extends Control {
     public void setSkinType(final SkinType SKIN_TYPE) {
         switch(SKIN_TYPE) {
             case AMP         :
+                setKnobPosition(Pos.BOTTOM_CENTER);
                 setTitleColor(Color.WHITE);
                 setLedVisible(true);
                 setBackgroundPaint(Color.WHITE);
@@ -2056,17 +2090,20 @@ public class Gauge extends Control {
                 super.setSkin(new AmpSkin(this));
                 break;
             case BULLET_CHART:
+                setKnobPosition(Pos.CENTER);
                 setBarColor(Color.BLACK);
                 setThresholdColor(Color.BLACK);
                 super.setSkin(new BulletChartSkin(this));
                 break;
             case DASHBOARD   :
+                setKnobPosition(Pos.BOTTOM_CENTER);
                 setDecimals(0);
                 setBarBackgroundColor(Color.LIGHTGRAY);
                 setBarColor(Color.rgb(93,190,205));
                 super.setSkin(new DashboardSkin(this));
                 break;
             case FLAT        :
+                setKnobPosition(Pos.CENTER);
                 setBarColor(Color.CYAN);
                 setBackgroundPaint(Color.TRANSPARENT);
                 setTitleColor(Gauge.DARK_COLOR);
@@ -2077,6 +2114,7 @@ public class Gauge extends Control {
                 super.setSkin(new FlatSkin(this));
                 break;
             case INDICATOR   :
+                setKnobPosition(Pos.BOTTOM_CENTER);
                 setValueVisible(false);
                 setColorGradientEnabled(false);
                 setGradientLookupStops(new Stop(0.0, Color.rgb(34,180,11)),
@@ -2089,6 +2127,7 @@ public class Gauge extends Control {
                 super.setSkin(new IndicatorSkin(this));
                 break;
             case KPI         :
+                setKnobPosition(Pos.BOTTOM_CENTER);
                 setDecimals(0);
                 setForegroundBaseColor(Color.rgb(126,126,127));
                 setBarColor(Color.rgb(168,204,254));
@@ -2098,6 +2137,7 @@ public class Gauge extends Control {
                 super.setSkin(new KpiSkin(this));
                 break;
             case MODERN      :
+                setKnobPosition(Pos.CENTER);
                 setDecimals(0);
                 setValueColor(Color.WHITE);
                 setTitleColor(Color.WHITE);
@@ -2112,6 +2152,7 @@ public class Gauge extends Control {
                 super.setSkin(new ModernSkin(this));
                 break;
             case SIMPLE      :
+                setKnobPosition(Pos.CENTER);
                 setBorderPaint(Color.WHITE);
                 setBackgroundPaint(Color.DARKGRAY);
                 setDecimals(0);
@@ -2122,6 +2163,7 @@ public class Gauge extends Control {
                 super.setSkin(new SimpleSkin(this));
                 break;
             case SLIM        :
+                setKnobPosition(Pos.CENTER);
                 setDecimals(2);
                 setBarBackgroundColor(Color.rgb(62, 67, 73));
                 setBarColor(Color.rgb(93,190,205));
@@ -2131,6 +2173,7 @@ public class Gauge extends Control {
                 super.setSkin(new SlimSkin(this));
                 break;
             case SPACE_X     :
+                setKnobPosition(Pos.CENTER);
                 setDecimals(0);
                 setThresholdColor(Color.rgb(180, 0, 0));
                 setBarBackgroundColor(Color.rgb(169, 169, 169, 0.25));
@@ -2140,6 +2183,9 @@ public class Gauge extends Control {
                 setValueColor(Color.WHITE);
                 setUnitColor(Color.WHITE);
                 super.setSkin(new SpaceXSkin(this));
+                break;
+            case QUARTER     :
+                setKnobPosition(Pos.BOTTOM_RIGHT);
                 break;
             case GAUGE       :
             default          : super.setSkin(new GaugeSkin(this)); break;

@@ -32,6 +32,7 @@ import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.IndicatorSkin;
 import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
+import eu.hansolo.medusa.skins.QuarterSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SlimSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
@@ -53,6 +54,7 @@ import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -188,6 +190,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B knobType(final KnobType TYPE) {
         properties.put("knobType", new SimpleObjectProperty<>(TYPE));
+        return (B)this;
+    }
+
+    public final B knobPosition(final Pos POSITION) {
+        properties.put("knobPosition", new SimpleObjectProperty<>(POSITION));
         return (B)this;
     }
 
@@ -753,6 +760,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setNeedleColor(Color.rgb(71,71,71));
                 CONTROL.setBarBackgroundColor(Color.rgb(232,231,223));
                 CONTROL.setBarColor(Color.rgb(255,0,39));
+            } else if (skinClass == QuarterSkin.class) {
+                CONTROL.setKnobPosition(Pos.BOTTOM_RIGHT);
             }
         }
 
@@ -887,6 +896,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("knobType".equals(key)) {
                 CONTROL.setKnobType(((ObjectProperty<KnobType>) properties.get(key)).get());
+            } else if ("knobPosition".equals(key)) {
+                CONTROL.setKnobPosition(((ObjectProperty<Pos>) properties.get(key)).get());
             } else if("animated".equals(key)) {
                 CONTROL.setAnimated(((BooleanProperty) properties.get(key)).get());
             } else if("animationDuration".equals(key)) {
