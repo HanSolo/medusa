@@ -385,7 +385,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Private Methods ***********************************
     private void rotateNeedle(final double VALUE) {
-        angleStep          = getSkinnable().getAngleStep();
         double startAngle  = 180 - getSkinnable().getStartAngle();
         double targetAngle;
         if (ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection()) {
