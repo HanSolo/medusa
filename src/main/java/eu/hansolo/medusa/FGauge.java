@@ -17,6 +17,8 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
+import eu.hansolo.medusa.skins.GaugeSkin;
+import javafx.scene.control.Skin;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.layout.Region;
@@ -28,6 +30,9 @@ import javafx.scene.shape.Circle;
 
 
 /**
+ * A Region that embeds a given Gauge control. Keep in mind that
+ * this only works with the round Medusa Skins and not with
+ * skins like BulletChartSkin and QuarterSkin.
  * Created by hansolo on 08.01.16.
  */
 public class FGauge extends Region {
@@ -58,10 +63,14 @@ public class FGauge extends Region {
     public FGauge(final Gauge GAUGE, final GaugeDesign DESIGN, final GaugeBackground BACKGROUND) {
         getStylesheets().add(getClass().getResource("framed-gauge.css").toExternalForm());
         getStyleClass().setAll("framed-gauge");
-
         gauge           = GAUGE;
         gaugeDesign     = DESIGN;
         gaugeBackground = BACKGROUND;
+
+        Skin skin = gauge.getSkin();
+        if (null != skin && gauge.getSkin().getClass() != GaugeSkin.class) {
+            throw new RuntimeException("Please change Skin to GaugeSkin.");
+        }
 
         init();
         initGraphics();
