@@ -23,12 +23,14 @@ import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
+import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
 import eu.hansolo.medusa.skins.AmpSkin;
 import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
+import eu.hansolo.medusa.skins.GaugeSkin;
 import eu.hansolo.medusa.skins.IndicatorSkin;
 import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
@@ -86,6 +88,24 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
     public final B skin(final Class<Skin> SKIN) {
         skinClass = SKIN;
         return (B) this;
+    }
+
+    public final B skin(final SkinType SKIN_TYPE) {
+        switch (SKIN_TYPE) {
+            case AMP         : skinClass = AmpSkin.class; break;
+            case BULLET_CHART: skinClass = BulletChartSkin.class; break;
+            case DASHBOARD   : skinClass = DashboardSkin.class; break;
+            case FLAT        : skinClass = FlatSkin.class; break;
+            case GAUGE       : skinClass = GaugeSkin.class; break;
+            case INDICATOR   : skinClass = IndicatorSkin.class; break;
+            case KPI         : skinClass = KpiSkin.class; break;
+            case MODERN      : skinClass = ModernSkin.class; break;
+            case QUARTER     : skinClass = QuarterSkin.class; break;
+            case SIMPLE      : skinClass = SimpleSkin.class; break;
+            case SLIM        : skinClass = SlimSkin.class; break;
+            case SPACE_X     : skinClass = SpaceXSkin.class; break;
+        }
+        return (B)this;
     }
 
     public final B value(final double VALUE) {
