@@ -37,6 +37,7 @@ import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.IndicatorSkin;
 import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
+import eu.hansolo.medusa.skins.QuarterSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SlimSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
@@ -82,6 +83,7 @@ public class OverviewDemo extends Application {
     private Gauge          gauge11;
     private Gauge          gauge12;
     private Gauge          gauge13;
+    private Gauge          gauge14;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -319,6 +321,11 @@ public class OverviewDemo extends Application {
                               .animated(true)
                               .build();
 
+        gauge14 = GaugeBuilder.create()
+                              .skin(QuarterSkin.class)
+                              .animated(true)
+                              .build();
+
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO);
 
         framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
@@ -340,6 +347,7 @@ public class OverviewDemo extends Application {
                     gauge11.setValue(RND.nextDouble() * gauge11.getRange() + gauge11.getMinValue());
                     gauge12.setValue(RND.nextDouble() * gauge12.getRange() + gauge12.getMinValue());
                     gauge13.setValue(RND.nextDouble() * gauge13.getRange() + gauge13.getMinValue());
+                    gauge14.setValue(RND.nextDouble() * gauge14.getRange() + gauge14.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -361,6 +369,7 @@ public class OverviewDemo extends Application {
         pane.add(gauge11, 0, 2);
         pane.add(gauge12, 1, 2);
         pane.add(gauge13, 2, 2);
+        pane.add(gauge14, 3, 2);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));
