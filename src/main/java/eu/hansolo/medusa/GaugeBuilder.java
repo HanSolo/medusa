@@ -1067,7 +1067,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         if (null != skinClass) {
             try {
                 final Constructor<Skin> CONSTRUCTOR = skinClass.getConstructors()[0];
-                final Skin              SKIN = CONSTRUCTOR.newInstance(CONTROL);
+                final Skin              SKIN        = CONSTRUCTOR.newInstance(CONTROL);
                 CONTROL.setSkin(SKIN);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 System.out.println(e);
