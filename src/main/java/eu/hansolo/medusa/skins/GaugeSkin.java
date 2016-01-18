@@ -31,6 +31,7 @@ import eu.hansolo.medusa.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
@@ -43,6 +44,13 @@ import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -92,7 +100,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double                   oldValue;
     private double                   size;
     private Pane                     pane;
-    private Circle                   background;
     private InnerShadow              backgroundInnerShadow;
     private Canvas                   ticksAndSectionsCanvas;
     private GraphicsContext          ticksAndSections;
@@ -137,7 +144,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public GaugeSkin(Gauge gauge) {
         super(gauge);
-        angleStep    = gauge.getAngleRange() / (gauge.getMaxValue() - gauge.getMinValue());
+        angleStep    = gauge.getAngleRange() / gauge.getRange();
         oldValue     = gauge.getValue();
         limitString  = "";
         formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
@@ -171,7 +178,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void initGraphics() {
         backgroundInnerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(10, 10, 10, 0.45), 8, 0d, 8d, 0d);
-        background = new Circle();
 
         ticksAndSectionsCanvas = new Canvas();
         ticksAndSections = ticksAndSectionsCanvas.getGraphicsContext2D();
@@ -244,15 +250,15 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setMouseTransparent(true);
 
         // Set initial value
-        angleStep          = getSkinnable().getAngleStep();
         double targetAngle = 180 - getSkinnable().getStartAngle() + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
         targetAngle        = Helper.clamp(180 - getSkinnable().getStartAngle(), 180 - getSkinnable().getStartAngle() + getSkinnable().getAngleRange(), targetAngle);
         needleRotate.setAngle(targetAngle);
 
         // Add all nodes
         pane = new Pane();
-        pane.getChildren().setAll(background,
-                                  ticksAndSectionsCanvas,
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.getChildren().setAll(ticksAndSectionsCanvas,
                                   markerPane,
                                   ledCanvas,
                                   lcd,
@@ -1318,11 +1324,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             backgroundInnerShadow.setOffsetY(size * 0.03);
             backgroundInnerShadow.setRadius(size * 0.04);
 
-            background.setCenterX(center);
-            background.setCenterY(center);
-            background.setRadius(center);
-            background.setStrokeWidth(1);
-            background.setEffect(getSkinnable().isInnerShadowEnabled() ? backgroundInnerShadow : null);
+            pane.setEffect(getSkinnable().isInnerShadowEnabled() ? backgroundInnerShadow : null);
 
             ticksAndSectionsCanvas.setWidth(size);
             ticksAndSectionsCanvas.setHeight(size);
@@ -1400,7 +1402,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleCubicCurveTo6.setControlX2(0.25 * needleWidth); needleCubicCurveTo6.setControlY2(0.025423728813559324 * needleHeight);
             needleCubicCurveTo6.setX(0.25 * needleWidth); needleCubicCurveTo6.setY(0.025423728813559324 * needleHeight);
 
-            needle.relocate((size - needle.getLayoutBounds().getWidth()) * 0.5, center - needle.getLayoutBounds().getHeight());
+            needle.relocate(center - needle.getLayoutBounds().getWidth() * 0.5, center - needle.getLayoutBounds().getHeight());
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
             needleRotate.setPivotY(needle.getLayoutBounds().getHeight());
 
@@ -1417,8 +1419,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
 
         // Background stroke and fill
-        background.setStroke(getSkinnable().getBorderPaint());
-        background.setFill(getSkinnable().getBackgroundPaint());
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         // Areas, Sections and Tick Marks
         ticksAndSectionsCanvas.setCache(false);
