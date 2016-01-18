@@ -214,4 +214,22 @@ public class Helper {
 
         return PATTERN;
     }
+
+    public static void drawTriangle(final GraphicsContext CTX,
+                              final double PI1X, final double PI1Y, final double PI2X, final double PI2Y,
+                              final double PO1X, final double PO1Y, final double PO2X, final double PO2Y) {
+        CTX.beginPath();
+        CTX.moveTo(PI2X, PI2Y);
+        CTX.lineTo(PI1X, PI1Y);
+        CTX.lineTo(PO1X, PO1Y);
+        CTX.lineTo(PO2X, PO2Y);
+        CTX.closePath();
+        CTX.fill();
+    }
+    public static void drawDot(final GraphicsContext CTX, final double CENTER_X, final double CENTER_Y, final double SIZE) {
+        CTX.fillOval(CENTER_X, CENTER_Y, SIZE, SIZE);
+    }
+    public static void drawLine(final GraphicsContext CTX, final double P1X, final double P1Y, final double P2X, final double P2Y) {
+        CTX.strokeLine(P1X, P1Y, P2X, P2Y);
+    }
 }

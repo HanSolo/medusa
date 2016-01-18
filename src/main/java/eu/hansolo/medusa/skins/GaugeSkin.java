@@ -716,18 +716,18 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 switch (tickMarkType) {
                     case TRIANGLE:
                         if (majorTickMarksVisible) {
-                            drawTriangle(ticksAndSections, triangleMajorInnerPoint1X, triangleMajorInnerPoint1Y, triangleMajorInnerPoint2X, triangleMajorInnerPoint2Y,
+                            Helper.drawTriangle(ticksAndSections, triangleMajorInnerPoint1X, triangleMajorInnerPoint1Y, triangleMajorInnerPoint2X, triangleMajorInnerPoint2Y,
                                          triangleMajorOuterPoint1X, triangleMajorOuterPoint1Y, triangleMajorOuterPoint2X, triangleMajorOuterPoint2Y);
                         } else if (minorTickMarksVisible) {
-                            drawTriangle(ticksAndSections, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
+                            Helper.drawTriangle(ticksAndSections, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
                                          triangleMinorOuterPoint1X, triangleMinorOuterPoint1Y, triangleMinorOuterPoint2X, triangleMinorOuterPoint2Y);
                         }
                         break;
                     case DOT:
                         if (majorTickMarksVisible) {
-                            drawDot(ticksAndSections, dotCenterX - majorHalfDotSize, dotCenterY - majorHalfDotSize, majorDotSize);
+                            Helper.drawDot(ticksAndSections, dotCenterX - majorHalfDotSize, dotCenterY - majorHalfDotSize, majorDotSize);
                         } else if (minorTickMarksVisible) {
-                            drawDot(ticksAndSections, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
+                            Helper.drawDot(ticksAndSections, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
                         }
                         break;
                     case TICK_LABEL:
@@ -747,12 +747,12 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     case LINE:
                     default:
                         if (majorTickMarksVisible) {
-                            drawLine(ticksAndSections, innerPointX, innerPointY, outerPointX, outerPointY);
+                            Helper.drawLine(ticksAndSections, innerPointX, innerPointY, outerPointX, outerPointY);
                         } else if (minorTickMarksVisible) {
                             if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
-                                drawLine(ticksAndSections, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
+                                Helper.drawLine(ticksAndSections, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
                             } else {
-                                drawLine(ticksAndSections, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
+                                Helper.drawLine(ticksAndSections, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
                             }
                         }
                         break;
@@ -797,19 +797,19 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, mediumTickMarkColor) : mediumTickMarkColor);
                 switch(mediumTickMarkType) {
                     case TRIANGLE:
-                        drawTriangle(ticksAndSections, triangleMediumInnerPoint1X, triangleMediumInnerPoint1Y, triangleMediumInnerPoint2X, triangleMediumInnerPoint2Y,
+                        Helper.drawTriangle(ticksAndSections, triangleMediumInnerPoint1X, triangleMediumInnerPoint1Y, triangleMediumInnerPoint2X, triangleMediumInnerPoint2Y,
                                      triangleMediumOuterPoint1X, triangleMediumOuterPoint1Y, triangleMediumOuterPoint2X, triangleMediumOuterPoint2Y);
                         break;
                     case DOT:
-                        drawDot(ticksAndSections, dotMediumCenterX - mediumHalfDotSize, dotMediumCenterY - mediumHalfDotSize, mediumDotSize);
+                        Helper.drawDot(ticksAndSections, dotMediumCenterX - mediumHalfDotSize, dotMediumCenterY - mediumHalfDotSize, mediumDotSize);
                         break;
                     case LINE:
                     default:
                         ticksAndSections.setLineWidth(size * 0.0035);
                         if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
-                            drawLine(ticksAndSections, innerPointX, innerPointY, outerMediumPointX, outerMediumPointY);
+                            Helper.drawLine(ticksAndSections, innerPointX, innerPointY, outerMediumPointX, outerMediumPointY);
                         } else {
-                            drawLine(ticksAndSections, innerMediumPointX, innerMediumPointY, outerPointX, outerPointY);
+                            Helper.drawLine(ticksAndSections, innerMediumPointX, innerMediumPointY, outerPointX, outerPointY);
                         }
                     break;
                 }
@@ -820,19 +820,19 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     switch (minorTickMarkType) {
                         case TRIANGLE:
-                            drawTriangle(ticksAndSections, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
+                            Helper.drawTriangle(ticksAndSections, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
                                          triangleMinorOuterPoint1X, triangleMinorOuterPoint1Y, triangleMinorOuterPoint2X, triangleMinorOuterPoint2Y);
                             break;
                         case DOT:
-                            drawDot(ticksAndSections, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
+                            Helper.drawDot(ticksAndSections, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
                             break;
                         case LINE:
                         default:
                             ticksAndSections.setLineWidth(size * 0.00225);
                             if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
-                                drawLine(ticksAndSections, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
+                                Helper.drawLine(ticksAndSections, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
                             } else {
-                                drawLine(ticksAndSections, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
+                                Helper.drawLine(ticksAndSections, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
                             }
                             break;
                     }
@@ -843,24 +843,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (counter > maxValue) break;
             angle     = ScaleDirection.CLOCKWISE == scaleDirection ? (angle - tmpAngleStep) : (angle + tmpAngleStep);
         }
-    }
-
-    private void drawTriangle(final GraphicsContext CTX,
-                              final double PI1X, final double PI1Y, final double PI2X, final double PI2Y,
-                              final double PO1X, final double PO1Y, final double PO2X, final double PO2Y) {
-        CTX.beginPath();
-        CTX.moveTo(PI2X, PI2Y);
-        CTX.lineTo(PI1X, PI1Y);
-        CTX.lineTo(PO1X, PO1Y);
-        CTX.lineTo(PO2X, PO2Y);
-        CTX.closePath();
-        CTX.fill();
-    }
-    private void drawDot(final GraphicsContext CTX, final double CENTER_X, final double CENTER_Y, final double SIZE) {
-        CTX.fillOval(CENTER_X, CENTER_Y, SIZE, SIZE);
-    }
-    private void drawLine(final GraphicsContext CTX, final double P1X, final double P1Y, final double P2X, final double P2Y) {
-        CTX.strokeLine(P1X, P1Y, P2X, P2Y);
     }
 
     private void drawGradientBar() {
