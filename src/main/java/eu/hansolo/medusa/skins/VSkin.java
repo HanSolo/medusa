@@ -1358,7 +1358,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             valueText.setTranslateX(Pos.CENTER_LEFT == getSkinnable().getKnobPosition() ? width * 0.6 - valueText.getLayoutBounds().getWidth() : width * 0.9 - valueText.getLayoutBounds().getWidth());
             valueText.setTranslateY(height * 0.6);
 
-            double needleWidth  = height * getSkinnable().getNeedleSize().FACTOR;
+            double needleWidth  = scaledHeight * getSkinnable().getNeedleSize().FACTOR;
             double needleHeight = TickLabelLocation.OUTSIDE == getSkinnable().getTickLabelLocation() ? scaledHeight * 0.3965 : scaledHeight * 0.455;
 
             needleMoveTo1.setX(0.25 * needleWidth); needleMoveTo1.setY(0.025423728813559324 * needleHeight);

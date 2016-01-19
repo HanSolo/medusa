@@ -1422,8 +1422,8 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? height * 0.29 : height * 0.7);
             }
 
-            double needleWidth  = width * getSkinnable().getNeedleSize().FACTOR;
-            double needleHeight = TickLabelLocation.OUTSIDE == getSkinnable().getTickLabelLocation() ? width * 0.3965 : width * 0.455;
+            double needleWidth  = scaledWidth * getSkinnable().getNeedleSize().FACTOR;
+            double needleHeight = TickLabelLocation.OUTSIDE == getSkinnable().getTickLabelLocation() ? scaledWidth * 0.3965 : scaledWidth * 0.455;
 
             needleMoveTo1.setX(0.25 * needleWidth); needleMoveTo1.setY(0.025423728813559324 * needleHeight);
 
