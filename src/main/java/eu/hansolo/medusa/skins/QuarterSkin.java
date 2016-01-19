@@ -896,11 +896,14 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawSections() {
+        Pos               knobPosition      = getSkinnable().getKnobPosition();
         if (getSkinnable().getSections().isEmpty()) return;
         double            scaledSize        = size * 1.9;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.105 * scaledSize : 0.03875 * scaledSize;
         double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledSize * 0.79 : scaledSize * 0.925;
+        double            offsetX           = Pos.BOTTOM_RIGHT == knobPosition || Pos.TOP_RIGHT == knobPosition ? 0 : -scaledSize * 0.475;
+        double            offsetY           = Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.475 : 0;
         double            offset            = 90 - startAngle;
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
         IntStream.range(0, getSkinnable().getSections().size()).parallel().forEachOrdered(
@@ -923,7 +926,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     ticksAndSections.setStroke(section.getColor());
                     ticksAndSections.setLineWidth(scaledSize * 0.052);
                     ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-                    ticksAndSections.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
+                    ticksAndSections.strokeArc(xy + offsetX, xy + offsetY, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
                     ticksAndSections.restore();
                 }
             }
@@ -931,11 +934,14 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawAreas() {
+        Pos               knobPosition      = getSkinnable().getKnobPosition();
         if (getSkinnable().getAreas().isEmpty()) return;
         double            scaledSize        = size * 1.9;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.078 * scaledSize : 0.0125 * scaledSize;
         double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledSize * 0.846 : scaledSize * 0.97;
+        double            offsetX           = Pos.BOTTOM_RIGHT == knobPosition || Pos.TOP_RIGHT == knobPosition ? 0 : -scaledSize * 0.475;
+        double            offsetY           = Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.475 : 0;
         double            offset            = 90 - startAngle;
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
 
@@ -957,7 +963,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     }
                     ticksAndSections.save();
                     ticksAndSections.setFill(area.getColor());
-                    ticksAndSections.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
+                    ticksAndSections.fillArc(xy + offsetX, xy + offsetY, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
                     ticksAndSections.restore();
                 }
             }
@@ -1177,6 +1183,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double hue       = knobColor.getHue();
         double sat       = knobColor.getSaturation();
         double alp       = knobColor.getOpacity();
+        double brg       = Color.BLACK.equals(knobColor) ? 0.2 : knobColor.getBrightness();
         double gradTop;
         double gradBot;
 
@@ -1189,11 +1196,11 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 knob.fillOval(0, 0, w, h);
 
                 knob.setFill(new LinearGradient(0, 0.11764706 * h, 0, 0.76470588 * h, false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? 0.9 : 1.0, alp)),
-                                                new Stop(0.01, Color.hsb(hue, sat, PRESSED ? 0.75 : 0.85, alp)),
-                                                new Stop(0.5, Color.hsb(hue, sat, PRESSED ? 0.4 : 0.5, alp)),
-                                                new Stop(0.51, Color.hsb(hue, sat, PRESSED ? 0.35 : 0.45, alp)),
-                                                new Stop(1.0, Color.hsb(hue, sat, PRESSED ? 0.7 : 0.8, alp))));
+                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.9 : brg * 1.0, alp)),
+                                                new Stop(0.01, Color.hsb(hue, sat, PRESSED ? brg * 0.75 : brg * 0.85, alp)),
+                                                new Stop(0.5, Color.hsb(hue, sat, PRESSED ? brg * 0.4 : brg * 0.5, alp)),
+                                                new Stop(0.51, Color.hsb(hue, sat, PRESSED ? brg * 0.35 : brg * 0.45, alp)),
+                                                new Stop(1.0, Color.hsb(hue, sat, PRESSED ? brg * 0.7 : brg * 0.8, alp))));
                 knob.fillOval(w * 0.11764706, h * 0.11764706, w - w * 0.23529412, h - h * 0.23529412);
 
                 knob.setFill(new RadialGradient(0, 0, 0.5 * w, 0.47 * h, w * 0.38, false, CycleMethod.NO_CYCLE,
@@ -1212,8 +1219,8 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
                 knob.setFill(new LinearGradient(0, 0.058823529411764705 * h, 0, 0.9411764705882353 * h,
                                                 false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? 0.7 : 0.9, alp)),
-                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? 0.3 : 0.5, alp))));
+                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.7 : brg * 0.9, alp)),
+                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.3 : brg * 0.5, alp))));
                 knob.fillOval(0.05882353 * w, 0.05882353 * h, w * 0.88235294, h * 0.88235294);
 
                 knob.beginPath();
@@ -1281,9 +1288,9 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 gradBot = PRESSED ? size * 0.005 : h - size * 0.01;
                 knob.setFill(new LinearGradient(0,gradTop, 0, gradBot,
                                                 false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.hsb(hue, sat, 0.85, alp)),
-                                                new Stop(0.45, Color.hsb(hue, sat, 0.65, alp)),
-                                                new Stop(1.0, Color.hsb(hue, sat, 0.4, alp))));
+                                                new Stop(0.0, Color.hsb(hue, sat, brg * 0.85, alp)),
+                                                new Stop(0.45, Color.hsb(hue, sat, brg * 0.65, alp)),
+                                                new Stop(1.0, Color.hsb(hue, sat, brg * 0.4, alp))));
                 knob.fillOval(size * 0.005, size * 0.005, w - size * 0.01, h - size * 0.01);
                 break;
         }

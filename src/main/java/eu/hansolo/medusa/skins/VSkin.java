@@ -23,7 +23,6 @@ import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
-import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.AngleConicalGradient;
@@ -251,8 +250,8 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         // Add all nodes
         pane = new Pane();
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
         pane.getChildren().setAll(ticksAndSectionsCanvas,
                                   markerPane,
                                   ledCanvas,
@@ -1154,6 +1153,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double hue       = knobColor.getHue();
         double sat       = knobColor.getSaturation();
         double alp       = knobColor.getOpacity();
+        double brg       = Color.BLACK.equals(knobColor) ? 0.2 : knobColor.getBrightness();
         double gradTop;
         double gradBot;
 
@@ -1166,11 +1166,12 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 knob.fillOval(0, 0, w, h);
 
                 knob.setFill(new LinearGradient(0, 0.11764706 * h, 0, 0.76470588 * h, false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? 0.9 : 1.0, alp)),
-                                                new Stop(0.01, Color.hsb(hue, sat, PRESSED ? 0.75 : 0.85, alp)),
-                                                new Stop(0.5, Color.hsb(hue, sat, PRESSED ? 0.4 : 0.5, alp)),
-                                                new Stop(0.51, Color.hsb(hue, sat, PRESSED ? 0.35 : 0.45, alp)),
-                                                new Stop(1.0, Color.hsb(hue, sat, PRESSED ? 0.7 : 0.8, alp))));
+                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.9 : brg * 1.0, alp)),
+                                                new Stop(0.01, Color.hsb(hue, sat, PRESSED ? brg * 0.75 : brg * 0.85, alp)),
+                                                new Stop(0.5, Color.hsb(hue, sat, PRESSED ? brg * 0.4 : brg * 0.5, alp)),
+                                                new Stop(0.51, Color.hsb(hue, sat, PRESSED ? brg * 0.35 :brg *  0.45, alp)),
+                                                new Stop(1.0, Color.hsb(hue, sat, PRESSED ? brg * 0.7 : brg * 0.8, alp))
+                                            ));
                 knob.fillOval(w * 0.11764706, h * 0.11764706, w - w * 0.23529412, h - h * 0.23529412);
 
                 knob.setFill(new RadialGradient(0, 0, 0.5 * w, 0.47 * h, w * 0.38, false, CycleMethod.NO_CYCLE,
@@ -1189,8 +1190,8 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
                 knob.setFill(new LinearGradient(0, 0.058823529411764705 * h, 0, 0.9411764705882353 * h,
                                                 false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? 0.7 : 0.9, alp)),
-                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? 0.3 : 0.5, alp))));
+                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.7 : brg * 0.9, alp)),
+                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.3 : brg * 0.5, alp))));
                 knob.fillOval(0.05882353 * w, 0.05882353 * h, w * 0.88235294, h * 0.88235294);
 
                 knob.beginPath();
@@ -1258,9 +1259,9 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 gradBot = PRESSED ? width * 0.005 : h - width * 0.01;
                 knob.setFill(new LinearGradient(0,gradTop, 0, gradBot,
                                                 false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.hsb(hue, sat, 0.85, alp)),
-                                                new Stop(0.45, Color.hsb(hue, sat, 0.65, alp)),
-                                                new Stop(1.0, Color.hsb(hue, sat, 0.4, alp))));
+                                                new Stop(0.0, Color.hsb(hue, sat, brg * 0.85, alp)),
+                                                new Stop(0.45, Color.hsb(hue, sat, brg * 0.65, alp)),
+                                                new Stop(1.0, Color.hsb(hue, sat, brg * 0.4, alp))));
                 knob.fillOval(width * 0.005, width * 0.005, w - width * 0.01, h - width * 0.01);
                 break;
         }
@@ -1276,13 +1277,13 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setFont(Fonts.robotoMedium(fontSize));
         titleText.setText(getSkinnable().getTitle());
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
-        titleText.relocate(Pos.CENTER_LEFT == knobPosition ? width * 0.6 - titleText.getLayoutBounds().getWidth() : width * 0.4, height * 0.38);
+        titleText.relocate(Pos.CENTER_LEFT == knobPosition ? width * 0.6 - titleText.getLayoutBounds().getWidth() : width * 0.4, (height - titleText.getLayoutBounds().getHeight()) * 0.5);
 
         fontSize = 0.04 * height;
         unitText.setFont(Fonts.robotoRegular(fontSize));
         unitText.setText(getSkinnable().getUnit());
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(Pos.CENTER_LEFT == knobPosition ? width * 0.6 - unitText.getLayoutBounds().getWidth() : width * 0.4, (height - unitText.getLayoutBounds().getHeight()) * 0.5);
+        unitText.relocate(Pos.CENTER_LEFT == knobPosition ? width * 0.6 - unitText.getLayoutBounds().getWidth() : width * 0.4, (height - unitText.getLayoutBounds().getHeight()) * 0.38);
     }
 
     private void resize() {
@@ -1373,8 +1374,8 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
 
         // Background stroke and fill
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         // Areas, Sections and Tick Marks
         ticksAndSectionsCanvas.setCache(false);
