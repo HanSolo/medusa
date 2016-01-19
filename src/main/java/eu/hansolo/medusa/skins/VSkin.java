@@ -408,9 +408,9 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void drawTickMarks() {
         ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-        double               scaledHeight          = height * 0.9;
         double               sinValue;
         double               cosValue;
+        double               scaledHeight          = height * 0.9;
         double               centerX               = width * 0.9;
         double               centerY               = height * 0.5;
         int                  tickLabelDecimals     = getSkinnable().getTickLabelDecimals();
@@ -989,7 +989,8 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double            markerSize        = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0125 * height : 0.015 * height;
         double            pathHalf          = markerSize * 0.3;
-        double            centerX           = Pos.CENTER_LEFT == getSkinnable().getKnobPosition() ? width * 0.05 : width * 0.95;
+        double            scaledHeight      = height * 0.9;
+        double            centerX           = Pos.CENTER_LEFT == getSkinnable().getKnobPosition() ? width * 0.1 : width * 0.9;
         double            centerY           = height * 0.5;
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
         if (getSkinnable().areMarkersVisible()) {
@@ -1009,24 +1010,24 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         triangle.getElements().clear();
                         switch (tickLabelLocation) {
                             case OUTSIDE:
-                                triangle.getElements().add(new MoveTo(centerX + height * 0.38 * sinValue, centerY + height * 0.38 * cosValue));
+                                triangle.getElements().add(new MoveTo(centerX + scaledHeight * 0.38 * sinValue, centerY + scaledHeight * 0.38 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + height * 0.4075 * sinValue, centerY + height * 0.4075 * cosValue));
+                                triangle.getElements().add(new LineTo(centerX + scaledHeight * 0.4075 * sinValue, centerY + scaledHeight * 0.4075 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + height * 0.4075 * sinValue, centerY + height * 0.4075 * cosValue));
+                                triangle.getElements().add(new LineTo(centerX + scaledHeight * 0.4075 * sinValue, centerY + scaledHeight * 0.4075 * cosValue));
                                 triangle.getElements().add(new ClosePath());
                                 break;
                             case INSIDE:
                             default:
-                                triangle.getElements().add(new MoveTo(centerX + height * 0.465 * sinValue, centerY + height * 0.465 * cosValue));
+                                triangle.getElements().add(new MoveTo(centerX + scaledHeight * 0.465 * sinValue, centerY + scaledHeight * 0.465 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + height * 0.436 * sinValue, centerY + height * 0.436 * cosValue));
+                                triangle.getElements().add(new LineTo(centerX + scaledHeight * 0.436 * sinValue, centerY + scaledHeight * 0.436 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + height * 0.436 * sinValue, centerY + height * 0.436 * cosValue));
+                                triangle.getElements().add(new LineTo(centerX + scaledHeight * 0.436 * sinValue, centerY + scaledHeight * 0.436 * cosValue));
                                 triangle.getElements().add(new ClosePath());
                                 break;
                         }
@@ -1036,12 +1037,12 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         dot.setRadius(markerSize);
                         switch (tickLabelLocation) {
                             case OUTSIDE:
-                                dot.setCenterX(centerX + height * 0.3945 * sinValue);
-                                dot.setCenterY(centerY + height * 0.3945 * cosValue);
+                                dot.setCenterX(centerX + scaledHeight * 0.3945 * sinValue);
+                                dot.setCenterY(centerY + scaledHeight * 0.3945 * cosValue);
                                 break;
                             default:
-                                dot.setCenterX(centerX + height * 0.449 * sinValue);
-                                dot.setCenterY(centerY + height * 0.449 * cosValue);
+                                dot.setCenterX(centerX + scaledHeight * 0.449 * sinValue);
+                                dot.setCenterY(centerY + scaledHeight * 0.449 * cosValue);
                                 break;
                         }
                         break;
@@ -1051,28 +1052,28 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         standard.getElements().clear();
                         switch (tickLabelLocation) {
                             case OUTSIDE:
-                                standard.getElements().add(new MoveTo(centerX + height * 0.38 * sinValue, centerY + height * 0.38 * cosValue));
+                                standard.getElements().add(new MoveTo(centerX + scaledHeight * 0.38 * sinValue, centerY + scaledHeight * 0.38 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
-                                standard.getElements().add(new LineTo(centerX + height * 0.4075 * sinValue, centerY + height * 0.4075 * cosValue));
-                                standard.getElements().add(new LineTo(centerX + height * 0.4575 * sinValue, centerY + height * 0.4575 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledHeight * 0.4075 * sinValue, centerY + scaledHeight * 0.4075 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledHeight * 0.4575 * sinValue, centerY + scaledHeight * 0.4575 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
-                                standard.getElements().add(new LineTo(centerX + height * 0.4575 * sinValue, centerY + height * 0.4575 * cosValue));
-                                standard.getElements().add(new LineTo(centerX + height * 0.4075 * sinValue, centerY + height * 0.4075 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledHeight * 0.4575 * sinValue, centerY + scaledHeight * 0.4575 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledHeight * 0.4075 * sinValue, centerY + scaledHeight * 0.4075 * cosValue));
                                 standard.getElements().add(new ClosePath());
                                 break;
                             case INSIDE:
                             default:
-                                standard.getElements().add(new MoveTo(centerX + height * 0.465 * sinValue, centerY + height * 0.465 * cosValue));
+                                standard.getElements().add(new MoveTo(centerX + scaledHeight * 0.465 * sinValue, centerY + scaledHeight * 0.465 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
-                                standard.getElements().add(new LineTo(centerX + height * 0.436 * sinValue, centerY + height * 0.436 * cosValue));
-                                standard.getElements().add(new LineTo(centerX + height * 0.386 * sinValue, centerY + height * 0.386 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledHeight * 0.436 * sinValue, centerY + scaledHeight * 0.436 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledHeight * 0.386 * sinValue, centerY + scaledHeight * 0.386 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
-                                standard.getElements().add(new LineTo(centerX + height * 0.386 * sinValue, centerY + height * 0.386 * cosValue));
-                                standard.getElements().add(new LineTo(centerX + height * 0.436 * sinValue, centerY + height * 0.436 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledHeight * 0.386 * sinValue, centerY + scaledHeight * 0.386 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledHeight * 0.436 * sinValue, centerY + scaledHeight * 0.436 * cosValue));
                                 standard.getElements().add(new ClosePath());
                                 break;
                         }

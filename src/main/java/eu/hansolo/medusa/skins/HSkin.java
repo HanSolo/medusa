@@ -426,7 +426,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needleRotate.setAngle(targetAngle);
         valueText.setText(limitString + String.format(Locale.US, formatString, VALUE));
         if (getSkinnable().isLcdVisible()) {
-            valueText.setTranslateX((0.691 * width - valueText.getLayoutBounds().getWidth()));
+            valueText.setTranslateX((0.675 * width - valueText.getLayoutBounds().getWidth()));
         } else {
             valueText.setTranslateX((width - valueText.getLayoutBounds().getWidth()) * 0.5);
         }
@@ -436,8 +436,9 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ticksAndSections.setLineCap(StrokeLineCap.BUTT);
         double               sinValue;
         double               cosValue;
+        double               scaledWidth           = width * 0.9;
         double               centerX               = width * 0.5;
-        double               centerY               = height * 0.95;
+        double               centerY               = height * 0.9;
         int                  tickLabelDecimals     = getSkinnable().getTickLabelDecimals();
         String               tickLabelFormatString = "%." + tickLabelDecimals + "f";
         double               minorTickSpace        = getSkinnable().getMinorTickSpace();
@@ -483,25 +484,25 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double orthTextFactor;
         if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
             orthTextFactor    = Gauge.TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.45 * textDisplacementFactor : 0.45 * textDisplacementFactor;
-            majorDotSize      = 0.02 * width;
+            majorDotSize      = 0.02 * scaledWidth;
             majorHalfDotSize  = majorDotSize * 0.5;
-            mediumDotSize     = 0.01375 * width;
+            mediumDotSize     = 0.01375 * scaledWidth;
             mediumHalfDotSize = mediumDotSize * 0.5;
-            minorDotSize      = 0.0075 * width;
+            minorDotSize      = 0.0075 * scaledWidth;
             minorHalfDotSize  = minorDotSize * 0.5;
         } else {
             orthTextFactor    = Gauge.TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.38 * textDisplacementFactor : 0.37 * textDisplacementFactor;
-            majorDotSize      = 0.025 * width;
+            majorDotSize      = 0.025 * scaledWidth;
             majorHalfDotSize  = majorDotSize * 0.5;
-            mediumDotSize     = 0.01875 * width;
+            mediumDotSize     = 0.01875 * scaledWidth;
             mediumHalfDotSize = mediumDotSize * 0.5;
-            minorDotSize      = 0.0125 * width;
+            minorDotSize      = 0.0125 * scaledWidth;
             minorHalfDotSize  = minorDotSize * 0.5;
         };
 
         boolean fullRange                  = (minValue < 0 && maxValue > 0);
-        double  tickLabelFontSize          = tickLabelDecimals == 0 ? 0.054 * width : 0.051 * width;
-        double  tickMarkFontSize           = tickLabelDecimals == 0 ? 0.047 * width: 0.044 * width;
+        double  tickLabelFontSize          = tickLabelDecimals == 0 ? 0.054 * scaledWidth : 0.051 * scaledWidth;
+        double  tickMarkFontSize           = tickLabelDecimals == 0 ? 0.047 * scaledWidth : 0.044 * scaledWidth;
         double  tickLabelOrientationFactor = TickLabelOrientation.HORIZONTAL == tickLabelOrientation ? 0.9 : 1.0;
 
         Font tickLabelFont     = Fonts.robotoCondensedRegular(tickLabelFontSize * tickLabelOrientationFactor);
@@ -586,131 +587,131 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             switch(tickLabelLocation) {
                 case OUTSIDE:
-                    innerPointX                = centerX + width * 0.3585 * sinValue;
-                    innerPointY                = centerY + width * 0.3585 * cosValue;
-                    innerMediumPointX          = centerX + width * 0.3585 * sinValue;
-                    innerMediumPointY          = centerY + width * 0.3585 * cosValue;
-                    innerMinorPointX           = centerX + width * 0.3585 * sinValue;
-                    innerMinorPointY           = centerY + width * 0.3585 * cosValue;
-                    outerPointX                = centerX + width * 0.4105 * sinValue;
-                    outerPointY                = centerY + width * 0.4105 * cosValue;
-                    outerMediumPointX          = centerX + width * 0.4045 * sinValue;
-                    outerMediumPointY          = centerY + width * 0.4045 * cosValue;
-                    outerMinorPointX           = centerX + width * 0.3975 * sinValue;
-                    outerMinorPointY           = centerY + width * 0.3975 * cosValue;
-                    textPointX                 = centerX + width * orthTextFactor * sinValue;
-                    textPointY                 = centerY + width * orthTextFactor * cosValue;
-                    dotCenterX                 = centerX + width * 0.3685 * sinValue;
-                    dotCenterY                 = centerY + width * 0.3685 * cosValue;
-                    dotMediumCenterX           = centerX + width * 0.365375 * sinValue;
-                    dotMediumCenterY           = centerY + width * 0.365375 * cosValue;
-                    dotMinorCenterX            = centerX + width * 0.36225 * sinValue;
-                    dotMinorCenterY            = centerY + width * 0.36225 * cosValue;
-                    tickLabelTickMarkX         = centerX + width * 0.3805 * sinValue;
-                    tickLabelTickMarkY         = centerY + width * 0.3805 * cosValue;
+                    innerPointX                = centerX + scaledWidth * 0.3585 * sinValue;
+                    innerPointY                = centerY + scaledWidth * 0.3585 * cosValue;
+                    innerMediumPointX          = centerX + scaledWidth * 0.3585 * sinValue;
+                    innerMediumPointY          = centerY + scaledWidth * 0.3585 * cosValue;
+                    innerMinorPointX           = centerX + scaledWidth * 0.3585 * sinValue;
+                    innerMinorPointY           = centerY + scaledWidth * 0.3585 * cosValue;
+                    outerPointX                = centerX + scaledWidth * 0.4105 * sinValue;
+                    outerPointY                = centerY + scaledWidth * 0.4105 * cosValue;
+                    outerMediumPointX          = centerX + scaledWidth * 0.4045 * sinValue;
+                    outerMediumPointY          = centerY + scaledWidth * 0.4045 * cosValue;
+                    outerMinorPointX           = centerX + scaledWidth * 0.3975 * sinValue;
+                    outerMinorPointY           = centerY + scaledWidth * 0.3975 * cosValue;
+                    textPointX                 = centerX + scaledWidth * orthTextFactor * sinValue;
+                    textPointY                 = centerY + scaledWidth * orthTextFactor * cosValue;
+                    dotCenterX                 = centerX + scaledWidth * 0.3685 * sinValue;
+                    dotCenterY                 = centerY + scaledWidth * 0.3685 * cosValue;
+                    dotMediumCenterX           = centerX + scaledWidth * 0.365375 * sinValue;
+                    dotMediumCenterY           = centerY + scaledWidth * 0.365375 * cosValue;
+                    dotMinorCenterX            = centerX + scaledWidth * 0.36225 * sinValue;
+                    dotMinorCenterY            = centerY + scaledWidth * 0.36225 * cosValue;
+                    tickLabelTickMarkX         = centerX + scaledWidth * 0.3805 * sinValue;
+                    tickLabelTickMarkY         = centerY + scaledWidth * 0.3805 * cosValue;
 
                     triangleMajorInnerAngle1   = Math.toRadians(angle - 1.2 + startAngle);
                     triangleMajorInnerAngle2   = Math.toRadians(angle + 1.2 + startAngle);
                     triangleMajorOuterAngle1   = Math.toRadians(angle - 0.8 + startAngle);
                     triangleMajorOuterAngle2   = Math.toRadians(angle + 0.8 + startAngle);
-                    triangleMajorInnerPoint1X  = centerX + width * 0.3585 * Math.sin(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint1Y  = centerY + width * 0.3585 * Math.cos(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint2X  = centerX + width * 0.3585 * Math.sin(triangleMajorInnerAngle2);
-                    triangleMajorInnerPoint2Y  = centerY + width * 0.3585 * Math.cos(triangleMajorInnerAngle2);
-                    triangleMajorOuterPoint1X  = centerX + width * 0.4105 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint1Y  = centerY + width * 0.4105 * Math.cos(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint2X  = centerX + width * 0.4105 * Math.sin(triangleMajorOuterAngle2);
-                    triangleMajorOuterPoint2Y  = centerY + width * 0.4105 * Math.cos(triangleMajorOuterAngle2);
+                    triangleMajorInnerPoint1X  = centerX + scaledWidth * 0.3585 * Math.sin(triangleMajorInnerAngle1);
+                    triangleMajorInnerPoint1Y  = centerY + scaledWidth * 0.3585 * Math.cos(triangleMajorInnerAngle1);
+                    triangleMajorInnerPoint2X  = centerX + scaledWidth * 0.3585 * Math.sin(triangleMajorInnerAngle2);
+                    triangleMajorInnerPoint2Y  = centerY + scaledWidth * 0.3585 * Math.cos(triangleMajorInnerAngle2);
+                    triangleMajorOuterPoint1X  = centerX + scaledWidth * 0.4105 * Math.sin(triangleMajorOuterAngle1);
+                    triangleMajorOuterPoint1Y  = centerY + scaledWidth * 0.4105 * Math.cos(triangleMajorOuterAngle1);
+                    triangleMajorOuterPoint2X  = centerX + scaledWidth * 0.4105 * Math.sin(triangleMajorOuterAngle2);
+                    triangleMajorOuterPoint2Y  = centerY + scaledWidth * 0.4105 * Math.cos(triangleMajorOuterAngle2);
 
                     triangleMediumInnerAngle1  = Math.toRadians(angle - 1.0 + startAngle);
                     triangleMediumInnerAngle2  = Math.toRadians(angle + 1.0 + startAngle);
                     triangleMediumOuterAngle1  = Math.toRadians(angle - 0.7 + startAngle);
                     triangleMediumOuterAngle2  = Math.toRadians(angle + 0.7 + startAngle);
-                    triangleMediumInnerPoint1X = centerX + width * 0.3585 * Math.sin(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint1Y = centerY + width * 0.3585 * Math.cos(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint2X = centerX + width * 0.3585 * Math.sin(triangleMediumInnerAngle2);
-                    triangleMediumInnerPoint2Y = centerY + width * 0.3585 * Math.cos(triangleMediumInnerAngle2);
-                    triangleMediumOuterPoint1X = centerX + width * 0.3985 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMediumOuterPoint1Y = centerY + width * 0.3985 * Math.cos(triangleMediumOuterAngle1);
-                    triangleMediumOuterPoint2X = centerX + width * 0.3985 * Math.sin(triangleMediumOuterAngle2);
-                    triangleMediumOuterPoint2Y = centerY + width * 0.3985 * Math.cos(triangleMediumOuterAngle2);
+                    triangleMediumInnerPoint1X = centerX + scaledWidth * 0.3585 * Math.sin(triangleMediumInnerAngle1);
+                    triangleMediumInnerPoint1Y = centerY + scaledWidth * 0.3585 * Math.cos(triangleMediumInnerAngle1);
+                    triangleMediumInnerPoint2X = centerX + scaledWidth * 0.3585 * Math.sin(triangleMediumInnerAngle2);
+                    triangleMediumInnerPoint2Y = centerY + scaledWidth * 0.3585 * Math.cos(triangleMediumInnerAngle2);
+                    triangleMediumOuterPoint1X = centerX + scaledWidth * 0.3985 * Math.sin(triangleMajorOuterAngle1);
+                    triangleMediumOuterPoint1Y = centerY + scaledWidth * 0.3985 * Math.cos(triangleMediumOuterAngle1);
+                    triangleMediumOuterPoint2X = centerX + scaledWidth * 0.3985 * Math.sin(triangleMediumOuterAngle2);
+                    triangleMediumOuterPoint2Y = centerY + scaledWidth * 0.3985 * Math.cos(triangleMediumOuterAngle2);
 
                     triangleMinorInnerAngle1   = Math.toRadians(angle - 0.8 + startAngle);
                     triangleMinorInnerAngle2   = Math.toRadians(angle + 0.8 + startAngle);
                     triangleMinorOuterAngle1   = Math.toRadians(angle - 0.6 + startAngle);
                     triangleMinorOuterAngle2   = Math.toRadians(angle + 0.6 + startAngle);
-                    triangleMinorInnerPoint1X  = centerX + width * 0.3585 * Math.sin(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint1Y  = centerY + width * 0.3585 * Math.cos(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint2X  = centerX + width * 0.3585 * Math.sin(triangleMinorInnerAngle2);
-                    triangleMinorInnerPoint2Y  = centerY + width * 0.3585 * Math.cos(triangleMinorInnerAngle2);
-                    triangleMinorOuterPoint1X  = centerX + width * 0.3975 * Math.sin(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint1Y  = centerY + width * 0.3975 * Math.cos(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint2X  = centerX + width * 0.3975 * Math.sin(triangleMinorOuterAngle2);
-                    triangleMinorOuterPoint2Y  = centerY + width * 0.3975 * Math.cos(triangleMinorOuterAngle2);
+                    triangleMinorInnerPoint1X  = centerX + scaledWidth * 0.3585 * Math.sin(triangleMinorInnerAngle1);
+                    triangleMinorInnerPoint1Y  = centerY + scaledWidth * 0.3585 * Math.cos(triangleMinorInnerAngle1);
+                    triangleMinorInnerPoint2X  = centerX + scaledWidth * 0.3585 * Math.sin(triangleMinorInnerAngle2);
+                    triangleMinorInnerPoint2Y  = centerY + scaledWidth * 0.3585 * Math.cos(triangleMinorInnerAngle2);
+                    triangleMinorOuterPoint1X  = centerX + scaledWidth * 0.3975 * Math.sin(triangleMinorOuterAngle1);
+                    triangleMinorOuterPoint1Y  = centerY + scaledWidth * 0.3975 * Math.cos(triangleMinorOuterAngle1);
+                    triangleMinorOuterPoint2X  = centerX + scaledWidth * 0.3975 * Math.sin(triangleMinorOuterAngle2);
+                    triangleMinorOuterPoint2Y  = centerY + scaledWidth * 0.3975 * Math.cos(triangleMinorOuterAngle2);
                     break;
                 case INSIDE:
                 default:
-                    innerPointX                = centerX + width * 0.423 * sinValue;
-                    innerPointY                = centerY + width * 0.423 * cosValue;
-                    innerMediumPointX          = centerX + width * 0.43 * sinValue;
-                    innerMediumPointY          = centerY + width * 0.43 * cosValue;
-                    innerMinorPointX           = centerX + width * 0.436 * sinValue;
-                    innerMinorPointY           = centerY + width * 0.436 * cosValue;
-                    outerPointX                = centerX + width * 0.475 * sinValue;
-                    outerPointY                = centerY + width * 0.475 * cosValue;
-                    outerMediumPointX          = centerX + width * 0.475 * sinValue;
-                    outerMediumPointY          = centerY + width * 0.475 * cosValue;
-                    outerMinorPointX           = centerX + width * 0.475 * sinValue;
-                    outerMinorPointY           = centerY + width * 0.475 * cosValue;
-                    textPointX                 = centerX + width * orthTextFactor * sinValue;
-                    textPointY                 = centerY + width * orthTextFactor * cosValue;
-                    dotCenterX                 = centerX + width * 0.4625 * sinValue;
-                    dotCenterY                 = centerY + width * 0.4625 * cosValue;
-                    dotMediumCenterX           = centerX + width * 0.465625 * sinValue;
-                    dotMediumCenterY           = centerY + width * 0.465625 * cosValue;
-                    dotMinorCenterX            = centerX + width * 0.46875 * sinValue;
-                    dotMinorCenterY            = centerY + width * 0.46875 * cosValue;
-                    tickLabelTickMarkX         = centerX + width * 0.445 * sinValue;
-                    tickLabelTickMarkY         = centerY + width * 0.445 * cosValue;
+                    innerPointX                = centerX + scaledWidth * 0.423 * sinValue;
+                    innerPointY                = centerY + scaledWidth * 0.423 * cosValue;
+                    innerMediumPointX          = centerX + scaledWidth * 0.43 * sinValue;
+                    innerMediumPointY          = centerY + scaledWidth * 0.43 * cosValue;
+                    innerMinorPointX           = centerX + scaledWidth * 0.436 * sinValue;
+                    innerMinorPointY           = centerY + scaledWidth * 0.436 * cosValue;
+                    outerPointX                = centerX + scaledWidth * 0.475 * sinValue;
+                    outerPointY                = centerY + scaledWidth * 0.475 * cosValue;
+                    outerMediumPointX          = centerX + scaledWidth * 0.475 * sinValue;
+                    outerMediumPointY          = centerY + scaledWidth * 0.475 * cosValue;
+                    outerMinorPointX           = centerX + scaledWidth * 0.475 * sinValue;
+                    outerMinorPointY           = centerY + scaledWidth * 0.475 * cosValue;
+                    textPointX                 = centerX + scaledWidth * orthTextFactor * sinValue;
+                    textPointY                 = centerY + scaledWidth * orthTextFactor * cosValue;
+                    dotCenterX                 = centerX + scaledWidth * 0.4625 * sinValue;
+                    dotCenterY                 = centerY + scaledWidth * 0.4625 * cosValue;
+                    dotMediumCenterX           = centerX + scaledWidth * 0.465625 * sinValue;
+                    dotMediumCenterY           = centerY + scaledWidth * 0.465625 * cosValue;
+                    dotMinorCenterX            = centerX + scaledWidth * 0.46875 * sinValue;
+                    dotMinorCenterY            = centerY + scaledWidth * 0.46875 * cosValue;
+                    tickLabelTickMarkX         = centerX + scaledWidth * 0.445 * sinValue;
+                    tickLabelTickMarkY         = centerY + scaledWidth * 0.445 * cosValue;
 
                     triangleMajorInnerAngle1   = Math.toRadians(angle - 0.8 + startAngle);
                     triangleMajorInnerAngle2   = Math.toRadians(angle + 0.8 + startAngle);
                     triangleMajorOuterAngle1   = Math.toRadians(angle - 1.2 + startAngle);
                     triangleMajorOuterAngle2   = Math.toRadians(angle + 1.2 + startAngle);
-                    triangleMajorInnerPoint1X  = centerX + width * 0.423 * Math.sin(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint1Y  = centerY + width * 0.423 * Math.cos(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint2X  = centerX + width * 0.423 * Math.sin(triangleMajorInnerAngle2);
-                    triangleMajorInnerPoint2Y  = centerY + width * 0.423 * Math.cos(triangleMajorInnerAngle2);
-                    triangleMajorOuterPoint1X  = centerX + width * 0.475 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint1Y  = centerY + width * 0.475 * Math.cos(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint2X  = centerX + width * 0.475 * Math.sin(triangleMajorOuterAngle2);
-                    triangleMajorOuterPoint2Y  = centerY + width * 0.475 * Math.cos(triangleMajorOuterAngle2);
+                    triangleMajorInnerPoint1X  = centerX + scaledWidth * 0.423 * Math.sin(triangleMajorInnerAngle1);
+                    triangleMajorInnerPoint1Y  = centerY + scaledWidth * 0.423 * Math.cos(triangleMajorInnerAngle1);
+                    triangleMajorInnerPoint2X  = centerX + scaledWidth * 0.423 * Math.sin(triangleMajorInnerAngle2);
+                    triangleMajorInnerPoint2Y  = centerY + scaledWidth * 0.423 * Math.cos(triangleMajorInnerAngle2);
+                    triangleMajorOuterPoint1X  = centerX + scaledWidth * 0.475 * Math.sin(triangleMajorOuterAngle1);
+                    triangleMajorOuterPoint1Y  = centerY + scaledWidth * 0.475 * Math.cos(triangleMajorOuterAngle1);
+                    triangleMajorOuterPoint2X  = centerX + scaledWidth * 0.475 * Math.sin(triangleMajorOuterAngle2);
+                    triangleMajorOuterPoint2Y  = centerY + scaledWidth * 0.475 * Math.cos(triangleMajorOuterAngle2);
 
                     triangleMediumInnerAngle1  = Math.toRadians(angle - 0.7 + startAngle);
                     triangleMediumInnerAngle2  = Math.toRadians(angle + 0.7 + startAngle);
                     triangleMediumOuterAngle1  = Math.toRadians(angle - 1.0 + startAngle);
                     triangleMediumOuterAngle2  = Math.toRadians(angle + 1.0 + startAngle);
-                    triangleMediumInnerPoint1X = centerX + width * 0.435 * Math.sin(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint1Y = centerY + width * 0.435 * Math.cos(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint2X = centerX + width * 0.435 * Math.sin(triangleMediumInnerAngle2);
-                    triangleMediumInnerPoint2Y = centerY + width * 0.435 * Math.cos(triangleMediumInnerAngle2);
-                    triangleMediumOuterPoint1X = centerX + width * 0.475 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMediumOuterPoint1Y = centerY + width * 0.475 * Math.cos(triangleMediumOuterAngle1);
-                    triangleMediumOuterPoint2X = centerX + width * 0.475 * Math.sin(triangleMediumOuterAngle2);
-                    triangleMediumOuterPoint2Y = centerY + width * 0.475 * Math.cos(triangleMediumOuterAngle2);
+                    triangleMediumInnerPoint1X = centerX + scaledWidth * 0.435 * Math.sin(triangleMediumInnerAngle1);
+                    triangleMediumInnerPoint1Y = centerY + scaledWidth * 0.435 * Math.cos(triangleMediumInnerAngle1);
+                    triangleMediumInnerPoint2X = centerX + scaledWidth * 0.435 * Math.sin(triangleMediumInnerAngle2);
+                    triangleMediumInnerPoint2Y = centerY + scaledWidth * 0.435 * Math.cos(triangleMediumInnerAngle2);
+                    triangleMediumOuterPoint1X = centerX + scaledWidth * 0.475 * Math.sin(triangleMajorOuterAngle1);
+                    triangleMediumOuterPoint1Y = centerY + scaledWidth * 0.475 * Math.cos(triangleMediumOuterAngle1);
+                    triangleMediumOuterPoint2X = centerX + scaledWidth * 0.475 * Math.sin(triangleMediumOuterAngle2);
+                    triangleMediumOuterPoint2Y = centerY + scaledWidth * 0.475 * Math.cos(triangleMediumOuterAngle2);
 
                     triangleMinorInnerAngle1   = Math.toRadians(angle - 0.6 + startAngle);
                     triangleMinorInnerAngle2   = Math.toRadians(angle + 0.6 + startAngle);
                     triangleMinorOuterAngle1   = Math.toRadians(angle - 0.8 + startAngle);
                     triangleMinorOuterAngle2   = Math.toRadians(angle + 0.8 + startAngle);
-                    triangleMinorInnerPoint1X  = centerX + width * 0.440 * Math.sin(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint1Y  = centerY + width * 0.440 * Math.cos(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint2X  = centerX + width * 0.440 * Math.sin(triangleMinorInnerAngle2);
-                    triangleMinorInnerPoint2Y  = centerY + width * 0.440 * Math.cos(triangleMinorInnerAngle2);
-                    triangleMinorOuterPoint1X  = centerX + width * 0.475 * Math.sin(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint1Y  = centerY + width * 0.475 * Math.cos(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint2X  = centerX + width * 0.475 * Math.sin(triangleMinorOuterAngle2);
-                    triangleMinorOuterPoint2Y  = centerY + width * 0.475 * Math.cos(triangleMinorOuterAngle2);
+                    triangleMinorInnerPoint1X  = centerX + scaledWidth * 0.440 * Math.sin(triangleMinorInnerAngle1);
+                    triangleMinorInnerPoint1Y  = centerY + scaledWidth * 0.440 * Math.cos(triangleMinorInnerAngle1);
+                    triangleMinorInnerPoint2X  = centerX + scaledWidth * 0.440 * Math.sin(triangleMinorInnerAngle2);
+                    triangleMinorInnerPoint2Y  = centerY + scaledWidth * 0.440 * Math.cos(triangleMinorInnerAngle2);
+                    triangleMinorOuterPoint1X  = centerX + scaledWidth * 0.475 * Math.sin(triangleMinorOuterAngle1);
+                    triangleMinorOuterPoint1Y  = centerY + scaledWidth * 0.475 * Math.cos(triangleMinorOuterAngle1);
+                    triangleMinorOuterPoint2X  = centerX + scaledWidth * 0.475 * Math.sin(triangleMinorOuterAngle2);
+                    triangleMinorOuterPoint2Y  = centerY + scaledWidth * 0.475 * Math.cos(triangleMinorOuterAngle2);
                     break;
             }
 
@@ -725,12 +726,12 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 if (majorTickMarksVisible) {
                     ticksAndSections.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
                     ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
-                    ticksAndSections.setLineWidth(width * 0.0055);
+                    ticksAndSections.setLineWidth(scaledWidth * 0.0055);
                     tickMarkType = majorTickMarkType;
                 } else if (minorTickMarksVisible) {
                     ticksAndSections.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
-                    ticksAndSections.setLineWidth(width * 0.00225);
+                    ticksAndSections.setLineWidth(scaledWidth * 0.00225);
                     tickMarkType = minorTickMarkType;
                 }
                 if (fullRange && !isNotZero) {
@@ -838,7 +839,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         break;
                     case LINE:
                     default:
-                        ticksAndSections.setLineWidth(width * 0.0035);
+                        ticksAndSections.setLineWidth(scaledWidth * 0.0035);
                         if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
                             Helper.drawLine(ticksAndSections, innerPointX, innerPointY, outerMediumPointX, outerMediumPointY);
                         } else {
@@ -861,7 +862,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                             break;
                         case LINE:
                         default:
-                            ticksAndSections.setLineWidth(width * 0.00225);
+                            ticksAndSections.setLineWidth(scaledWidth * 0.00225);
                             if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
                                 Helper.drawLine(ticksAndSections, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
                             } else {
@@ -880,9 +881,10 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void drawGradientBar() {
         TickLabelLocation  tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * width : 0.0515 * width;
-        double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? width * 0.77 : width * 0.897;
-        double             offsetY           = -0.05 * height;
+        double             scaledWidth       = width * 0.9;
+        double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1705 * scaledWidth : 0.107 * scaledWidth;
+        double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledWidth * 0.77 : scaledWidth * 0.897;
+        double             offsetY           = -0.1 * height;
         double             offset            = 90 - startAngle;
         ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
         List<Stop>         stops             = getSkinnable().getGradientBarStops();
@@ -896,7 +898,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double barAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? getSkinnable().getRange() * angleStep : -getSkinnable().getRange() * angleStep;
         ticksAndSections.save();
         ticksAndSections.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.026 * width, xy - 0.026 * width + offsetY, wh + 0.052 * width, wh + 0.052 * width)));
-        ticksAndSections.setLineWidth(width * 0.052);
+        ticksAndSections.setLineWidth(scaledWidth * 0.052);
         ticksAndSections.setLineCap(StrokeLineCap.BUTT);
         ticksAndSections.strokeArc(xy, xy + offsetY, wh, wh, -(offset + barStartAngle), -barAngleExtend, ArcType.OPEN);
         ticksAndSections.restore();
@@ -905,9 +907,10 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void drawSections() {
         if (getSkinnable().getSections().isEmpty()) return;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * width : 0.0515 * width;
-        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? width * 0.77 : width * 0.897;
-        double            offsetY           = -0.05 * height;
+        double            scaledWidth       = width * 0.9;
+        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1705 * scaledWidth : 0.107 * scaledWidth;
+        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledWidth * 0.77 : scaledWidth * 0.897;
+        double            offsetY           = -0.1 * height;
         double            offset            = 90 - startAngle;
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
         IntStream.range(0, getSkinnable().getSections().size()).parallel().forEachOrdered(
@@ -928,7 +931,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     }
                     ticksAndSections.save();
                     ticksAndSections.setStroke(section.getColor());
-                    ticksAndSections.setLineWidth(width * 0.052);
+                    ticksAndSections.setLineWidth(scaledWidth * 0.052);
                     ticksAndSections.setLineCap(StrokeLineCap.BUTT);
                     ticksAndSections.strokeArc(xy, xy + offsetY, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
                     ticksAndSections.restore();
@@ -940,9 +943,10 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void drawAreas() {
         if (getSkinnable().getAreas().isEmpty()) return;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0895 * width : 0.025 * width;
-        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? width * 0.821 : width * 0.95;
-        double            offsetY           = -0.05 * height;
+        double            scaledWidth       = width * 0.9;
+        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1445 * scaledWidth : 0.081 * scaledWidth;
+        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledWidth * 0.821 : scaledWidth * 0.9505;
+        double            offsetY           = -0.1 * height;
         double            offset            = 90 - startAngle;
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
 
@@ -1011,8 +1015,9 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double            markerSize        = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0125 * width : 0.015 * width;
         double            pathHalf          = markerSize * 0.3;
+        double            scaledWidth       = width * 0.9;
         double            centerX           = width * 0.5;
-        double            centerY           = Pos.TOP_CENTER == getSkinnable().getKnobPosition() ? height * 0.05 : height * 0.95;
+        double            centerY           = Pos.TOP_CENTER == getSkinnable().getKnobPosition() ? height * 0.1 : height * 0.9;
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
         if (getSkinnable().areMarkersVisible()) {
             markerMap.keySet().forEach(marker -> {
@@ -1031,24 +1036,24 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         triangle.getElements().clear();
                         switch (tickLabelLocation) {
                             case OUTSIDE:
-                                triangle.getElements().add(new MoveTo(centerX + width * 0.38 * sinValue, centerY + width * 0.38 * cosValue));
+                                triangle.getElements().add(new MoveTo(centerX + scaledWidth * 0.38 * sinValue, centerY + scaledWidth * 0.38 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + width * 0.4075 * sinValue, centerY + width * 0.4075 * cosValue));
+                                triangle.getElements().add(new LineTo(centerX + scaledWidth * 0.4075 * sinValue, centerY + scaledWidth * 0.4075 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + width * 0.4075 * sinValue, centerY + width * 0.4075 * cosValue));
+                                triangle.getElements().add(new LineTo(centerX + scaledWidth * 0.4075 * sinValue, centerY + scaledWidth * 0.4075 * cosValue));
                                 triangle.getElements().add(new ClosePath());
                                 break;
                             case INSIDE:
                             default:
-                                triangle.getElements().add(new MoveTo(centerX + width * 0.465 * sinValue, centerY + width * 0.465 * cosValue));
+                                triangle.getElements().add(new MoveTo(centerX + scaledWidth * 0.465 * sinValue, centerY + scaledWidth * 0.465 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + width * 0.436 * sinValue, centerY + width * 0.436 * cosValue));
+                                triangle.getElements().add(new LineTo(centerX + scaledWidth * 0.436 * sinValue, centerY + scaledWidth * 0.436 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + width * 0.436 * sinValue, centerY + width * 0.436 * cosValue));
+                                triangle.getElements().add(new LineTo(centerX + scaledWidth * 0.436 * sinValue, centerY + scaledWidth * 0.436 * cosValue));
                                 triangle.getElements().add(new ClosePath());
                                 break;
                         }
@@ -1058,12 +1063,12 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         dot.setRadius(markerSize);
                         switch (tickLabelLocation) {
                             case OUTSIDE:
-                                dot.setCenterX(centerX + width * 0.3945 * sinValue);
-                                dot.setCenterY(centerY + width * 0.3945 * cosValue);
+                                dot.setCenterX(centerX + scaledWidth * 0.3945 * sinValue);
+                                dot.setCenterY(centerY + scaledWidth * 0.3945 * cosValue);
                                 break;
                             default:
-                                dot.setCenterX(centerX + width * 0.449 * sinValue);
-                                dot.setCenterY(centerY + width * 0.449 * cosValue);
+                                dot.setCenterX(centerX + scaledWidth * 0.449 * sinValue);
+                                dot.setCenterY(centerY + scaledWidth * 0.449 * cosValue);
                                 break;
                         }
                         break;
@@ -1073,28 +1078,28 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         standard.getElements().clear();
                         switch (tickLabelLocation) {
                             case OUTSIDE:
-                                standard.getElements().add(new MoveTo(centerX + width * 0.38 * sinValue, centerY + width * 0.38 * cosValue));
+                                standard.getElements().add(new MoveTo(centerX + scaledWidth * 0.38 * sinValue, centerY + scaledWidth * 0.38 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
-                                standard.getElements().add(new LineTo(centerX + width * 0.4075 * sinValue, centerY + width * 0.4075 * cosValue));
-                                standard.getElements().add(new LineTo(centerX + width * 0.4575 * sinValue, centerY + width * 0.4575 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledWidth * 0.4075 * sinValue, centerY + scaledWidth * 0.4075 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledWidth * 0.4575 * sinValue, centerY + scaledWidth * 0.4575 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
-                                standard.getElements().add(new LineTo(centerX + width * 0.4575 * sinValue, centerY + width * 0.4575 * cosValue));
-                                standard.getElements().add(new LineTo(centerX + width * 0.4075 * sinValue, centerY + width * 0.4075 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledWidth * 0.4575 * sinValue, centerY + scaledWidth * 0.4575 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledWidth * 0.4075 * sinValue, centerY + scaledWidth * 0.4075 * cosValue));
                                 standard.getElements().add(new ClosePath());
                                 break;
                             case INSIDE:
                             default:
-                                standard.getElements().add(new MoveTo(centerX + width * 0.465 * sinValue, centerY + width * 0.465 * cosValue));
+                                standard.getElements().add(new MoveTo(centerX + scaledWidth * 0.465 * sinValue, centerY + scaledWidth * 0.465 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
-                                standard.getElements().add(new LineTo(centerX + width * 0.436 * sinValue, centerY + width * 0.436 * cosValue));
-                                standard.getElements().add(new LineTo(centerX + width * 0.386 * sinValue, centerY + width * 0.386 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledWidth * 0.436 * sinValue, centerY + scaledWidth * 0.436 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledWidth * 0.386 * sinValue, centerY + scaledWidth * 0.386 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
-                                standard.getElements().add(new LineTo(centerX + width * 0.386 * sinValue, centerY + width * 0.386 * cosValue));
-                                standard.getElements().add(new LineTo(centerX + width * 0.436 * sinValue, centerY + width * 0.436 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledWidth * 0.386 * sinValue, centerY + scaledWidth * 0.386 * cosValue));
+                                standard.getElements().add(new LineTo(centerX + scaledWidth * 0.436 * sinValue, centerY + scaledWidth * 0.436 * cosValue));
                                 standard.getElements().add(new ClosePath());
                                 break;
                         }
@@ -1296,26 +1301,27 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void resizeText() {
         Pos    knobPosition = getSkinnable().getKnobPosition();
-        double maxWidth     = 0.25 * width;
-        double fontSize     = 0.06 * width;
+        double scaledWidth  = 0.9 * width;
+        double maxWidth     = 0.25 * scaledWidth;
+        double fontSize     = 0.06 * scaledWidth;
 
         titleText.setFont(Fonts.robotoMedium(fontSize));
         titleText.setText(getSkinnable().getTitle());
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, Pos.TOP_CENTER == knobPosition ? height * 0.525 : height * 0.32);
 
-        maxWidth = 0.4 * width;
-        fontSize = 0.04 * width;
+        maxWidth = 0.4 * scaledWidth;
+        fontSize = 0.04 * scaledWidth;
         unitText.setFont(Fonts.robotoRegular(fontSize));
         unitText.setText(getSkinnable().getUnit());
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
         unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, Pos.TOP_CENTER == knobPosition ? height * 0.43 : height * 0.465);
 
-        maxWidth = 0.25 * width;
+        maxWidth = 0.25 * scaledWidth;
         subTitleText.setFont(Fonts.robotoRegular(fontSize));
         subTitleText.setText(getSkinnable().getSubTitle());
         if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, fontSize); }
-        subTitleText.relocate(width * 0.57, Pos.TOP_CENTER == knobPosition ? 0: height * 0.9);
+        subTitleText.relocate(width * 0.57, Pos.TOP_CENTER == knobPosition ? height * 0.05 : height * 0.86);
     }
 
     private void resize() {
@@ -1331,31 +1337,32 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (width > 0 && height > 0) {
             Pos    knobPosition = getSkinnable().getKnobPosition();
             double centerX      = width * 0.5;
-            double centerY      = Pos.TOP_CENTER == knobPosition ? height * 0.05 : height * 0.95;
+            double centerY      = Pos.TOP_CENTER == knobPosition ? height * 0.1 : height * 0.9;
+            double scaledWidth  = width * 0.9;
             
             pane.setMaxSize(width, height);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
 
-            dropShadow.setRadius(0.008 * width);
-            dropShadow.setOffsetY(0.008 * width);
+            dropShadow.setRadius(0.008 * scaledWidth);
+            dropShadow.setOffsetY(0.008 * scaledWidth);
 
             backgroundInnerShadow.setOffsetX(0);
-            backgroundInnerShadow.setOffsetY(width * 0.03);
-            backgroundInnerShadow.setRadius(width * 0.04);
+            backgroundInnerShadow.setOffsetY(scaledWidth * 0.03);
+            backgroundInnerShadow.setRadius(scaledWidth * 0.04);
 
             pane.setEffect(getSkinnable().isInnerShadowEnabled() ? backgroundInnerShadow : null);
 
             ticksAndSectionsCanvas.setWidth(width);
             ticksAndSectionsCanvas.setHeight(width);
-            ticksAndSectionsCanvas.relocate(0, Pos.TOP_CENTER == getSkinnable().getKnobPosition() ? -width * 0.45 : 0);
+            ticksAndSectionsCanvas.relocate(0, Pos.TOP_CENTER == getSkinnable().getKnobPosition() ? -height * 0.8 : 0);
 
             markerPane.setPrefSize(width, width);
 
             boolean isFlatLed = LedType.FLAT == getSkinnable().getLedType();
-            ledSize = isFlatLed ? 0.05 * width : 0.06 * width;
+            ledSize = isFlatLed ? 0.05 * scaledWidth : 0.06 * scaledWidth;
             ledCanvas.setWidth(ledSize);
             ledCanvas.setHeight(ledSize);
-            ledCanvas.relocate(0.35 * width, Pos.TOP_CENTER == knobPosition ?  0 : 0.45 * width);
+            ledCanvas.relocate(0.35 * width, Pos.TOP_CENTER == knobPosition ?  0.025 * width : 0.425 * width);
             ledOffShadow = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
             ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
             if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getLedColor(), 0.36 * ledSize, 0, 0, 0));
@@ -1363,40 +1370,40 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resizeText();
 
             if (getSkinnable().isLcdVisible()) {
-                lcd.setWidth(0.4 * width);
-                lcd.setHeight(0.114 * width);
-                lcd.setArcWidth(0.0125 * width);
-                lcd.setArcHeight(0.0125 * width);
-                lcd.relocate((width - lcd.getWidth()) * 0.5, Pos.TOP_CENTER == knobPosition ? 0.189 * height:  0.583 * height);
+                lcd.setWidth(0.4 * scaledWidth);
+                lcd.setHeight(0.114 * scaledWidth);
+                lcd.setArcWidth(0.0125 * scaledWidth);
+                lcd.setArcHeight(0.0125 * scaledWidth);
+                lcd.relocate((width - lcd.getWidth()) * 0.5, Pos.TOP_CENTER == knobPosition ? 0.215 * height:  0.57 * height);
 
                 switch(getSkinnable().getLcdFont()) {
                     case LCD:
-                        valueText.setFont(Fonts.digital(0.108 * width));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.31 * height : 0.71 * height);
+                        valueText.setFont(Fonts.digital(0.108 * scaledWidth));
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.32 * height : 0.7 * height);
                         break;
                     case DIGITAL:
-                        valueText.setFont(Fonts.digitalReadout(0.105 * width));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.32 * height : 0.72 * height);
+                        valueText.setFont(Fonts.digitalReadout(0.105 * scaledWidth));
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.33 * height : 0.71 * height);
                         break;
                     case DIGITAL_BOLD:
-                        valueText.setFont(Fonts.digitalReadoutBold(0.105 * width));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.32 * height : 0.72 * height);
+                        valueText.setFont(Fonts.digitalReadoutBold(0.105 * scaledWidth));
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.33 * height : 0.71 * height);
                         break;
                     case ELEKTRA:
-                        valueText.setFont(Fonts.elektra(0.1116 * width));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.315 * height : 0.715 * height);
+                        valueText.setFont(Fonts.elektra(0.1116 * scaledWidth));
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.325 * height : 0.705 * height);
                         break;
                     case STANDARD:
                     default:
-                        valueText.setFont(Fonts.robotoMedium(0.09 * width));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.31 * height : 0.71 * height);
+                        valueText.setFont(Fonts.robotoMedium(0.09 * scaledWidth));
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.32 * height : 0.70 * height);
                         break;
                 }
-                valueText.setTranslateX((0.691 * width - valueText.getLayoutBounds().getWidth()));
+                valueText.setTranslateX((0.75 * scaledWidth - valueText.getLayoutBounds().getWidth()));
             } else {
-                valueText.setFont(Fonts.robotoMedium(width * 0.1));
+                valueText.setFont(Fonts.robotoMedium(scaledWidth * 0.1));
                 valueText.setTranslateX((width - valueText.getLayoutBounds().getWidth()) * 0.5);
-                valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? height * 0.27 : height * 0.72);
+                valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? height * 0.29 : height * 0.7);
             }
 
             double needleWidth  = width * getSkinnable().getNeedleSize().FACTOR;
