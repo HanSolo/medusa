@@ -86,15 +86,23 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(HSkin.class)
+                            .skin(VSkin.class)
+                            .prefSize(500, 500)
+                            .backgroundPaint(Color.BLACK)
+                            .knobColor(Color.rgb(0, 0, 0))
+                            .foregroundBaseColor(Color.WHITE)
                             .animated(true)
                             .title("Fuel")
                             .valueVisible(false)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
-                            .knobPosition(Pos.BOTTOM_LEFT)
-                            //.scaleDirection(ScaleDirection.COUNTER_CLOCKWISE)
+                            .knobPosition(Pos.CENTER_LEFT)
+                            .scaleDirection(ScaleDirection.COUNTER_CLOCKWISE)
                             .minorTickMarksVisible(false)
                             .mediumTickMarksVisible(false)
+                            .majorTickMarksVisible(true)
+                            .majorTickMarkType(TickMarkType.BOX)
+                            .mediumTickMarkType(TickMarkType.BOX)
+                            .minorTickMarkType(TickMarkType.BOX)
                             .sectionsVisible(true)
                             .sections(new Section(0, 0.1, Color.rgb(200, 0, 0, 0.6)))
                             .minValue(0)
@@ -126,11 +134,13 @@ public class Test extends Application {
         stage.setScene(scene);
         stage.show();
 
+        //gauge.setValue(0.5);
+
         // Calculate number of nodes
         calcNoOfNodes(gauge);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        timer.start();
+        //timer.start();
     }
 
     @Override public void stop() {

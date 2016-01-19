@@ -87,7 +87,7 @@ public class Gauge extends Control {
     public enum KnobType { STANDARD, PLAIN, METAL, FLAT }
     public enum LedType { STANDARD, FLAT }
     public enum TickLabelOrientation { ORTHOGONAL,  HORIZONTAL, TANGENT }
-    public enum TickMarkType { LINE, DOT, TRIANGLE, DIAMOND, TICK_LABEL }
+    public enum TickMarkType { LINE, DOT, TRIANGLE, BOX, TICK_LABEL }
     public enum NumberFormat {
         AUTO("0"),
         STANDARD("0"),

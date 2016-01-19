@@ -716,15 +716,15 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 isNotZero = Double.compare(0d, counter) != 0;
                 TickMarkType tickMarkType = null;
                 if (majorTickMarksVisible) {
+                    tickMarkType = majorTickMarkType;
                     ticksAndSections.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
                     ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
-                    ticksAndSections.setLineWidth(size * 0.0055);
-                    tickMarkType = majorTickMarkType;
+                    ticksAndSections.setLineWidth(size * (TickMarkType.BOX == tickMarkType ? 0.016 : 0.0055));
                 } else if (minorTickMarksVisible) {
+                    tickMarkType = minorTickMarkType;
                     ticksAndSections.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
-                    ticksAndSections.setLineWidth(size * 0.00225);
-                    tickMarkType = minorTickMarkType;
+                    ticksAndSections.setLineWidth(size * (TickMarkType.BOX == tickMarkType ? 0.007 : 0.00225));
                 }
                 if (fullRange && !isNotZero) {
                     ticksAndSections.setFill(zeroColor);
@@ -829,6 +829,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     case DOT:
                         Helper.drawDot(ticksAndSections, dotMediumCenterX - mediumHalfDotSize, dotMediumCenterY - mediumHalfDotSize, mediumDotSize);
                         break;
+                    case BOX:
+                        ticksAndSections.setLineWidth(size * 0.009);
+                        if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
+                            Helper.drawLine(ticksAndSections, innerPointX, innerPointY, outerMediumPointX, outerMediumPointY);
+                        } else {
+                            Helper.drawLine(ticksAndSections, innerMediumPointX, innerMediumPointY, outerPointX, outerPointY);
+                        }
+                        break;
                     case LINE:
                     default:
                         ticksAndSections.setLineWidth(size * 0.0035);
@@ -851,6 +859,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                             break;
                         case DOT:
                             Helper.drawDot(ticksAndSections, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
+                            break;
+                        case BOX:
+                            ticksAndSections.setLineWidth(size * 0.007);
+                            if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
+                                Helper.drawLine(ticksAndSections, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
+                            } else {
+                                Helper.drawLine(ticksAndSections, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
+                            }
                             break;
                         case LINE:
                         default:
