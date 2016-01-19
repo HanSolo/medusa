@@ -23,12 +23,15 @@ import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.GaugeSkin;
+import eu.hansolo.medusa.skins.HSkin;
 import eu.hansolo.medusa.skins.IndicatorSkin;
 import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
+import eu.hansolo.medusa.skins.QuarterSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SlimSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
+import eu.hansolo.medusa.skins.VSkin;
 import eu.hansolo.medusa.tools.GradientLookup;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.animation.Interpolator;
@@ -2186,12 +2189,15 @@ public class Gauge extends Control {
                 break;
             case QUARTER     :
                 setKnobPosition(Pos.BOTTOM_RIGHT);
+                super.setSkin(new QuarterSkin(Gauge.this));
                 break;
             case HORIZONTAL:
                 setKnobPosition(Pos.BOTTOM_CENTER);
+                super.setSkin(new HSkin(Gauge.this));
                 break;
             case VERTICAL:
                 setKnobPosition(Pos.CENTER_RIGHT);
+                super.setSkin(new VSkin(Gauge.this));
                 break;
             case GAUGE       :
             default          : super.setSkin(new GaugeSkin(Gauge.this)); break;
