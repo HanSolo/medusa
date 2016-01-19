@@ -1120,7 +1120,7 @@ public class Gauge extends Control {
         } else {
             scaleDirection.set(DIRECTION);
         }
-        fireUpdateEvent(RESIZE_EVENT);
+        fireUpdateEvent(RECALC_EVENT);
     }
     public ObjectProperty<ScaleDirection> scaleDirectionProperty() {
         if (null == scaleDirection) {
