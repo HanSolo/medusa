@@ -186,12 +186,12 @@ public class FGaugeDemo extends Application {
                             .onThresholdExceeded(thresholdEvent -> System.out.println("Threshold exceeded"))    // Defines a handler that will be triggered if checkThreshold==true and the threshold is exceeded
                             .onThresholdUnderrun(thresholdEvent -> System.out.println("Threshold underrun"))    // Defines a handler that will be triggered if checkThreshold==true and the threshold is underrun
                             // Related to Gradient Bar
-                            .colorGradientEnabled(true)                                                         // Defines if a gradient filled bar should be visible to visualize a range
-                            .gradientLookupStops(new Stop(0.0, Color.BLUE),// Defines a conical color gradient that will be use to color the gradient bar
-                                                 new Stop(0.25, Color.CYAN),
-                                                 new Stop(0.5, Color.LIME),
-                                                 new Stop(0.75, Color.YELLOW),
-                                                 new Stop(1.0, Color.RED))
+                            .gradientBarEnabled(true)                                                         // Defines if a gradient filled bar should be visible to visualize a range
+                            .gradientBarStops(new Stop(0.0, Color.BLUE),// Defines a conical color gradient that will be use to color the gradient bar
+                                              new Stop(0.25, Color.CYAN),
+                                              new Stop(0.5, Color.LIME),
+                                              new Stop(0.75, Color.YELLOW),
+                                              new Stop(1.0, Color.RED))
                             // Related to Markers
                             .markersVisible(true)                                                               // Defines if markers will be visible
                             .markers(marker1, marker2)                                                          // Defines markers that will be drawn

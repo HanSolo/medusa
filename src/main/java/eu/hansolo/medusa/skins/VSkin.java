@@ -860,7 +860,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double             offset            = 90 - startAngle;
         double             offsetX           = -0.05 * width;
         ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
-        List<Stop>         stops             = getSkinnable().getGradientLookupStops();
+        List<Stop>         stops             = getSkinnable().getGradientBarStops();
         Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
 
         stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
@@ -1380,7 +1380,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ticksAndSectionsCanvas.setCache(false);
         ticksAndSections.clearRect(0, 0, height, height);
         if (getSkinnable().areAreasVisible()) drawAreas();
-        if (getSkinnable().isColorGradientEnabled() && getSkinnable().getGradientLookup() != null) {
+        if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
             drawGradientBar();
         } else if (getSkinnable().areSectionsVisible()) {
             drawSections();

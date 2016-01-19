@@ -105,7 +105,7 @@ public class Gauge extends Control {
     public enum TickLabelLocation { INSIDE, OUTSIDE }
     public enum LcdFont { STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA }
     public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE }
-    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI, MODERN, SIMPLE, SLIM, SPACE_X, QUARTER }
+    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI, MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL }
 
     public  static final Color                   DARK_COLOR           = Color.rgb(36, 36, 36);
     public  static final Color                   BRIGHT_COLOR         = Color.rgb(223, 223, 223);
@@ -307,8 +307,8 @@ public class Gauge extends Control {
     private BooleanProperty                      ledBlinking;
     private Orientation                          _orientation;
     private ObjectProperty<Orientation>          orientation;
-    private boolean                              _colorGradientEnabled;
-    private BooleanProperty                      colorGradientEnabled;
+    private boolean                              _gradientBarEnabled;
+    private BooleanProperty                      gradientBarEnabled;
     private GradientLookup                       gradientLookup;
     private boolean                              _customTickLabelsEnabled;
     private BooleanProperty                      customTickLabelsEnabled;
@@ -467,7 +467,7 @@ public class Gauge extends Control {
         _ledOn                            = false;
         _ledBlinking                      = false;
         _orientation                      = Orientation.HORIZONTAL;
-        _colorGradientEnabled             = false;
+        _gradientBarEnabled               = false;
         _customTickLabelsEnabled          = false;
         customTickLabels                  = FXCollections.observableArrayList();
         _interactive                      = false;
@@ -1942,18 +1942,18 @@ public class Gauge extends Control {
         return orientation;
     }
 
-    public boolean isColorGradientEnabled() { return null == colorGradientEnabled ? _colorGradientEnabled : colorGradientEnabled.get(); }
-    public void setColorGradientEnabled(final boolean ENABLED) {
-        if (null == colorGradientEnabled) {
-            _colorGradientEnabled = ENABLED;
+    public boolean isGradientBarEnabled() { return null == gradientBarEnabled ? _gradientBarEnabled : gradientBarEnabled.get(); }
+    public void setGradientBarEnabled(final boolean ENABLED) {
+        if (null == gradientBarEnabled) {
+            _gradientBarEnabled = ENABLED;
         } else {
-            colorGradientEnabled.set(ENABLED);
+            gradientBarEnabled.set(ENABLED);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
-    public BooleanProperty colorGradientEnabledProperty() {
-        if (null == colorGradientEnabled) { colorGradientEnabled = new SimpleBooleanProperty(Gauge.this, "colorGradientEnabled", _colorGradientEnabled); }
-        return colorGradientEnabled;
+    public BooleanProperty gradientBarEnabledProperty() {
+        if (null == gradientBarEnabled) { gradientBarEnabled = new SimpleBooleanProperty(Gauge.this, "colorGradientEnabled", _gradientBarEnabled); }
+        return gradientBarEnabled;
     }
 
     public GradientLookup getGradientLookup() {
@@ -1964,9 +1964,9 @@ public class Gauge extends Control {
         gradientLookup = GRADIENT_LOOKUP;
         fireUpdateEvent(REDRAW_EVENT);
     }
-    public List<Stop> getGradientLookupStops() { return getGradientLookup().getStops(); }
-    public void setGradientLookupStops(final Stop... STOPS) { setGradientLookupStops(Arrays.asList(STOPS)); }
-    public void setGradientLookupStops(final List<Stop> STOPS) {
+    public List<Stop> getGradientBarStops() { return getGradientLookup().getStops(); }
+    public void setGradientBarStops(final Stop... STOPS) { setGradientBarStops(Arrays.asList(STOPS)); }
+    public void setGradientBarStops(final List<Stop> STOPS) {
         getGradientLookup().setStops(STOPS);
         fireUpdateEvent(REDRAW_EVENT);
     }
@@ -2116,10 +2116,10 @@ public class Gauge extends Control {
             case INDICATOR   :
                 setKnobPosition(Pos.BOTTOM_CENTER);
                 setValueVisible(false);
-                setColorGradientEnabled(false);
-                setGradientLookupStops(new Stop(0.0, Color.rgb(34,180,11)),
-                                       new Stop(0.5, Color.rgb(255,146,0)),
-                                       new Stop(1.0, Color.rgb(255,0,39)));
+                setGradientBarEnabled(false);
+                setGradientBarStops(new Stop(0.0, Color.rgb(34,180,11)),
+                                    new Stop(0.5, Color.rgb(255,146,0)),
+                                    new Stop(1.0, Color.rgb(255,0,39)));
                 setTickLabelsVisible(false);
                 setNeedleColor(Color.rgb(71,71,71));
                 setBarBackgroundColor(Color.rgb(232,231,223));
@@ -2186,6 +2186,12 @@ public class Gauge extends Control {
                 break;
             case QUARTER     :
                 setKnobPosition(Pos.BOTTOM_RIGHT);
+                break;
+            case HORIZONTAL:
+                setKnobPosition(Pos.BOTTOM_CENTER);
+                break;
+            case VERTICAL:
+                setKnobPosition(Pos.CENTER_RIGHT);
                 break;
             case GAUGE       :
             default          : super.setSkin(new GaugeSkin(Gauge.this)); break;

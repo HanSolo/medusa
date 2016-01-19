@@ -878,7 +878,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double             offsetY           = Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.475 : 0;
         double             offset            = 90 - startAngle;
         ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
-        List<Stop>         stops             = getSkinnable().getGradientLookupStops();
+        List<Stop>         stops             = getSkinnable().getGradientBarStops();
         Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
 
         stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
@@ -1607,7 +1607,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ticksAndSectionsCanvas.setCache(false);
         ticksAndSections.clearRect(0, 0, size * 1.9, size * 1.9);
         if (getSkinnable().areAreasVisible()) drawAreas();
-        if (getSkinnable().isColorGradientEnabled() && getSkinnable().getGradientLookup() != null) {
+        if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
             drawGradientBar();
         } else if (getSkinnable().areSectionsVisible()) {
             drawSections();

@@ -190,12 +190,12 @@ public class GaugeDemo extends Application {
                         .onThresholdExceeded(thresholdEvent -> System.out.println("Threshold exceeded")) // Handler (triggered if checkThreshold==true and the threshold is exceeded)
                         .onThresholdUnderrun(thresholdEvent -> System.out.println("Threshold underrun")) // Handler (triggered if checkThreshold==true and the threshold is underrun)
                         // Related to Gradient Bar
-                        .colorGradientEnabled(false)                                                     // Should gradient filled bar be visible to visualize a range
-                        .gradientLookupStops(new Stop(0.0, Color.BLUE),                                  // Color gradient that will be use to color fill bar
-                                             new Stop(0.25, Color.CYAN),
-                                             new Stop(0.5, Color.LIME),
-                                             new Stop(0.75, Color.YELLOW),
-                                             new Stop(1.0, Color.RED))
+                        .gradientBarEnabled(false)                                                       // Should gradient filled bar be visible to visualize a range
+                        .gradientBarStops(new Stop(0.0, Color.BLUE),                                     // Color gradient that will be use to color fill bar
+                                          new Stop(0.25, Color.CYAN),
+                                          new Stop(0.5, Color.LIME),
+                                          new Stop(0.75, Color.YELLOW),
+                                          new Stop(1.0, Color.RED))
                         // Related to Sections
                         .sectionsVisible(false)                                                          // Should sections be visible
                         .sections(section1, section2)                                                    // Sections that will be drawn (won't be drawn if colorGradientEnabled==true)

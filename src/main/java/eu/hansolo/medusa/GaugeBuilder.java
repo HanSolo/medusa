@@ -31,6 +31,7 @@ import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.GaugeSkin;
+import eu.hansolo.medusa.skins.HSkin;
 import eu.hansolo.medusa.skins.IndicatorSkin;
 import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
@@ -38,6 +39,7 @@ import eu.hansolo.medusa.skins.QuarterSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SlimSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
+import eu.hansolo.medusa.skins.VSkin;
 import eu.hansolo.medusa.tools.GradientLookup;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -90,13 +92,14 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B) this;
     }
 
-    public final B skin(final SkinType SKIN_TYPE) {
-        switch (SKIN_TYPE) {
+    public final B skinType(final SkinType TYPE) {
+        switch (TYPE) {
             case AMP         : skinClass = AmpSkin.class; break;
             case BULLET_CHART: skinClass = BulletChartSkin.class; break;
             case DASHBOARD   : skinClass = DashboardSkin.class; break;
             case FLAT        : skinClass = FlatSkin.class; break;
             case GAUGE       : skinClass = GaugeSkin.class; break;
+            case HORIZONTAL  : skinClass = HSkin.class; break;
             case INDICATOR   : skinClass = IndicatorSkin.class; break;
             case KPI         : skinClass = KpiSkin.class; break;
             case MODERN      : skinClass = ModernSkin.class; break;
@@ -104,6 +107,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             case SIMPLE      : skinClass = SimpleSkin.class; break;
             case SLIM        : skinClass = SlimSkin.class; break;
             case SPACE_X     : skinClass = SpaceXSkin.class; break;
+            case VERTICAL    : skinClass = VSkin.class; break;
         }
         return (B)this;
     }
@@ -563,8 +567,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
-    public final B colorGradientEnabled(final boolean ENABLED) {
-        properties.put("colorGradientEnabled", new SimpleBooleanProperty(ENABLED));
+    public final B gradientBarEnabled(final boolean ENABLED) {
+        properties.put("gradientBarEnabled", new SimpleBooleanProperty(ENABLED));
         return (B)this;
     }
 
@@ -573,13 +577,13 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
-    public final B gradientLookupStops(final Stop... STOPS) {
-        properties.put("gradientLookupStopsArray", new SimpleObjectProperty<>(STOPS));
+    public final B gradientBarStops(final Stop... STOPS) {
+        properties.put("gradientBarStopsArray", new SimpleObjectProperty<>(STOPS));
         return (B)this;
     }
 
-    public final B gradientLookupStops(final List<Stop> STOPS) {
-        properties.put("gradientLookupStopsList", new SimpleObjectProperty<>(STOPS));
+    public final B gradientBarStops(final List<Stop> STOPS) {
+        properties.put("gradientBarStopsList", new SimpleObjectProperty<>(STOPS));
         return (B)this;
     }
 
@@ -772,16 +776,20 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setNeedleColor(Color.rgb(74,74,74));
             } else if (skinClass == IndicatorSkin.class) {
                 CONTROL.setValueVisible(false);
-                CONTROL.setColorGradientEnabled(false);
-                CONTROL.setGradientLookupStops(new Stop(0.0, Color.rgb(34,180,11)),
-                                               new Stop(0.5, Color.rgb(255,146,0)),
-                                               new Stop(1.0, Color.rgb(255,0,39)));
+                CONTROL.setGradientBarEnabled(false);
+                CONTROL.setGradientBarStops(new Stop(0.0, Color.rgb(34,180,11)),
+                                            new Stop(0.5, Color.rgb(255,146,0)),
+                                            new Stop(1.0, Color.rgb(255,0,39)));
                 CONTROL.setTickLabelsVisible(false);
                 CONTROL.setNeedleColor(Color.rgb(71,71,71));
                 CONTROL.setBarBackgroundColor(Color.rgb(232,231,223));
                 CONTROL.setBarColor(Color.rgb(255,0,39));
             } else if (skinClass == QuarterSkin.class) {
                 CONTROL.setKnobPosition(Pos.BOTTOM_RIGHT);
+            } else if (skinClass == HSkin.class) {
+                CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
+            } else if (skinClass == VSkin.class) {
+                CONTROL.setKnobPosition(Pos.CENTER_RIGHT);
             }
         }
 
@@ -821,11 +829,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             CONTROL.setMarkers(((ObjectProperty<List<Marker>>) properties.get("markersList")).get());
         }
 
-        if (properties.keySet().contains("gradientLookupStopsArray")) {
-            CONTROL.setGradientLookupStops(((ObjectProperty<Stop[]>) properties.get("gradientLookupStopsArray")).get());
+        if (properties.keySet().contains("gradientBarStopsArray")) {
+            CONTROL.setGradientBarStops(((ObjectProperty<Stop[]>) properties.get("gradientBarStopsArray")).get());
         }
-        if (properties.keySet().contains("gradientLookupStopsList")) {
-            CONTROL.setGradientLookupStops(((ObjectProperty<List<Stop>>) properties.get("gradientLookupStopsList")).get());
+        if (properties.keySet().contains("gradientBarStopsList")) {
+            CONTROL.setGradientBarStops(((ObjectProperty<List<Stop>>) properties.get("gradientBarStopsList")).get());
         }
 
         if (properties.keySet().contains("customTickLabelsArray")) {
@@ -1026,8 +1034,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setLedOn(((BooleanProperty) properties.get(key)).get());
             } else if ("orientation".equals(key)) {
                 CONTROL.setOrientation(((ObjectProperty<Orientation>) properties.get(key)).get());
-            } else if("colorGradientEnabled".equals(key)) {
-                CONTROL.setColorGradientEnabled(((BooleanProperty) properties.get(key)).get());
+            } else if("gradientBarEnabled".equals(key)) {
+                CONTROL.setGradientBarEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("gradientLookup".equals(key)) {
                 CONTROL.setGradientLookup(((ObjectProperty<GradientLookup>) properties.get(key)).get());
             } else if ("customTickLabelsEnabled".equals(key)) {

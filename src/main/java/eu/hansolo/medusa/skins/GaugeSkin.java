@@ -877,7 +877,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
         double             offset            = 90 - startAngle;
         ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
-        List<Stop>         stops             = getSkinnable().getGradientLookupStops();
+        List<Stop>         stops             = getSkinnable().getGradientBarStops();
         Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
 
         stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()));
@@ -1425,7 +1425,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ticksAndSectionsCanvas.setCache(false);
         ticksAndSections.clearRect(0, 0, size, size);
         if (getSkinnable().areAreasVisible()) drawAreas();
-        if (getSkinnable().isColorGradientEnabled() && getSkinnable().getGradientLookup() != null) {
+        if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
             drawGradientBar();
         } else if (getSkinnable().areSectionsVisible()) {
             drawSections();

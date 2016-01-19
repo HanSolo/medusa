@@ -95,8 +95,8 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         minValue             = gauge.getMinValue();
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;
-        colorGradientEnabled = gauge.isColorGradientEnabled();
-        noOfGradientStops    = gauge.getGradientLookupStops().size();
+        colorGradientEnabled = gauge.isGradientBarEnabled();
+        noOfGradientStops    = gauge.getGradientBarStops().size();
         sectionsVisible      = gauge.areSectionsVisible();
         sections             = gauge.getSections();
         formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
@@ -243,8 +243,8 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
-        colorGradientEnabled = getSkinnable().isColorGradientEnabled();
-        noOfGradientStops    = getSkinnable().getGradientLookupStops().size();
+        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
+        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
         sectionsVisible      = getSkinnable().areSectionsVisible();
         sections             = getSkinnable().getSections();
 

@@ -92,8 +92,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         super(gauge);
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;
-        colorGradientEnabled = gauge.isColorGradientEnabled();
-        noOfGradientStops    = gauge.getGradientLookupStops().size();
+        colorGradientEnabled = gauge.isGradientBarEnabled();
+        noOfGradientStops    = gauge.getGradientBarStops().size();
         sectionsVisible      = gauge.areSectionsVisible();
         sections             = gauge.getSections();
         currentValueAngle    = 0;
@@ -246,8 +246,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void redraw() {
         formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
-        colorGradientEnabled = getSkinnable().isColorGradientEnabled();
-        noOfGradientStops    = getSkinnable().getGradientLookupStops().size();
+        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
+        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
         sectionsVisible      = getSkinnable().areSectionsVisible();
         sections             = getSkinnable().getSections();
 

@@ -86,11 +86,13 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(VSkin.class)
+                            .skin(HSkin.class)
                             .animated(true)
                             .title("Fuel")
                             .valueVisible(false)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
+                            .knobPosition(Pos.BOTTOM_LEFT)
+                            //.scaleDirection(ScaleDirection.COUNTER_CLOCKWISE)
                             .minorTickMarksVisible(false)
                             .mediumTickMarksVisible(false)
                             .sectionsVisible(true)
