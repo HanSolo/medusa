@@ -918,7 +918,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.105 * scaledSize : 0.03875 * scaledSize;
         double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledSize * 0.79 : scaledSize * 0.925;
-        double            offsetX           = Pos.BOTTOM_RIGHT == knobPosition || Pos.TOP_RIGHT == knobPosition ? 0 : -scaledSize * 0.475;
+        double            offsetX           = Pos.BOTTOM_RIGHT == knobPosition || Pos.TOP_RIGHT == knobPosition ? 0 : -scaledSize * 0.4765;
         double            offsetY           = Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.475 : 0;
         double            offset            = 90 - startAngle;
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
