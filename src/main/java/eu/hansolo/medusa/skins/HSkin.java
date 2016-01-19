@@ -882,22 +882,23 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         TickLabelLocation  tickLabelLocation = getSkinnable().getTickLabelLocation();
         double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * width : 0.0515 * width;
         double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? width * 0.77 : width * 0.897;
+        double             offsetY           = -0.05 * height;
         double             offset            = 90 - startAngle;
         ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
         List<Stop>         stops             = getSkinnable().getGradientLookupStops();
         Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
 
         stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
-        double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? (startAngle - 90) : (startAngle + 180);
+        double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? startAngle : (startAngle + 180);
         AngleConicalGradient gradient     = new AngleConicalGradient(width * 0.5, width * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
 
         double barStartAngle  = ScaleDirection.CLOCKWISE == scaleDirection ? -minValue * angleStep : minValue * angleStep;
         double barAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? getSkinnable().getRange() * angleStep : -getSkinnable().getRange() * angleStep;
         ticksAndSections.save();
-        ticksAndSections.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.026 * width, xy - 0.026 * width, wh + 0.052 * width, wh + 0.052 * width)));
+        ticksAndSections.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.026 * width, xy - 0.026 * width + offsetY, wh + 0.052 * width, wh + 0.052 * width)));
         ticksAndSections.setLineWidth(width * 0.052);
         ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-        ticksAndSections.strokeArc(xy, xy, wh, wh, -(offset + barStartAngle), -barAngleExtend, ArcType.OPEN);
+        ticksAndSections.strokeArc(xy, xy + offsetY, wh, wh, -(offset + barStartAngle), -barAngleExtend, ArcType.OPEN);
         ticksAndSections.restore();
     }
 
