@@ -869,25 +869,29 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawGradientBar() {
+        Pos                knobPosition      = getSkinnable().getKnobPosition();
         TickLabelLocation  tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * size : 0.0515 * size;
-        double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
+        double             scaledSize        = size * 1.9;
+        double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.105 * scaledSize : 0.03875 * scaledSize;
+        double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledSize * 0.79 : scaledSize * 0.925;
+        double             offsetX           = Pos.BOTTOM_RIGHT == knobPosition || Pos.TOP_RIGHT == knobPosition ? 0 : -scaledSize * 0.475;
+        double             offsetY           = Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.475 : 0;
         double             offset            = 90 - startAngle;
         ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
         List<Stop>         stops             = getSkinnable().getGradientLookupStops();
         Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
 
         stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
-        double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? (startAngle - 90) : (startAngle + 180);
-        AngleConicalGradient gradient     = new AngleConicalGradient(size * 0.5, size * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
+        double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? (Pos.TOP_LEFT == knobPosition || Pos.BOTTOM_RIGHT == knobPosition ? startAngle : 180 - startAngle) : (startAngle + 180);
+        AngleConicalGradient gradient     = new AngleConicalGradient(scaledSize * 0.5, scaledSize * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
 
         double barStartAngle  = ScaleDirection.CLOCKWISE == scaleDirection ? -minValue * angleStep : minValue * angleStep;
         double barAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? getSkinnable().getRange() * angleStep : -getSkinnable().getRange() * angleStep;
         ticksAndSections.save();
-        ticksAndSections.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.026 * size, xy - 0.026 * size, wh + 0.052 * size, wh + 0.052 * size)));
-        ticksAndSections.setLineWidth(size * 0.052);
+        ticksAndSections.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.026 * scaledSize + offsetX, xy - 0.026 * scaledSize + offsetY, wh + 0.052 * scaledSize, wh + 0.052 * scaledSize)));
+        ticksAndSections.setLineWidth(scaledSize * 0.052);
         ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-        ticksAndSections.strokeArc(xy, xy, wh, wh, -(offset + barStartAngle), -barAngleExtend, ArcType.OPEN);
+        ticksAndSections.strokeArc(xy + offsetX, xy + offsetY, wh, wh, -(offset + barStartAngle), -barAngleExtend, ArcType.OPEN);
         ticksAndSections.restore();
     }
 
