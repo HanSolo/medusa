@@ -32,6 +32,7 @@ import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
@@ -78,6 +79,7 @@ import javafx.scene.transform.Rotate;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -141,6 +143,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Tooltip                  buttonTooltip;
     private Tooltip                  thresholdTooltip;
     private String                   formatString;
+    private double                   minValue;
+    private double                   maxValue;
 
 
     // ******************** Constructors **************************************
@@ -150,6 +154,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleRange   = gauge.getAngleRange();
         angleStep    = gauge.getAngleStep();
         oldValue     = gauge.getValue();
+        minValue     = gauge.getMinValue();
+        maxValue     = gauge.getMaxValue();
         limitString  = "";
         formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
         mouseHandler = event -> handleMouseEvent(event);
@@ -205,7 +211,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         lcd.setVisible(getSkinnable().isLcdVisible());
 
         needleRotate = new Rotate(180 - startAngle);
-        needleRotate.setAngle(needleRotate.getAngle() + (getSkinnable().getValue() - oldValue - getSkinnable().getMinValue()) * angleStep);
+        needleRotate.setAngle(needleRotate.getAngle() + (getSkinnable().getValue() - oldValue - minValue) * angleStep);
         needleMoveTo1       = new MoveTo();
         needleCubicCurveTo2 = new CubicCurveTo();
         needleCubicCurveTo3 = new CubicCurveTo();
@@ -254,7 +260,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setMouseTransparent(true);
 
         // Set initial value
-        double targetAngle = 180 - startAngle + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
+        double targetAngle = 180 - startAngle + (getSkinnable().getCurrentValue() - minValue) * angleStep;
         targetAngle        = Helper.clamp(180 - startAngle, 180 - startAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
 
@@ -308,12 +314,20 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             // Check sections for value and fire section events
             if (getSkinnable().getCheckSectionsForValue()) {
-                for (Section section : getSkinnable().getSections()) { section.checkForValue(currentValue); }
+                List<Section> sections = getSkinnable().getSections();
+                int listSize = sections.size();
+                for (int i = sections.size() ; i > listSize ; i--) {
+                    sections.get(i).checkForValue(currentValue);
+                }
             }
 
             // Check areas for value and fire section events
             if (getSkinnable().getCheckAreasForValue()) {
-                for (Section area : getSkinnable().getAreas()) { area.checkForValue(currentValue); }
+                List<Section> areas = getSkinnable().getSections();
+                int listSize = areas.size();
+                for (int i = areas.size() ; i > listSize ; i--) {
+                    areas.get(i).checkForValue(currentValue);
+                }
             }
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
@@ -350,14 +364,16 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             startAngle = getSkinnable().getStartAngle();
             angleRange = getSkinnable().getAngleRange();
             angleStep  = getSkinnable().getAngleStep();
-            needleRotate.setAngle((180 - startAngle) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
-            if (getSkinnable().getValue() < getSkinnable().getMinValue()) {
-                getSkinnable().setValue(getSkinnable().getMinValue());
-                oldValue = getSkinnable().getMinValue();
+            minValue   = getSkinnable().getMinValue();
+            maxValue   = getSkinnable().getMaxValue();
+            needleRotate.setAngle((180 - startAngle) + (getSkinnable().getValue() - minValue) * angleStep);
+            if (getSkinnable().getValue() < minValue) {
+                getSkinnable().setValue(minValue);
+                oldValue = minValue;
             }
-            if (getSkinnable().getValue() > getSkinnable().getMaxValue()) {
-                getSkinnable().setValue(getSkinnable().getMaxValue());
-                oldValue = getSkinnable().getMaxValue();
+            if (getSkinnable().getValue() > maxValue) {
+                getSkinnable().setValue(maxValue);
+                oldValue = maxValue;
             }
             resize();
             redraw();
@@ -394,10 +410,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double startOffsetAngle = 180 - startAngle;
         double targetAngle;
         if (ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection()) {
-            targetAngle = startOffsetAngle + (VALUE - getSkinnable().getMinValue()) * angleStep;
+            targetAngle = startOffsetAngle + (VALUE - minValue) * angleStep;
             targetAngle = Helper.clamp(startOffsetAngle, startOffsetAngle + angleRange, targetAngle);
         } else {
-            targetAngle = startOffsetAngle - (VALUE - getSkinnable().getMinValue()) * angleStep;
+            targetAngle = startOffsetAngle - (VALUE - minValue) * angleStep;
             targetAngle = Helper.clamp(startOffsetAngle - angleRange, startOffsetAngle, targetAngle);
         }
         needleRotate.setAngle(targetAngle);
@@ -413,21 +429,20 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ticksAndSections.setLineCap(StrokeLineCap.BUTT);
         double               sinValue;
         double               cosValue;
-        double               centerX              = size * 0.5;
-        double               centerY              = size * 0.5;
-        int                  decimals             = getSkinnable().getTickLabelDecimals();
-        double               minValue             = getSkinnable().getMinValue();
-        double               maxValue             = getSkinnable().getMaxValue();
-        double               minorTickSpace       = getSkinnable().getMinorTickSpace();
-        double               tmpAngleStep         = angleStep * minorTickSpace;
-        TickLabelOrientation tickLabelOrientation = getSkinnable().getTickLabelOrientation();
-        TickLabelLocation    tickLabelLocation    = getSkinnable().getTickLabelLocation();
-        BigDecimal           minorTickSpaceBD     = BigDecimal.valueOf(minorTickSpace);
-        BigDecimal           majorTickSpaceBD     = BigDecimal.valueOf(getSkinnable().getMajorTickSpace());
-        BigDecimal           mediumCheck2         = BigDecimal.valueOf(2 * minorTickSpace);
-        BigDecimal           mediumCheck5         = BigDecimal.valueOf(5 * minorTickSpace);
-        BigDecimal           counterBD            = BigDecimal.valueOf(minValue);
-        double               counter              = minValue;
+        double               centerX               = size * 0.5;
+        double               centerY               = size * 0.5;
+        int                  tickLabelDecimals     = getSkinnable().getTickLabelDecimals();
+        String               tickLabelFormatString = "%." + tickLabelDecimals + "f";
+        double               minorTickSpace        = getSkinnable().getMinorTickSpace();
+        double               tmpAngleStep          = angleStep * minorTickSpace;
+        TickLabelOrientation tickLabelOrientation  = getSkinnable().getTickLabelOrientation();
+        TickLabelLocation    tickLabelLocation     = getSkinnable().getTickLabelLocation();
+        BigDecimal           minorTickSpaceBD      = BigDecimal.valueOf(minorTickSpace);
+        BigDecimal           majorTickSpaceBD      = BigDecimal.valueOf(getSkinnable().getMajorTickSpace());
+        BigDecimal           mediumCheck2          = BigDecimal.valueOf(2 * minorTickSpace);
+        BigDecimal           mediumCheck5          = BigDecimal.valueOf(5 * minorTickSpace);
+        BigDecimal           counterBD             = BigDecimal.valueOf(minValue);
+        double               counter               = minValue;
 
         List<Section> tickMarkSections             = getSkinnable().getTickMarkSections();
         List<Section> tickLabelSections            = getSkinnable().getTickLabelSections();
@@ -448,6 +463,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         boolean       minorTickMarksVisible        = getSkinnable().areMinorTickMarksVisible();
         boolean       tickLabelsVisible            = getSkinnable().areTickLabelsVisible();
         boolean       onlyFirstAndLastLabelVisible = getSkinnable().isOnlyFirstAndLastTickLabelVisible();
+        boolean       customTickLabelsEnabled      = getSkinnable().areCustomTickLabelsEnabled();
+        List<String>  customTickLabels             = customTickLabelsEnabled ? getSkinnable().getCustomTickLabels() : null;
         double        textDisplacementFactor       = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
         double        majorDotSize;
         double        majorHalfDotSize;
@@ -475,9 +492,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             minorHalfDotSize  = minorDotSize * 0.5;
         };
 
-        boolean fullRange                  = (minValue < 0 && getSkinnable().getMaxValue() > 0);
-        double  tickLabelFontSize          = decimals == 0 ? 0.054 * size : 0.051 * size;
-        double  tickMarkFontSize           = decimals == 0 ? 0.047 * size: 0.044 * size;
+        boolean fullRange                  = (minValue < 0 && maxValue > 0);
+        double  tickLabelFontSize          = tickLabelDecimals == 0 ? 0.054 * size : 0.051 * size;
+        double  tickMarkFontSize           = tickLabelDecimals == 0 ? 0.047 * size: 0.044 * size;
         double  tickLabelOrientationFactor = TickLabelOrientation.HORIZONTAL == tickLabelOrientation ? 0.9 : 1.0;
 
         Font tickLabelFont     = Fonts.robotoCondensedRegular(tickLabelFontSize * tickLabelOrientationFactor);
@@ -552,9 +569,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Main loop
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
         BigDecimal     tmpStepBD      = new BigDecimal(tmpAngleStep);
-        tmpStepBD = tmpStepBD.setScale(3, BigDecimal.ROUND_HALF_UP);
-        double tmpStep = tmpStepBD.doubleValue();
-        double angle   = 0;
+        tmpStepBD                     = tmpStepBD.setScale(3, BigDecimal.ROUND_HALF_UP);
+        double tmpStep                = tmpStepBD.doubleValue();
+        double angle                  = 0;
+        int    customTickLabelCounter = 0;
         for (double i = 0 ; Double.compare(-angleRange - tmpStep, i) <= 0 ; i -= tmpStep) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
@@ -740,7 +758,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                             ticksAndSections.setFont(isNotZero ? tickMarkFont : tickMarkZeroFont);
                             ticksAndSections.setTextAlign(TextAlignment.CENTER);
                             ticksAndSections.setTextBaseline(VPos.CENTER);
-                            ticksAndSections.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
+                            ticksAndSections.fillText(String.format(Locale.US, tickLabelFormatString, counter), 0, 0);
                             ticksAndSections.restore();
                         }
                         break;
@@ -786,7 +804,15 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         }
                     }
 
-                    ticksAndSections.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
+                    if (customTickLabelsEnabled) {
+                        if (customTickLabelCounter >= 0) {
+                            ticksAndSections.fillText(customTickLabels.get(customTickLabelCounter), 0, 0);
+                            customTickLabelCounter++;
+                        }
+                        if (customTickLabelCounter > customTickLabels.size() - 1) customTickLabelCounter = -1;
+                    } else {
+                        ticksAndSections.fillText(String.format(Locale.US, tickLabelFormatString, counter), 0, 0);
+                    }
                     ticksAndSections.restore();
                 }
             } else if (mediumTickMarksVisible &&
@@ -846,59 +872,56 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawGradientBar() {
-        final TickLabelLocation TICK_LABEL_LOCATION = getSkinnable().getTickLabelLocation();
-        final double            xy                  = TickLabelLocation.OUTSIDE == TICK_LABEL_LOCATION ? 0.115 * size : 0.0515 * size;
-        final double            wh                  = TickLabelLocation.OUTSIDE == TICK_LABEL_LOCATION ? size * 0.77 : size * 0.897;
-        final double            MIN_VALUE           = getSkinnable().getMinValue();
-        final double            OFFSET              = 90 - startAngle;
-        final ScaleDirection    SCALE_DIRECTION     = getSkinnable().getScaleDirection();
-        List<Stop>              stops               = getSkinnable().getGradientLookupStops();
-        Map<Double, Color>      stopAngleMap        = new HashMap<>(stops.size());
+        TickLabelLocation  tickLabelLocation = getSkinnable().getTickLabelLocation();
+        double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * size : 0.0515 * size;
+        double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
+        double             offset            = 90 - startAngle;
+        ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
+        List<Stop>         stops             = getSkinnable().getGradientLookupStops();
+        Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
 
         stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()));
-        double                  offsetFactor        = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (startAngle - 90) : (startAngle + 180);
+        double                  offsetFactor        = ScaleDirection.CLOCKWISE == scaleDirection ? (startAngle - 90) : (startAngle + 180);
         AngleConicalGradient    gradient            = new AngleConicalGradient(size * 0.5, size * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
 
-        final double BAR_START_ANGLE  = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? -MIN_VALUE * angleStep : MIN_VALUE * angleStep;
-        final double BAR_ANGLE_EXTEND = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? getSkinnable().getRange() * angleStep : -getSkinnable().getRange() * angleStep;
+        double barStartAngle  = ScaleDirection.CLOCKWISE == scaleDirection ? -minValue * angleStep : minValue * angleStep;
+        double barAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? getSkinnable().getRange() * angleStep : -getSkinnable().getRange() * angleStep;
         ticksAndSections.save();
         ticksAndSections.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.026 * size, xy - 0.026 * size, wh + 0.052 * size, wh + 0.052 * size)));
         ticksAndSections.setLineWidth(size * 0.052);
         ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-        ticksAndSections.strokeArc(xy, xy, wh, wh, -(OFFSET + BAR_START_ANGLE), -BAR_ANGLE_EXTEND, ArcType.OPEN);
+        ticksAndSections.strokeArc(xy, xy, wh, wh, -(offset + barStartAngle), -barAngleExtend, ArcType.OPEN);
         ticksAndSections.restore();
     }
 
     private void drawSections() {
         if (getSkinnable().getSections().isEmpty()) return;
-        TickLabelLocation   tickLabelLocation = getSkinnable().getTickLabelLocation();
-        final double         xy               = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * size : 0.0515 * size;
-        final double         wh               = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
-        final double         MIN_VALUE        = getSkinnable().getMinValue();
-        final double         MAX_VALUE        = getSkinnable().getMaxValue();
-        final double         OFFSET           = 90 - startAngle;
-        final ScaleDirection SCALE_DIRECTION  = getSkinnable().getScaleDirection();
+        TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
+        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * size : 0.0515 * size;
+        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
+        double            offset            = 90 - startAngle;
+        ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
         IntStream.range(0, getSkinnable().getSections().size()).parallel().forEachOrdered(
             i -> {
-                final Section SECTION = getSkinnable().getSections().get(i);
-                final double SECTION_START_ANGLE;
-                if (Double.compare(SECTION.getStart(), MAX_VALUE) <= 0 && Double.compare(SECTION.getStop(), MIN_VALUE) >= 0) {
-                    if (Double.compare(SECTION.getStart(), MIN_VALUE) < 0 && Double.compare(SECTION.getStop(), MAX_VALUE) < 0) {
-                        SECTION_START_ANGLE = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? MIN_VALUE * angleStep : -MIN_VALUE * angleStep;
+                Section section = getSkinnable().getSections().get(i);
+                double sectionStartAngle;
+                if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
+                    if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
+                        sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? minValue * angleStep : -minValue * angleStep;
                     } else {
-                        SECTION_START_ANGLE = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (SECTION.getStart() - MIN_VALUE) * angleStep : -(SECTION.getStart() - MIN_VALUE) * angleStep;
+                        sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStart() - minValue) * angleStep : -(section.getStart() - minValue) * angleStep;
                     }
-                    final double SECTION_ANGLE_EXTEND;
-                    if (Double.compare(SECTION.getStop(), MAX_VALUE) > 0) {
-                        SECTION_ANGLE_EXTEND = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (MAX_VALUE - SECTION.getStart()) * angleStep : -(MAX_VALUE - SECTION.getStart()) * angleStep;
+                    double sectionAngleExtend;
+                    if (Double.compare(section.getStop(), maxValue) > 0) {
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - section.getStart()) * angleStep : -(maxValue - section.getStart()) * angleStep;
                     } else {
-                        SECTION_ANGLE_EXTEND = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (SECTION.getStop() - SECTION.getStart()) * angleStep : -(SECTION.getStop() - SECTION.getStart()) * angleStep;
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStop() - section.getStart()) * angleStep : -(section.getStop() - section.getStart()) * angleStep;
                     }
                     ticksAndSections.save();
-                    ticksAndSections.setStroke(SECTION.getColor());
+                    ticksAndSections.setStroke(section.getColor());
                     ticksAndSections.setLineWidth(size * 0.052);
                     ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-                    ticksAndSections.strokeArc(xy, xy, wh, wh, -(OFFSET + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
+                    ticksAndSections.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
                     ticksAndSections.restore();
                 }
             }
@@ -908,32 +931,30 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void drawAreas() {
         if (getSkinnable().getAreas().isEmpty()) return;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
-        final double         xy              = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0895 * size : 0.025 * size;
-        final double         wh              = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.821 : size * 0.95;
-        final double         MIN_VALUE       = getSkinnable().getMinValue();
-        final double         MAX_VALUE       = getSkinnable().getMaxValue();
-        final double         OFFSET          = 90 - startAngle;
-        final ScaleDirection SCALE_DIRECTION = getSkinnable().getScaleDirection();
+        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0895 * size : 0.025 * size;
+        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.821 : size * 0.95;
+        double            offset            = 90 - startAngle;
+        ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
 
         IntStream.range(0, getSkinnable().getAreas().size()).parallel().forEachOrdered(
             i -> {
-                final Section AREA = getSkinnable().getAreas().get(i);
-                final double AREA_START_ANGLE;
-                if (Double.compare(AREA.getStart(), MAX_VALUE) <= 0 && Double.compare(AREA.getStop(), MIN_VALUE) >= 0) {
-                    if (AREA.getStart() < MIN_VALUE && AREA.getStop() < MAX_VALUE) {
-                        AREA_START_ANGLE = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? MIN_VALUE * angleStep : -MIN_VALUE * angleStep;
+                Section area = getSkinnable().getAreas().get(i);
+                double areaStartAngle;
+                if (Double.compare(area.getStart(), maxValue) <= 0 && Double.compare(area.getStop(), minValue) >= 0) {
+                    if (area.getStart() < minValue && area.getStop() < maxValue) {
+                        areaStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? minValue * angleStep : -minValue * angleStep;
                     } else {
-                        AREA_START_ANGLE = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (AREA.getStart() - MIN_VALUE) * angleStep : -(AREA.getStart() - MIN_VALUE) * angleStep;
+                        areaStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStart() - minValue) * angleStep : -(area.getStart() - minValue) * angleStep;
                     }
-                    final double AREA_ANGLE_EXTEND;
-                    if (AREA.getStop() > MAX_VALUE) {
-                        AREA_ANGLE_EXTEND = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (MAX_VALUE - AREA.getStart()) * angleStep : -(MAX_VALUE - AREA.getStart()) * angleStep;
+                    double areaAngleExtend;
+                    if (area.getStop() > maxValue) {
+                        areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - area.getStart()) * angleStep : -(maxValue - area.getStart()) * angleStep;
                     } else {
-                        AREA_ANGLE_EXTEND = ScaleDirection.CLOCKWISE == SCALE_DIRECTION ? (AREA.getStop() - AREA.getStart()) * angleStep : -(AREA.getStop() - AREA.getStart()) * angleStep;
+                        areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStop() - area.getStart()) * angleStep : -(area.getStop() - area.getStart()) * angleStep;
                     }
                     ticksAndSections.save();
-                    ticksAndSections.setFill(AREA.getColor());
-                    ticksAndSections.fillArc(xy, xy, wh, wh, -(OFFSET + AREA_START_ANGLE), - AREA_ANGLE_EXTEND, ArcType.ROUND);
+                    ticksAndSections.setFill(area.getColor());
+                    ticksAndSections.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
                     ticksAndSections.restore();
                 }
             }
@@ -988,9 +1009,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 Shape  shape = markerMap.get(marker);
                 double valueAngle;
                 if (ScaleDirection.CLOCKWISE == scaleDirection) {
-                    valueAngle = startAngle - (marker.getValue() - getSkinnable().getMinValue()) * angleStep;
+                    valueAngle = startAngle - (marker.getValue() - minValue) * angleStep;
                 } else {
-                    valueAngle = startAngle + (marker.getValue() - getSkinnable().getMinValue()) * angleStep;
+                    valueAngle = startAngle + (marker.getValue() - minValue) * angleStep;
                 }
                 double sinValue = Math.sin(Math.toRadians(valueAngle));
                 double cosValue = Math.cos(Math.toRadians(valueAngle));
@@ -1091,9 +1112,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             threshold.getElements().clear();
             double thresholdAngle;
             if (ScaleDirection.CLOCKWISE == scaleDirection) {
-                thresholdAngle = startAngle - (getSkinnable().getThreshold() - getSkinnable().getMinValue()) * angleStep;
+                thresholdAngle = startAngle - (getSkinnable().getThreshold() - minValue) * angleStep;
             } else {
-                thresholdAngle = startAngle + (getSkinnable().getThreshold() - getSkinnable().getMinValue()) * angleStep;
+                thresholdAngle = startAngle + (getSkinnable().getThreshold() - minValue) * angleStep;
             }
             double thresholdSize = Helper.clamp(3d, 3.5, 0.01 * size);
             double sinValue      = Math.sin(Math.toRadians(thresholdAngle));
@@ -1130,16 +1151,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         markerMap.clear();
         getSkinnable().getMarkers().forEach(marker -> {
             switch(marker.getMarkerType()) {
-                case TRIANGLE:
-                    markerMap.put(marker, new Path());
-                    break;
-                case DOT:
-                    markerMap.put(marker, new Circle());
-                    break;
+                case TRIANGLE: markerMap.put(marker, new Path()); break;
+                case DOT     : markerMap.put(marker, new Circle()); break;
                 case STANDARD:
-                default:
-                    markerMap.put(marker, new Path());
-                    break;
+                default:       markerMap.put(marker, new Path()); break;
             }
         });
     }
@@ -1270,21 +1285,23 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void resizeText() {
         double maxWidth = 0.4 * size;
+        double fontSize = 0.06 * size;
 
-        titleText.setFont(Fonts.robotoMedium(size * 0.06));
+        titleText.setFont(Fonts.robotoMedium(fontSize));
         titleText.setText(getSkinnable().getTitle());
-        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, size * 0.06); }
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate((size - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.26);
 
-        unitText.setFont(Fonts.robotoRegular(size * 0.05));
+        fontSize = 0.05 * size;
+        unitText.setFont(Fonts.robotoRegular(fontSize));
         unitText.setText(getSkinnable().getUnit());
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, size * 0.05); }
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
         unitText.relocate((size - unitText.getLayoutBounds().getWidth()) * 0.5, size * 0.35);
 
         maxWidth = 0.25 * size;
-        subTitleText.setFont(Fonts.robotoRegular(size * 0.05));
+        subTitleText.setFont(Fonts.robotoRegular(fontSize));
         subTitleText.setText(getSkinnable().getSubTitle());
-        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, size * 0.05); }
+        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, fontSize); }
         subTitleText.relocate((size - subTitleText.getLayoutBounds().getWidth()) * 0.5, size * 0.76);
     }
 
