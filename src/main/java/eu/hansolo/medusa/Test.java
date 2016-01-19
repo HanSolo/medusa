@@ -35,6 +35,7 @@ import eu.hansolo.medusa.skins.BulletChartSkin;
 import eu.hansolo.medusa.skins.DashboardSkin;
 import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.GaugeSkin;
+import eu.hansolo.medusa.skins.HSkin;
 import eu.hansolo.medusa.skins.IndicatorSkin;
 import eu.hansolo.medusa.skins.KpiSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
@@ -42,6 +43,7 @@ import eu.hansolo.medusa.skins.QuarterSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
 import eu.hansolo.medusa.skins.SlimSkin;
 import eu.hansolo.medusa.skins.SpaceXSkin;
+import eu.hansolo.medusa.skins.VSkin;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ListChangeListener;
@@ -79,13 +81,24 @@ public class Test extends Application {
     private static final Random         RND = new Random();
     private static       int            noOfNodes = 0;
     private              Gauge          gauge;
-    private              FGauge         fGauge;
     private              long           lastTimerCall;
     private              AnimationTimer timer;
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            //.skin(QuarterSkin.class)
+                            .skin(VSkin.class)
+                            .animated(true)
+                            .title("Fuel")
+                            .valueVisible(false)
+                            .tickLabelLocation(TickLabelLocation.OUTSIDE)
+                            .minorTickMarksVisible(false)
+                            .mediumTickMarksVisible(false)
+                            .sectionsVisible(true)
+                            .sections(new Section(0, 0.1, Color.rgb(200, 0, 0, 0.6)))
+                            .minValue(0)
+                            .maxValue(1)
+                            .customTickLabelsEnabled(true)
+                            .customTickLabels("E", "", "", "", "", "1/2", "", "", "", "", "F")
                             .build();
 
         lastTimerCall = System.nanoTime();
