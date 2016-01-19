@@ -61,6 +61,8 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
@@ -86,25 +88,22 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(VSkin.class)
-                            .prefSize(500, 500)
-                            .backgroundPaint(Color.BLACK)
+                            .skin(HSkin.class)
+                            .prefSize(500, 250)
                             .knobColor(Color.rgb(0, 0, 0))
-                            .foregroundBaseColor(Color.WHITE)
+                            .foregroundBaseColor(Color.rgb(249, 249, 249))
                             .animated(true)
-                            .title("Fuel")
+                            .shadowsEnabled(true)
                             .valueVisible(false)
-                            .tickLabelLocation(TickLabelLocation.OUTSIDE)
-                            .knobPosition(Pos.CENTER_LEFT)
-                            .scaleDirection(ScaleDirection.COUNTER_CLOCKWISE)
+                            .title("FUEL")
+                            .needleColor(Color.rgb(255, 10, 1))
+                            .needleShape(NeedleShape.ROUND)
+                            .needleSize(NeedleSize.THICK)
                             .minorTickMarksVisible(false)
                             .mediumTickMarksVisible(false)
-                            .majorTickMarksVisible(true)
-                            .majorTickMarkType(TickMarkType.BOX)
-                            .mediumTickMarkType(TickMarkType.BOX)
-                            .minorTickMarkType(TickMarkType.BOX)
+                            .majorTickMarkType(TickMarkType.TRIANGLE)
                             .sectionsVisible(true)
-                            .sections(new Section(0, 0.1, Color.rgb(200, 0, 0, 0.6)))
+                            .sections(new Section(0, 0.2, Color.rgb(255, 10, 1)))
                             .minValue(0)
                             .maxValue(1)
                             .customTickLabelsEnabled(true)
@@ -125,8 +124,13 @@ public class Test extends Application {
     @Override public void start(Stage stage) {
         StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(10));
+        LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
+                                                     false, CycleMethod.NO_CYCLE,
+                                                     new Stop(0.0, Color.rgb(38, 38, 38)),
+                                                     new Stop(1.0, Color.rgb(15, 15, 15)));
+        pane.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
         //pane.setBackground(new Background(new BackgroundFill(Color.rgb(39,44,50), CornerRadii.EMPTY, Insets.EMPTY)));
-        pane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+        //pane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
 
@@ -134,13 +138,11 @@ public class Test extends Application {
         stage.setScene(scene);
         stage.show();
 
-        //gauge.setValue(0.5);
-
         // Calculate number of nodes
         calcNoOfNodes(gauge);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        //timer.start();
+        timer.start();
     }
 
     @Override public void stop() {
