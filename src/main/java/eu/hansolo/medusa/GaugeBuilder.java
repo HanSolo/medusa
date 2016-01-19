@@ -843,6 +843,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             CONTROL.setCustomTickLabels(((ObjectProperty<List<String>>) properties.get("customTickLabelsList")).get());
         }
 
+        if(properties.keySet().contains("foregroundBaseColor")) {
+            CONTROL.setForegroundBaseColor(((ObjectProperty<Color>) properties.get("foregroundBaseColor")).get());
+        }
+
         for (String key : properties.keySet()) {
             if ("prefSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
@@ -900,8 +904,6 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setSubTitle(((StringProperty) properties.get(key)).get());
             } else if("unit".equals(key)) {
                 CONTROL.setUnit(((StringProperty) properties.get(key)).get());
-            } else if("foregroundBaseColor".equals(key)) {
-                CONTROL.setForegroundBaseColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("startFromZero".equals(key)) {
                 CONTROL.setStartFromZero(((BooleanProperty) properties.get(key)).get());
             } else if("returnToZero".equals(key)) {
