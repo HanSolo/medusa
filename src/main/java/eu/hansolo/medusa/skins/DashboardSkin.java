@@ -219,7 +219,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Private Methods ***********************************
     private void setBar(final double VALUE) {
-        currentValueAngle = Helper.clamp(90d, 270d, (VALUE + Math.abs(minValue)) * angleStep + 90d);
+        currentValueAngle = Helper.clamp(90d, 270d, (VALUE - minValue) * angleStep + 90d);
         dataBarOuterArc.setX(centerX + (0.675 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
         dataBarOuterArc.setY(centerX + (0.675 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
         dataBarLineToInnerArc.setX(centerX + (0.3 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
@@ -233,7 +233,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (!sectionsVisible && !colorGradientEnabled) {
             dataBar.setFill(getSkinnable().getBarColor());
         } else if (colorGradientEnabled && noOfGradientStops > 1) {
-            dataBar.setFill(getSkinnable().getGradientLookup().getColorAt(VALUE / range));
+            dataBar.setFill(getSkinnable().getGradientLookup().getColorAt((VALUE - minValue) / range));
         } else {
             for (Section section : sections) {
                 if (section.contains(VALUE)) {
@@ -325,7 +325,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barBackgroundInnerArc.setX(0.27778 * width);
             barBackgroundInnerArc.setY(0.675 * height);
 
-            currentValueAngle = (getSkinnable().getCurrentValue() + Math.abs(minValue)) * angleStep + 90;
+            currentValueAngle = (getSkinnable().getCurrentValue() - minValue) * angleStep + 90;
             dataBarStart.setX(0);
             dataBarStart.setY(0.675 * height);
             dataBarOuterArc.setRadiusX(0.675 * height);
