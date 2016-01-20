@@ -1149,29 +1149,29 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             } else {
                 thresholdAngle = startAngle + (getSkinnable().getThreshold() - minValue) * angleStep;
             }
-            double thresholdSize = Helper.clamp(3d, 3.5, 0.01 * width);
+            double thresholdSize = Helper.clamp(3d, 3.5, 0.01 * scaledWidth);
             double sinValue      = Math.sin(Math.toRadians(thresholdAngle));
             double cosValue      = Math.cos(Math.toRadians(thresholdAngle));
             switch (tickLabelLocation) {
                 case OUTSIDE:
-                    threshold.getElements().add(new MoveTo(centerX + width * 0.38 * sinValue, centerY + width * 0.38 * cosValue));
+                    threshold.getElements().add(new MoveTo(centerX + scaledWidth * 0.38 * sinValue, centerY + scaledWidth * 0.38 * cosValue));
                     sinValue = Math.sin(Math.toRadians(thresholdAngle - thresholdSize));
                     cosValue = Math.cos(Math.toRadians(thresholdAngle - thresholdSize));
-                    threshold.getElements().add(new LineTo(centerX + width * 0.34 * sinValue, centerY + width * 0.34 * cosValue));
+                    threshold.getElements().add(new LineTo(centerX + scaledWidth * 0.34 * sinValue, centerY + scaledWidth * 0.34 * cosValue));
                     sinValue = Math.sin(Math.toRadians(thresholdAngle + thresholdSize));
                     cosValue = Math.cos(Math.toRadians(thresholdAngle + thresholdSize));
-                    threshold.getElements().add(new LineTo(centerX + width * 0.34 * sinValue, centerY + width * 0.34 * cosValue));
+                    threshold.getElements().add(new LineTo(centerX + scaledWidth * 0.34 * sinValue, centerY + scaledWidth * 0.34 * cosValue));
                     threshold.getElements().add(new ClosePath());
                     break;
                 case INSIDE:
                 default:
-                    threshold.getElements().add(new MoveTo(centerX + width * 0.465 * sinValue, centerY + width * 0.465 * cosValue));
+                    threshold.getElements().add(new MoveTo(centerX + scaledWidth * 0.465 * sinValue, centerY + scaledWidth * 0.465 * cosValue));
                     sinValue = Math.sin(Math.toRadians(thresholdAngle - thresholdSize));
                     cosValue = Math.cos(Math.toRadians(thresholdAngle - thresholdSize));
-                    threshold.getElements().add(new LineTo(centerX + width * 0.425 * sinValue, centerY + width * 0.425 * cosValue));
+                    threshold.getElements().add(new LineTo(centerX + scaledWidth * 0.425 * sinValue, centerY + scaledWidth * 0.425 * cosValue));
                     sinValue = Math.sin(Math.toRadians(thresholdAngle + thresholdSize));
                     cosValue = Math.cos(Math.toRadians(thresholdAngle + thresholdSize));
-                    threshold.getElements().add(new LineTo(centerX + width * 0.425 * sinValue, centerY + width * 0.425 * cosValue));
+                    threshold.getElements().add(new LineTo(centerX + scaledWidth * 0.425 * sinValue, centerY + scaledWidth * 0.425 * cosValue));
                     threshold.getElements().add(new ClosePath());
                     break;
             }
