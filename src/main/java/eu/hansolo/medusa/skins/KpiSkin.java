@@ -18,6 +18,7 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
@@ -52,8 +53,6 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double MINIMUM_HEIGHT   = 50;
     private static final double MAXIMUM_WIDTH    = 1024;
     private static final double MAXIMUM_HEIGHT   = 1024;
-    private static final double START_ANGLE      = 26;
-    private static final double ANGLE_RANGE      = 128;
     private double       size;
     private double       oldValue;
     private Arc          barBackground;
@@ -75,6 +74,8 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text         maxValueText;
     private Text         thresholdText;
     private Pane         pane;
+    private double       startAngle       = 26;
+    private double       angleRange       = 128;
     private double       minValue;
     private double       range;
     private double       angleStep;
@@ -84,10 +85,12 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public KpiSkin(Gauge gauge) {
         super(gauge);
+        angleRange   = Helper.clamp(90d, 180d, gauge.getAngleRange());
+        startAngle   = getStartAngle();
         oldValue     = gauge.getValue();
         minValue     = gauge.getMinValue();
         range        = gauge.getRange();
-        angleStep    = ANGLE_RANGE / range;
+        angleStep    = angleRange / range;
         formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
         init();
@@ -117,14 +120,14 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void initGraphics() {
-        barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, START_ANGLE, ANGLE_RANGE);
+        barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, angleRange * 0.5 + 90, -angleRange);
         barBackground.setType(ArcType.OPEN);
         barBackground.setStroke(getSkinnable().getBarColor());
         barBackground.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
         barBackground.setStrokeLineCap(StrokeLineCap.BUTT);
         barBackground.setFill(null);
 
-        thresholdBar = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, START_ANGLE, 0);
+        thresholdBar = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, -angleRange * 0.5 + 90, 0);
         thresholdBar.setType(ArcType.OPEN);
         thresholdBar.setStroke(getSkinnable().getThresholdColor());
         thresholdBar.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
@@ -186,17 +189,28 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            minValue  = getSkinnable().getMinValue();
-            range     = getSkinnable().getRange();
-            angleStep = ANGLE_RANGE / range;
+            angleRange = Helper.clamp(90d, 180d, getSkinnable().getAngleRange());
+            startAngle = getStartAngle();
+            minValue   = getSkinnable().getMinValue();
+            range      = getSkinnable().getRange();
+            angleStep  = angleRange / range;
             redraw();
         }
     }
 
+    private double getStartAngle() {
+        ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
+        switch(scaleDirection) {
+            //case COUNTER_CLOCKWISE: return 180 - angleRange * 0.5;
+            case CLOCKWISE        :
+            default               : return 180 + angleRange * 0.5;
+        }
+    }
+
     private void rotateNeedle(final double VALUE) {
-        double needleStartAngle = ANGLE_RANGE * 0.5;
+        double needleStartAngle = angleRange * 0.5;
         double targetAngle = (VALUE - minValue) * angleStep - needleStartAngle;
-        targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + ANGLE_RANGE, targetAngle);
+        targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
         valueText.setText(String.format(Locale.US, formatString, VALUE));
         resizeValueText();
@@ -256,8 +270,8 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (thresholdText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(thresholdText, maxWidth, fontSize); }
         double thresholdRadius = size * 0.5;
         double thresholdAngle  = getSkinnable().getThreshold() * angleStep;
-        double sinValue        = Math.sin(Math.toRadians(180 + ANGLE_RANGE * 0.5 - thresholdAngle));
-        double cosValue        = Math.cos(Math.toRadians(180 + ANGLE_RANGE * 0.5 - thresholdAngle));
+        double sinValue        = Math.sin(Math.toRadians(180 + angleRange * 0.5 - thresholdAngle));
+        double cosValue        = Math.cos(Math.toRadians(180 + angleRange * 0.5 - thresholdAngle));
         double thresholdX      = size * 0.5 + thresholdRadius * sinValue;
         double thresholdY      = size * 0.72 + thresholdRadius * cosValue;
         thresholdText.setTranslateX(-thresholdText.getLayoutBounds().getWidth() * 0.5);
@@ -284,12 +298,15 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barBackground.setRadiusX(barRadius);
             barBackground.setRadiusY(barRadius);
             barBackground.setStrokeWidth(barWidth);
+            barBackground.setStartAngle(angleRange * 0.5 + 90);
+            barBackground.setLength(-angleRange);
 
             thresholdBar.setCenterX(centerX);
             thresholdBar.setCenterY(centerY - size * 0.008);
             thresholdBar.setRadiusX(barRadius);
             thresholdBar.setRadiusY(barRadius);
             thresholdBar.setStrokeWidth(barWidth);
+            thresholdBar.setStartAngle(-angleRange * 0.5 + 90);
             thresholdBar.setLength((getSkinnable().getRange() - getSkinnable().getThreshold()) * angleStep);
 
             double needleWidth  = size * 0.064;

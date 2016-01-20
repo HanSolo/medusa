@@ -2127,6 +2127,7 @@ public class Gauge extends Control {
                 setNeedleColor(Color.rgb(71,71,71));
                 setBarBackgroundColor(Color.rgb(232,231,223));
                 setBarColor(Color.rgb(255,0,39));
+                setAngleRange(180);
                 super.setSkin(new IndicatorSkin(Gauge.this));
                 break;
             case KPI         :
@@ -2137,6 +2138,7 @@ public class Gauge extends Control {
                 setThresholdVisible(true);
                 setThresholdColor(Color.rgb(45,86,184));
                 setNeedleColor(Color.rgb(74,74,74));
+                setAngleRange(128);
                 super.setSkin(new KpiSkin(Gauge.this));
                 break;
             case MODERN      :
@@ -2189,14 +2191,17 @@ public class Gauge extends Control {
                 break;
             case QUARTER     :
                 setKnobPosition(Pos.BOTTOM_RIGHT);
+                setAngleRange(90);
                 super.setSkin(new QuarterSkin(Gauge.this));
                 break;
             case HORIZONTAL:
                 setKnobPosition(Pos.BOTTOM_CENTER);
+                setAngleRange(180);
                 super.setSkin(new HSkin(Gauge.this));
                 break;
             case VERTICAL:
                 setKnobPosition(Pos.CENTER_RIGHT);
+                setAngleRange(180);
                 super.setSkin(new VSkin(Gauge.this));
                 break;
             case GAUGE       :

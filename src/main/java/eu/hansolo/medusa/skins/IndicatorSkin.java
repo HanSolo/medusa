@@ -18,6 +18,7 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Bounds;
@@ -57,8 +58,6 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double MAXIMUM_WIDTH    = 1024;
     private static final double MAXIMUM_HEIGHT   = 1024;
     private static final double ASPECT_RATIO     = 0.59375;
-    private static final double START_ANGLE      = 0;
-    private static final double ANGLE_RANGE      = 180;
     private double       width;
     private double       height;
     private double       oldValue;
@@ -77,9 +76,11 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text          minValueText;
     private Text          maxValueText;
     private Pane          pane;
+    private double        angleRange;
     private double        minValue;
     private double        range;
     private double        angleStep;
+    private double        startAngle;
     private boolean       colorGradientEnabled;
     private int           noOfGradientStops;
     private boolean       sectionsVisible;
@@ -91,10 +92,12 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public IndicatorSkin(Gauge gauge) {
         super(gauge);
+        angleRange           = Helper.clamp(90d, 180d, gauge.getAngleRange());
+        startAngle           = getStartAngle();
         oldValue             = gauge.getValue();
         minValue             = gauge.getMinValue();
         range                = gauge.getRange();
-        angleStep            = ANGLE_RANGE / range;
+        angleStep            = angleRange / range;
         colorGradientEnabled = gauge.isGradientBarEnabled();
         noOfGradientStops    = gauge.getGradientBarStops().size();
         sectionsVisible      = gauge.getSectionsVisible();
@@ -128,14 +131,14 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void initGraphics() {
-        barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, START_ANGLE, ANGLE_RANGE);
+        barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, angleRange * 0.5 + 90, -angleRange);
         barBackground.setType(ArcType.OPEN);
         barBackground.setStroke(getSkinnable().getBarBackgroundColor());
         barBackground.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
         barBackground.setStrokeLineCap(StrokeLineCap.BUTT);
         barBackground.setFill(null);
 
-        bar = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, -180, 0);
+        bar = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, angleRange * 0.5 + 90, 0);
         bar.setType(ArcType.OPEN);
         bar.setStroke(getSkinnable().getBarColor());
         bar.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
@@ -193,9 +196,11 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            minValue  = getSkinnable().getMinValue();
-            range     = getSkinnable().getRange();
-            angleStep = ANGLE_RANGE / range;
+            angleRange = Helper.clamp(90d, 180d, getSkinnable().getAngleRange());
+            startAngle = getStartAngle();
+            minValue   = getSkinnable().getMinValue();
+            range      = getSkinnable().getRange();
+            angleStep  = angleRange / range;
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             needleTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getValue()));
@@ -204,8 +209,8 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 double value         = getSkinnable().getValue();
                 double xFactor       = value > getSkinnable().getRange() * 0.8 ? 0.0 : 0.25;
                 double tooltipAngle  = value * angleStep;
-                double sinValue      = Math.sin(Math.toRadians(180 + ANGLE_RANGE * 0.5 - tooltipAngle));
-                double cosValue      = Math.cos(Math.toRadians(180 + ANGLE_RANGE * 0.5 - tooltipAngle));
+                double sinValue      = Math.sin(Math.toRadians(180 + angleRange * 0.5 - tooltipAngle));
+                double cosValue      = Math.cos(Math.toRadians(180 + angleRange * 0.5 - tooltipAngle));
                 double needleTipX    = bounds.getMinX() + width * 0.5 + height * sinValue;
                 double needleTipY    = bounds.getMinY() + height * 0.72 + height * cosValue;
                 needleTooltip.show(needle, needleTipX, needleTipY);
@@ -214,10 +219,20 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
+    private double getStartAngle() {
+        ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
+        switch(scaleDirection) {
+            //case COUNTER_CLOCKWISE: return 180 - angleRange * 0.5;
+            case CLOCKWISE        :
+            default               : return 180 + angleRange * 0.5;
+        }
+    }
+
     private void rotateNeedle(final double VALUE) {
-        double needleStartAngle = ANGLE_RANGE * 0.5;
-        double targetAngle = (VALUE - minValue) * angleStep - needleStartAngle;
-        targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + ANGLE_RANGE, targetAngle);
+
+        double needleStartAngle = angleRange * 0.5;
+        double targetAngle      = (VALUE - minValue) * angleStep - needleStartAngle;
+        targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
         bar.setLength(-getSkinnable().getCurrentValue() * angleStep);
         setBarColor(VALUE);
@@ -300,12 +315,15 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barBackground.setRadiusX(barRadius);
             barBackground.setRadiusY(barRadius);
             barBackground.setStrokeWidth(barWidth);
+            barBackground.setStartAngle(angleRange * 0.5 + 90);
+            barBackground.setLength(-angleRange);
 
             bar.setCenterX(centerX);
             bar.setCenterY(centerY);
             bar.setRadiusX(barRadius);
             bar.setRadiusY(barRadius);
             bar.setStrokeWidth(barWidth);
+            bar.setStartAngle(angleRange * 0.5 + 90);
             bar.setLength(-getSkinnable().getCurrentValue() * angleStep);
 
             double needleWidth  = height * 0.13157895;
