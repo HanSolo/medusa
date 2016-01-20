@@ -774,6 +774,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setThresholdVisible(true);
                 CONTROL.setThresholdColor(Color.rgb(45,86,184));
                 CONTROL.setNeedleColor(Color.rgb(74,74,74));
+                CONTROL.setAngleRange(128);
             } else if (skinClass == IndicatorSkin.class) {
                 CONTROL.setValueVisible(false);
                 CONTROL.setGradientBarEnabled(false);
@@ -784,12 +785,16 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setNeedleColor(Color.rgb(71,71,71));
                 CONTROL.setBarBackgroundColor(Color.rgb(232,231,223));
                 CONTROL.setBarColor(Color.rgb(255,0,39));
+                CONTROL.setAngleRange(180);
             } else if (skinClass == QuarterSkin.class) {
                 CONTROL.setKnobPosition(Pos.BOTTOM_RIGHT);
+                CONTROL.setAngleRange(90);
             } else if (skinClass == HSkin.class) {
                 CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
+                CONTROL.setAngleRange(180);
             } else if (skinClass == VSkin.class) {
                 CONTROL.setKnobPosition(Pos.CENTER_RIGHT);
+                CONTROL.setAngleRange(180);
             }
         }
 
