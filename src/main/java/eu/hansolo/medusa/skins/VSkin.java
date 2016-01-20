@@ -95,7 +95,6 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double             MAXIMUM_WIDTH    = 1024;
     private static final double             MAXIMUM_HEIGHT   = 1024;
     private static final double             ASPECT_RATIO     = 2;
-    private static final double             ANGLE_RANGE      = 180;
     private              Map<Marker, Shape> markerMap        = new ConcurrentHashMap<>();
     private double                   oldValue;
     private double                   width;
@@ -133,6 +132,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text                     unitText;
     private Text                     valueText;
     private double                   startAngle;
+    private double                   angleRange;
     private double                   angleStep;
     private String                   limitString;
     private EventHandler<MouseEvent> mouseHandler;
@@ -146,8 +146,9 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public VSkin(Gauge gauge) {
         super(gauge);
+        angleRange   = Helper.clamp(90d, 180d, gauge.getAngleRange());
         startAngle   = getStartAngle();
-        angleStep    = ANGLE_RANGE / gauge.getRange();
+        angleStep    = angleRange / gauge.getRange();
         oldValue     = gauge.getValue();
         minValue     = gauge.getMinValue();
         maxValue     = gauge.getMaxValue();
@@ -245,7 +246,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         // Set initial value
         double targetAngle = 180 - startAngle + (getSkinnable().getCurrentValue() - minValue) * angleStep;
-        targetAngle        = Helper.clamp(180 - startAngle, 180 - startAngle + ANGLE_RANGE, targetAngle);
+        targetAngle        = Helper.clamp(180 - startAngle, 180 - startAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
 
         // Add all nodes
@@ -336,11 +337,12 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }
         } else if ("RECALC".equals(EVENT_TYPE)) {
+            angleRange = Helper.clamp(90d, 180d, getSkinnable().getAngleRange());
             startAngle = getStartAngle();
             if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             minValue   = getSkinnable().getMinValue();
             maxValue   = getSkinnable().getMaxValue();
-            angleStep  = ANGLE_RANGE / getSkinnable().getRange();
+            angleStep  = angleRange / getSkinnable().getRange();
             needleRotate.setAngle((180 - startAngle) + (getSkinnable().getValue() - minValue) * angleStep);
             if (getSkinnable().getValue() < minValue) {
                 getSkinnable().setValue(minValue);
@@ -385,9 +387,9 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
         Pos            knobPosition   = getSkinnable().getKnobPosition();
         switch(knobPosition) {
-            case CENTER_LEFT : return ScaleDirection.CLOCKWISE == scaleDirection ? 180 : 0;
+            case CENTER_LEFT : return ScaleDirection.CLOCKWISE == scaleDirection ? 270 - angleRange : 90 - angleRange * 0.5;
             case CENTER_RIGHT:
-            default          : return ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection() ? 0 : 180;
+            default          : return ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection() ? angleRange * 0.5 - 90 : 270 -  angleRange * 0.5;
         }
     }
 
@@ -396,10 +398,10 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double targetAngle;
         if (ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection()) {
             targetAngle = startOffsetAngle + (VALUE - minValue) * angleStep;
-            targetAngle = Helper.clamp(startOffsetAngle, startOffsetAngle + ANGLE_RANGE, targetAngle);
+            targetAngle = Helper.clamp(startOffsetAngle, startOffsetAngle + angleRange, targetAngle);
         } else {
             targetAngle = startOffsetAngle - (VALUE - minValue) * angleStep;
-            targetAngle = Helper.clamp(startOffsetAngle - ANGLE_RANGE, startOffsetAngle, targetAngle);
+            targetAngle = Helper.clamp(startOffsetAngle - angleRange, startOffsetAngle, targetAngle);
         }
         needleRotate.setAngle(targetAngle);
         valueText.setText(limitString + String.format(Locale.US, formatString, VALUE));
@@ -555,7 +557,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double tmpStep                = tmpStepBD.doubleValue();
         double angle                  = 0;
         int    customTickLabelCounter = 0;
-        for (double i = 0 ; Double.compare(-ANGLE_RANGE - tmpStep, i) <= 0 ; i -= tmpStep) {
+        for (double i = 0; Double.compare(-angleRange - tmpStep, i) <= 0 ; i -= tmpStep) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
 
@@ -875,14 +877,14 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double             scaledHeight      = height * 0.9;
         double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1705 * scaledHeight : 0.107 * scaledHeight;
         double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledHeight * 0.77 : scaledHeight * 0.897;
-        double             offset            = 90 - startAngle;
+        double             offset            = 90 - startAngle;//90 - startAngle;
         double             offsetX           = -0.1 * width;
         ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
         List<Stop>         stops             = getSkinnable().getGradientBarStops();
         Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
 
-        stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
-        double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? (startAngle + 180) : 180 - startAngle;
+        stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()));
+        double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? (startAngle + angleRange) + angleRange * 2 : angleRange - startAngle + angleRange * 2;
         AngleConicalGradient gradient     = new AngleConicalGradient(width * 0.5, width * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
 
         double barStartAngle  = ScaleDirection.CLOCKWISE == scaleDirection ? -minValue * angleStep : minValue * angleStep;
