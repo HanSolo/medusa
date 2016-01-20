@@ -389,7 +389,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         switch(knobPosition) {
             case CENTER_LEFT : return ScaleDirection.CLOCKWISE == scaleDirection ? angleRange * 0.5 + 90 : 90 - angleRange * 0.5;
             case CENTER_RIGHT:
-            default          : return ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection() ? angleRange * 0.5 - 90 : 270 -  angleRange * 0.5;
+            default          : return ScaleDirection.CLOCKWISE == scaleDirection ? angleRange * 0.5 - 90 : 270 -  angleRange * 0.5;
         }
     }
 

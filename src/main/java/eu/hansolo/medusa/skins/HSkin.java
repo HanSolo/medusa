@@ -411,7 +411,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         switch(knobPosition) {
             case TOP_CENTER   : return ScaleDirection.CLOCKWISE == scaleDirection ? angleRange * 0.5 : -angleRange * 0.5;
             case BOTTOM_CENTER:
-            default           : return ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection() ? 180 + angleRange * 0.5 : 180 - angleRange * 0.5;
+            default           : return ScaleDirection.CLOCKWISE == scaleDirection ? 180 + angleRange * 0.5 : 180 - angleRange * 0.5;
         }
     }
 
