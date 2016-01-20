@@ -89,27 +89,6 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(HSkin.class)
-                            .prefSize(500, 250)
-                            .knobColor(Color.rgb(0, 0, 0))
-                            .foregroundBaseColor(Color.rgb(249, 249, 249))
-                            .animated(true)
-                            .shadowsEnabled(true)
-                            .valueVisible(false)
-                            .title("FUEL")
-                            .needleColor(Color.rgb(255, 10, 1))
-                            .needleShape(NeedleShape.ROUND)
-                            .needleSize(NeedleSize.THICK)
-                            .minorTickMarksVisible(false)
-                            .mediumTickMarksVisible(false)
-                            .majorTickMarkType(TickMarkType.TRIANGLE)
-                            .sectionsVisible(true)
-                            .sections(new Section(0, 0.2, Color.rgb(255, 10, 1)))
-                            .minValue(0)
-                            .maxValue(1)
-                            .angleRange(140)
-                            .customTickLabelsEnabled(true)
-                            .customTickLabels("E", "", "", "", "", "1/2", "", "", "", "", "F")
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -130,7 +109,7 @@ public class Test extends Application {
                                                      false, CycleMethod.NO_CYCLE,
                                                      new Stop(0.0, Color.rgb(38, 38, 38)),
                                                      new Stop(1.0, Color.rgb(15, 15, 15)));
-        pane.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
+        //pane.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
         //pane.setBackground(new Background(new BackgroundFill(Color.rgb(39,44,50), CornerRadii.EMPTY, Insets.EMPTY)));
         //pane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
