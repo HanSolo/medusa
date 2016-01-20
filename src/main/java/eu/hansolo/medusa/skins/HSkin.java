@@ -149,7 +149,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public HSkin(Gauge gauge) {
         super(gauge);
-        angleRange   = Helper.clamp(90d, 180d, getSkinnable().getAngleRange());
+        angleRange   = Helper.clamp(90d, 180d, gauge.getAngleRange());
         startAngle   = getStartAngle();
         angleStep    = angleRange / gauge.getRange();
         oldValue     = gauge.getValue();
