@@ -190,7 +190,7 @@ public class Gauge extends Control {
     private KnobType                             _knobType;
     private ObjectProperty<KnobType>             knobType;
     private Pos                                  _knobPosition;
-    private ObjectProperty<Pos>                 knobPosition;
+    private ObjectProperty<Pos>                  knobPosition;
     private boolean                              _animated;
     private BooleanProperty                      animated;
     private long                                 animationDuration;
