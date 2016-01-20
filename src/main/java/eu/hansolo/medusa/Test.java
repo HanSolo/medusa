@@ -107,7 +107,7 @@ public class Test extends Application {
                             .sections(new Section(0, 0.2, Color.rgb(255, 10, 1)))
                             .minValue(0)
                             .maxValue(1)
-                            .angleRange(90)
+                            .angleRange(140)
                             .customTickLabelsEnabled(true)
                             .customTickLabels("E", "", "", "", "", "1/2", "", "", "", "", "F")
                             .build();
