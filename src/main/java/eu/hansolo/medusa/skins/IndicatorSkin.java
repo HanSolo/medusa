@@ -236,18 +236,6 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needleRotate.setAngle(targetAngle);
         bar.setLength(-getSkinnable().getCurrentValue() * angleStep);
         setBarColor(VALUE);
-        /*
-        double startOffsetAngle = 180 - startAngle;
-        double targetAngle;
-        if (ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection()) {
-            targetAngle = startOffsetAngle + (VALUE - minValue) * angleStep;
-            targetAngle = Helper.clamp(startOffsetAngle, startOffsetAngle + angleRange, targetAngle);
-        } else {
-            targetAngle = startOffsetAngle - (VALUE - minValue) * angleStep;
-            targetAngle = Helper.clamp(startOffsetAngle - angleRange, startOffsetAngle, targetAngle);
-        }
-        needleRotate.setAngle(targetAngle);
-        */
     }
     private void setBarColor(final double VALUE) {
         if (!sectionsVisible && !colorGradientEnabled) {
@@ -326,9 +314,9 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barBackground.setCenterY(centerY);
             barBackground.setRadiusX(barRadius);
             barBackground.setRadiusY(barRadius);
+            barBackground.setStrokeWidth(barWidth);
             barBackground.setStartAngle(angleRange * 0.5 + 90);
             barBackground.setLength(-angleRange);
-            barBackground.setStrokeWidth(barWidth);
 
             bar.setCenterX(centerX);
             bar.setCenterY(centerY);
