@@ -222,7 +222,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double getStartAngle() {
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
         switch(scaleDirection) {
-            case COUNTER_CLOCKWISE: return 180 - angleRange * 0.5;
+            //case COUNTER_CLOCKWISE: return 180 - angleRange * 0.5;
             case CLOCKWISE        :
             default               : return 180 + angleRange * 0.5;
         }
