@@ -975,7 +975,7 @@ public class Gauge extends Control {
         } else {
             knobPosition.set(POSITION);
         }
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(RESIZE_EVENT);
     }
     public ObjectProperty<Pos> knobPositionProperty() {
         if (null == knobPosition) {
