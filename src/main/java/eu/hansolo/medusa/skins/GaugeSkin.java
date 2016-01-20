@@ -32,7 +32,6 @@ import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
@@ -74,12 +73,9 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextBoundsType;
 import javafx.scene.transform.Rotate;
 
 import java.math.BigDecimal;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -239,7 +235,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
 
         shadowGroup = new Group(needle, knobCanvas);
-        shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
@@ -351,8 +347,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             lcd.setVisible(getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
 
             markerMap.values().forEach(shape -> {
-                shape.setManaged(getSkinnable().areMarkersVisible());
-                shape.setVisible(getSkinnable().areMarkersVisible());
+                shape.setManaged(getSkinnable().getMarkersVisible());
+                shape.setVisible(getSkinnable().getMarkersVisible());
             });
 
             threshold.setManaged(getSkinnable().isThresholdVisible());
@@ -456,14 +452,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         TickMarkType  majorTickMarkType            = getSkinnable().getMajorTickMarkType();
         TickMarkType  mediumTickMarkType           = getSkinnable().getMediumTickMarkType();
         TickMarkType  minorTickMarkType            = getSkinnable().getMinorTickMarkType();
-        boolean       tickMarkSectionsVisible      = getSkinnable().areTickMarkSectionsVisible();
-        boolean       tickLabelSectionsVisible     = getSkinnable().areTickLabelSectionsVisible();
-        boolean       majorTickMarksVisible        = getSkinnable().areMajorTickMarksVisible();
-        boolean       mediumTickMarksVisible       = getSkinnable().areMediumTickMarksVisible();
-        boolean       minorTickMarksVisible        = getSkinnable().areMinorTickMarksVisible();
-        boolean       tickLabelsVisible            = getSkinnable().areTickLabelsVisible();
+        boolean       tickMarkSectionsVisible      = getSkinnable().getTickMarkSectionsVisible();
+        boolean       tickLabelSectionsVisible     = getSkinnable().getTickLabelSectionsVisible();
+        boolean       majorTickMarksVisible        = getSkinnable().getMajorTickMarksVisible();
+        boolean       mediumTickMarksVisible       = getSkinnable().getMediumTickMarksVisible();
+        boolean       minorTickMarksVisible        = getSkinnable().getMinorTickMarksVisible();
+        boolean       tickLabelsVisible            = getSkinnable().getTickLabelsVisible();
         boolean       onlyFirstAndLastLabelVisible = getSkinnable().isOnlyFirstAndLastTickLabelVisible();
-        boolean       customTickLabelsEnabled      = getSkinnable().areCustomTickLabelsEnabled();
+        boolean       customTickLabelsEnabled      = getSkinnable().getCustomTickLabelsEnabled();
         List<String>  customTickLabels             = customTickLabelsEnabled ? getSkinnable().getCustomTickLabels() : null;
         double        textDisplacementFactor       = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
         double        majorDotSize;
@@ -1020,7 +1016,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double         centerX        = size * 0.5;
         double         centerY        = size * 0.5;
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
-        if (getSkinnable().areMarkersVisible()) {
+        if (getSkinnable().getMarkersVisible()) {
             markerMap.keySet().forEach(marker -> {
                 Shape  shape = markerMap.get(marker);
                 double valueAngle;
@@ -1432,7 +1428,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void redraw() {
         formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
-        shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
 
         // Background stroke and fill
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
@@ -1441,10 +1437,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Areas, Sections and Tick Marks
         ticksAndSectionsCanvas.setCache(false);
         ticksAndSections.clearRect(0, 0, size, size);
-        if (getSkinnable().areAreasVisible()) drawAreas();
+        if (getSkinnable().getAreasVisible()) drawAreas();
         if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
             drawGradientBar();
-        } else if (getSkinnable().areSectionsVisible()) {
+        } else if (getSkinnable().getSectionsVisible()) {
             drawSections();
         }
         drawTickMarks();

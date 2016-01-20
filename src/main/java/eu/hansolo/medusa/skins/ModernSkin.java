@@ -394,8 +394,8 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         BigDecimal mediumCheck5           = BigDecimal.valueOf(5 * minorTickSpace);
         BigDecimal counterBD              = BigDecimal.valueOf(minValue);
         double     counter                = minValue;
-        boolean    majorTickMarksVisible  = getSkinnable().areMajorTickMarksVisible();
-        boolean    mediumTickMarksVisible = getSkinnable().areMediumTickMarksVisible();
+        boolean    majorTickMarksVisible  = getSkinnable().getMajorTickMarksVisible();
+        boolean    mediumTickMarksVisible = getSkinnable().getMediumTickMarksVisible();
         double     threshold              = getSkinnable().getThreshold();
         Color      tickMarkColor          = Color.TRANSPARENT;
         Color      highlightColor         = CURRENT_VALUE < getSkinnable().getThreshold() ? getSkinnable().getBarColor() : getSkinnable().getThresholdColor();
@@ -558,9 +558,9 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         BigDecimal           mediumCheck5           = BigDecimal.valueOf(5 * minorTickSpace);
         BigDecimal           counterBD              = BigDecimal.valueOf(minValue);
         double               counter                = minValue;
-        boolean              majorTickMarksVisible  = getSkinnable().areMajorTickMarksVisible();
-        boolean              mediumTickMarksVisible = getSkinnable().areMediumTickMarksVisible();
-        boolean              tickLabelsVisible      = getSkinnable().areTickLabelsVisible();
+        boolean              majorTickMarksVisible  = getSkinnable().getMajorTickMarksVisible();
+        boolean              mediumTickMarksVisible = getSkinnable().getMediumTickMarksVisible();
+        boolean              tickLabelsVisible      = getSkinnable().getTickLabelsVisible();
         TickLabelOrientation tickLabelOrientation   = getSkinnable().getTickLabelOrientation();
         Color                tickMarkColor          = getSkinnable().getTickMarkColor();
         Color                majorTickMarkColor     = tickMarkColor;

@@ -72,7 +72,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep            = ANGLE_RANGE / range;
         colorGradientEnabled = gauge.isGradientBarEnabled();
         noOfGradientStops    = gauge.getGradientBarStops().size();
-        sectionsVisible      = gauge.areSectionsVisible();
+        sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
         formatString         = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
 
@@ -186,7 +186,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
-        sectionsVisible      = getSkinnable().areSectionsVisible();
+        sectionsVisible      = getSkinnable().getSectionsVisible();
         sections             = getSkinnable().getSections();
 
         titleText.setText(getSkinnable().getTitle());

@@ -215,8 +215,8 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double        tmpMaxValue              = smallRange ? getSkinnable().getMaxValue() * 10 : getSkinnable().getMaxValue();
         double        tmpStepSize              = smallRange ? stepSize / 10 : stepSize;
         Font          tickLabelFont            = Fonts.robotoRegular(0.15 * (Orientation.VERTICAL == orientation ? width : height));
-        boolean       tickMarkSectionsVisible  = getSkinnable().areTickMarkSectionsVisible();
-        boolean       tickLabelSectionsVisible = getSkinnable().areTickLabelSectionsVisible();
+        boolean       tickMarkSectionsVisible  = getSkinnable().getTickMarkSectionsVisible();
+        boolean       tickLabelSectionsVisible = getSkinnable().getTickLabelSectionsVisible();
         double        offsetX                  = 0.18345865 * width;
         double        offsetY                  = 0.1 * height;
         double        innerPointX              = 0;
@@ -245,14 +245,14 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             if (counter % getSkinnable().getMajorTickSpace() == 0) {
                 // Draw major tick mark
-                if (getSkinnable().areMajorTickMarksVisible()) {
+                if (getSkinnable().getMajorTickMarksVisible()) {
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, smallRange ? smallCounter : counter, majorTickMarkColor) : majorTickMarkColor);
                     CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, smallRange ? smallCounter : counter, majorTickMarkColor) : majorTickMarkColor);
                     CTX.setLineWidth(1);
                     CTX.strokeLine(innerPointX, innerPointY, outerPointX, outerPointY);
                 }
                 // Draw tick label text
-                if (getSkinnable().areTickLabelsVisible()) {
+                if (getSkinnable().getTickLabelsVisible()) {
                     CTX.save();
                     CTX.translate(textPointX, textPointY);
                     CTX.setFont(tickLabelFont);

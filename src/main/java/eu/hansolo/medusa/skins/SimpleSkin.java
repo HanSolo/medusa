@@ -19,7 +19,6 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.Section.SectionEvent;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Point2D;
@@ -246,7 +245,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             // Draw Section Icon
             if (size > 0) {
-                if (getSkinnable().areSectionIconsVisible() && !getSkinnable().isSectionTextVisible()) {
+                if (getSkinnable().getSectionIconsVisible() && !getSkinnable().isSectionTextVisible()) {
                     if (null != SECTION.getImage()) {
                         Image icon = SECTION.getImage();
                         sinValue = -Math.sin(Math.toRadians(OFFSET - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));

@@ -177,7 +177,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
 
         shadowGroup = new Group(needle);
-        shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
@@ -368,12 +368,12 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 CTX.setFill(getSkinnable().getTickLabelColor());
                 CTX.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
                 CTX.restore();
-            } else if (getSkinnable().areMediumTickMarksVisible() &&
+            } else if (getSkinnable().getMediumTickMarksVisible() &&
                        Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0d) != 0d &&
                        Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0d) == 0d) {
                 CTX.setLineWidth(height * 0.0035);
                 CTX.strokeLine(innerPoint.getX(), innerPoint.getY(), outerMediumPoint.getX(), outerMediumPoint.getY());
-            } else if (getSkinnable().areMinorTickMarksVisible() && Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0d) == 0) {
+            } else if (getSkinnable().getMinorTickMarksVisible() && Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0d) == 0) {
                 CTX.setLineWidth(height * 0.00225);
                 CTX.strokeLine(innerPoint.getX(), innerPoint.getY(), outerMinorPoint.getX(), outerMinorPoint.getY());
             }
@@ -615,7 +615,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                     new Stop(1.0, Color.TRANSPARENT)));
 
         ticksAndSections.fillRect(0, 0, width, height);
-        if (getSkinnable().areSectionsVisible()) drawSections(ticksAndSections);
+        if (getSkinnable().getSectionsVisible()) drawSections(ticksAndSections);
         drawTickMarks(ticksAndSections);
         ticksAndSectionsCanvas.setCache(true);
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
@@ -651,7 +651,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         if (getSkinnable().isLedVisible()) drawLed(led);
 
-        shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
 
         foreground.setFill(getSkinnable().getForegroundPaint());
     }

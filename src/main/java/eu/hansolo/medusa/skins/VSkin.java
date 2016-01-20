@@ -228,7 +228,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
 
         shadowGroup = new Group(needle, knobCanvas);
-        shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
@@ -328,8 +328,8 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             valueText.setVisible(getSkinnable().isValueVisible());
 
             markerMap.values().forEach(shape -> {
-                shape.setManaged(getSkinnable().areMarkersVisible());
-                shape.setVisible(getSkinnable().areMarkersVisible());
+                shape.setManaged(getSkinnable().getMarkersVisible());
+                shape.setVisible(getSkinnable().getMarkersVisible());
             });
 
             threshold.setManaged(getSkinnable().isThresholdVisible());
@@ -440,14 +440,14 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         TickMarkType  majorTickMarkType            = getSkinnable().getMajorTickMarkType();
         TickMarkType  mediumTickMarkType           = getSkinnable().getMediumTickMarkType();
         TickMarkType  minorTickMarkType            = getSkinnable().getMinorTickMarkType();
-        boolean       tickMarkSectionsVisible      = getSkinnable().areTickMarkSectionsVisible();
-        boolean       tickLabelSectionsVisible     = getSkinnable().areTickLabelSectionsVisible();
-        boolean       majorTickMarksVisible        = getSkinnable().areMajorTickMarksVisible();
-        boolean       mediumTickMarksVisible       = getSkinnable().areMediumTickMarksVisible();
-        boolean       minorTickMarksVisible        = getSkinnable().areMinorTickMarksVisible();
-        boolean       tickLabelsVisible            = getSkinnable().areTickLabelsVisible();
+        boolean       tickMarkSectionsVisible      = getSkinnable().getTickMarkSectionsVisible();
+        boolean       tickLabelSectionsVisible     = getSkinnable().getTickLabelSectionsVisible();
+        boolean       majorTickMarksVisible        = getSkinnable().getMajorTickMarksVisible();
+        boolean       mediumTickMarksVisible       = getSkinnable().getMediumTickMarksVisible();
+        boolean       minorTickMarksVisible        = getSkinnable().getMinorTickMarksVisible();
+        boolean       tickLabelsVisible            = getSkinnable().getTickLabelsVisible();
         boolean       onlyFirstAndLastLabelVisible = getSkinnable().isOnlyFirstAndLastTickLabelVisible();
-        boolean       customTickLabelsEnabled      = getSkinnable().areCustomTickLabelsEnabled();
+        boolean       customTickLabelsEnabled      = getSkinnable().getCustomTickLabelsEnabled();
         List<String>  customTickLabels             = customTickLabelsEnabled ? getSkinnable().getCustomTickLabels() : null;
         double        textDisplacementFactor       = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
         double        majorDotSize;
@@ -1014,7 +1014,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double            centerX           = Pos.CENTER_LEFT == getSkinnable().getKnobPosition() ? width * 0.1 : width * 0.9;
         double            centerY           = height * 0.5;
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
-        if (getSkinnable().areMarkersVisible()) {
+        if (getSkinnable().getMarkersVisible()) {
             markerMap.keySet().forEach(marker -> {
                 Shape  shape = markerMap.get(marker);
                 double valueAngle;
@@ -1399,7 +1399,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void redraw() {
         formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
-        shadowGroup.setEffect(getSkinnable().areShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
 
         // Background stroke and fill
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
@@ -1408,10 +1408,10 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Areas, Sections and Tick Marks
         ticksAndSectionsCanvas.setCache(false);
         ticksAndSections.clearRect(0, 0, height, height);
-        if (getSkinnable().areAreasVisible()) drawAreas();
+        if (getSkinnable().getAreasVisible()) drawAreas();
         if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
             drawGradientBar();
-        } else if (getSkinnable().areSectionsVisible()) {
+        } else if (getSkinnable().getSectionsVisible()) {
             drawSections();
         }
         drawTickMarks();

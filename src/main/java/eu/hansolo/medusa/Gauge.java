@@ -1102,7 +1102,7 @@ public class Gauge extends Control {
         return autoScale;
     }
 
-    public boolean areShadowsEnabled() { return null == shadowsEnabled ? _shadowsEnabled : shadowsEnabled.get(); }
+    public boolean getShadowsEnabled() { return null == shadowsEnabled ? _shadowsEnabled : shadowsEnabled.get(); }
     public void setShadowsEnabled(final boolean ENABLED) {
         if (null == shadowsEnabled) {
             _shadowsEnabled = ENABLED;
@@ -1674,7 +1674,7 @@ public class Gauge extends Control {
         return thresholdVisible;
     }
 
-    public boolean areSectionsVisible() { return null == sectionsVisible ? _sectionsVisible : sectionsVisible.get(); }
+    public boolean getSectionsVisible() { return null == sectionsVisible ? _sectionsVisible : sectionsVisible.get(); }
     public void setSectionsVisible(final boolean VISIBLE) {
         if (null == sectionsVisible) {
             _sectionsVisible = VISIBLE;
@@ -1702,7 +1702,7 @@ public class Gauge extends Control {
         return sectionTextVisible;
     }
 
-    public boolean areSectionIconsVisible() { return null == sectionIconsVisible ? _sectionIconsVisible : sectionIconsVisible.get(); }
+    public boolean getSectionIconsVisible() { return null == sectionIconsVisible ? _sectionIconsVisible : sectionIconsVisible.get(); }
     public void setSectionIconsVisible(final boolean VISIBLE) {
         if (null == sectionIconsVisible) {
             _sectionIconsVisible = VISIBLE;
@@ -1716,7 +1716,7 @@ public class Gauge extends Control {
         return sectionIconsVisible;
     }
 
-    public boolean areAreasVisible() { return null == areasVisible ? _areasVisible : areasVisible.get(); }
+    public boolean getAreasVisible() { return null == areasVisible ? _areasVisible : areasVisible.get(); }
     public void setAreasVisible(final boolean VISIBLE) {
         if (null == areasVisible) {
             _areasVisible = VISIBLE;
@@ -1730,7 +1730,7 @@ public class Gauge extends Control {
         return areasVisible;
     }
 
-    public boolean areTickMarkSectionsVisible() { return null == tickMarkSectionsVisible ? _tickMarkSectionsVisible : tickMarkSectionsVisible.get(); }
+    public boolean getTickMarkSectionsVisible() { return null == tickMarkSectionsVisible ? _tickMarkSectionsVisible : tickMarkSectionsVisible.get(); }
     public void setTickMarkSectionsVisible(final boolean VISIBLE) {
         if (null == tickMarkSectionsVisible) {
             _tickMarkSectionsVisible = VISIBLE;
@@ -1744,7 +1744,7 @@ public class Gauge extends Control {
         return tickMarkSectionsVisible;
     }
 
-    public boolean areTickLabelSectionsVisible() { return null == tickLabelSectionsVisible ? _tickLabelSectionsVisible : tickLabelSectionsVisible.get(); }
+    public boolean getTickLabelSectionsVisible() { return null == tickLabelSectionsVisible ? _tickLabelSectionsVisible : tickLabelSectionsVisible.get(); }
     public void setTickLabelSectionsVisible(final boolean VISIBLE) {
         if (null == tickLabelSectionsVisible) {
             _tickLabelSectionsVisible = VISIBLE;
@@ -1758,7 +1758,7 @@ public class Gauge extends Control {
         return tickLabelSectionsVisible;
     }
 
-    public boolean areMarkersVisible() { return null == markersVisible ? _markersVisible : markersVisible.get() ; }
+    public boolean getMarkersVisible() { return null == markersVisible ? _markersVisible : markersVisible.get() ; }
     public void setMarkersVisible(final boolean VISIBLE) {
         if (null == markersVisible) {
             _markersVisible = VISIBLE;
@@ -1772,7 +1772,7 @@ public class Gauge extends Control {
         return markersVisible;
     }
 
-    public boolean areTickLabelsVisible() { return null == tickLabelsVisible ? _tickLabelsVisible : tickLabelsVisible.get(); }
+    public boolean getTickLabelsVisible() { return null == tickLabelsVisible ? _tickLabelsVisible : tickLabelsVisible.get(); }
     public void setTickLabelsVisible(final boolean VISIBLE) {
         if (null == tickLabelsVisible) {
             _tickLabelsVisible = VISIBLE;
@@ -1800,7 +1800,7 @@ public class Gauge extends Control {
         return onlyFirstAndLastTickLabelVisible;
     }
 
-    public boolean areMajorTickMarksVisible() { return null == majorTickMarksVisible ? _majorTickMarksVisible : majorTickMarksVisible.get(); }
+    public boolean getMajorTickMarksVisible() { return null == majorTickMarksVisible ? _majorTickMarksVisible : majorTickMarksVisible.get(); }
     public void setMajorTickMarksVisible(final boolean VISIBLE) {
         if (null == majorTickMarksVisible) {
             _majorTickMarksVisible = VISIBLE;
@@ -1814,7 +1814,7 @@ public class Gauge extends Control {
         return majorTickMarksVisible;
     }
 
-    public boolean areMediumTickMarksVisible() { return null == mediumTickMarksVisible ? _mediumTickMarksVisible : mediumTickMarksVisible.get(); }
+    public boolean getMediumTickMarksVisible() { return null == mediumTickMarksVisible ? _mediumTickMarksVisible : mediumTickMarksVisible.get(); }
     public void setMediumTickMarksVisible(final boolean VISIBLE) {
         if (null == mediumTickMarksVisible) {
             _mediumTickMarksVisible = VISIBLE;
@@ -1828,7 +1828,7 @@ public class Gauge extends Control {
         return mediumTickMarksVisible;
     }
     
-    public boolean areMinorTickMarksVisible() { return null == minorTickMarksVisible ? _minorTickMarksVisible : minorTickMarksVisible.get(); }
+    public boolean getMinorTickMarksVisible() { return null == minorTickMarksVisible ? _minorTickMarksVisible : minorTickMarksVisible.get(); }
     public void setMinorTickMarksVisible(final boolean VISIBLE) {
         if (null == minorTickMarksVisible) {
             _minorTickMarksVisible = VISIBLE;
@@ -1974,7 +1974,7 @@ public class Gauge extends Control {
         fireUpdateEvent(REDRAW_EVENT);
     }
 
-    public boolean areCustomTickLabelsEnabled() { return null == customTickLabelsEnabled ? _customTickLabelsEnabled : customTickLabelsEnabled.get(); }
+    public boolean getCustomTickLabelsEnabled() { return null == customTickLabelsEnabled ? _customTickLabelsEnabled : customTickLabelsEnabled.get(); }
     public void setCustomTickLabelsEnabled(final boolean ENABLED) {
         if (null == customTickLabelsEnabled) {
             _customTickLabelsEnabled = ENABLED;

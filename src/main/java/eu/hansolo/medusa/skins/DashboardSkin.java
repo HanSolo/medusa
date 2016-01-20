@@ -94,7 +94,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep            = ANGLE_RANGE / range;
         colorGradientEnabled = gauge.isGradientBarEnabled();
         noOfGradientStops    = gauge.getGradientBarStops().size();
-        sectionsVisible      = gauge.areSectionsVisible();
+        sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
         currentValueAngle    = 0;
         formatString         = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
@@ -163,7 +163,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         barBackground.getElements().add(new ClosePath());
         barBackground.setFill(getSkinnable().getBarBackgroundColor());
         barBackground.setStroke(getSkinnable().getBorderPaint());
-        barBackground.setEffect(getSkinnable().areShadowsEnabled() ? innerShadow : null);
+        barBackground.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
 
         dataBarStart          = new MoveTo(0, 0.675 * PREFERRED_HEIGHT);
         dataBarOuterArc       = new ArcTo(0.675 * PREFERRED_HEIGHT, 0.675 * PREFERRED_HEIGHT, 0, 0, 0, false, true);
@@ -179,7 +179,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBar.getElements().add(new ClosePath());
         dataBar.setFill(getSkinnable().getBarColor());
         dataBar.setStroke(getSkinnable().getBorderPaint());
-        dataBar.setEffect(getSkinnable().areShadowsEnabled() ? innerShadow : null);
+        dataBar.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
 
         pane = new Pane();
         pane.getChildren().setAll(unitText,
@@ -248,11 +248,11 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
-        sectionsVisible      = getSkinnable().areSectionsVisible();
+        sectionsVisible      = getSkinnable().getSectionsVisible();
         sections             = getSkinnable().getSections();
 
         barBackground.setFill(getSkinnable().getBarBackgroundColor());
-        barBackground.setEffect(getSkinnable().areShadowsEnabled() ? innerShadow : null);
+        barBackground.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
 
         setBarColor(getSkinnable().getCurrentValue());
 
@@ -264,7 +264,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         unitText.setFill(getSkinnable().getUnitColor());
 
-        dataBar.setEffect(getSkinnable().areShadowsEnabled() ? innerShadow : null);
+        dataBar.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
     }
 
     private void resize() {
@@ -307,7 +307,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             maxText.setFont(smallFont);
             maxText.relocate(((0.27778 * width) - maxText.getLayoutBounds().getWidth()) * 0.5 + 0.72222 * width, 0.7 * height);
 
-            if (getSkinnable().areShadowsEnabled()) {
+            if (getSkinnable().getShadowsEnabled()) {
                 innerShadow.setRadius(0.075 * height);
                 innerShadow.setOffsetY(0.025 * height);
             }
