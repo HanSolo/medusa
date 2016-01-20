@@ -1397,24 +1397,24 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 switch(getSkinnable().getLcdFont()) {
                     case LCD:
                         valueText.setFont(Fonts.digital(0.108 * scaledWidth));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.32 * height : 0.7 * height);
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.32 * height : 0.68 * height);
                         break;
                     case DIGITAL:
                         valueText.setFont(Fonts.digitalReadout(0.105 * scaledWidth));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.33 * height : 0.71 * height);
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.33 * height : 0.69 * height);
                         break;
                     case DIGITAL_BOLD:
                         valueText.setFont(Fonts.digitalReadoutBold(0.105 * scaledWidth));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.33 * height : 0.71 * height);
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.33 * height : 0.69 * height);
                         break;
                     case ELEKTRA:
                         valueText.setFont(Fonts.elektra(0.1116 * scaledWidth));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.325 * height : 0.705 * height);
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.325 * height : 0.685 * height);
                         break;
                     case STANDARD:
                     default:
                         valueText.setFont(Fonts.robotoMedium(0.09 * scaledWidth));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.32 * height : 0.70 * height);
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.32 * height : 0.68 * height);
                         break;
                 }
                 valueText.setTranslateX((0.75 * scaledWidth - valueText.getLayoutBounds().getWidth()));
