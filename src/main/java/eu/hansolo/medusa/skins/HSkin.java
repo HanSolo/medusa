@@ -909,7 +909,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
 
         stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()));
-        double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? startAngle : (startAngle + 180);
+        double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? startAngle - angleRange + 180 : (startAngle + 180);
         AngleConicalGradient gradient     = new AngleConicalGradient(width * 0.5, width * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
 
         double barStartAngle  = ScaleDirection.CLOCKWISE == scaleDirection ? -minValue * angleStep : minValue * angleStep;

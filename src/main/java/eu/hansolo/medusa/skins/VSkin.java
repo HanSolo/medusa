@@ -387,7 +387,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
         Pos            knobPosition   = getSkinnable().getKnobPosition();
         switch(knobPosition) {
-            case CENTER_LEFT : return ScaleDirection.CLOCKWISE == scaleDirection ? 270 - angleRange : 90 - angleRange * 0.5;
+            case CENTER_LEFT : return ScaleDirection.CLOCKWISE == scaleDirection ? angleRange * 0.5 + 90 : 90 - angleRange * 0.5;
             case CENTER_RIGHT:
             default          : return ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection() ? angleRange * 0.5 - 90 : 270 -  angleRange * 0.5;
         }
@@ -873,18 +873,20 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawGradientBar() {
-        TickLabelLocation  tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double             scaledHeight      = height * 0.9;
-        double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1705 * scaledHeight : 0.107 * scaledHeight;
-        double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledHeight * 0.77 : scaledHeight * 0.897;
-        double             offset            = 90 - startAngle;//90 - startAngle;
-        double             offsetX           = -0.1 * width;
-        ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
-        List<Stop>         stops             = getSkinnable().getGradientBarStops();
-        Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
+        TickLabelLocation  tickLabelLocation     = getSkinnable().getTickLabelLocation();
+        double             scaledHeight          = height * 0.9;
+        double             xy                    = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1705 * scaledHeight : 0.107 * scaledHeight;
+        double             wh                    = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledHeight * 0.77 : scaledHeight * 0.897;
+        double             offset                = 90 - startAngle;
+        double             offsetX               = -0.1 * width;
+        double             knobPositionOffsetCW  = Pos.CENTER_LEFT == getSkinnable().getKnobPosition() ? 90 : 270;
+        double             knobPositionOffsetCCW = Pos.CENTER_LEFT == getSkinnable().getKnobPosition() ? 180 : 0;
+        ScaleDirection     scaleDirection        = getSkinnable().getScaleDirection();
+        List<Stop>         stops                 = getSkinnable().getGradientBarStops();
+        Map<Double, Color> stopAngleMap          = new HashMap<>(stops.size());
 
         stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()));
-        double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? (startAngle + angleRange) + angleRange * 2 : angleRange - startAngle + angleRange * 2;
+        double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? knobPositionOffsetCW - angleRange * 0.5 : angleRange - (angleRange / 180 * angleRange) + knobPositionOffsetCCW;
         AngleConicalGradient gradient     = new AngleConicalGradient(width * 0.5, width * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
 
         double barStartAngle  = ScaleDirection.CLOCKWISE == scaleDirection ? -minValue * angleStep : minValue * angleStep;
