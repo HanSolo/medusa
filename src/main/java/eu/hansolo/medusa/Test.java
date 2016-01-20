@@ -60,6 +60,7 @@ import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -106,6 +107,7 @@ public class Test extends Application {
                             .sections(new Section(0, 0.2, Color.rgb(255, 10, 1)))
                             .minValue(0)
                             .maxValue(1)
+                            .angleRange(90)
                             .customTickLabelsEnabled(true)
                             .customTickLabels("E", "", "", "", "", "1/2", "", "", "", "", "F")
                             .build();
@@ -137,6 +139,8 @@ public class Test extends Application {
         stage.setTitle("Medusa");
         stage.setScene(scene);
         stage.show();
+
+        //gauge.setValue(0.35);
 
         // Calculate number of nodes
         calcNoOfNodes(gauge);
