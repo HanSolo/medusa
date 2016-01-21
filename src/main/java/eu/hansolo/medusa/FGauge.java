@@ -173,9 +173,9 @@ public class FGauge extends Region {
                     innerShadow.setRadius(0.08 * size);
                     innerShadow.setOffsetX(0);
                     innerShadow.setOffsetY(0.0 * size);
-                    foreground.setFill(new RadialGradient(0, 0, size * 0.5, size * gaugeDesign.FRAME_FACTOR * 0.5, size * 0.5, false, CycleMethod.NO_CYCLE,
-                                                          new Stop(0, Color.rgb(255, 255, 255, 0.7)),
-                                                          new Stop(1, Color.rgb(255, 255, 255, 0))));
+                    foreground.setFill(new RadialGradient(0, 0, size * 0.5, size * gaugeDesign.FRAME_FACTOR * 0.5, size, false, CycleMethod.NO_CYCLE,
+                                                          new Stop(0, Color.rgb(255, 255, 255, 0.6)),
+                                                          new Stop(0.4, Color.TRANSPARENT)));
                     foreground.setStroke(null);
                     break;
             }
