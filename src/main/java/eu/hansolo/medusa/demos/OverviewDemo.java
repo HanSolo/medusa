@@ -38,6 +38,7 @@ import eu.hansolo.medusa.skins.FlatSkin;
 import eu.hansolo.medusa.skins.HSkin;
 import eu.hansolo.medusa.skins.IndicatorSkin;
 import eu.hansolo.medusa.skins.KpiSkin;
+import eu.hansolo.medusa.skins.LcdSkin;
 import eu.hansolo.medusa.skins.ModernSkin;
 import eu.hansolo.medusa.skins.QuarterSkin;
 import eu.hansolo.medusa.skins.SimpleSkin;
@@ -89,6 +90,7 @@ public class OverviewDemo extends Application {
     private Gauge          gauge14;
     private Gauge          gauge15;
     private Gauge          gauge16;
+    private Gauge          gauge17;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -344,6 +346,15 @@ public class OverviewDemo extends Application {
                               .foregroundBaseColor(Color.WHITE)
                               .build();
 
+        gauge17 = GaugeBuilder.create()
+                              .skin(LcdSkin.class)
+                              .animated(true)
+                              .title("Temperature")
+                              .subTitle("Office")
+                              .unit("°C")
+                              .lcdDesign(LcdDesign.STANDARD_GREEN)
+                              .build();
+
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO);
 
         framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
@@ -368,6 +379,7 @@ public class OverviewDemo extends Application {
                     gauge14.setValue(RND.nextDouble() * gauge14.getRange() + gauge14.getMinValue());
                     gauge15.setValue(RND.nextDouble() * gauge15.getRange() + gauge15.getMinValue());
                     gauge16.setValue(RND.nextDouble() * gauge16.getRange() + gauge16.getMinValue());
+                    gauge17.setValue(RND.nextDouble() * gauge17.getRange() + gauge17.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -392,6 +404,7 @@ public class OverviewDemo extends Application {
         pane.add(gauge14, 3, 2);
         pane.add(gauge15, 4, 2);
         pane.add(gauge16, 0, 3);
+        pane.add(gauge17, 1, 3);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));

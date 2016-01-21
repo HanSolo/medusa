@@ -108,7 +108,7 @@ public class Gauge extends Control {
     public enum TickLabelLocation { INSIDE, OUTSIDE }
     public enum LcdFont { STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA }
     public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE }
-    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI, MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL }
+    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI, MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL, LCD }
 
     public  static final Color                   DARK_COLOR           = Color.rgb(36, 36, 36);
     public  static final Color                   BRIGHT_COLOR         = Color.rgb(223, 223, 223);
@@ -302,6 +302,8 @@ public class Gauge extends Control {
     private DoubleProperty                       minorTickSpace;
     private boolean                              _lcdVisible;
     private BooleanProperty                      lcdVisible;
+    private boolean                              _lcdCrystalEnabled;
+    private BooleanProperty                      lcdCrystalEnabled;
     private boolean                              _ledVisible;
     private BooleanProperty                      ledVisible;
     private boolean                              _ledOn;
@@ -320,6 +322,8 @@ public class Gauge extends Control {
     private BooleanProperty                      interactive;
     private String                               _buttonTooltipText;
     private StringProperty                       buttonTooltipText;
+    private boolean                              _keepAspect;
+    private BooleanProperty                      keepAspect;
 
     // others
     private double                               originalMinValue;
@@ -466,6 +470,7 @@ public class Gauge extends Control {
         _majorTickSpace                   = 10;
         _minorTickSpace                   = 1;
         _lcdVisible                       = false;
+        _lcdCrystalEnabled                = false;
         _ledVisible                       = false;
         _ledOn                            = false;
         _ledBlinking                      = false;
@@ -475,6 +480,7 @@ public class Gauge extends Control {
         customTickLabels                  = FXCollections.observableArrayList();
         _interactive                      = false;
         _buttonTooltipText                = "";
+        _keepAspect                       = true;
 
         originalMinValue                  = -Double.MAX_VALUE;
         originalMaxValue                  = Double.MAX_VALUE;
@@ -1884,6 +1890,20 @@ public class Gauge extends Control {
         return lcdVisible;
     }
 
+    public boolean isLcdCrystalEnabled() { return null == lcdCrystalEnabled ? _lcdCrystalEnabled : lcdCrystalEnabled.get(); }
+    public void set_lcdCrystalEnabled(final boolean ENABLED) {
+        if (null == lcdCrystalEnabled) {
+            _lcdCrystalEnabled = ENABLED;
+        } else {
+            lcdCrystalEnabled.set(ENABLED);
+        }
+        fireUpdateEvent(VISIBILITY_EVENT);
+    }
+    public BooleanProperty lcdCrystalEnabledProperty() {
+        if (null == lcdCrystalEnabled) { lcdCrystalEnabled = new SimpleBooleanProperty(Gauge.this, "lcdCrystalEnabled", _lcdCrystalEnabled); }
+        return lcdCrystalEnabled;
+    }
+
     public boolean isLedVisible() { return null == ledVisible ? _ledVisible : ledVisible.get(); }
     public void setLedVisible(final boolean VISIBLE) {
         if (null == ledVisible) {
@@ -2035,6 +2055,19 @@ public class Gauge extends Control {
     public StringProperty buttonTooltipTextProperty() {
         if (null == buttonTooltipText) { buttonTooltipText = new SimpleStringProperty(Gauge.this, "buttonTooltipText", _buttonTooltipText); }
         return buttonTooltipText;
+    }
+
+    public boolean isKeepAspect() { return null == keepAspect ? _keepAspect : keepAspect.get(); }
+    public void setKeepAspect(final boolean KEEP) {
+        if (null == keepAspect) {
+            _keepAspect = KEEP;
+        } else {
+            keepAspect.set(KEEP);
+        }
+    }
+    public BooleanProperty keepAspectProperty() {
+        if (null == keepAspect) { keepAspect = new SimpleBooleanProperty(Gauge.this, "keepAspect", _keepAspect); }
+        return keepAspect;
     }
 
     public void calcAutoScale() {
@@ -2203,6 +2236,12 @@ public class Gauge extends Control {
                 setKnobPosition(Pos.CENTER_RIGHT);
                 setAngleRange(180);
                 super.setSkin(new VSkin(Gauge.this));
+                break;
+            case LCD:
+                setDecimals(1);
+                setTickLabelDecimals(1);
+                setMinMeasuredValueVisible(true);
+                setMaxMeasuredValueVisible(true);
                 break;
             case GAUGE       :
             default          : super.setSkin(new GaugeSkin(Gauge.this)); break;

@@ -26,20 +26,7 @@ import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
-import eu.hansolo.medusa.skins.AmpSkin;
-import eu.hansolo.medusa.skins.BulletChartSkin;
-import eu.hansolo.medusa.skins.DashboardSkin;
-import eu.hansolo.medusa.skins.FlatSkin;
-import eu.hansolo.medusa.skins.GaugeSkin;
-import eu.hansolo.medusa.skins.HSkin;
-import eu.hansolo.medusa.skins.IndicatorSkin;
-import eu.hansolo.medusa.skins.KpiSkin;
-import eu.hansolo.medusa.skins.ModernSkin;
-import eu.hansolo.medusa.skins.QuarterSkin;
-import eu.hansolo.medusa.skins.SimpleSkin;
-import eu.hansolo.medusa.skins.SlimSkin;
-import eu.hansolo.medusa.skins.SpaceXSkin;
-import eu.hansolo.medusa.skins.VSkin;
+import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.GradientLookup;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -382,6 +369,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B lcdCrystalEnabled(final boolean ENABLED) {
+        properties.put("lcdCrystalEnabled", new SimpleBooleanProperty(ENABLED));
+        return (B)this;
+    }
+
     public final B lcdDesign(final LcdDesign DESIGN) {
         properties.put("lcdDesign", new SimpleObjectProperty<>(DESIGN));
         return (B)this;
@@ -612,6 +604,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B keepAspect(final boolean KEEP) {
+        properties.put("keepAspect", new SimpleBooleanProperty(KEEP));
+        return (B)this;
+    }
+
     public final B onValueChanged(final InvalidationListener LISTENER) {
         properties.put("onValueChanged", new SimpleObjectProperty<>(LISTENER));
         return (B)this;
@@ -795,6 +792,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             } else if (skinClass == VSkin.class) {
                 CONTROL.setKnobPosition(Pos.CENTER_RIGHT);
                 CONTROL.setAngleRange(180);
+            } else if (skinClass == LcdSkin.class) {
+                CONTROL.setDecimals(1);
+                CONTROL.setTickLabelDecimals(1);
+                CONTROL.setMinMeasuredValueVisible(true);
+                CONTROL.setMaxMeasuredValueVisible(true);
             }
         }
 
@@ -987,6 +989,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setLedVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("lcdVisible".equals(key)) {
                 CONTROL.setLcdVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("lcdCrystalEnabled".equals(key)) {
+                CONTROL.set_lcdCrystalEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("lcdDesign".equals(key)) {
                 CONTROL.setLcdDesign(((ObjectProperty<LcdDesign>) properties.get(key)).get());
             } else if ("lcdFont".equals(key)) {
@@ -1067,6 +1071,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setOnThresholdUnderrun(((ObjectProperty<EventHandler>) properties.get(key)).get());
             } else if ("buttonTooltipText".equals(key)) {
                 CONTROL.setButtonTooltipText(((StringProperty) properties.get(key)).get());
+            } else if ("keepAspect".equals(key)) {
+                CONTROL.setKeepAspect(((BooleanProperty) properties.get(key)).get());
             }
         }
 
