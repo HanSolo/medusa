@@ -20,6 +20,7 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.tools.AngleConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
@@ -37,6 +38,8 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.ClosePath;
@@ -44,13 +47,16 @@ import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.FillRule;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 
@@ -249,6 +255,28 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
                                                                                          );
     }
+    
+    private void drawGradientBar() {
+        double             xy           = size * 0.1875;
+        double             wh           = size * 0.625;
+        double             offset       = -ANGLE_RANGE * 0.5 - 90;
+        double             startAngle   = -ANGLE_RANGE * 0.5 - 90;
+        List<Stop>         stops        = getSkinnable().getGradientBarStops();
+        Map<Double, Color> stopAngleMap = new HashMap<>(stops.size());
+
+        stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
+        double               offsetFactor = startAngle - 90;
+        AngleConicalGradient gradient     = new AngleConicalGradient(size * 0.5, size * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
+
+        double barStartAngle  = -minValue * angleStep;
+        double barAngleExtend = getSkinnable().getRange() * angleStep;
+        sectionCtx.save();
+        sectionCtx.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.09191176 * size, xy - 0.09191176 * size, wh + 0.18382353 * size, wh + 0.18382353 * size)));
+        sectionCtx.setLineWidth(size * 0.18382353);
+        sectionCtx.setLineCap(StrokeLineCap.BUTT);
+        sectionCtx.strokeArc(xy, xy, wh, wh, -(offset + barStartAngle), -barAngleExtend, ArcType.OPEN);
+        sectionCtx.restore();    
+    }
 
     private void redraw() {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
@@ -264,7 +292,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sectionCanvas.setCache(false);
         sectionCtx.clearRect(0, 0, size, size);
         if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
-            //drawGradientBar();
+            drawGradientBar();
         } else if (getSkinnable().getSectionsVisible()) {
             drawSections();
         }
@@ -300,7 +328,16 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sectionCanvas.setWidth(size);
             sectionCanvas.setHeight(size);
 
-            drawSections();
+            // Areas, Sections and Tick Marks
+            sectionCanvas.setCache(false);
+            sectionCtx.clearRect(0, 0, size, size);
+            if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
+                drawGradientBar();
+            } else if (getSkinnable().getSectionsVisible()) {
+                drawSections();
+            }
+            sectionCanvas.setCache(true);
+            sectionCanvas.setCacheHint(CacheHint.QUALITY);
 
             double needleWidth  = size * 0.26470588;
             double needleHeight = size * 0.47426471;
