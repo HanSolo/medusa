@@ -27,6 +27,7 @@ import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
 import eu.hansolo.medusa.GaugeBuilder;
 import eu.hansolo.medusa.GaugeDesign;
+import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Marker.MarkerType;
@@ -355,7 +356,7 @@ public class OverviewDemo extends Application {
                               .lcdDesign(LcdDesign.STANDARD_GREEN)
                               .build();
 
-        framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO);
+        framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO, GaugeBackground.DARK_GRAY);
 
         framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
 
