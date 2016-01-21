@@ -229,12 +229,11 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void rotateNeedle(final double VALUE) {
-
         double needleStartAngle = angleRange * 0.5;
         double targetAngle      = (VALUE - minValue) * angleStep - needleStartAngle;
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
-        bar.setLength(-getSkinnable().getCurrentValue() * angleStep);
+        bar.setLength(-(getSkinnable().getCurrentValue() - minValue) * angleStep);
         setBarColor(VALUE);
     }
     private void setBarColor(final double VALUE) {
@@ -324,7 +323,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setRadiusY(barRadius);
             bar.setStrokeWidth(barWidth);
             bar.setStartAngle(angleRange * 0.5 + 90);
-            bar.setLength(-getSkinnable().getCurrentValue() * angleStep);
+            bar.setLength(-(getSkinnable().getCurrentValue() - minValue) * angleStep);
 
             double needleWidth  = height * 0.13157895;
             double needleHeight = height * 0.91315789;

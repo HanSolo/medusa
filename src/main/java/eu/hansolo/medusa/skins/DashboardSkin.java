@@ -219,7 +219,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Private Methods ***********************************
     private void setBar(final double VALUE) {
-        currentValueAngle = Helper.clamp(90d, 270d, (VALUE + Math.abs(minValue)) * angleStep + 90d);
+        currentValueAngle = Helper.clamp(90d, 270d, (VALUE - minValue) * angleStep + 90d);
         dataBarOuterArc.setX(centerX + (0.675 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
         dataBarOuterArc.setY(centerX + (0.675 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
         dataBarLineToInnerArc.setX(centerX + (0.3 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
@@ -325,7 +325,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barBackgroundInnerArc.setX(0.27778 * width);
             barBackgroundInnerArc.setY(0.675 * height);
 
-            currentValueAngle = (getSkinnable().getCurrentValue() + Math.abs(minValue)) * angleStep + 90;
+            currentValueAngle = Helper.clamp(90d, 270d, (getSkinnable().getCurrentValue() - minValue) * angleStep + 90d);
             dataBarStart.setX(0);
             dataBarStart.setY(0.675 * height);
             dataBarOuterArc.setRadiusX(0.675 * height);
@@ -338,6 +338,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             dataBarInnerArc.setRadiusY(0.3 * height);
             dataBarInnerArc.setX(0.27778 * width);
             dataBarInnerArc.setY(0.675 * height);
+
+            System.out.println(getSkinnable().getCurrentValue() + "   " + minValue + "   " + currentValueAngle + "   " + angleStep);
         }
     }
 }
