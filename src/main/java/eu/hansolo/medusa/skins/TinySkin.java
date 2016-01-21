@@ -1,0 +1,349 @@
+/*
+ * Copyright (c) 2016 by Gerrit Grunwald
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package eu.hansolo.medusa.skins;
+
+import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Gauge.ScaleDirection;
+import eu.hansolo.medusa.Gauge.TickLabelLocation;
+import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.tools.Helper;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
+import javafx.scene.CacheHint;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Skin;
+import javafx.scene.control.SkinBase;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.ArcType;
+import javafx.scene.shape.ClosePath;
+import javafx.scene.shape.CubicCurveTo;
+import javafx.scene.shape.FillRule;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeType;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Rotate;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.IntStream;
+
+
+/**
+ * Created by hansolo on 21.01.16.
+ */
+public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
+    private static final double PREFERRED_WIDTH  = 250;
+    private static final double PREFERRED_HEIGHT = 250;
+    private static final double MINIMUM_WIDTH    = 50;
+    private static final double MINIMUM_HEIGHT   = 50;
+    private static final double MAXIMUM_WIDTH    = 1024;
+    private static final double MAXIMUM_HEIGHT   = 1024;
+    private static final double START_ANGLE      = 0;
+    private static final double ANGLE_RANGE      = 270;
+    private double          size;
+    private double          oldValue;
+    private Arc             barBackground;
+    private Canvas          sectionCanvas;
+    private GraphicsContext sectionCtx;
+    private Path            needle;
+    private MoveTo          needleMoveTo1;
+    private CubicCurveTo    needleCubicCurveTo2;
+    private CubicCurveTo    needleCubicCurveTo3;
+    private CubicCurveTo    needleCubicCurveTo4;
+    private CubicCurveTo    needleCubicCurveTo5;
+    private ClosePath       needleClosePath6;
+    private MoveTo          needleMoveTo7;
+    private CubicCurveTo    needleCubicCurveTo8;
+    private CubicCurveTo    needleCubicCurveTo9;
+    private CubicCurveTo    needleCubicCurveTo10;
+    private CubicCurveTo    needleCubicCurveTo11;
+    private ClosePath       needleClosePath12;
+    private Rotate          needleRotate;
+    private Pane            pane;
+    private double          minValue;
+    private double          maxValue;
+    private double          range;
+    private double          angleStep;
+    private boolean         colorGradientEnabled;
+    private int             noOfGradientStops;
+    private List<Section>   sections;
+    private Tooltip         needleTooltip;
+    private String          formatString;
+
+
+    // ******************** Constructors **************************************
+    public TinySkin(Gauge gauge) {
+        super(gauge);
+        oldValue             = gauge.getValue();
+        minValue             = gauge.getMinValue();
+        maxValue             = gauge.getMaxValue();
+        range                = gauge.getRange();
+        angleStep            = ANGLE_RANGE / range;
+        colorGradientEnabled = gauge.isGradientBarEnabled();
+        noOfGradientStops    = gauge.getGradientBarStops().size();
+        sections             = gauge.getSections();
+        formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+
+        init();
+        initGraphics();
+        registerListeners();
+
+        rotateNeedle(gauge.getCurrentValue());
+
+        redraw();
+    }
+
+
+    // ******************** Initialization ************************************
+    private void init() {
+        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
+            if (getSkinnable().getPrefWidth() < 0 && getSkinnable().getPrefHeight() < 0) {
+                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+            }
+        }
+
+        if (Double.compare(getSkinnable().getMinWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMinHeight(), 0.0) <= 0) {
+            getSkinnable().setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
+        }
+
+        if (Double.compare(getSkinnable().getMaxWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMaxHeight(), 0.0) <= 0) {
+            getSkinnable().setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
+        }
+    }
+
+    private void initGraphics() {
+        barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, ANGLE_RANGE * 0.5 + 90, -ANGLE_RANGE);
+        barBackground.setType(ArcType.OPEN);
+        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
+        barBackground.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
+        barBackground.setStrokeLineCap(StrokeLineCap.BUTT);
+        barBackground.setFill(null);
+
+        sectionCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+        sectionCtx    = sectionCanvas.getGraphicsContext2D();
+
+        needleRotate = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
+
+        needleMoveTo1        = new MoveTo();
+        needleCubicCurveTo2  = new CubicCurveTo();
+        needleCubicCurveTo3  = new CubicCurveTo();
+        needleCubicCurveTo4  = new CubicCurveTo();
+        needleCubicCurveTo5  = new CubicCurveTo();
+        needleClosePath6     = new ClosePath();
+        needleMoveTo7        = new MoveTo();
+        needleCubicCurveTo8  = new CubicCurveTo();
+        needleCubicCurveTo9  = new CubicCurveTo();
+        needleCubicCurveTo10 = new CubicCurveTo();
+        needleCubicCurveTo11 = new CubicCurveTo();
+        needleClosePath12    = new ClosePath();
+        needle = new Path(needleMoveTo1, needleCubicCurveTo2, needleCubicCurveTo3, needleCubicCurveTo4, needleCubicCurveTo5, needleClosePath6,
+                          needleMoveTo7, needleCubicCurveTo8, needleCubicCurveTo9, needleCubicCurveTo10, needleCubicCurveTo11, needleClosePath12);
+        needle.setFillRule(FillRule.EVEN_ODD);
+        needle.getTransforms().setAll(needleRotate);
+        needle.setFill(getSkinnable().getNeedleColor());
+        needle.setStrokeType(StrokeType.INSIDE);
+        needle.setStrokeWidth(1);
+        needle.setStroke(getSkinnable().getBackgroundPaint());
+
+        needleTooltip = new Tooltip(String.format(Locale.US, formatString, getSkinnable().getValue()));
+        needleTooltip.setTextAlignment(TextAlignment.CENTER);
+        Tooltip.install(needle, needleTooltip);
+
+        pane = new Pane(barBackground, sectionCanvas, needle);
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(26))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+
+        getChildren().setAll(pane);
+    }
+
+    private void registerListeners() {
+        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
+        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
+        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
+        getSkinnable().currentValueProperty().addListener(o -> rotateNeedle(getSkinnable().getCurrentValue()));
+    }
+
+
+    // ******************** Methods *******************************************
+    private void handleEvents(final String EVENT_TYPE) {
+        if ("RESIZE".equals(EVENT_TYPE)) {
+            resize();
+        } else if ("REDRAW".equals(EVENT_TYPE)) {
+            redraw();
+        } else if ("RECALC".equals(EVENT_TYPE)) {
+            minValue  = getSkinnable().getMinValue();
+            maxValue  = getSkinnable().getMaxValue();
+            range     = getSkinnable().getRange();
+            angleStep = ANGLE_RANGE / range;
+            redraw();
+        } else if ("FINISHED".equals(EVENT_TYPE)) {
+            needleTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getValue()));
+        }
+    }
+    
+    private void rotateNeedle(final double VALUE) {
+        double needleStartAngle = ANGLE_RANGE * 0.5;
+        double targetAngle      = (VALUE - minValue) * angleStep - needleStartAngle;
+        targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + ANGLE_RANGE, targetAngle);
+        needleRotate.setAngle(targetAngle);
+    }
+
+
+    // ******************** Resizing ******************************************
+    private void drawSections() {
+        if (sections.isEmpty()) return;
+        double xy     = size * 0.1875;
+        double wh     = size * 0.625;
+        double offset = -ANGLE_RANGE * 0.5 - 90;
+        sectionCtx.clearRect(0, 0, size, size);
+        IntStream.range(0, sections.size()).parallel().forEachOrdered(
+            i -> {
+                Section section = sections.get(i);
+                double sectionStartAngle;
+                if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
+                    if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
+                        sectionStartAngle = minValue * angleStep;
+                    } else {
+                        sectionStartAngle = (section.getStart() - minValue) * angleStep;
+                    }
+                    double sectionAngleExtend;
+                    if (Double.compare(section.getStop(), maxValue) > 0) {
+                        sectionAngleExtend = (maxValue - section.getStart()) * angleStep;
+                    } else {
+                        sectionAngleExtend = (section.getStop() - section.getStart()) * angleStep;
+                    }
+                    sectionCtx.save();
+                    sectionCtx.setStroke(section.getColor());
+                    sectionCtx.setLineWidth(size * 0.18382353);
+                    sectionCtx.setLineCap(StrokeLineCap.BUTT);
+                    sectionCtx.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
+                    sectionCtx.restore();
+                }
+            }
+                                                                                         );
+    }
+
+    private void redraw() {
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+
+        formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
+        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
+        sections             = getSkinnable().getSections();
+
+        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
+
+        // Areas, Sections and Tick Marks
+        sectionCanvas.setCache(false);
+        sectionCtx.clearRect(0, 0, size, size);
+        if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
+            //drawGradientBar();
+        } else if (getSkinnable().getSectionsVisible()) {
+            drawSections();
+        }
+        sectionCanvas.setCache(true);
+        sectionCanvas.setCacheHint(CacheHint.QUALITY);
+
+        needle.setFill(getSkinnable().getNeedleColor());
+    }
+
+    private void resize() {
+        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
+        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+        size = width < height ? width : height;
+
+        if (size > 0 && size > 0) {
+            double centerX   = size * 0.5;
+            double centerY   = size * 0.5;
+            double barRadius = size * 0.3125;
+            double barWidth  = size * 0.18382353;
+
+            pane.setMaxSize(size, size);
+            pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+            pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(0.09558824 * size))));
+
+            barBackground.setCenterX(centerX);
+            barBackground.setCenterY(centerY);
+            barBackground.setRadiusX(barRadius);
+            barBackground.setRadiusY(barRadius);
+            barBackground.setStrokeWidth(barWidth);
+            barBackground.setStartAngle(ANGLE_RANGE * 0.5 + 90);
+            barBackground.setLength(-ANGLE_RANGE);
+
+            sectionCanvas.setWidth(size);
+            sectionCanvas.setHeight(size);
+
+            drawSections();
+
+            double needleWidth  = size * 0.26470588;
+            double needleHeight = size * 0.47426471;
+
+            needleMoveTo1.setX(0.277777777777778 * needleWidth); needleMoveTo1.setY(0.720930232558139 * needleHeight);
+
+            needleCubicCurveTo2.setControlX1(0.277777777777778 * needleWidth); needleCubicCurveTo2.setControlY1(0.652428682170543 * needleHeight);
+            needleCubicCurveTo2.setControlX2(0.377268055555556 * needleWidth); needleCubicCurveTo2.setControlY2(0.596899224806202 * needleHeight);
+            needleCubicCurveTo2.setX(0.5 * needleWidth); needleCubicCurveTo2.setY(0.596899224806202 * needleHeight);
+
+            needleCubicCurveTo3.setControlX1(0.622731944444444 * needleWidth); needleCubicCurveTo3.setControlY1(0.596899224806202 * needleHeight);
+            needleCubicCurveTo3.setControlX2(0.722222222222222 * needleWidth); needleCubicCurveTo3.setControlY2(0.652428682170543 * needleHeight);
+            needleCubicCurveTo3.setX(0.722222222222222 * needleWidth); needleCubicCurveTo3.setY(0.720930232558139 * needleHeight);
+
+            needleCubicCurveTo4.setControlX1(0.722222222222222 * needleWidth); needleCubicCurveTo4.setControlY1(0.789431782945736 * needleHeight);
+            needleCubicCurveTo4.setControlX2(0.622731944444444 * needleWidth); needleCubicCurveTo4.setControlY2(0.844961240310077 * needleHeight);
+            needleCubicCurveTo4.setX(0.5 * needleWidth); needleCubicCurveTo4.setY(0.844961240310077 * needleHeight);
+
+            needleCubicCurveTo5.setControlX1(0.377268055555556 * needleWidth); needleCubicCurveTo5.setControlY1(0.844961240310077 * needleHeight);
+            needleCubicCurveTo5.setControlX2(0.277777777777778 * needleWidth); needleCubicCurveTo5.setControlY2(0.789431782945736 * needleHeight);
+            needleCubicCurveTo5.setX(0.277777777777778 * needleWidth); needleCubicCurveTo5.setY(0.720930232558139 * needleHeight);
+
+            needleMoveTo7.setX(0); needleMoveTo7.setY(0.720930232558139 * needleHeight);
+            
+            needleCubicCurveTo8.setControlX1(0); needleCubicCurveTo8.setControlY1(0.875058139534884 * needleHeight);
+            needleCubicCurveTo8.setControlX2(0.223854166666667 * needleWidth); needleCubicCurveTo8.setControlY2(needleHeight);
+            needleCubicCurveTo8.setX(0.5 * needleWidth); needleCubicCurveTo8.setY(needleHeight);
+
+            needleCubicCurveTo9.setControlX1(0.776145833333333 * needleWidth); needleCubicCurveTo9.setControlY1(needleHeight);
+            needleCubicCurveTo9.setControlX2(needleWidth); needleCubicCurveTo9.setControlY2(0.875058139534884 * needleHeight);
+            needleCubicCurveTo9.setX(needleWidth); needleCubicCurveTo9.setY(0.720930232558139 * needleHeight);
+
+            needleCubicCurveTo10.setControlX1(needleWidth); needleCubicCurveTo10.setControlY1(0.566860465116279 * needleHeight);
+            needleCubicCurveTo10.setControlX2(0.5 * needleWidth); needleCubicCurveTo10.setControlY2(0);
+            needleCubicCurveTo10.setX(0.5 * needleWidth); needleCubicCurveTo10.setY(0);
+
+            needleCubicCurveTo11.setControlX1(0.5 * needleWidth); needleCubicCurveTo11.setControlY1(0);
+            needleCubicCurveTo11.setControlX2(0); needleCubicCurveTo11.setControlY2(0.566860465116279 * needleHeight);
+            needleCubicCurveTo11.setX(0); needleCubicCurveTo11.setY(0.720930232558139 * needleHeight);
+
+            needle.relocate((size - needle.getLayoutBounds().getWidth()) * 0.5, centerY - needle.getLayoutBounds().getHeight() + needle.getLayoutBounds().getWidth() * 0.5);
+            needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
+            needleRotate.setPivotY(needle.getLayoutBounds().getHeight() - needle.getLayoutBounds().getWidth() * 0.5);
+        }
+    }
+}
