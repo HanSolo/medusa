@@ -249,8 +249,15 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.relocate((size - valueText.getLayoutBounds().getWidth()) * 0.5, (size * 0.744));
     }
     private void resizeStaticText() {
-        double maxWidth = 0.98 * size;
-        double fontSize = size * 0.104;
+        double maxWidth   = 0.98 * size;
+        double fontSize   = size * 0.104;
+        double textRadius;
+        double textAngle;
+        double sinValue;
+        double cosValue;
+        double textX;
+        double textY;
+
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.02, size * 0.02);
@@ -259,24 +266,37 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         fontSize = size * 0.048;
         maxValueText.setFont(Fonts.latoRegular(fontSize));
         if (maxValueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(maxValueText, maxWidth, fontSize); }
-        maxValueText.relocate(size * 0.86, size * 0.5);
+        textRadius = size * 0.45;
+        sinValue  = Math.sin(Math.toRadians(90 + (180 - angleRange) * 0.5));
+        cosValue  = Math.cos(Math.toRadians(90 + (180 - angleRange) * 0.5));
+        textX     = size * 0.5 + textRadius * sinValue;
+        textY     = size * 0.672 + textRadius * cosValue;
+        maxValueText.setTranslateX(-maxValueText.getLayoutBounds().getWidth() * 0.5);
+        maxValueText.setTranslateY(-maxValueText.getLayoutBounds().getHeight() * 0.5);
+        maxValueText.relocate(textX, textY);
 
         minValueText.setFont(Fonts.latoRegular(maxValueText.getFont().getSize()));
         if (minValueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(minValueText, maxWidth, fontSize); }
-        minValueText.relocate((size * 0.14) - minValueText.getLayoutBounds().getWidth(), size * 0.5);
+        sinValue  = Math.sin(Math.toRadians(-90 - (180 - angleRange) * 0.5));
+        cosValue  = Math.cos(Math.toRadians(-90 - (180 - angleRange) * 0.5));
+        textX     = size * 0.5 + textRadius * sinValue;
+        textY     = size * 0.672 + textRadius * cosValue;
+        minValueText.setTranslateX(-minValueText.getLayoutBounds().getWidth() * 0.5);
+        minValueText.setTranslateY(-minValueText.getLayoutBounds().getHeight() * 0.5);
+        minValueText.relocate(textX, textY);
 
         fontSize = size * 0.08;
         thresholdText.setFont(Fonts.latoRegular(fontSize));
         if (thresholdText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(thresholdText, maxWidth, fontSize); }
-        double thresholdRadius = size * 0.5;
-        double thresholdAngle  = getSkinnable().getThreshold() * angleStep;
-        double sinValue        = Math.sin(Math.toRadians(180 + angleRange * 0.5 - thresholdAngle));
-        double cosValue        = Math.cos(Math.toRadians(180 + angleRange * 0.5 - thresholdAngle));
-        double thresholdX      = size * 0.5 + thresholdRadius * sinValue;
-        double thresholdY      = size * 0.72 + thresholdRadius * cosValue;
+        textRadius = size * 0.5;
+        textAngle  = getSkinnable().getThreshold() * angleStep;
+        sinValue   = Math.sin(Math.toRadians(180 + angleRange * 0.5 - textAngle));
+        cosValue   = Math.cos(Math.toRadians(180 + angleRange * 0.5 - textAngle));
+        textX      = size * 0.5 + textRadius * sinValue;
+        textY      = size * 0.72 + textRadius * cosValue;
         thresholdText.setTranslateX(-thresholdText.getLayoutBounds().getWidth() * 0.5);
         thresholdText.setTranslateY(-thresholdText.getLayoutBounds().getHeight() * 0.5);
-        thresholdText.relocate(thresholdX, thresholdY);
+        thresholdText.relocate(textX, textY);
     }
 
     private void resize() {
@@ -306,8 +326,8 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             thresholdBar.setRadiusX(barRadius);
             thresholdBar.setRadiusY(barRadius);
             thresholdBar.setStrokeWidth(barWidth);
-            thresholdBar.setStartAngle(-angleRange * 0.5 + 90);
-            thresholdBar.setLength((getSkinnable().getRange() - getSkinnable().getThreshold()) * angleStep);
+            thresholdBar.setStartAngle(90 - angleRange * 0.5);
+            thresholdBar.setLength((getSkinnable().getMaxValue() - getSkinnable().getThreshold()) * angleStep);
 
             double needleWidth  = size * 0.064;
             double needleHeight = size * 0.42;
