@@ -338,8 +338,6 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             dataBarInnerArc.setRadiusY(0.3 * height);
             dataBarInnerArc.setX(0.27778 * width);
             dataBarInnerArc.setY(0.675 * height);
-
-            System.out.println(getSkinnable().getCurrentValue() + "   " + minValue + "   " + currentValueAngle + "   " + angleStep);
         }
     }
 }
