@@ -30,20 +30,7 @@ import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
 import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import eu.hansolo.medusa.Marker.MarkerType;
-import eu.hansolo.medusa.skins.AmpSkin;
-import eu.hansolo.medusa.skins.BulletChartSkin;
-import eu.hansolo.medusa.skins.DashboardSkin;
-import eu.hansolo.medusa.skins.FlatSkin;
-import eu.hansolo.medusa.skins.GaugeSkin;
-import eu.hansolo.medusa.skins.HSkin;
-import eu.hansolo.medusa.skins.IndicatorSkin;
-import eu.hansolo.medusa.skins.KpiSkin;
-import eu.hansolo.medusa.skins.ModernSkin;
-import eu.hansolo.medusa.skins.QuarterSkin;
-import eu.hansolo.medusa.skins.SimpleSkin;
-import eu.hansolo.medusa.skins.SlimSkin;
-import eu.hansolo.medusa.skins.SpaceXSkin;
-import eu.hansolo.medusa.skins.VSkin;
+import eu.hansolo.medusa.skins.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ListChangeListener;
@@ -89,6 +76,13 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
+                            .skin(TinySkin.class)
+                            .animated(true)
+                            .sections(new Section(0, 20, Color.rgb(0, 0, 200, 0.5)),
+                                      new Section(20, 40, Color.rgb(0, 200, 200, 0.5)),
+                                      new Section(40, 60, Color.rgb(0, 200, 0, 0.5)),
+                                      new Section(60, 80, Color.rgb(200, 200, 0, 0.5)),
+                                      new Section(80, 100, Color.rgb(200, 0, 0, 0.5)))
                             .build();
 
         lastTimerCall = System.nanoTime();

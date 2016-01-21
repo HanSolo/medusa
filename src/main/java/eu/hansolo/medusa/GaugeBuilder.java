@@ -95,6 +95,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             case SLIM        : skinClass = SlimSkin.class; break;
             case SPACE_X     : skinClass = SpaceXSkin.class; break;
             case VERTICAL    : skinClass = VSkin.class; break;
+            case LCD         : skinClass = LcdSkin.class; break;
+            case TINY        : skinClass = TinySkin.class; break;
         }
         return (B)this;
     }
@@ -797,6 +799,12 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setTickLabelDecimals(1);
                 CONTROL.setMinMeasuredValueVisible(true);
                 CONTROL.setMaxMeasuredValueVisible(true);
+            } else if (skinClass == TinySkin.class) {
+                CONTROL.setBackgroundPaint(Color.rgb(216,216,216));
+                CONTROL.setBorderPaint(Color.rgb(76,76,76));
+                CONTROL.setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));
+                CONTROL.setNeedleColor(Color.rgb(76, 76, 76));
+                CONTROL.setSectionsVisible(true);
             }
         }
 

@@ -108,7 +108,7 @@ public class Gauge extends Control {
     public enum TickLabelLocation { INSIDE, OUTSIDE }
     public enum LcdFont { STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA }
     public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE }
-    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI, MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL, LCD }
+    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI, MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL, LCD, TINY }
 
     public  static final Color                   DARK_COLOR           = Color.rgb(36, 36, 36);
     public  static final Color                   BRIGHT_COLOR         = Color.rgb(223, 223, 223);
@@ -2245,6 +2245,13 @@ public class Gauge extends Control {
                 setTickLabelDecimals(1);
                 setMinMeasuredValueVisible(true);
                 setMaxMeasuredValueVisible(true);
+                break;
+            case TINY:
+                setBackgroundPaint(Color.rgb(216,216,216));
+                setBorderPaint(Color.rgb(76,76,76));
+                setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));
+                setNeedleColor(Color.rgb(76, 76, 76));
+                setSectionsVisible(true);
                 break;
             case GAUGE       :
             default          : super.setSkin(new GaugeSkin(Gauge.this)); break;

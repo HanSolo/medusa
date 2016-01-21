@@ -32,20 +32,7 @@ import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Marker.MarkerType;
 import eu.hansolo.medusa.Section;
-import eu.hansolo.medusa.skins.AmpSkin;
-import eu.hansolo.medusa.skins.BulletChartSkin;
-import eu.hansolo.medusa.skins.DashboardSkin;
-import eu.hansolo.medusa.skins.FlatSkin;
-import eu.hansolo.medusa.skins.HSkin;
-import eu.hansolo.medusa.skins.IndicatorSkin;
-import eu.hansolo.medusa.skins.KpiSkin;
-import eu.hansolo.medusa.skins.LcdSkin;
-import eu.hansolo.medusa.skins.ModernSkin;
-import eu.hansolo.medusa.skins.QuarterSkin;
-import eu.hansolo.medusa.skins.SimpleSkin;
-import eu.hansolo.medusa.skins.SlimSkin;
-import eu.hansolo.medusa.skins.SpaceXSkin;
-import eu.hansolo.medusa.skins.VSkin;
+import eu.hansolo.medusa.skins.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
@@ -92,6 +79,7 @@ public class OverviewDemo extends Application {
     private Gauge          gauge15;
     private Gauge          gauge16;
     private Gauge          gauge17;
+    private Gauge          gauge18;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -356,6 +344,16 @@ public class OverviewDemo extends Application {
                               .lcdDesign(LcdDesign.STANDARD_GREEN)
                               .build();
 
+        gauge18 = GaugeBuilder.create()
+                              .skin(TinySkin.class)
+                              .animated(true)
+                              .sections(new Section(0, 20, Color.rgb(0, 0, 200, 0.75)),
+                                        new Section(20, 40, Color.rgb(0, 200, 200, 0.75)),
+                                        new Section(40, 60, Color.rgb(0, 200, 0, 0.75)),
+                                        new Section(60, 80, Color.rgb(200, 200, 0, 0.75)),
+                                        new Section(80, 100, Color.rgb(200, 0, 0, 0.75)))
+                              .build();
+
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO, GaugeBackground.DARK_GRAY);
 
         framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
@@ -381,6 +379,7 @@ public class OverviewDemo extends Application {
                     gauge15.setValue(RND.nextDouble() * gauge15.getRange() + gauge15.getMinValue());
                     gauge16.setValue(RND.nextDouble() * gauge16.getRange() + gauge16.getMinValue());
                     gauge17.setValue(RND.nextDouble() * gauge17.getRange() + gauge17.getMinValue());
+                    gauge18.setValue(RND.nextDouble() * gauge18.getRange() + gauge18.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -406,6 +405,7 @@ public class OverviewDemo extends Application {
         pane.add(gauge15, 4, 2);
         pane.add(gauge16, 0, 3);
         pane.add(gauge17, 1, 3);
+        pane.add(gauge18, 2, 3);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));
