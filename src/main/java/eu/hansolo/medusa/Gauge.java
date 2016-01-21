@@ -353,7 +353,7 @@ public class Gauge extends Control {
                 super.set(VALUE);
                 withinSpeedLimit = !(Instant.now().minusMillis(getAnimationDuration()).isBefore(lastCall));
                 lastCall         = Instant.now();
-                if (withinSpeedLimit && isAnimated()) {
+                if (isAnimated() && withinSpeedLimit) {
                     long animationDuration = isReturnToZero() ? (long) (0.2 * getAnimationDuration()) : getAnimationDuration();
                     timeline.stop();
 
@@ -372,7 +372,6 @@ public class Gauge extends Control {
         currentValue                      = new DoublePropertyBase(value.get()) {
             @Override public void set(final double VALUE) {
                 double formerValue = get();
-                super.set(VALUE);
                 if (isCheckThreshold()) {
                     double thrshld = getThreshold();
                     if (formerValue < thrshld && VALUE > thrshld) {
@@ -381,8 +380,12 @@ public class Gauge extends Control {
                         fireThresholdEvent(UNDERRUN_EVENT);
                     }
                 }
-                if (VALUE < getMinMeasuredValue()) { setMinMeasuredValue(VALUE); }
-                if (VALUE > getMaxMeasuredValue()) { setMaxMeasuredValue(VALUE); }
+                if (VALUE < getMinMeasuredValue()) {
+                    setMinMeasuredValue(VALUE);
+                } else if (VALUE > getMaxMeasuredValue()) {
+                    setMaxMeasuredValue(VALUE);
+                }
+                super.set(VALUE);
             }
             @Override public Object getBean() { return Gauge.this; }
             @Override public String getName() { return "currentValue";}

@@ -300,14 +300,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             double currentValue = getSkinnable().getCurrentValue();
-            // Check min- and maxMeasuredValue
-            if (currentValue < getSkinnable().getMinMeasuredValue()) {
-                getSkinnable().setMinMeasuredValue(currentValue);
-            }
-            if (currentValue > getSkinnable().getMaxMeasuredValue()) {
-                getSkinnable().setMaxMeasuredValue(currentValue);
-            }
-
             // Check sections for value and fire section events
             if (getSkinnable().getCheckSectionsForValue()) {
                 List<Section> sections = getSkinnable().getSections();
