@@ -255,7 +255,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         barBackground.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
 
         setBarColor(getSkinnable().getCurrentValue());
-
+        
+        titleText.setText(getSkinnable().getTitle());
         titleText.setFill(getSkinnable().getTitleColor());
 
         valueText.setFill(getSkinnable().getValueColor());
