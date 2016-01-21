@@ -34,12 +34,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.ClosePath;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
@@ -77,7 +80,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Rectangle     crystalClip;
     private              InnerShadow   mainInnerShadow0;
     private              InnerShadow   mainInnerShadow1;
-    private              Region        threshold;
+    private              Path          threshold;
     private              Text          valueText;
     private              Text          backgroundText;
     private              Text          unitText;
@@ -181,9 +184,10 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         crystalOverlay.setManaged(getSkinnable().isLcdCrystalEnabled());
         crystalOverlay.setVisible(getSkinnable().isLcdCrystalEnabled());
 
-        threshold = new Region();
-        threshold.getStyleClass().setAll("threshold");
-        threshold.setOpacity(0);
+        threshold = new Path();
+        threshold.setManaged(getSkinnable().isThresholdVisible());
+        threshold.setVisible(getSkinnable().isThresholdVisible());
+        threshold.setStroke(null);
         
         backgroundText = new Text(String.format(Locale.US, valueFormatString, getSkinnable().getCurrentValue()));
         backgroundText.setFill(getSkinnable().getLcdDesign().lcdBackgroundColor);
@@ -251,7 +255,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Methods *******************************************
     protected void handleEvents(final String EVENT_TYPE) {
         if ("REDRAW".equals(EVENT_TYPE)) {
-            updateFonts();
             main.setEffect(getSkinnable().getShadowsEnabled() ? mainInnerShadow1 : null);
             shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? FOREGROUND_SHADOW : null);
             redraw();
@@ -401,6 +404,9 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setFill(lcdDesign.lcdForegroundColor);
         lowerRightText.setFill(lcdDesign.lcdForegroundColor);
         lowerCenterText.setFill(lcdDesign.lcdForegroundColor);
+        threshold.setFill(lcdDesign.lcdForegroundColor);
+
+        threshold.setVisible(Double.compare(getSkinnable().getCurrentValue(), getSkinnable().getThreshold()) >= 0);
 
         if (isNoOfDigitsInvalid()) {
             valueText.setText("-E-");
@@ -507,10 +513,26 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 crystalOverlay.setCache(true);
             }
 
-            threshold.setPrefSize(0.20 * height, 0.20 * height);
-            threshold.setTranslateX(0.027961994662429348 * width);
-            threshold.setTranslateY(0.75 * height - 2);
-            threshold.setCacheShape(true);
+            double tSize = 0.2 * height;
+            threshold.getElements().clear();
+            threshold.getElements().add(new MoveTo(0.41666667 * tSize, 0.75 * tSize));
+            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.75 * tSize));
+            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.916666666666667 * tSize));
+            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.916666666666667 * tSize));
+            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.75 * tSize));
+            threshold.getElements().add(new ClosePath());
+            threshold.getElements().add(new MoveTo(0.416666666666667 * tSize, 0.333333333333333 * tSize));
+            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.333333333333333 * tSize));
+            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.666666666666667 * tSize));
+            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.666666666666667 * tSize));
+            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.333333333333333 * tSize));
+            threshold.getElements().add(new ClosePath());
+            threshold.getElements().add(new MoveTo(tSize, tSize));
+            threshold.getElements().add(new LineTo(0.5 * tSize, 0));
+            threshold.getElements().add(new LineTo(0, tSize));
+            threshold.getElements().add(new LineTo(tSize, tSize));
+            threshold.getElements().add(new ClosePath());
+            threshold.relocate(0.027961994662429348 * width, 0.75 * height - 2);
 
             updateFonts();
 
