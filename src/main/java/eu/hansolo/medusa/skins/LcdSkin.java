@@ -356,7 +356,11 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 Section section = sections.get(i);
                 if (section.contains(currentValue)) {
                     Color sectionColor = section.getColor();
-                    LcdDesign.SECTIONS.lcdForegroundColor = Color.hsb(sectionColor.getHue(), sectionColor.getSaturation(), sectionColor.getBrightness() * 0.3);
+                    if (Helper.isMonochrome(sectionColor)) {
+                        LcdDesign.SECTIONS.lcdForegroundColor = Helper.isDark(sectionColor) ? Color.WHITE : Color.BLACK;
+                    } else {
+                        LcdDesign.SECTIONS.lcdForegroundColor = Color.hsb(sectionColor.getHue(), sectionColor.getSaturation(), sectionColor.getBrightness() * 0.3);
+                    }
                     LcdDesign.SECTIONS.lcdBackgroundColor = Color.color(sectionColor.getRed(), sectionColor.getGreen(), sectionColor.getBlue(), 0.1);
                     break;
                 }
