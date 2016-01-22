@@ -805,6 +805,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));
                 CONTROL.setNeedleColor(Color.rgb(76, 76, 76));
                 CONTROL.setSectionsVisible(true);
+                CONTROL.setMajorTickMarksVisible(true);
+                CONTROL.setMajorTickMarkColor(Color.WHITE);
             }
         }
 

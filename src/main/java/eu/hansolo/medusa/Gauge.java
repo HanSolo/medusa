@@ -2266,6 +2266,8 @@ public class Gauge extends Control {
                 setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));
                 setNeedleColor(Color.rgb(76, 76, 76));
                 setSectionsVisible(true);
+                setMajorTickMarksVisible(true);
+                setMajorTickMarkColor(Color.WHITE);
                 break;
             case GAUGE       :
             default          : super.setSkin(new GaugeSkin(Gauge.this)); break;
