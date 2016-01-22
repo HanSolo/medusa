@@ -350,6 +350,8 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             threshold.setVisible(getSkinnable().isThresholdVisible());
         } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }
+        } else if ("LCD".equals(EVENT_TYPE)) {
+            if (getSkinnable().isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             angleRange = Helper.clamp(90d, 180d, getSkinnable().getAngleRange());
             startAngle = getStartAngle();

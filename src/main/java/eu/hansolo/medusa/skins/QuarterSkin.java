@@ -341,6 +341,8 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             threshold.setVisible(getSkinnable().isThresholdVisible());
         } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }
+        } else if ("LCD".equals(EVENT_TYPE)) {
+            if (getSkinnable().isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             startAngle = getStartAngle();
             if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();

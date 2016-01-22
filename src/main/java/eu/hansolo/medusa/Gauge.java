@@ -123,6 +123,7 @@ public class Gauge extends Control {
     private        final UpdateEvent             REDRAW_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
     private        final UpdateEvent             RESIZE_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
     private        final UpdateEvent             LED_EVENT            = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED);
+    private        final UpdateEvent             LCD_EVENT            = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LCD);
     private        final UpdateEvent             VISIBILITY_EVENT     = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
     private        final UpdateEvent             INTERACTIVITY_EVENT  = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
     private        final UpdateEvent             FINISHED_EVENT       = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
@@ -1486,7 +1487,7 @@ public class Gauge extends Control {
         } else {
             lcdDesign.set(DESIGN);
         }
-        fireUpdateEvent(RESIZE_EVENT);
+        fireUpdateEvent(LCD_EVENT);
     }
     public ObjectProperty<LcdDesign> lcdDesignProperty() {
         if (null == lcdDesign) {

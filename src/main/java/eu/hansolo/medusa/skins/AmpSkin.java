@@ -279,8 +279,10 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
             redraw();
-        } else if ("LED_BLINK".equals(EVENT_TYPE)) {
+        } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(led); }
+        } else if ("LCD".equals(EVENT_TYPE)) {
+            if (getSkinnable().isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             angleStep = getSkinnable().getAngleStep();
             needleRotate.setAngle((180 - START_ANGLE) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
