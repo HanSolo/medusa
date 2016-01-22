@@ -264,26 +264,20 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void resizeText() {
-        valueText.setFont(Fonts.robotoMedium(size * 0.145));
+        double fontSize = size * 0.145;
+        valueText.setFont(Fonts.robotoMedium(fontSize));
         double maxWidth = 0.395 * size;
-        if (valueText.getLayoutBounds().getWidth() > maxWidth) { adjustTextSize(valueText, maxWidth, 0.15); }
+        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         valueText.setTranslateY(size * (titleText.getText().isEmpty() ? 0.5 : 0.48));
 
-        titleText.setFont(Fonts.robotoMedium(size * 0.045));
-        if (titleText.getLayoutBounds().getWidth() > maxWidth) { adjustTextSize(titleText, maxWidth, 0.05); }
+        fontSize = size * 0.045;
+        titleText.setFont(Fonts.robotoMedium(fontSize));
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.setTranslateX((size - titleText.getLayoutBounds().getWidth()) * 0.5);
         titleText.setTranslateY(size * 0.5 + valueText.getFont().getSize() * 0.7);
     }
-
-    private void adjustTextSize(final Text TEXT, final double MAX_WIDTH, final double DECREMENT_FACTOR) {
-        double decrement = 0d;
-        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && TEXT.getFont().getSize() > 0) {
-            TEXT.setFont(Fonts.robotoMedium(size * (DECREMENT_FACTOR - decrement)));
-            decrement += 0.01;
-        }
-    }
-
+    
     private void resize() {
         double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
