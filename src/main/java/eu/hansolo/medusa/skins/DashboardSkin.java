@@ -84,6 +84,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private boolean       sectionsVisible;
     private List<Section> sections;
     private String        formatString;
+    private String        otherFormatString;
     private double        minValue;
 
 
@@ -98,6 +99,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sections             = gauge.getSections();
         currentValueAngle    = 0;
         formatString         = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        otherFormatString    = String.join("", "%.", Integer.toString(gauge.getTickLabelDecimals()), "f");
 
         init();
         initGraphics();
@@ -139,11 +141,11 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setFill(getSkinnable().getValueColor());
 
         minValue = getSkinnable().getMinValue();
-        minText  = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", minValue));
+        minText  = new Text(String.format(Locale.US, otherFormatString, minValue));
         minText.setTextOrigin(VPos.CENTER);
         minText.setFill(getSkinnable().getValueColor());
 
-        maxText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
+        maxText = new Text(String.format(Locale.US, otherFormatString, getSkinnable().getMaxValue()));
         maxText.setTextOrigin(VPos.CENTER);
         maxText.setFill(getSkinnable().getValueColor());
 
@@ -246,6 +248,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void redraw() {
         formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        otherFormatString    = String.join("", "%.", Integer.toString(getSkinnable().getTickLabelDecimals()), "f");
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
         sectionsVisible      = getSkinnable().getSectionsVisible();
@@ -257,12 +260,24 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         setBarColor(getSkinnable().getCurrentValue());
 
         titleText.setFill(getSkinnable().getTitleColor());
+        titleText.setText(getSkinnable().getTitle());
+        titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.88 * height);
 
         valueText.setFill(getSkinnable().getValueColor());
+        valueText.setText(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
+        valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
+
         minText.setFill(getSkinnable().getValueColor());
+        minText.setText(String.format(Locale.US, otherFormatString, getSkinnable().getMinValue()));
+        minText.relocate(((0.27778 * width) - minText.getLayoutBounds().getWidth()) * 0.5, 0.7 * height);
+
         maxText.setFill(getSkinnable().getValueColor());
+        maxText.setText(String.format(Locale.US, otherFormatString, getSkinnable().getMaxValue()));
+        maxText.relocate(((0.27778 * width) - maxText.getLayoutBounds().getWidth()) * 0.5 + 0.72222 * width, 0.7 * height);
 
         unitText.setFill(getSkinnable().getUnitColor());
+        unitText.setText(getSkinnable().getUnit());
+        unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.5 * height);
 
         dataBar.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
     }
