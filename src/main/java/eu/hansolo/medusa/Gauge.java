@@ -2109,6 +2109,20 @@ public class Gauge extends Control {
         blinkFuture = blinkService.schedule(blinkTask, LED_BLINK_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
+    @Override public String toString() {
+        return new StringBuilder("{")
+            .append("\"title\":").append("\"").append(getTitle()).append("\",")
+            .append("\"subTitle\":").append("\"").append(getTitle()).append("\",")
+            .append("\"unit\":").append("\"").append(getUnit()).append("\",")
+            .append("\"value\":").append(getValue()).append(",")
+            .append("\"minValue\":").append(getMinValue()).append(",")
+            .append("\"maxValue\":").append(getMaxValue()).append(",")
+            .append("\"threshold\":").append(getThreshold()).append(",")
+            .append("\"minMeasuredValue\":").append(getMinMeasuredValue()).append(",")
+            .append("\"maxMeasuredValue\":").append(getMaxMeasuredValue())
+            .append("}").toString();
+    }
+
     
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() { return new GaugeSkin(this); }
