@@ -18,11 +18,9 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
-import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.AngleConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.CacheHint;
 import javafx.scene.canvas.Canvas;
@@ -53,6 +51,7 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -70,7 +69,6 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double MINIMUM_HEIGHT   = 50;
     private static final double MAXIMUM_WIDTH    = 1024;
     private static final double MAXIMUM_HEIGHT   = 1024;
-    private static final double START_ANGLE      = 0;
     private static final double ANGLE_RANGE      = 270;
     private double          size;
     private double          oldValue;
@@ -260,16 +258,16 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double             xy           = size * 0.1875;
         double             wh           = size * 0.625;
         double             offset       = -ANGLE_RANGE * 0.5 - 90;
-        double             startAngle   = -ANGLE_RANGE * 0.5 - 90;
+        double             startAngle   = 315;
         List<Stop>         stops        = getSkinnable().getGradientBarStops();
         Map<Double, Color> stopAngleMap = new HashMap<>(stops.size());
 
         stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
         double               offsetFactor = startAngle - 90;
-        AngleConicalGradient gradient     = new AngleConicalGradient(size * 0.5, size * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
+        AngleConicalGradient gradient     = new AngleConicalGradient(size * 0.5, size * 0.5, offsetFactor, stopAngleMap, ScaleDirection.CLOCKWISE);
 
-        double barStartAngle  = -minValue * angleStep;
-        double barAngleExtend = getSkinnable().getRange() * angleStep;
+        double barStartAngle  = 0;
+        double barAngleExtend = 270;
         sectionCtx.save();
         sectionCtx.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.09191176 * size, xy - 0.09191176 * size, wh + 0.18382353 * size, wh + 0.18382353 * size)));
         sectionCtx.setLineWidth(size * 0.18382353);
@@ -278,6 +276,50 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sectionCtx.restore();    
     }
 
+    private void drawTickMarks() {
+        double     sinValue;
+        double     cosValue;
+        double     centerX               = size * 0.5;
+        double     centerY               = size * 0.5;
+        double     minorTickSpace        = getSkinnable().getMinorTickSpace();
+        double     tmpAngleStep          = angleStep * minorTickSpace;
+        BigDecimal minorTickSpaceBD      = BigDecimal.valueOf(minorTickSpace);
+        BigDecimal majorTickSpaceBD      = BigDecimal.valueOf(getSkinnable().getMajorTickSpace());
+        BigDecimal counterBD             = BigDecimal.valueOf(minValue);
+        double     counter               = minValue;
+        Color      tickMarkColor         = getSkinnable().getTickMarkColor();
+        Color      majorTickMarkColor    = getSkinnable().getMajorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMajorTickMarkColor();
+        double     majorDotSize          = 0.025 * size;
+        double     majorHalfDotSize      = majorDotSize * 0.5;
+        double     dotCenterX;
+        double     dotCenterY;
+
+        // Main loop
+        BigDecimal     tmpStepBD      = new BigDecimal(tmpAngleStep);
+        tmpStepBD                     = tmpStepBD.setScale(3, BigDecimal.ROUND_HALF_UP);
+        double tmpStep                = tmpStepBD.doubleValue();
+        double angle                  = 0;
+        double startAngle             = -45;
+        for (double i = 0 ; Double.compare(-ANGLE_RANGE - tmpStep, i) <= 0 ; i -= tmpStep) {
+            sinValue    = Math.sin(Math.toRadians(angle + startAngle));
+            cosValue    = Math.cos(Math.toRadians(angle + startAngle));
+            dotCenterX  = centerX + size * 0.3125 * sinValue;
+            dotCenterY  = centerY + size * 0.3125 * cosValue;
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+                if ((Double.compare(counter, minValue) == 0 || Double.compare(counter, maxValue) == 0)) {
+                    sectionCtx.setFill(Color.TRANSPARENT);
+                } else {
+                    sectionCtx.setFill(majorTickMarkColor);
+                }
+                Helper.drawDot(sectionCtx, dotCenterX - majorHalfDotSize, dotCenterY - majorHalfDotSize, majorDotSize);
+            }
+            counterBD = counterBD.add(minorTickSpaceBD);
+            counter   = counterBD.doubleValue();
+            if (counter > maxValue) break;
+            angle -= tmpAngleStep;
+        }
+    }
+    
     private void redraw() {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
@@ -293,8 +335,10 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sectionCtx.clearRect(0, 0, size, size);
         if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
             drawGradientBar();
+            if (getSkinnable().getMajorTickMarksVisible()) drawTickMarks();
         } else if (getSkinnable().getSectionsVisible()) {
             drawSections();
+            if (getSkinnable().getMajorTickMarksVisible()) drawTickMarks();
         }
         sectionCanvas.setCache(true);
         sectionCanvas.setCacheHint(CacheHint.QUALITY);
@@ -333,8 +377,10 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sectionCtx.clearRect(0, 0, size, size);
             if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
                 drawGradientBar();
+                if (getSkinnable().getMajorTickMarksVisible()) drawTickMarks();
             } else if (getSkinnable().getSectionsVisible()) {
                 drawSections();
+                if (getSkinnable().getMajorTickMarksVisible()) drawTickMarks();
             }
             sectionCanvas.setCache(true);
             sectionCanvas.setCacheHint(CacheHint.QUALITY);
