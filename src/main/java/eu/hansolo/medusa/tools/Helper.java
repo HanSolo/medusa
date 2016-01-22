@@ -232,4 +232,23 @@ public class Helper {
     public static void drawLine(final GraphicsContext CTX, final double P1X, final double P1Y, final double P2X, final double P2Y) {
         CTX.strokeLine(P1X, P1Y, P2X, P2Y);
     }
+
+    public static boolean isMonochrome(final Color COLOR) {
+        return Double.compare(COLOR.getRed(), COLOR.getGreen()) == 0 && Double.compare(COLOR.getGreen(), COLOR.getBlue()) == 0;
+    }
+
+    public static double colorDistance(final Color COLOR_1, final Color COLOR_2) {
+        final double DELTA_R = (COLOR_2.getRed() - COLOR_1.getRed());
+        final double DELTA_G = (COLOR_2.getGreen() - COLOR_1.getGreen());
+        final double DELTA_B = (COLOR_2.getBlue() - COLOR_1.getBlue());
+
+        return Math.sqrt(DELTA_R * DELTA_R + DELTA_G * DELTA_G + DELTA_B * DELTA_B);
+    }
+
+    public static boolean isBright(final Color COLOR) { return !isDark(COLOR); }
+    public static boolean isDark(final Color COLOR) {
+        final double DISTANCE_TO_WHITE = colorDistance(COLOR, Color.WHITE);
+        final double DISTANCE_TO_BLACK = colorDistance(COLOR, Color.BLACK);
+        return DISTANCE_TO_BLACK < DISTANCE_TO_WHITE;
+    }
 }
