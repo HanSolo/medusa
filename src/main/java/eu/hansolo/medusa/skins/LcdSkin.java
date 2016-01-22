@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LcdFont;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
@@ -33,6 +34,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -72,7 +80,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              double        width;
     private              double        height;
     private              Pane          pane;
-    private              Rectangle     main;
     private              Paint         lcdPaint;
     private              Paint         lcdFramePaint;
     private              ImageView     crystalOverlay;
@@ -152,11 +159,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void initGraphics() {
-        main = new Rectangle();
-        main.setArcWidth(0.10416667 * PREFERRED_HEIGHT);
-        main.setArcHeight(0.10416667 * PREFERRED_HEIGHT);
-        main.setStrokeType(StrokeType.INSIDE);
-
         mainInnerShadow0 = new InnerShadow();
         mainInnerShadow0.setOffsetX(0.0);
         mainInnerShadow0.setOffsetY(0.0);
@@ -171,8 +173,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         mainInnerShadow1.setColor(Color.web("0x000000a6"));
         mainInnerShadow1.setBlurType(BlurType.TWO_PASS_BOX);
         mainInnerShadow1.setInput(mainInnerShadow0);
-
-        main.setEffect(getSkinnable().getShadowsEnabled() ? mainInnerShadow1 : null);
 
         crystalClip = new Rectangle(0, 0, width, height);
         crystalClip.setArcWidth(5);
@@ -236,8 +236,8 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                          lowerCenterText);
 
         pane = new Pane();
-        pane.getChildren().setAll(main,
-                                  crystalOverlay,
+        pane.setEffect(getSkinnable().getShadowsEnabled() ? mainInnerShadow1 : null);
+        pane.getChildren().setAll(crystalOverlay,
                                   backgroundText,
                                   shadowGroup);
 
@@ -247,7 +247,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void registerListeners() {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-
+        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
         getSkinnable().currentValueProperty().addListener(e -> redraw());
     }
 
@@ -255,13 +255,15 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Methods *******************************************
     protected void handleEvents(final String EVENT_TYPE) {
         if ("REDRAW".equals(EVENT_TYPE)) {
-            main.setEffect(getSkinnable().getShadowsEnabled() ? mainInnerShadow1 : null);
+            pane.setEffect(getSkinnable().getShadowsEnabled() ? mainInnerShadow1 : null);
             shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? FOREGROUND_SHADOW : null);
             redraw();
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             aspectRatio = getSkinnable().getPrefHeight() / getSkinnable().getPrefWidth();
             resize();
             redraw();
+        } else if ("LCD".equals(EVENT_TYPE)) {
+            updateLcdDesign(height);
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             crystalOverlay.setManaged(getSkinnable().isLcdCrystalEnabled());
             crystalOverlay.setVisible(getSkinnable().isLcdCrystalEnabled());
@@ -284,6 +286,42 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         final double AVAILABLE_WIDTH = width - 2 - valueOffsetLeft - valueOffsetRight;
         final double NEEDED_WIDTH    = valueText.getLayoutBounds().getWidth();
         return Double.compare(AVAILABLE_WIDTH, NEEDED_WIDTH) < 0;
+    }
+
+    private void updateLcdDesign(final double HEIGHT) {
+        LcdDesign lcdDesign = getSkinnable().getLcdDesign();
+        Color[]   lcdColors = lcdDesign.getColors();
+
+        lcdPaint = new LinearGradient(0, 1, 0, HEIGHT - 1,
+                                      false, CycleMethod.NO_CYCLE,
+                                      new Stop(0, lcdColors[0]),
+                                      new Stop(0.03, lcdColors[1]),
+                                      new Stop(0.5, lcdColors[2]),
+                                      new Stop(0.5, lcdColors[3]),
+                                      new Stop(1.0, lcdColors[4]));
+        if (lcdDesign.name().startsWith("FLAT")) {
+            lcdFramePaint = Color.WHITE;
+        } else {
+            lcdFramePaint = new LinearGradient(0, 0.02083333 * height, 0, HEIGHT - 0.02083333 * HEIGHT,
+                                               false, CycleMethod.NO_CYCLE,
+                                               new Stop(0.0, Color.rgb(26, 26, 26)),
+                                               new Stop(0.015, Color.rgb(77, 77, 77)),
+                                               new Stop(0.985, Color.rgb(77, 77, 77)),
+                                               new Stop(1.0, Color.rgb(221, 221, 221)));
+        }
+
+        pane.setBackground(new Background(new BackgroundFill(lcdPaint, new CornerRadii(0.10416667 * HEIGHT), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(lcdFramePaint, BorderStrokeStyle.SOLID, new CornerRadii(0.10416667 * HEIGHT), new BorderWidths(0.02083333 * HEIGHT))));
+
+        backgroundText.setFill(lcdDesign.lcdBackgroundColor);
+        valueText.setFill(lcdDesign.lcdForegroundColor);
+        upperLeftText.setFill(lcdDesign.lcdForegroundColor);
+        title.setFill(lcdDesign.lcdForegroundColor);
+        upperRightText.setFill(lcdDesign.lcdForegroundColor);
+        unitText.setFill(lcdDesign.lcdForegroundColor);
+        lowerRightText.setFill(lcdDesign.lcdForegroundColor);
+        lowerCenterText.setFill(lcdDesign.lcdForegroundColor);
+        threshold.setFill(lcdDesign.lcdForegroundColor);
     }
 
     private Image createNoiseImage(final double WIDTH, final double HEIGHT, final Color DARK_COLOR, final Color BRIGHT_COLOR, final double ALPHA_VARIATION_IN_PERCENT) {
@@ -392,9 +430,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueFormatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         otherFormatString = String.join("", "%.", Integer.toString(getSkinnable().getTickLabelDecimals()), "f");
 
-        main.setFill(lcdPaint);
-        main.setStroke(lcdFramePaint);
-
         LcdDesign lcdDesign = getSkinnable().getLcdDesign();
         backgroundText.setFill(lcdDesign.lcdBackgroundColor);
         valueText.setFill(lcdDesign.lcdForegroundColor);
@@ -455,7 +490,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Update the lower right text
         lowerRightText.setText(getSkinnable().getSubTitle());
         lowerRightText.setX(width - lowerRightText.getLayoutBounds().getWidth() - 0.0416666667 * height);
-        lowerRightText.setY(main.getLayoutY() + height - 3 - 0.0416666667 * height);
+        lowerRightText.setY(pane.getLayoutBounds().getMinY() + height - 3 - 0.0416666667 * height);
         if (lowerRightText.getX() < lowerCenterText.getX() + lowerCenterText.getLayoutBounds().getWidth()) {
             lowerRightText.setText("...");
             lowerRightText.setX(width - lowerRightText.getLayoutBounds().getWidth() - 0.0416666667 * height);
@@ -476,32 +511,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             pane.setMaxSize(width, height);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
 
-            main.setWidth(width);
-            main.setHeight(height);
-            main.setArcWidth(0.10416667 * height);
-            main.setArcHeight(0.10416667 * height);
-            main.setStrokeWidth(0.02083333 * height);
-
-            LcdDesign lcdDesign = getSkinnable().getLcdDesign();
-            Color[]   lcdColors = lcdDesign.getColors();
-
-            lcdPaint = new LinearGradient(0, 1, 0, main.getHeight() - 1,
-                                          false, CycleMethod.NO_CYCLE,
-                                          new Stop(0, lcdColors[0]),
-                                          new Stop(0.03, lcdColors[1]),
-                                          new Stop(0.5, lcdColors[2]),
-                                          new Stop(0.5, lcdColors[3]),
-                                          new Stop(1.0, lcdColors[4]));
-            if (lcdDesign.name().startsWith("FLAT")) {
-                lcdFramePaint = Color.WHITE;
-            } else {
-                lcdFramePaint = new LinearGradient(0, 0.02083333 * height, 0, main.getHeight() - 0.02083333 * height,
-                                                   false, CycleMethod.NO_CYCLE,
-                                                   new Stop(0.0, Color.rgb(26, 26, 26)),
-                                                   new Stop(0.015, Color.rgb(77, 77, 77)),
-                                                   new Stop(0.985, Color.rgb(77, 77, 77)),
-                                                   new Stop(1.0, Color.rgb(221, 221, 221)));
-            }
+            updateLcdDesign(height);
 
             mainInnerShadow0.setRadius(3.0 / 132.0 * height);
             mainInnerShadow1.setRadius(2.0 / 132.0 * height);
@@ -576,35 +586,35 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             title.setTextAlignment(TextAlignment.CENTER);
             title.setText(getSkinnable().getTitle());
             title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
-            title.setY(main.getLayoutY() + title.getLayoutBounds().getHeight() - 0.04 * height + 2);
+            title.setY(pane.getLayoutBounds().getMinY() + title.getLayoutBounds().getHeight() - 0.04 * height + 2);
 
             // Info Text
             lowerRightText.setFont(smallFont);
             lowerRightText.setTextOrigin(VPos.BASELINE);
             lowerRightText.setTextAlignment(TextAlignment.RIGHT);
             lowerRightText.setText(getSkinnable().getSubTitle());
-            lowerRightText.setX(main.getLayoutX() + (main.getLayoutBounds().getWidth() - lowerRightText.getLayoutBounds().getWidth()) * 0.5);
-            lowerRightText.setY(main.getLayoutY() + height - 3 - 0.0416666667 * height);
+            lowerRightText.setX(pane.getLayoutBounds().getMinX() + (pane.getLayoutBounds().getWidth() - lowerRightText.getLayoutBounds().getWidth()) * 0.5);
+            lowerRightText.setY(pane.getLayoutBounds().getMinY() + height - 3 - 0.0416666667 * height);
 
             // Min measured value
             upperLeftText.setFont(smallFont);
             upperLeftText.setTextOrigin(VPos.BASELINE);
             upperLeftText.setTextAlignment(TextAlignment.RIGHT);
-            upperLeftText.setX(main.getLayoutX() + 0.0416666667 * height);
-            upperLeftText.setY(main.getLayoutY() + upperLeftText.getLayoutBounds().getHeight() - 0.04 * height + 2);
+            upperLeftText.setX(pane.getLayoutBounds().getMinX() + 0.0416666667 * height);
+            upperLeftText.setY(pane.getLayoutBounds().getMinY() + upperLeftText.getLayoutBounds().getHeight() - 0.04 * height + 2);
 
             // Max measured value
             upperRightText.setFont(smallFont);
             upperRightText.setTextOrigin(VPos.BASELINE);
             upperRightText.setTextAlignment(TextAlignment.RIGHT);
-            upperRightText.setY(main.getLayoutY() + upperRightText.getLayoutBounds().getHeight() - 0.04 * height + 2);
+            upperRightText.setY(pane.getLayoutBounds().getMinY() + upperRightText.getLayoutBounds().getHeight() - 0.04 * height + 2);
 
             // Former value
             lowerCenterText.setFont(smallFont);
             lowerCenterText.setTextOrigin(VPos.BASELINE);
             lowerCenterText.setTextAlignment(TextAlignment.CENTER);
             lowerCenterText.setX((width - lowerCenterText.getLayoutBounds().getWidth()) * 0.5);
-            lowerCenterText.setY(main.getLayoutY() + height - 3 - 0.0416666667 * height);
+            lowerCenterText.setY(pane.getLayoutBounds().getMinY() + height - 3 - 0.0416666667 * height);
         }
     }
 }
