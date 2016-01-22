@@ -289,8 +289,15 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarThreshold.setFill(thresholdColor);
 
         titleText.setFill(getSkinnable().getTitleColor());
+        titleText.setText(getSkinnable().getTitle());
+
         valueText.setFill(getSkinnable().getValueColor());
+        valueText.setText(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
+        valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
+
         unitText.setFill(getSkinnable().getUnitColor());
+        unitText.setText(getSkinnable().getUnit());
+        unitText.relocate((width - unitText.getLayoutBounds().getWidth()), 0.79 * height);
     }
 
     private void resize() {
