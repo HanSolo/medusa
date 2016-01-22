@@ -20,6 +20,7 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LcdFont;
 import eu.hansolo.medusa.LcdDesign;
+import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -52,11 +53,11 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -112,6 +113,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Group         shadowGroup;
     private              String        valueFormatString;
     private              String        otherFormatString;
+    private              List<Section> sections;
 
 
     // ******************** Constructors **************************************
@@ -123,6 +125,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         backgroundTextBuilder = new StringBuilder();
         valueFormatString     = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
         otherFormatString     = String.join("", "%.", Integer.toString(gauge.getTickLabelDecimals()), "f");
+        sections              = getSkinnable().getSections();
         FOREGROUND_SHADOW.setOffsetX(0);
         FOREGROUND_SHADOW.setOffsetY(1);
         FOREGROUND_SHADOW.setColor(Color.rgb(0, 0, 0, 0.5));
@@ -248,7 +251,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(e -> redraw());
+        getSkinnable().currentValueProperty().addListener(e -> handleEvents("REDRAW"));
     }
 
 
@@ -257,6 +260,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if ("REDRAW".equals(EVENT_TYPE)) {
             pane.setEffect(getSkinnable().getShadowsEnabled() ? mainInnerShadow1 : null);
             shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? FOREGROUND_SHADOW : null);
+            checkSections();
             redraw();
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             aspectRatio = getSkinnable().getPrefHeight() / getSkinnable().getPrefWidth();
@@ -342,6 +346,23 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         }
         return IMAGE;
+    }
+
+    private void checkSections() {
+        if (LcdDesign.SECTIONS == getSkinnable().getLcdDesign() && !getSkinnable().getSections().isEmpty()) {
+            int    noOfSections = sections.size();
+            double currentValue = getSkinnable().getCurrentValue();
+            for (int i = 0 ; i < noOfSections ; i++) {
+                Section section = sections.get(i);
+                if (section.contains(currentValue)) {
+                    Color sectionColor = section.getColor();
+                    LcdDesign.SECTIONS.lcdForegroundColor = Color.hsb(sectionColor.getHue(), sectionColor.getSaturation(), sectionColor.getBrightness() * 0.3);
+                    LcdDesign.SECTIONS.lcdBackgroundColor = Color.color(sectionColor.getRed(), sectionColor.getGreen(), sectionColor.getBlue(), 0.1);
+                    break;
+                }
+            }
+            updateLcdDesign(height);
+        }
     }
 
     private void updateFonts() {
@@ -508,9 +529,12 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         if (width > 0 && height > 0) {
+            sections = getSkinnable().getSections();
+
             pane.setMaxSize(width, height);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
 
+            checkSections();
             updateLcdDesign(height);
 
             mainInnerShadow0.setRadius(3.0 / 132.0 * height);
