@@ -347,11 +347,10 @@ public class OverviewDemo extends Application {
         gauge18 = GaugeBuilder.create()
                               .skin(TinySkin.class)
                               .animated(true)
-                              .sections(new Section(0, 20, Color.rgb(0, 0, 200, 0.75)),
-                                        new Section(20, 40, Color.rgb(0, 200, 200, 0.75)),
-                                        new Section(40, 60, Color.rgb(0, 200, 0, 0.75)),
-                                        new Section(60, 80, Color.rgb(200, 200, 0, 0.75)),
-                                        new Section(80, 100, Color.rgb(200, 0, 0, 0.75)))
+                              .minValue(0)
+                              .sections(new Section(0, 33, Color.rgb(0, 200, 0, 0.75)),
+                                        new Section(33, 66, Color.rgb(200, 200, 0, 0.75)),
+                                        new Section(66, 100, Color.rgb(200, 0, 0, 0.75)))
                               .build();
 
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO, GaugeBackground.DARK_GRAY);
