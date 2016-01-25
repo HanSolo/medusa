@@ -108,7 +108,9 @@ public class Gauge extends Control {
     public enum TickLabelLocation { INSIDE, OUTSIDE }
     public enum LcdFont { STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA }
     public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE, LEFT_TO_RIGHT, RIGHT_TO_LEFT, BOTTOM_TO_TOP, TOP_TO_BOTTOM }
-    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI, MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL, LCD, TINY, BATTERY }
+    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
+                           MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL,
+                           LCD, TINY, BATTERY, LEVEL }
 
     public  static final Color                   DARK_COLOR           = Color.rgb(36, 36, 36);
     public  static final Color                   BRIGHT_COLOR         = Color.rgb(223, 223, 223);
@@ -2271,7 +2273,12 @@ public class Gauge extends Control {
                 break;
             case BATTERY:
                 setBarBackgroundColor(Color.BLACK);
+                setBarColor(Color.BLACK);
                 setValueColor(Color.WHITE);
+                break;
+            case LEVEL:
+                setValueColor(Color.WHITE);
+                setBarColor(Color.CYAN);
                 break;
             case GAUGE       :
             default          : super.setSkin(new GaugeSkin(Gauge.this)); break;

@@ -98,6 +98,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             case LCD         : skinClass = LcdSkin.class; break;
             case TINY        : skinClass = TinySkin.class; break;
             case BATTERY     : skinClass = BatterySkin.class; break;
+            case LEVEL       : skinClass = LevelSkin.class; break;
         }
         return (B)this;
     }
@@ -809,6 +810,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setMajorTickMarkColor(Color.WHITE);
             } else if (skinClass == BatterySkin.class) {
                 CONTROL.setBarBackgroundColor(Color.BLACK);
+                CONTROL.setBarColor(Color.BLACK);
+                CONTROL.setValueColor(Color.WHITE);
+            } else if (skinClass == LevelSkin.class) {
+                CONTROL.setBarColor(Color.CYAN);
                 CONTROL.setValueColor(Color.WHITE);
             }
         }
