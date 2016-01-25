@@ -140,6 +140,8 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private String                   formatString;
     private double                   minValue;
     private double                   maxValue;
+    private List<Section>            sections;
+    private List<Section>            areas;
 
 
     // ******************** Constructors **************************************
@@ -153,6 +155,8 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxValue     = gauge.getMaxValue();
         limitString  = "";
         formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        sections     = gauge.getSections();
+        areas        = gauge.getAreas();
         mouseHandler = event -> handleMouseEvent(event);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         updateMarkers();
@@ -301,20 +305,14 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             double currentValue = getSkinnable().getCurrentValue();
             // Check sections for value and fire section events
             if (getSkinnable().getCheckSectionsForValue()) {
-                List<Section> sections = getSkinnable().getSections();
-                int           listSize = sections.size();
-                for (int i = sections.size() ; i > listSize ; i--) {
-                    sections.get(i).checkForValue(currentValue);
-                }
+                int listSize = sections.size();
+                for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(currentValue); }
             }
 
             // Check areas for value and fire section events
             if (getSkinnable().getCheckAreasForValue()) {
-                List<Section> areas = getSkinnable().getSections();
                 int listSize = areas.size();
-                for (int i = areas.size() ; i > listSize ; i--) {
-                    areas.get(i).checkForValue(currentValue);
-                }
+                for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(currentValue); }
             }
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
@@ -364,6 +362,8 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 getSkinnable().setValue(maxValue);
                 oldValue = maxValue;
             }
+            sections = getSkinnable().getSections();
+            areas    = getSkinnable().getAreas();
             resize();
             redraw();
         } else if ("INTERACTIVITY".equals(EVENT_TYPE)) {
@@ -1003,7 +1003,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if (getSkinnable().getSectionsVisible()) {
             drawSections();
         }
-        Helper.drawTickMarks(getSkinnable(), ticksAndSections, minValue, maxValue, startAngle, angleRange, angleStep, width * 0.5, height * 0.9, width * 0.9);
+        Helper.drawRadialTickMarks(getSkinnable(), ticksAndSections, minValue, maxValue, startAngle, angleRange, angleStep, width * 0.5, height * 0.9, width * 0.9);
         ticksAndSectionsCanvas.setCache(true);
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 

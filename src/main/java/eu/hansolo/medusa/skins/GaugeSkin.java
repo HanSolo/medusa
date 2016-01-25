@@ -20,8 +20,6 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.TickLabelLocation;
-import eu.hansolo.medusa.Gauge.TickLabelOrientation;
-import eu.hansolo.medusa.Gauge.TickMarkType;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
@@ -70,12 +68,10 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -141,6 +137,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private String                   formatString;
     private double                   minValue;
     private double                   maxValue;
+    private List<Section>            sections;
+    private List<Section>            areas;
 
 
     // ******************** Constructors **************************************
@@ -154,6 +152,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxValue     = gauge.getMaxValue();
         limitString  = "";
         formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        sections     = gauge.getSections();
+        areas        = gauge.getAreas();
         mouseHandler = event -> handleMouseEvent(event);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         updateMarkers();
@@ -302,20 +302,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             double currentValue = getSkinnable().getCurrentValue();
             // Check sections for value and fire section events
             if (getSkinnable().getCheckSectionsForValue()) {
-                List<Section> sections = getSkinnable().getSections();
                 int listSize = sections.size();
-                for (int i = sections.size() ; i > listSize ; i--) {
-                    sections.get(i).checkForValue(currentValue);
-                }
+                for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(currentValue); }
             }
 
             // Check areas for value and fire section events
             if (getSkinnable().getCheckAreasForValue()) {
-                List<Section> areas = getSkinnable().getSections();
                 int listSize = areas.size();
-                for (int i = areas.size() ; i > listSize ; i--) {
-                    areas.get(i).checkForValue(currentValue);
-                }
+                for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(currentValue); }
             }
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
@@ -365,6 +359,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 getSkinnable().setValue(maxValue);
                 oldValue = maxValue;
             }
+            sections = getSkinnable().getSections();
+            areas    = getSkinnable().getAreas();
             resize();
             redraw();
         } else if ("INTERACTIVITY".equals(EVENT_TYPE)) {
@@ -414,7 +410,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         }
     }
-    
+
     private void drawGradientBar() {
         TickLabelLocation  tickLabelLocation = getSkinnable().getTickLabelLocation();
         double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * size : 0.0515 * size;
@@ -975,7 +971,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if (getSkinnable().getSectionsVisible()) {
             drawSections();
         }
-        Helper.drawTickMarks(getSkinnable(), ticksAndSections, minValue, maxValue, startAngle, angleRange, angleStep, size * 0.5, size * 0.5, size);
+        Helper.drawRadialTickMarks(getSkinnable(), ticksAndSections, minValue, maxValue, startAngle, angleRange, angleStep, size * 0.5, size * 0.5, size);
         ticksAndSectionsCanvas.setCache(true);
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 

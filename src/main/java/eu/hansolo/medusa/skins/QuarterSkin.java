@@ -96,7 +96,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double       MAXIMUM_WIDTH    = 1024;
     private static final double       MAXIMUM_HEIGHT   = 1024;
     private static final double       ANGLE_RANGE      = 90;
-    private              Map<Marker, Shape> markerMap        = new ConcurrentHashMap<>();
+    private              Map<Marker, Shape> markerMap  = new ConcurrentHashMap<>();
     private double                   oldValue;
     private double                   size;
     private double                   centerX;
@@ -144,6 +144,8 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private String                   formatString;
     private double                   minValue;
     private double                   maxValue;
+    private List<Section>            sections;
+    private List<Section>            areas;
 
 
     // ******************** Constructors **************************************
@@ -156,6 +158,8 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         minValue     = gauge.getMinValue();
         maxValue     = gauge.getMaxValue();
         formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        sections     = gauge.getSections();
+        areas        = gauge.getAreas();
         mouseHandler = event -> handleMouseEvent(event);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         updateMarkers();
@@ -304,12 +308,14 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             double currentValue = getSkinnable().getCurrentValue();
             // Check sections for value and fire section events
             if (getSkinnable().getCheckSectionsForValue()) {
-                for (Section section : getSkinnable().getSections()) { section.checkForValue(currentValue); }
+                int listSize = sections.size();
+                for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(currentValue); }
             }
 
             // Check areas for value and fire section events
             if (getSkinnable().getCheckAreasForValue()) {
-                for (Section area : getSkinnable().getAreas()) { area.checkForValue(currentValue); }
+                int listSize = areas.size();
+                for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(currentValue); }
             }
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
@@ -358,6 +364,8 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 getSkinnable().setValue(maxValue);
                 oldValue = maxValue;
             }
+            sections = getSkinnable().getSections();
+            areas    = getSkinnable().getAreas();
             resize();
             redraw();
         } else if ("INTERACTIVITY".equals(EVENT_TYPE)) {
@@ -421,7 +429,6 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double               sinValue;
         double               cosValue;
         double               scaledSize            = size * 1.95;
-        double               angleRange            = ANGLE_RANGE;
         int                  tickLabelDecimals     = getSkinnable().getTickLabelDecimals();
         String               tickLabelFormatString = "%." + tickLabelDecimals + "f";
         double               minorTickSpace        = getSkinnable().getMinorTickSpace();
@@ -564,7 +571,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double tmpStep                = tmpStepBD.doubleValue();
         double angle                  = 0;
         int    customTickLabelCounter = 0;
-        for (double i = 0 ; Double.compare(-angleRange - tmpStep, i) <= 0 ; i -= tmpStep) {
+        for (double i = 0 ; Double.compare(-ANGLE_RANGE - tmpStep, i) <= 0 ; i -= tmpStep) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
 

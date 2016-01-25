@@ -43,6 +43,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
+import java.util.List;
 import java.util.Locale;
 
 
@@ -76,6 +77,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text                titleText;
     private double              angleStep;
     private String              formatString;
+    private List<Section>       sections;
 
 
     // ******************** Constructors **************************************
@@ -83,6 +85,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         super(gauge);
         angleStep    = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
         formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        sections     = gauge.getSections();
 
         init();
         initGraphics();
@@ -178,13 +181,15 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             if (getSkinnable().getCheckSectionsForValue()) {
                 double currentValue = getSkinnable().getCurrentValue();
-                for (Section section : getSkinnable().getSections()) { section.checkForValue(currentValue); }
+                int listSize = sections.size();
+                for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(currentValue); }
             }
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             angleStep = ANGLE_RANGE / getSkinnable().getRange();
             needleRotate.setAngle((180 - START_ANGLE) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
+            sections = getSkinnable().getSections();
             resize();
         }
     }
