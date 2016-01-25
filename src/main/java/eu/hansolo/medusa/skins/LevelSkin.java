@@ -115,7 +115,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         Tooltip.install(tube, barTooltip);
 
         tubeTop = new Ellipse();
-        tubeTop.setStroke(Color.rgb(255, 255, 255, 0.75));
+        tubeTop.setStroke(Color.rgb(255, 255, 255, 0.5));
         tubeTop.setStrokeType(StrokeType.INSIDE);
         tubeTop.setStrokeWidth(1);
 
@@ -217,7 +217,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (getSkinnable().isGradientBarEnabled() && !getSkinnable().getGradientBarStops().isEmpty()) {
             Color color = getSkinnable().getGradientLookup().getColorAt(factor);
             fluidBody.setFill(color);
-            fluidTop.setFill(color.darker().darker());
+            fluidTop.setFill(color.darker());
         }
 
         double centerY = height * 0.71111111 - factor * 0.58888889 * height;
@@ -361,7 +361,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         fluidBody.setFill(getSkinnable().getBarColor());
-        fluidTop.setFill(getSkinnable().getBarColor().darker().darker());
+        fluidTop.setFill(getSkinnable().getBarColor().darker());
 
         valueText.setFill(getSkinnable().getValueColor());
         titleText.setFill(getSkinnable().getTitleColor());
