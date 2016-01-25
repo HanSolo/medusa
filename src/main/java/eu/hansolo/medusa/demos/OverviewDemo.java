@@ -80,6 +80,7 @@ public class OverviewDemo extends Application {
     private Gauge          gauge16;
     private Gauge          gauge17;
     private Gauge          gauge18;
+    private Gauge          gauge19;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -353,6 +354,15 @@ public class OverviewDemo extends Application {
                                         new Section(66, 100, Color.rgb(200, 0, 0, 0.75)))
                               .build();
 
+        gauge19 = GaugeBuilder.create()
+                              .skin(BatterySkin.class)
+                              .animated(true)
+                              .sectionsVisible(true)
+                              .sections(new Section(0, 10, Color.rgb(200, 0, 0, 0.8)),
+                                        new Section(10, 30, Color.rgb(200, 200, 0, 0.8)),
+                                        new Section(30, 100, Color.rgb(0, 200, 0, 0.8)))
+                              .build();
+
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO, GaugeBackground.DARK_GRAY);
 
         framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
@@ -379,6 +389,7 @@ public class OverviewDemo extends Application {
                     gauge16.setValue(RND.nextDouble() * gauge16.getRange() + gauge16.getMinValue());
                     gauge17.setValue(RND.nextDouble() * gauge17.getRange() + gauge17.getMinValue());
                     gauge18.setValue(RND.nextDouble() * gauge18.getRange() + gauge18.getMinValue());
+                    gauge19.setValue(RND.nextDouble() * gauge19.getRange() + gauge19.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -405,6 +416,7 @@ public class OverviewDemo extends Application {
         pane.add(gauge16, 0, 3);
         pane.add(gauge17, 1, 3);
         pane.add(gauge18, 2, 3);
+        pane.add(gauge19, 3, 3);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));

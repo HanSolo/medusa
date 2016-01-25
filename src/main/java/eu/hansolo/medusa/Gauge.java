@@ -107,8 +107,8 @@ public class Gauge extends Control {
     }
     public enum TickLabelLocation { INSIDE, OUTSIDE }
     public enum LcdFont { STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA }
-    public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE }
-    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI, MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL, LCD, TINY }
+    public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE, LEFT_TO_RIGHT, RIGHT_TO_LEFT, BOTTOM_TO_TOP, TOP_TO_BOTTOM }
+    public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI, MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL, LCD, TINY, BATTERY }
 
     public  static final Color                   DARK_COLOR           = Color.rgb(36, 36, 36);
     public  static final Color                   BRIGHT_COLOR         = Color.rgb(223, 223, 223);
@@ -650,43 +650,43 @@ public class Gauge extends Control {
     public ObservableList<Section> getSections() { return sections; }
     public void setSections(final List<Section> SECTIONS) {
         sections.setAll(SECTIONS);
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(RECALC_EVENT);
     }
     public void setSections(final Section... SECTIONS) { setSections(Arrays.asList(SECTIONS)); }
     public void addSection(final Section SECTION) {
         if (null == SECTION) return;
         sections.add(SECTION);
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(RECALC_EVENT);
     }
     public void removeSection(final Section SECTION) {
         if (null == SECTION) return;
         sections.remove(SECTION);
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(RECALC_EVENT);
     }
     public void clearSections() {
         sections.clear();
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(RECALC_EVENT);
     }
 
     public ObservableList<Section> getAreas() { return areas; }
     public void setAreas(final List<Section> AREAS) {
         areas.setAll(AREAS);
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(RECALC_EVENT);
     }
     public void setAreas(final Section... AREAS) { setAreas(Arrays.asList(AREAS)); }
     public void addArea(final Section AREA) {
         if (null == AREA) return;
         areas.add(AREA);
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(RECALC_EVENT);
     }
     public void removeArea(final Section AREA) {
         if (null == AREA) return;
         areas.remove(AREA);
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(RECALC_EVENT);
     }
     public void clearAreas() {
         areas.clear();
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(RECALC_EVENT);
     }
 
     public ObservableList<Section> getTickMarkSections() { return tickMarkSections; }
@@ -2234,7 +2234,6 @@ public class Gauge extends Control {
                 setThresholdColor(Color.rgb(180, 0, 0));
                 setBarBackgroundColor(Color.rgb(169, 169, 169, 0.25));
                 setBarColor(Color.rgb(169, 169, 169));
-                setBackgroundPaint(Color.rgb(169, 169, 169, 0.3));
                 setTitleColor(Color.WHITE);
                 setValueColor(Color.WHITE);
                 setUnitColor(Color.WHITE);
@@ -2269,6 +2268,10 @@ public class Gauge extends Control {
                 setSectionsVisible(true);
                 setMajorTickMarksVisible(true);
                 setMajorTickMarkColor(Color.WHITE);
+                break;
+            case BATTERY:
+                setBarBackgroundColor(Color.BLACK);
+                setValueColor(Color.WHITE);
                 break;
             case GAUGE       :
             default          : super.setSkin(new GaugeSkin(Gauge.this)); break;
