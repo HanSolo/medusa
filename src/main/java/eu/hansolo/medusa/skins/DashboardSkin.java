@@ -30,9 +30,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.FillRule;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -74,6 +76,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private ArcTo         dataBarOuterArc;
     private LineTo        dataBarLineToInnerArc;
     private ArcTo         dataBarInnerArc;
+    private Line          threshold;
     private InnerShadow   innerShadow;
     private Font          smallFont;
     private Font          bigFont;
@@ -183,6 +186,11 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBar.setStroke(getSkinnable().getBorderPaint());
         dataBar.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
 
+        threshold = new Line();
+        threshold.setStrokeLineCap(StrokeLineCap.BUTT);
+        threshold.setVisible(getSkinnable().isThresholdVisible());
+        threshold.setManaged(getSkinnable().isThresholdVisible());
+
         pane = new Pane();
         pane.getChildren().setAll(unitText,
                                   titleText,
@@ -190,7 +198,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                   minText,
                                   maxText,
                                   barBackground,
-                                  dataBar);
+                                  dataBar,
+                                  threshold);
 
         getChildren().setAll(pane);
     }
@@ -216,6 +225,9 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sections  = getSkinnable().getSections();
             resize();
             redraw();
+        } else if ("VISBILITY".equals(EVENT_TYPE)) {
+            threshold.setVisible(getSkinnable().isThresholdVisible());
+            threshold.setManaged(getSkinnable().isThresholdVisible());
         }
     }
 
@@ -236,7 +248,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (!sectionsVisible && !colorGradientEnabled) {
             dataBar.setFill(getSkinnable().getBarColor());
         } else if (colorGradientEnabled && noOfGradientStops > 1) {
-            dataBar.setFill(getSkinnable().getGradientLookup().getColorAt(VALUE / range));
+            dataBar.setFill(getSkinnable().getGradientLookup().getColorAt((VALUE - minValue) / range));
         } else {
             for (Section section : sections) {
                 if (section.contains(VALUE)) {
@@ -280,6 +292,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.5 * height);
 
         dataBar.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
+
+        threshold.setStroke(getSkinnable().getThresholdColor());
     }
 
     private void resize() {
@@ -353,6 +367,16 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             dataBarInnerArc.setRadiusY(0.3 * height);
             dataBarInnerArc.setX(0.27778 * width);
             dataBarInnerArc.setY(0.675 * height);
+
+            threshold.setStroke(getSkinnable().getThresholdColor());
+            threshold.setStrokeWidth(Helper.clamp(1d, 2d, 0.00675676 * height));
+            double thresholdInnerRadius = 0.3 * height;
+            double thresholdOuterRadius = 0.675 * height;
+            double thresholdAngle = Helper.clamp(90d, 270d, (getSkinnable().getThreshold() - minValue) * angleStep + 90d);
+            threshold.setStartX(centerX + thresholdInnerRadius * Math.sin(-Math.toRadians(thresholdAngle)));
+            threshold.setStartY(centerX + thresholdInnerRadius * Math.cos(-Math.toRadians(thresholdAngle)));
+            threshold.setEndX(centerX + thresholdOuterRadius * Math.sin(-Math.toRadians(thresholdAngle)));
+            threshold.setEndY(centerX + thresholdOuterRadius * Math.cos(-Math.toRadians(thresholdAngle)));
         }
     }
 }
