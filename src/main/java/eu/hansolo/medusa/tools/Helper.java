@@ -568,50 +568,51 @@ public class Helper {
                     CTX.setFill(zeroColor);
                     CTX.setStroke(zeroColor);
                 }
-
-                switch (tickMarkType) {
-                    case TRIANGLE:
-                        if (majorTickMarksVisible) {
-                            Helper.drawTriangle(CTX, triangleMajorInnerPoint1X, triangleMajorInnerPoint1Y, triangleMajorInnerPoint2X, triangleMajorInnerPoint2Y,
-                                                triangleMajorOuterPoint1X, triangleMajorOuterPoint1Y, triangleMajorOuterPoint2X, triangleMajorOuterPoint2Y);
-                        } else if (minorTickMarksVisible) {
-                            Helper.drawTriangle(CTX, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
-                                                triangleMinorOuterPoint1X, triangleMinorOuterPoint1Y, triangleMinorOuterPoint2X, triangleMinorOuterPoint2Y);
-                        }
-                        break;
-                    case DOT:
-                        if (majorTickMarksVisible) {
-                            Helper.drawDot(CTX, dotCenterX - majorHalfDotSize, dotCenterY - majorHalfDotSize, majorDotSize);
-                        } else if (minorTickMarksVisible) {
-                            Helper.drawDot(CTX, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
-                        }
-                        break;
-                    case TICK_LABEL:
-                        if (majorTickMarksVisible) {
-                            CTX.save();
-                            CTX.translate(tickLabelTickMarkX, tickLabelTickMarkY);
-
-                            Helper.rotateContextForText(CTX, START_ANGLE, angle, tickLabelOrientation);
-
-                            CTX.setFont(isNotZero ? tickMarkFont : tickMarkZeroFont);
-                            CTX.setTextAlign(TextAlignment.CENTER);
-                            CTX.setTextBaseline(VPos.CENTER);
-                            CTX.fillText(String.format(Locale.US, tickLabelFormatString, counter), 0, 0);
-                            CTX.restore();
-                        }
-                        break;
-                    case LINE:
-                    default:
-                        if (majorTickMarksVisible) {
-                            Helper.drawLine(CTX, innerPointX, innerPointY, outerPointX, outerPointY);
-                        } else if (minorTickMarksVisible) {
-                            if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
-                                Helper.drawLine(CTX, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
-                            } else {
-                                Helper.drawLine(CTX, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
+                if (null != tickMarkType) {
+                    switch (tickMarkType) {
+                        case TRIANGLE:
+                            if (majorTickMarksVisible) {
+                                Helper.drawTriangle(CTX, triangleMajorInnerPoint1X, triangleMajorInnerPoint1Y, triangleMajorInnerPoint2X, triangleMajorInnerPoint2Y,
+                                                    triangleMajorOuterPoint1X, triangleMajorOuterPoint1Y, triangleMajorOuterPoint2X, triangleMajorOuterPoint2Y);
+                            } else if (minorTickMarksVisible) {
+                                Helper.drawTriangle(CTX, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
+                                                    triangleMinorOuterPoint1X, triangleMinorOuterPoint1Y, triangleMinorOuterPoint2X, triangleMinorOuterPoint2Y);
                             }
-                        }
-                        break;
+                            break;
+                        case DOT:
+                            if (majorTickMarksVisible) {
+                                Helper.drawDot(CTX, dotCenterX - majorHalfDotSize, dotCenterY - majorHalfDotSize, majorDotSize);
+                            } else if (minorTickMarksVisible) {
+                                Helper.drawDot(CTX, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
+                            }
+                            break;
+                        case TICK_LABEL:
+                            if (majorTickMarksVisible) {
+                                CTX.save();
+                                CTX.translate(tickLabelTickMarkX, tickLabelTickMarkY);
+
+                                Helper.rotateContextForText(CTX, START_ANGLE, angle, tickLabelOrientation);
+
+                                CTX.setFont(isNotZero ? tickMarkFont : tickMarkZeroFont);
+                                CTX.setTextAlign(TextAlignment.CENTER);
+                                CTX.setTextBaseline(VPos.CENTER);
+                                CTX.fillText(String.format(Locale.US, tickLabelFormatString, counter), 0, 0);
+                                CTX.restore();
+                            }
+                            break;
+                        case LINE:
+                        default:
+                            if (majorTickMarksVisible) {
+                                Helper.drawLine(CTX, innerPointX, innerPointY, outerPointX, outerPointY);
+                            } else if (minorTickMarksVisible) {
+                                if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
+                                    Helper.drawLine(CTX, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
+                                } else {
+                                    Helper.drawLine(CTX, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
+                                }
+                            }
+                            break;
+                    }
                 }
 
                 // Draw tick label text
