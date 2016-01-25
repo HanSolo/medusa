@@ -37,6 +37,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.IntStream;
@@ -89,6 +90,8 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             preferredHeight = 64;
         }
         gauge.setPrefSize(preferredWidth, preferredHeight);
+
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
 
         init();
         initGraphics();
@@ -188,20 +191,22 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
         } else if ("RECALC".equals(EVENT_TYPE)) {
+            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             if (Orientation.VERTICAL == orientation) {
-                width = height / aspectRatio;
+                width    = height / aspectRatio;
                 stepSize = (0.79699248 * height) / getSkinnable().getRange();
             } else {
-                height = width / aspectRatio;
+                height   = width / aspectRatio;
                 stepSize = (0.79699248 * width) / getSkinnable().getRange();
             }
+            resize();
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             barTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getValue()));
         }
     }
 
-    private void drawTickMarks(final GraphicsContext CTX) {
+    private void drawTickMarks1(final GraphicsContext CTX) {
         tickMarkCanvas.setCache(false);
         CTX.clearRect(0, 0, tickMarkCanvas.getWidth(), tickMarkCanvas.getHeight());
         CTX.setFill(getSkinnable().getMajorTickMarkColor());
@@ -267,6 +272,82 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     CTX.restore();
                 }
             }
+        }
+
+        tickMarkCanvas.setCache(true);
+        tickMarkCanvas.setCacheHint(CacheHint.QUALITY);
+    }
+
+    private void drawTickMarks(final GraphicsContext CTX) {
+        tickMarkCanvas.setCache(false);
+        CTX.clearRect(0, 0, tickMarkCanvas.getWidth(), tickMarkCanvas.getHeight());
+        CTX.setFill(getSkinnable().getMajorTickMarkColor());
+
+        List<Section> tickMarkSections         = getSkinnable().getTickMarkSections();
+        List<Section> tickLabelSections        = getSkinnable().getTickLabelSections();
+        Color         majorTickMarkColor       = getSkinnable().getTickMarkColor();
+        Color         tickLabelColor           = getSkinnable().getTickLabelColor();
+        boolean       smallRange               = Double.compare(getSkinnable().getRange(), 10d) <= 0;
+        double        minValue                 = getSkinnable().getMinValue();
+        double        maxValue                 = getSkinnable().getMaxValue();
+        double        tmpStepSize              = smallRange ? stepSize / 10 : stepSize;
+        Font          tickLabelFont            = Fonts.robotoRegular(0.15 * (Orientation.VERTICAL == orientation ? width : height));
+        boolean       tickMarkSectionsVisible  = getSkinnable().getTickMarkSectionsVisible();
+        boolean       tickLabelSectionsVisible = getSkinnable().getTickLabelSectionsVisible();
+        double        offsetX                  = 0.18345865 * width;
+        double        offsetY                  = 0.1 * height;
+        double        innerPointX              = 0;
+        double        innerPointY              = 0;
+        double        outerPointX              = 0.07 * width;
+        double        outerPointY              = 0.08 * height;
+        double        textPointX               = 0.55 * tickMarkCanvas.getWidth();
+        double        textPointY               = 0.7 * tickMarkCanvas.getHeight();
+        BigDecimal    minorTickSpaceBD         = BigDecimal.valueOf(getSkinnable().getMinorTickSpace());
+        BigDecimal    majorTickSpaceBD         = BigDecimal.valueOf(getSkinnable().getMajorTickSpace());
+        BigDecimal    counterBD                = BigDecimal.valueOf(getSkinnable().getMinValue());
+        double        counter                  = minValue;
+        double        range                    = getSkinnable().getRange();
+
+        for (double i = 0 ; Double.compare(i, range) <= 0 ; i++) {
+            if (Orientation.VERTICAL == orientation) {
+                innerPointY = counter * tmpStepSize + offsetY;
+                outerPointY = innerPointY;
+                textPointY  = innerPointY;
+            } else {
+                innerPointX = counter * tmpStepSize + offsetX;
+                outerPointX = innerPointX;
+                textPointX  = innerPointX;
+            }
+
+            // Set the general tickmark color
+            CTX.setStroke(getSkinnable().getTickMarkColor());
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+                // Draw major tick mark
+                if (getSkinnable().getMajorTickMarksVisible()) {
+                    CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
+                    CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
+                    CTX.setLineWidth(1);
+                    CTX.strokeLine(innerPointX, innerPointY, outerPointX, outerPointY);
+                }
+                // Draw tick label text
+                if (getSkinnable().getTickLabelsVisible()) {
+                    CTX.save();
+                    CTX.translate(textPointX, textPointY);
+                    CTX.setFont(tickLabelFont);
+                    CTX.setTextAlign(TextAlignment.CENTER);
+                    CTX.setTextBaseline(VPos.CENTER);
+                    CTX.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
+                    if (Orientation.VERTICAL == orientation) {
+                        CTX.fillText(Integer.toString((int) (maxValue - counter)), 0, 0);
+                    } else {
+                        CTX.fillText(Integer.toString((int) counter), 0, 0);
+                    }
+                    CTX.restore();
+                }
+            }
+            counterBD = counterBD.add(minorTickSpaceBD);
+            counter   = counterBD.doubleValue();
+            if (counter > maxValue) break;
         }
 
         tickMarkCanvas.setCache(true);
