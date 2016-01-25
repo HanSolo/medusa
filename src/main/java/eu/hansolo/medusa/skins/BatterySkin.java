@@ -153,9 +153,11 @@ public class BatterySkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Private Methods ***********************************
     private void setBar(final double VALUE) {
-        double barSize = VALUE / getSkinnable().getRange();
+        double factor = VALUE / getSkinnable().getRange();
         Color barColor = getSkinnable().getBarColor();
-        if (getSkinnable().getSectionsVisible() && !sections.isEmpty()) {
+        if (getSkinnable().isGradientBarEnabled() && !getSkinnable().getGradientBarStops().isEmpty()) {
+            barColor = getSkinnable().getGradientLookup().getColorAt(factor);
+        } else if (getSkinnable().getSectionsVisible() && !sections.isEmpty()) {
             int listSize = sections.size();
             for (int i = 0 ; i < listSize ; i++) {
                 if (sections.get(i).contains(VALUE)) {
@@ -168,19 +170,19 @@ public class BatterySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (Orientation.HORIZONTAL == orientation) {
             batteryPaint = new LinearGradient(0, 0, size, 0, false, CycleMethod.NO_CYCLE,
                                               new Stop(0, barColor),
-                                              new Stop(barSize, barColor),
-                                              new Stop(barSize, Color.TRANSPARENT),
+                                              new Stop(factor, barColor),
+                                              new Stop(factor, Color.TRANSPARENT),
                                               new Stop(1, Color.TRANSPARENT));
         } else {
             batteryPaint = new LinearGradient(0, 0, 0, size, false, CycleMethod.NO_CYCLE,
                                               new Stop(0, Color.TRANSPARENT),
-                                              new Stop(1 - barSize, Color.TRANSPARENT),
-                                              new Stop(1 - barSize, barColor),
+                                              new Stop(1 - factor, Color.TRANSPARENT),
+                                              new Stop(1 - factor, barColor),
                                               new Stop(1, barColor));
         }
         battery.setFill(batteryPaint);
 
-        valueText.setText(String.format(Locale.US, "%.0f%%", barSize * 100));
+        valueText.setText(String.format(Locale.US, "%.0f%%", factor * 100));
         valueText.relocate((size - valueText.getLayoutBounds().getWidth()) * 0.5, (size - valueText.getLayoutBounds().getHeight()) * 0.5);
     }
 
