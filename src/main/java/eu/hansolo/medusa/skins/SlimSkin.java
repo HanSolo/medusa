@@ -150,6 +150,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             minValue  = getSkinnable().getMinValue();
             range     = getSkinnable().getRange();
             angleStep = ANGLE_RANGE / range;
+            sections  = getSkinnable().getSections();
             redraw();
         }
     }
@@ -187,7 +188,6 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
         sectionsVisible      = getSkinnable().getSectionsVisible();
-        sections             = getSkinnable().getSections();
 
         titleText.setText(getSkinnable().getTitle());
         unitText.setText(getSkinnable().getUnit());

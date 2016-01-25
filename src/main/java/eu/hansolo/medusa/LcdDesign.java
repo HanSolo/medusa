@@ -16,7 +16,6 @@
 
 package eu.hansolo.medusa;
 
-import eu.hansolo.medusa.tools.Helper;
 import javafx.scene.paint.Color;
 
 
@@ -59,38 +58,7 @@ public enum LcdDesign {
     BLUE_LIGHTBLUE2(Color.rgb(15, 84, 151), Color.rgb(60, 103, 198), Color.rgb(67, 109, 209), Color.rgb(67, 109, 209), Color.rgb(64, 101, 190), Color.rgb(193, 253, 254), Color.rgb(193, 253, 254, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
     GRAY_PURPLE(Color.rgb(153, 164, 161), Color.rgb(203, 215, 213), Color.rgb(202, 212, 211), Color.rgb(202, 212, 211), Color.rgb(198, 209, 213), Color.rgb(99, 124, 204), Color.rgb(99, 124, 204, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
     YOCTOPUCE(Color.web("#0E181F"), Color.web("#232341"), Color.web("#1E1E3C"), Color.web("#1E1E3C"), Color.web("#191937"), Color.web("#99E5FF"), Color.rgb(153,229,255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
-    SECTIONS(Color.web("#B2B2B2"), Color.web("#FFFFFF"), Color.web("#C4C4C4"), Color.web("#C4C4C4"), Color.web("#B2B2B2"), Color.web("#000000"), Color.rgb(0, 0, 0, 0.1)) {
-        @Override public Color[] getColors() {
-            double hue = lcdBackgroundColor.getHue();
-            double sat = lcdBackgroundColor.getSaturation();
-
-            Color[] colors;
-            if (Helper.isMonochrome(lcdBackgroundColor)) {
-                // Section color is monochrome
-                colors = new Color[]{
-                    Color.hsb(hue, 0, 0.69),
-                    Color.hsb(hue, 0, 1.0),
-                    Color.hsb(hue, 0, 0.76),
-                    Color.hsb(hue, 0, 0.76),
-                    Color.hsb(hue, sat, 0.69),
-                    Helper.isDark(lcdBackgroundColor) ? Color.WHITE : Color.BLACK,
-                    Helper.isDark(lcdBackgroundColor) ? Color.rgb(255, 255, 255, 0.1) : Color.rgb(0, 0, 0, 0.1)
-                };
-            } else {
-                // Section color is not monochrome
-                colors = new Color[]{
-                    Color.hsb(hue, sat, 0.69),
-                    Color.hsb(hue, sat, 1.0),
-                    Color.hsb(hue, sat, 0.76),
-                    Color.hsb(hue, sat, 0.76),
-                    Color.hsb(hue, sat, 0.69),
-                    lcdForegroundColor,
-                    Color.color(lcdBackgroundColor.getRed(), lcdBackgroundColor.getGreen(), lcdBackgroundColor.getBlue(), 0.1)
-                };
-            }
-            return colors;
-        }
-    },
+    SECTIONS(Color.web("#B2B2B2"), Color.web("#FFFFFF"), Color.web("#C4C4C4"), Color.web("#C4C4C4"), Color.web("#B2B2B2"), Color.web("#000000"), Color.rgb(0, 0, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
     FLAT_CUSTOM(Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, Color.WHITE, Color.TRANSPARENT) { @Override public Color[] getColors() {
         return new Color[] {lcdBackgroundColor, lcdBackgroundColor, lcdBackgroundColor, lcdBackgroundColor, lcdBackgroundColor,
                             lcdForegroundColor, Color.color(lcdForegroundColor.getRed(), lcdForegroundColor.getGreen(), lcdForegroundColor.getBlue(), 0.1)};

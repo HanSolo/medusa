@@ -161,6 +161,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             minValue  = getSkinnable().getMinValue();
             range     = getSkinnable().getRange();
             angleStep = ANGLE_RANGE / range;
+            sections  = getSkinnable().getSections();
             redraw();
         }
     }
@@ -201,7 +202,6 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
         sectionsVisible      = getSkinnable().getSectionsVisible();
-        sections             = getSkinnable().getSections();
 
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
         setBarColor(getSkinnable().getCurrentValue());

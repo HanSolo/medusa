@@ -205,6 +205,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             minValue  = getSkinnable().getMinValue();
             maxValue  = getSkinnable().getMaxValue();
             range     = getSkinnable().getRange();
+            sections  = getSkinnable().getSections();
             angleStep = ANGLE_RANGE / range;
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
@@ -326,7 +327,6 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
-        sections             = getSkinnable().getSections();
 
         barBackground.setStroke(getSkinnable().getBarBackgroundColor());
 

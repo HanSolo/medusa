@@ -205,6 +205,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             startAngle = getStartAngle();
             minValue   = getSkinnable().getMinValue();
             range      = getSkinnable().getRange();
+            sections   = getSkinnable().getSections();
             angleStep  = angleRange / range;
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
@@ -265,7 +266,6 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
         sectionsVisible      = getSkinnable().getSectionsVisible();
-        sections             = getSkinnable().getSections();
 
         minValueText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
         maxValueText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));

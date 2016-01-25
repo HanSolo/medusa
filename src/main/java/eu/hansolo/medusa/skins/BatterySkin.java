@@ -139,6 +139,7 @@ public class BatterySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
+            sections = getSkinnable().getSections();
             if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             setBar(getSkinnable().getCurrentValue());
             resize();
@@ -264,8 +265,6 @@ public class BatterySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         size = width < height ? width : height;
         
         if (size > 0) {
-            sections = getSkinnable().getSections();
-
             pane.setMaxSize(size, size);
             pane.relocate((getSkinnable().getWidth() - size) * 0.5, (getSkinnable().getHeight() - size) * 0.5);
 

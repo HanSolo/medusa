@@ -213,6 +213,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             range     = getSkinnable().getRange();
             angleStep = ANGLE_RANGE / range;
             minValue  = getSkinnable().getMinValue();
+            sections  = getSkinnable().getSections();
             resize();
             redraw();
         }
@@ -252,7 +253,6 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
         sectionsVisible      = getSkinnable().getSectionsVisible();
-        sections             = getSkinnable().getSections();
 
         barBackground.setFill(getSkinnable().getBarBackgroundColor());
         barBackground.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
