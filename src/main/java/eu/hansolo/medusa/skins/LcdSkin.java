@@ -57,8 +57,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 
@@ -66,54 +68,55 @@ import java.util.Random;
  * Created by hansolo on 21.01.16.
  */
 public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double        PREFERRED_WIDTH    = 132;
-    private static final double        PREFERRED_HEIGHT   = 48;
-    private static final double        MINIMUM_WIDTH      = 5;
-    private static final double        MINIMUM_HEIGHT     = 5;
-    private static final double        MAXIMUM_WIDTH      = 1024;
-    private static final double        MAXIMUM_HEIGHT     = 1024;
-    private static final Color         DARK_NOISE_COLOR   = Color.rgb(100, 100, 100, 0.10);
-    private static final Color         BRIGHT_NOISE_COLOR = Color.rgb(200, 200, 200, 0.05);
-    private static final DropShadow    FOREGROUND_SHADOW  = new DropShadow();
-    private static       double        aspectRatio        = 0.36363636;
-    private static       Text          oneSegment         = new Text("8");
-    private static       Text          dotSegment         = new Text(".");
-    private              double        width;
-    private              double        height;
-    private              Pane          pane;
-    private              Paint         lcdPaint;
-    private              Paint         lcdFramePaint;
-    private              ImageView     crystalOverlay;
-    private              Image         crystalImage;
-    private              Rectangle     crystalClip;
-    private              InnerShadow   mainInnerShadow0;
-    private              InnerShadow   mainInnerShadow1;
-    private              Path          threshold;
-    private              Text          valueText;
-    private              Text          backgroundText;
-    private              Text          unitText;
-    private              Text          title;
-    private              Text          lowerRightText;
-    private              Text          upperLeftText;
-    private              Text          upperRightText;
-    private              Text          lowerCenterText;
-    private              double        valueOffsetLeft;
-    private              double        valueOffsetRight;
-    private              double        digitalFontSizeFactor;
-    private              Font          valueFont;
-    private              Font          unitFont;
-    private              Font          titleFont;
-    private              Font          smallFont;
-    private              double        oneSegmentWidth;
-    private              double        dotSegmentWidth;
-    private              double        widthOfDecimals;
-    private              double        availableWidth;
-    private              int           noOfSegments;
-    private              StringBuilder backgroundTextBuilder;
-    private              Group         shadowGroup;
-    private              String        valueFormatString;
-    private              String        otherFormatString;
-    private              List<Section> sections;
+    private static final double                PREFERRED_WIDTH    = 132;
+    private static final double                PREFERRED_HEIGHT   = 48;
+    private static final double                MINIMUM_WIDTH      = 5;
+    private static final double                MINIMUM_HEIGHT     = 5;
+    private static final double                MAXIMUM_WIDTH      = 1024;
+    private static final double                MAXIMUM_HEIGHT     = 1024;
+    private static final Color                 DARK_NOISE_COLOR   = Color.rgb(100, 100, 100, 0.10);
+    private static final Color                 BRIGHT_NOISE_COLOR = Color.rgb(200, 200, 200, 0.05);
+    private static final DropShadow            FOREGROUND_SHADOW  = new DropShadow();
+    private static       double                aspectRatio        = 0.36363636;
+    private static       Text                  oneSegment         = new Text("8");
+    private static       Text                  dotSegment         = new Text(".");
+    private              double                width;
+    private              double                height;
+    private              Pane                  pane;
+    private              Paint                 lcdPaint;
+    private              Paint                 lcdFramePaint;
+    private              ImageView             crystalOverlay;
+    private              Image                 crystalImage;
+    private              Rectangle             crystalClip;
+    private              InnerShadow           mainInnerShadow0;
+    private              InnerShadow           mainInnerShadow1;
+    private              Path                  threshold;
+    private              Text                  valueText;
+    private              Text                  backgroundText;
+    private              Text                  unitText;
+    private              Text                  title;
+    private              Text                  lowerRightText;
+    private              Text                  upperLeftText;
+    private              Text                  upperRightText;
+    private              Text                  lowerCenterText;
+    private              double                valueOffsetLeft;
+    private              double                valueOffsetRight;
+    private              double                digitalFontSizeFactor;
+    private              Font                  valueFont;
+    private              Font                  unitFont;
+    private              Font                  titleFont;
+    private              Font                  smallFont;
+    private              double                oneSegmentWidth;
+    private              double                dotSegmentWidth;
+    private              double                widthOfDecimals;
+    private              double                availableWidth;
+    private              int                   noOfSegments;
+    private              StringBuilder         backgroundTextBuilder;
+    private              Group                 shadowGroup;
+    private              String                valueFormatString;
+    private              String                otherFormatString;
+    private              List<Section>         sections;
+    private              Map<Section, Color[]> sectionColorMap;
 
 
     // ******************** Constructors **************************************
@@ -125,7 +128,9 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         backgroundTextBuilder = new StringBuilder();
         valueFormatString     = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
         otherFormatString     = String.join("", "%.", Integer.toString(gauge.getTickLabelDecimals()), "f");
-        sections              = getSkinnable().getSections();
+        sections              = gauge.getSections();
+        sectionColorMap       = new HashMap<>(sections.size());
+        updateSectionColors();
         FOREGROUND_SHADOW.setOffsetX(0);
         FOREGROUND_SHADOW.setOffsetY(1);
         FOREGROUND_SHADOW.setColor(Color.rgb(0, 0, 0, 0.5));
@@ -260,7 +265,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if ("REDRAW".equals(EVENT_TYPE)) {
             pane.setEffect(getSkinnable().getShadowsEnabled() ? mainInnerShadow1 : null);
             shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? FOREGROUND_SHADOW : null);
-            checkSections();
+            updateLcdDesign(height);
             redraw();
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             aspectRatio = getSkinnable().getPrefHeight() / getSkinnable().getPrefWidth();
@@ -281,6 +286,9 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             lowerRightText.setVisible(!getSkinnable().getSubTitle().isEmpty());
             resize();
             redraw();
+        } else if ("RECALC".equals(EVENT_TYPE)) {
+            sections = getSkinnable().getSections();
+            updateSectionColors();
         }
     }
 
@@ -295,6 +303,19 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void updateLcdDesign(final double HEIGHT) {
         LcdDesign lcdDesign = getSkinnable().getLcdDesign();
         Color[]   lcdColors = lcdDesign.getColors();
+
+        if (LcdDesign.SECTIONS == lcdDesign) {
+            double currentValue = getSkinnable().getCurrentValue();
+            int listSize = sections.size();
+            for (int i = 0 ; i < listSize ; i++) {
+                Section section = sections.get(i);
+                if (section.contains(currentValue)) {
+                    lcdColors = sectionColorMap.get(section);
+                    break;
+                }
+            }
+        }
+
 
         lcdPaint = new LinearGradient(0, 1, 0, HEIGHT - 1,
                                       false, CycleMethod.NO_CYCLE,
@@ -328,6 +349,22 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         threshold.setFill(lcdDesign.lcdForegroundColor);
     }
 
+    private void updateSectionColors() {
+        int listSize = sections.size();
+        sectionColorMap.clear();
+        for (int i = 0 ; i < listSize ; i++) {
+            Color sectionColor = sections.get(i).getColor();
+            Color lcdForegroundColor;
+            if (Helper.isMonochrome(sectionColor)) {
+                lcdForegroundColor = Helper.isDark(sectionColor) ? Color.WHITE : Color.BLACK;
+            } else {
+                lcdForegroundColor = Color.hsb(sectionColor.getHue(), sectionColor.getSaturation(), sectionColor.getBrightness() * 0.3);
+            }
+            Color lcdBackgroundColor = Color.color(sectionColor.getRed(), sectionColor.getGreen(), sectionColor.getBlue(), 0.1);
+            sectionColorMap.put(sections.get(i), getSectionColors(lcdBackgroundColor, lcdForegroundColor));
+        }
+    }
+
     private Image createNoiseImage(final double WIDTH, final double HEIGHT, final Color DARK_COLOR, final Color BRIGHT_COLOR, final double ALPHA_VARIATION_IN_PERCENT) {
         int                 width                   = WIDTH <= 0 ? (int) PREFERRED_WIDTH : (int) WIDTH;
         int                 height                  = HEIGHT <= 0 ? (int) PREFERRED_HEIGHT : (int) HEIGHT;
@@ -348,27 +385,37 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         return IMAGE;
     }
 
-    private void checkSections() {
-        if (LcdDesign.SECTIONS == getSkinnable().getLcdDesign() && !getSkinnable().getSections().isEmpty()) {
-            int    noOfSections = sections.size();
-            double currentValue = getSkinnable().getCurrentValue();
-            for (int i = 0 ; i < noOfSections ; i++) {
-                Section section = sections.get(i);
-                if (section.contains(currentValue)) {
-                    Color sectionColor = section.getColor();
-                    if (Helper.isMonochrome(sectionColor)) {
-                        LcdDesign.SECTIONS.lcdForegroundColor = Helper.isDark(sectionColor) ? Color.WHITE : Color.BLACK;
-                    } else {
-                        LcdDesign.SECTIONS.lcdForegroundColor = Color.hsb(sectionColor.getHue(), sectionColor.getSaturation(), sectionColor.getBrightness() * 0.3);
-                    }
-                    LcdDesign.SECTIONS.lcdBackgroundColor = Color.color(sectionColor.getRed(), sectionColor.getGreen(), sectionColor.getBlue(), 0.1);
-                    break;
-                }
-            }
-            updateLcdDesign(height);
-        }
-    }
+    private Color[] getSectionColors(final Color LCD_BACKGROUND_COLOR, final Color LCD_FOREGROUND_COLOR) {
+        double hue = LCD_BACKGROUND_COLOR.getHue();
+        double sat = LCD_BACKGROUND_COLOR.getSaturation();
 
+        Color[] colors;
+        if (Helper.isMonochrome(LCD_BACKGROUND_COLOR)) {
+            // Section color is monochrome
+            colors = new Color[]{
+                Color.hsb(hue, 0, 0.69),
+                Color.hsb(hue, 0, 1.0),
+                Color.hsb(hue, 0, 0.76),
+                Color.hsb(hue, 0, 0.76),
+                Color.hsb(hue, sat, 0.69),
+                Helper.isDark(LCD_BACKGROUND_COLOR) ? Color.WHITE : Color.BLACK,
+                Helper.isDark(LCD_BACKGROUND_COLOR) ? Color.rgb(255, 255, 255, 0.1) : Color.rgb(0, 0, 0, 0.1)
+            };
+        } else {
+            // Section color is not monochrome
+            colors = new Color[]{
+                Color.hsb(hue, sat, 0.69),
+                Color.hsb(hue, sat, 1.0),
+                Color.hsb(hue, sat, 0.76),
+                Color.hsb(hue, sat, 0.76),
+                Color.hsb(hue, sat, 0.69),
+                LCD_FOREGROUND_COLOR,
+                Color.color(LCD_BACKGROUND_COLOR.getRed(), LCD_BACKGROUND_COLOR.getGreen(), LCD_BACKGROUND_COLOR.getBlue(), 0.1)
+            };
+        }
+        return colors;
+    }
+    
     private void updateFonts() {
         digitalFontSizeFactor = 1.0;
         switch(getSkinnable().getLcdFont()) {
@@ -533,12 +580,9 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         if (width > 0 && height > 0) {
-            sections = getSkinnable().getSections();
-
             pane.setMaxSize(width, height);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
 
-            checkSections();
             updateLcdDesign(height);
 
             mainInnerShadow0.setRadius(3.0 / 132.0 * height);
