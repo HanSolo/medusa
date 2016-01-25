@@ -262,8 +262,8 @@ public class Helper {
         return DISTANCE_TO_BLACK < DISTANCE_TO_WHITE;
     }
 
-    public static void drawTickMarks(final Gauge GAUGE, final GraphicsContext CTX, final double MIN_VALUE, final double MAX_VALUE,
-                                     final double START_ANGLE, final double ANGLE_RANGE, final double ANGLE_STEP, final double CENTER_X, final double CENTER_Y, final double SIZE) {
+    public static void drawRadialTickMarks(final Gauge GAUGE, final GraphicsContext CTX, final double MIN_VALUE, final double MAX_VALUE,
+                                           final double START_ANGLE, final double ANGLE_RANGE, final double ANGLE_STEP, final double CENTER_X, final double CENTER_Y, final double SIZE) {
         CTX.setLineCap(StrokeLineCap.BUTT);
         double               sinValue;
         double               cosValue;
