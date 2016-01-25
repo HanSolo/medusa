@@ -235,7 +235,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (!sectionsVisible && !colorGradientEnabled) {
             dataBar.setFill(getSkinnable().getBarColor());
         } else if (colorGradientEnabled && noOfGradientStops > 1) {
-            dataBar.setFill(getSkinnable().getGradientLookup().getColorAt(VALUE / range));
+            dataBar.setFill(getSkinnable().getGradientLookup().getColorAt((VALUE - minValue) / range));
         } else {
             for (Section section : sections) {
                 if (section.contains(VALUE)) {
