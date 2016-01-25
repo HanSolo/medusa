@@ -56,10 +56,8 @@ import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
 
-import java.awt.*;
 import java.util.Random;
 
-import static javafx.scene.paint.Color.RED;
 
 
 /**
@@ -76,13 +74,6 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skin(TinySkin.class)
-                            .animated(true)
-                            .sections(new Section(0, 20, Color.rgb(0, 0, 200, 0.5)),
-                                      new Section(20, 40, Color.rgb(0, 200, 200, 0.5)),
-                                      new Section(40, 60, Color.rgb(0, 200, 0, 0.5)),
-                                      new Section(60, 80, Color.rgb(200, 200, 0, 0.5)),
-                                      new Section(80, 100, Color.rgb(200, 0, 0, 0.5)))
                             .build();
 
         lastTimerCall = System.nanoTime();
