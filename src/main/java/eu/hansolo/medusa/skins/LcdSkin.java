@@ -231,6 +231,8 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         lowerCenterText = new Text(String.format(Locale.US, otherFormatString, getSkinnable().getOldValue()));
         lowerCenterText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
+        lowerCenterText.setManaged(getSkinnable().isOldValueVisible());
+        lowerCenterText.setVisible(getSkinnable().isOldValueVisible());
 
         shadowGroup = new Group();
         shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? FOREGROUND_SHADOW : null);
@@ -284,6 +286,8 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             upperRightText.setVisible(getSkinnable().isMaxMeasuredValueVisible());
             lowerRightText.setManaged(!getSkinnable().getSubTitle().isEmpty());
             lowerRightText.setVisible(!getSkinnable().getSubTitle().isEmpty());
+            lowerCenterText.setManaged(getSkinnable().isOldValueVisible());
+            lowerCenterText.setVisible(getSkinnable().isOldValueVisible());
             resize();
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {

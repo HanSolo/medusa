@@ -180,6 +180,8 @@ public class Gauge extends Control {
     private BooleanProperty                      minMeasuredValueVisible;
     private boolean                              _maxMeasuredValueVisible;
     private BooleanProperty                      maxMeasuredValueVisible;
+    private boolean                              _oldValueVisible;
+    private BooleanProperty                      oldValueVisible;
     private boolean                              _valueVisible;
     private BooleanProperty                      valueVisible;
     private Paint                                _backgroundPaint;
@@ -413,6 +415,7 @@ public class Gauge extends Control {
         _maxMeasuredValue                 = _minValue;
         _minMeasuredValueVisible          = false;
         _maxMeasuredValueVisible          = false;
+        _oldValueVisible                  = false;
         _valueVisible                     = true;
         _backgroundPaint                  = Color.TRANSPARENT;
         _borderPaint                      = Color.TRANSPARENT;
@@ -857,6 +860,11 @@ public class Gauge extends Control {
         return maxMeasuredValue;
     }
 
+    public void resetMeasuredValues() {
+        setMinMeasuredValue(getValue());
+        setMaxMeasuredValue(getValue());
+    }
+
     public boolean isMinMeasuredValueVisible() { return null == minMeasuredValueVisible ? _minMeasuredValueVisible : minMeasuredValueVisible.get(); }
     public void setMinMeasuredValueVisible(final boolean VISIBLE) {
         if (null == minMeasuredValueVisible) {
@@ -885,9 +893,18 @@ public class Gauge extends Control {
         return maxMeasuredValueVisible;
     }
 
-    public void resetMeasuredValues() {
-        setMinMeasuredValue(getValue());
-        setMaxMeasuredValue(getValue());
+    public boolean isOldValueVisible() { return null == oldValueVisible ? _oldValueVisible : oldValueVisible.get(); }
+    public void setOldValueVisible(final boolean VISIBLE) {
+        if (null == oldValueVisible) {
+            _oldValueVisible = VISIBLE;
+        } else {
+            oldValueVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(VISIBILITY_EVENT);
+    }
+    public BooleanProperty oldValueVisibleProperty() {
+        if (null == oldValueVisible) { oldValueVisible = new SimpleBooleanProperty(Gauge.this, "oldValueVisible", _oldValueVisible); }
+        return oldValueVisible;
     }
 
     public boolean isValueVisible() { return null == valueVisible ? _valueVisible : valueVisible.get(); }
@@ -2261,6 +2278,7 @@ public class Gauge extends Control {
                 setTickLabelDecimals(1);
                 setMinMeasuredValueVisible(true);
                 setMaxMeasuredValueVisible(true);
+                setOldValueVisible(true);
                 break;
             case TINY:
                 setBackgroundPaint(Color.rgb(216,216,216));

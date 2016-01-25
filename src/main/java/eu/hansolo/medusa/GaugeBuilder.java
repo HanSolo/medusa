@@ -178,6 +178,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B oldValueVisible(final boolean VISIBLE) {
+        properties.put("oldValueVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B valueVisible(final boolean VISIBLE) {
         properties.put("valueVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
@@ -800,6 +805,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setTickLabelDecimals(1);
                 CONTROL.setMinMeasuredValueVisible(true);
                 CONTROL.setMaxMeasuredValueVisible(true);
+                CONTROL.setOldValueVisible(true);
             } else if (skinClass == TinySkin.class) {
                 CONTROL.setBackgroundPaint(Color.rgb(216,216,216));
                 CONTROL.setBorderPaint(Color.rgb(76,76,76));
@@ -939,6 +945,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setMinMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("maxMeasuredValueVisible".equals(key)) {
                 CONTROL.setMaxMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("oldValueVisible".equals(key)) {
+                CONTROL.setOldValueVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("valueVisible".equals(key)) {
                 CONTROL.setValueVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("backgroundPaint".equals(key)) {
