@@ -18,6 +18,7 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
@@ -45,6 +46,7 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
+import java.util.List;
 import java.util.Locale;
 
 
@@ -59,21 +61,22 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double MAXIMUM_WIDTH    = 1024;
     private static final double MAXIMUM_HEIGHT   = 1024;
     private static final double ASPECT_RATIO     = 1.15384615;
-    private double       width;
-    private double       height;
-    private Pane         pane;
-    private Path         tube;
-    private Ellipse      tubeTop;
-    private Ellipse      tubeBottom;
-    private Path         fluidBody;
-    private CubicCurveTo fluidUpperLeft;
-    private CubicCurveTo fluidUpperCenter;
-    private CubicCurveTo fluidUpperRight;
-    private Ellipse      fluidTop;
-    private Text         valueText;
-    private Text         titleText;
-    private Tooltip      barTooltip;
-    private String       formatString;
+    private double        width;
+    private double        height;
+    private Pane          pane;
+    private Path          tube;
+    private Ellipse       tubeTop;
+    private Ellipse       tubeBottom;
+    private Path          fluidBody;
+    private CubicCurveTo  fluidUpperLeft;
+    private CubicCurveTo  fluidUpperCenter;
+    private CubicCurveTo  fluidUpperRight;
+    private Ellipse       fluidTop;
+    private Text          valueText;
+    private Text          titleText;
+    private Tooltip       barTooltip;
+    private String        formatString;
+    private List<Section> sections;
 
 
 
@@ -81,6 +84,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     public LevelSkin(Gauge gauge) {
         super(gauge);
         formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        sections     = getSkinnable().getSections();
         barTooltip   = new Tooltip();
         barTooltip.setTextAlignment(TextAlignment.CENTER);
 
@@ -192,6 +196,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
+            sections = getSkinnable().getSections();
             if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             setBar(getSkinnable().getCurrentValue());
             resize();
@@ -218,6 +223,16 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             Color color = getSkinnable().getGradientLookup().getColorAt(factor);
             fluidBody.setFill(color);
             fluidTop.setFill(color.darker());
+        } else if (getSkinnable().getSectionsVisible() && !sections.isEmpty()) {
+            int listSize = sections.size();
+            for (int i = 0 ; i < listSize ; i++) {
+                if (sections.get(i).contains(VALUE)) {
+                    Color color = sections.get(i).getColor();
+                    fluidBody.setFill(color);
+                    fluidTop.setFill(color.darker());
+                    break;
+                }
+            }
         }
 
         double centerY = height * 0.71111111 - factor * 0.58888889 * height;
@@ -344,7 +359,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             tubeTop.setFill(new LinearGradient(0, 0, width, 0,
                                                false, CycleMethod.NO_CYCLE,
                                                new Stop(0.0, Color.rgb(0, 0, 0, 0.25)),
-                                               new Stop(0.52, Color.rgb(255, 255, 255, 0.25)),
+                                               new Stop(0.52, Color.rgb(200, 200, 200, 0.25)),
                                                new Stop(1.0, Color.rgb(0, 0, 0, 0.25))));
 
             resizeText();
