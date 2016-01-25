@@ -364,6 +364,9 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 getSkinnable().setValue(maxValue);
                 oldValue = maxValue;
             }
+            resize();
+            redraw();
+        } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = getSkinnable().getSections();
             areas    = getSkinnable().getAreas();
             resize();

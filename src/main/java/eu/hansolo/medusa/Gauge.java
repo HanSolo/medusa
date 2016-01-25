@@ -129,6 +129,7 @@ public class Gauge extends Control {
     private        final UpdateEvent             VISIBILITY_EVENT     = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
     private        final UpdateEvent             INTERACTIVITY_EVENT  = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
     private        final UpdateEvent             FINISHED_EVENT       = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
+    private        final UpdateEvent             SECTION_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.SECTION);
 
     private static volatile Future               blinkFuture;
     private static ScheduledExecutorService      blinkService         = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
@@ -655,43 +656,43 @@ public class Gauge extends Control {
     public ObservableList<Section> getSections() { return sections; }
     public void setSections(final List<Section> SECTIONS) {
         sections.setAll(SECTIONS);
-        fireUpdateEvent(RECALC_EVENT);
+        fireUpdateEvent(SECTION_EVENT);
     }
     public void setSections(final Section... SECTIONS) { setSections(Arrays.asList(SECTIONS)); }
     public void addSection(final Section SECTION) {
         if (null == SECTION) return;
         sections.add(SECTION);
-        fireUpdateEvent(RECALC_EVENT);
+        fireUpdateEvent(SECTION_EVENT);
     }
     public void removeSection(final Section SECTION) {
         if (null == SECTION) return;
         sections.remove(SECTION);
-        fireUpdateEvent(RECALC_EVENT);
+        fireUpdateEvent(SECTION_EVENT);
     }
     public void clearSections() {
         sections.clear();
-        fireUpdateEvent(RECALC_EVENT);
+        fireUpdateEvent(SECTION_EVENT);
     }
 
     public ObservableList<Section> getAreas() { return areas; }
     public void setAreas(final List<Section> AREAS) {
         areas.setAll(AREAS);
-        fireUpdateEvent(RECALC_EVENT);
+        fireUpdateEvent(SECTION_EVENT);
     }
     public void setAreas(final Section... AREAS) { setAreas(Arrays.asList(AREAS)); }
     public void addArea(final Section AREA) {
         if (null == AREA) return;
         areas.add(AREA);
-        fireUpdateEvent(RECALC_EVENT);
+        fireUpdateEvent(SECTION_EVENT);
     }
     public void removeArea(final Section AREA) {
         if (null == AREA) return;
         areas.remove(AREA);
-        fireUpdateEvent(RECALC_EVENT);
+        fireUpdateEvent(SECTION_EVENT);
     }
     public void clearAreas() {
         areas.clear();
-        fireUpdateEvent(RECALC_EVENT);
+        fireUpdateEvent(SECTION_EVENT);
     }
 
     public ObservableList<Section> getTickMarkSections() { return tickMarkSections; }

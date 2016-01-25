@@ -290,9 +290,11 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             lowerCenterText.setVisible(getSkinnable().isOldValueVisible());
             resize();
             redraw();
-        } else if ("RECALC".equals(EVENT_TYPE)) {
+        } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = getSkinnable().getSections();
             updateSectionColors();
+            resize();
+            redraw();
         }
     }
 

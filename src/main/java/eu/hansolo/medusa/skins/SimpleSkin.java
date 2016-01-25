@@ -189,8 +189,11 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("RECALC".equals(EVENT_TYPE)) {
             angleStep = ANGLE_RANGE / getSkinnable().getRange();
             needleRotate.setAngle((180 - START_ANGLE) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
+            resize();
+        } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = getSkinnable().getSections();
             resize();
+            redraw();
         }
     }
 
