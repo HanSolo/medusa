@@ -249,18 +249,14 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 sectionsCtx.setTextBaseline(VPos.CENTER);
                 sectionsCtx.setFill(section.getTextColor());
                 sectionsCtx.fillText(section.getText(), textPoint.getX(), textPoint.getY());
-            }
-
-            // Draw Section Icon
-            if (size > 0) {
-                if (getSkinnable().getSectionIconsVisible() && !getSkinnable().isSectionTextVisible()) {
-                    if (null != section.getImage()) {
-                        Image icon = section.getImage();
-                        sinValue = -Math.sin(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
-                        cosValue = -Math.cos(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
-                        Point2D iconPoint = new Point2D(size * 0.5 + size * 0.365 * sinValue, size * 0.5 + size * 0.365 * cosValue);
-                        sectionsCtx.drawImage(icon, iconPoint.getX() - size * 0.06, iconPoint.getY() - size * 0.06, size * 0.12, size * 0.12);
-                    }
+            } else if (size > 0 && getSkinnable().getSectionIconsVisible()) {
+                // Draw Section Icon
+                Image icon = section.getImage();
+                if (null != icon) {
+                    sinValue = -Math.sin(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
+                    cosValue = -Math.cos(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
+                    Point2D iconPoint = new Point2D(size * 0.5 + size * 0.365 * sinValue, size * 0.5 + size * 0.365 * cosValue);
+                    sectionsCtx.drawImage(icon, iconPoint.getX() - size * 0.06, iconPoint.getY() - size * 0.06, size * 0.12, size * 0.12);
                 }
             }
             sectionsCtx.restore();
