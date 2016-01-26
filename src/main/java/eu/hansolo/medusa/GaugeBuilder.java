@@ -16,17 +16,20 @@
 
 package eu.hansolo.medusa;
 
+import eu.hansolo.medusa.Gauge.ButtonEvent;
 import eu.hansolo.medusa.Gauge.KnobType;
 import eu.hansolo.medusa.Gauge.LcdFont;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.NeedleType;
+import eu.hansolo.medusa.Gauge.NumberFormat;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
+import eu.hansolo.medusa.Gauge.ThresholdEvent;
+import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
-import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.GradientLookup;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -46,13 +49,10 @@ import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -248,17 +248,17 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
-    public final B tickLabelOrientation(final Gauge.TickLabelOrientation ORIENTATION) {
+    public final B tickLabelOrientation(final TickLabelOrientation ORIENTATION) {
         properties.put("tickLabelOrientation", new SimpleObjectProperty<>(ORIENTATION));
         return (B)this;
     }
 
-    public final B tickLabelLocation(final Gauge.TickLabelLocation LOCATION) {
+    public final B tickLabelLocation(final TickLabelLocation LOCATION) {
         properties.put("tickLabelLocation", new SimpleObjectProperty<>(LOCATION));
         return (B)this;
     }
 
-    public final B numberFormat(final Gauge.NumberFormat FORMAT) {
+    public final B numberFormat(final NumberFormat FORMAT) {
         properties.put("numberFormat", new SimpleObjectProperty<>(FORMAT));
         return (B)this;
     }
@@ -598,22 +598,22 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
-    public final B onButtonPressed(final EventHandler<Gauge.ButtonEvent> HANDLER) {
+    public final B onButtonPressed(final EventHandler<ButtonEvent> HANDLER) {
         properties.put("onButtonPressed", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
 
-    public final B onButtonReleased(final EventHandler<Gauge.ButtonEvent> HANDLER) {
+    public final B onButtonReleased(final EventHandler<ButtonEvent> HANDLER) {
         properties.put("onButtonReleased", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
 
-    public final B onThresholdExceeded(final EventHandler<Gauge.ThresholdEvent> HANDLER) {
+    public final B onThresholdExceeded(final EventHandler<ThresholdEvent> HANDLER) {
         properties.put("onThresholdExceeded", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
 
-    public final B onThresholdUnderrun(final EventHandler<Gauge.ThresholdEvent> HANDLER) {
+    public final B onThresholdUnderrun(final EventHandler<ThresholdEvent> HANDLER) {
         properties.put("onThresholdUnderrun", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
@@ -851,11 +851,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             } else if ("barBackgroundColor".equals(key)) {
                 CONTROL.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("tickLabelOrientation".equals(key)) {
-                CONTROL.setTickLabelOrientation(((ObjectProperty<Gauge.TickLabelOrientation>) properties.get(key)).get());
+                CONTROL.setTickLabelOrientation(((ObjectProperty<TickLabelOrientation>) properties.get(key)).get());
             } else if("tickLabelLocation".equals(key)) {
-                CONTROL.setTickLabelLocation(((ObjectProperty<Gauge.TickLabelLocation>) properties.get(key)).get());
+                CONTROL.setTickLabelLocation(((ObjectProperty<TickLabelLocation>) properties.get(key)).get());
             } else if("numberFormat".equals(key)) {
-                CONTROL.setNumberFormat(((ObjectProperty<Gauge.NumberFormat>) properties.get(key)).get());
+                CONTROL.setNumberFormat(((ObjectProperty<NumberFormat>) properties.get(key)).get());
             } else if("majorTickSpace".equals(key)) {
                 CONTROL.setMajorTickSpace(((DoubleProperty) properties.get(key)).get());
             } else if("minorTickSpace".equals(key)) {
