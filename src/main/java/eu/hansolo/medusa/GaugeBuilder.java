@@ -62,7 +62,6 @@ import java.util.List;
  */
 public class GaugeBuilder<B extends GaugeBuilder<B>> {
     private HashMap<String, Property> properties = new HashMap<>();
-    private Class skinClass;
 
 
     // ******************** Constructors **************************************
@@ -74,32 +73,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return new GaugeBuilder();
     }
 
-    public final B skin(final Class<Skin> SKIN) {
-        skinClass = SKIN;
-        return (B) this;
-    }
-
     public final B skinType(final SkinType TYPE) {
-        switch (TYPE) {
-            case AMP         : skinClass = AmpSkin.class; break;
-            case BULLET_CHART: skinClass = BulletChartSkin.class; break;
-            case DASHBOARD   : skinClass = DashboardSkin.class; break;
-            case FLAT        : skinClass = FlatSkin.class; break;
-            case GAUGE       : skinClass = GaugeSkin.class; break;
-            case HORIZONTAL  : skinClass = HSkin.class; break;
-            case INDICATOR   : skinClass = IndicatorSkin.class; break;
-            case KPI         : skinClass = KpiSkin.class; break;
-            case MODERN      : skinClass = ModernSkin.class; break;
-            case QUARTER     : skinClass = QuarterSkin.class; break;
-            case SIMPLE      : skinClass = SimpleSkin.class; break;
-            case SLIM        : skinClass = SlimSkin.class; break;
-            case SPACE_X     : skinClass = SpaceXSkin.class; break;
-            case VERTICAL    : skinClass = VSkin.class; break;
-            case LCD         : skinClass = LcdSkin.class; break;
-            case TINY        : skinClass = TinySkin.class; break;
-            case BATTERY     : skinClass = BatterySkin.class; break;
-            case LEVEL       : skinClass = LevelSkin.class; break;
-        }
+        properties.put("skinType", new SimpleObjectProperty<>(TYPE));
         return (B)this;
     }
 
@@ -711,116 +686,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
     }
 
     public final Gauge build() {
-        final Gauge CONTROL = new Gauge();
-
-        // Set default styles for different skins
-        if (null != skinClass) {
-            if (skinClass == ModernSkin.class) {
-                CONTROL.setDecimals(0);
-                CONTROL.setValueColor(Color.WHITE);
-                CONTROL.setTitleColor(Color.WHITE);
-                CONTROL.setSubTitleColor(Color.WHITE);
-                CONTROL.setUnitColor(Color.WHITE);
-                CONTROL.setBarColor(Color.rgb(0, 214, 215));
-                CONTROL.setNeedleColor(Color.WHITE);
-                CONTROL.setThresholdColor(Color.rgb(204, 0, 0));
-                CONTROL.setTickLabelColor(Color.rgb(151, 151, 151));
-                CONTROL.setTickMarkColor(Color.BLACK);
-                CONTROL.setTickLabelOrientation(TickLabelOrientation.ORTHOGONAL);
-            } else if (skinClass == SpaceXSkin.class) {
-                CONTROL.setDecimals(0);
-                CONTROL.setThresholdColor(Color.rgb(180, 0, 0));
-                CONTROL.setBarBackgroundColor(Color.rgb(169, 169, 169, 0.25));
-                CONTROL.setBarColor(Color.rgb(169, 169, 169));
-                CONTROL.setTitleColor(Color.WHITE);
-                CONTROL.setValueColor(Color.WHITE);
-                CONTROL.setUnitColor(Color.WHITE);
-            } else if (skinClass == AmpSkin.class) {
-                CONTROL.setTitleColor(Color.WHITE);
-                CONTROL.setLedVisible(true);
-                CONTROL.setBackgroundPaint(Color.WHITE);
-                CONTROL.setForegroundPaint(Color.BLACK);
-                CONTROL.setLcdVisible(true);
-                CONTROL.setShadowsEnabled(true);
-            } else if (skinClass == SimpleSkin.class) {
-                CONTROL.setBorderPaint(Color.WHITE);
-                CONTROL.setBackgroundPaint(Color.DARKGRAY);
-                CONTROL.setDecimals(0);
-                CONTROL.setNeedleColor(Color.web("#5a615f"));
-                CONTROL.setValueColor(Color.WHITE);
-                CONTROL.setTitleColor(Color.WHITE);
-            } else if (skinClass == BulletChartSkin.class) {
-                CONTROL.setBarColor(Color.BLACK);
-                CONTROL.setThresholdColor(Color.BLACK);
-            } else if (skinClass == FlatSkin.class) {
-                CONTROL.setBarColor(Color.CYAN);
-                CONTROL.setBackgroundPaint(Color.TRANSPARENT);
-                CONTROL.setTitleColor(Gauge.DARK_COLOR);
-                CONTROL.setValueColor(Gauge.DARK_COLOR);
-                CONTROL.setUnitColor(Gauge.DARK_COLOR);
-                CONTROL.setBorderPaint(Color.rgb(208, 208, 208));
-                CONTROL.setDecimals(0);
-            } else if (skinClass == SlimSkin.class) {
-                CONTROL.setDecimals(2);
-                CONTROL.setBarBackgroundColor(Color.rgb(62, 67, 73));
-                CONTROL.setBarColor(Color.rgb(93,190,205));
-                CONTROL.setTitleColor(Color.rgb(142,147,151));
-                CONTROL.setValueColor(Color.rgb(228,231,238));
-                CONTROL.setUnitColor(Color.rgb(142,147,151));
-            } else if (skinClass == DashboardSkin.class) {
-                CONTROL.setDecimals(0);
-                CONTROL.setBarBackgroundColor(Color.LIGHTGRAY);
-                CONTROL.setBarColor(Color.rgb(93,190,205));
-            } else if (skinClass == KpiSkin.class) {
-                CONTROL.setDecimals(0);
-                CONTROL.setForegroundBaseColor(Color.rgb(126,126,127));
-                CONTROL.setBarColor(Color.rgb(168,204,254));
-                CONTROL.setThresholdVisible(true);
-                CONTROL.setThresholdColor(Color.rgb(45,86,184));
-                CONTROL.setNeedleColor(Color.rgb(74,74,74));
-                CONTROL.setAngleRange(128);
-            } else if (skinClass == IndicatorSkin.class) {
-                CONTROL.setValueVisible(false);
-                CONTROL.setGradientBarEnabled(false);
-                CONTROL.setGradientBarStops(new Stop(0.0, Color.rgb(34,180,11)),
-                                            new Stop(0.5, Color.rgb(255,146,0)),
-                                            new Stop(1.0, Color.rgb(255,0,39)));
-                CONTROL.setTickLabelsVisible(false);
-                CONTROL.setNeedleColor(Color.rgb(71,71,71));
-                CONTROL.setBarBackgroundColor(Color.rgb(232,231,223));
-                CONTROL.setBarColor(Color.rgb(255,0,39));
-                CONTROL.setAngleRange(180);
-            } else if (skinClass == QuarterSkin.class) {
-                CONTROL.setKnobPosition(Pos.BOTTOM_RIGHT);
-                CONTROL.setAngleRange(90);
-            } else if (skinClass == HSkin.class) {
-                CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
-                CONTROL.setAngleRange(180);
-            } else if (skinClass == VSkin.class) {
-                CONTROL.setKnobPosition(Pos.CENTER_RIGHT);
-                CONTROL.setAngleRange(180);
-            } else if (skinClass == LcdSkin.class) {
-                CONTROL.setDecimals(1);
-                CONTROL.setTickLabelDecimals(1);
-                CONTROL.setMinMeasuredValueVisible(true);
-                CONTROL.setMaxMeasuredValueVisible(true);
-                CONTROL.setOldValueVisible(true);
-            } else if (skinClass == TinySkin.class) {
-                CONTROL.setBackgroundPaint(Color.rgb(216,216,216));
-                CONTROL.setBorderPaint(Color.rgb(76,76,76));
-                CONTROL.setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));
-                CONTROL.setNeedleColor(Color.rgb(76, 76, 76));
-                CONTROL.setSectionsVisible(true);
-                CONTROL.setMajorTickMarksVisible(true);
-                CONTROL.setMajorTickMarkColor(Color.WHITE);
-            } else if (skinClass == BatterySkin.class) {
-                CONTROL.setBarBackgroundColor(Color.BLACK);
-                CONTROL.setBarColor(Color.BLACK);
-                CONTROL.setValueColor(Color.WHITE);
-            } else if (skinClass == LevelSkin.class) {
-                CONTROL.setBarColor(Color.CYAN);
-                CONTROL.setValueColor(Color.WHITE);
-            }
+        final Gauge CONTROL;
+        if (properties.containsKey("skinType")) {
+            CONTROL = new Gauge(((ObjectProperty<SkinType>) properties.get("skinType")).get());
+        } else {
+            CONTROL = new Gauge();
         }
 
         // Make sure that sections, areas and markers will be added first
@@ -1109,16 +979,6 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             if (!properties.containsKey("minorTickMarkColor")) CONTROL.setMinorTickMarkColor(tickMarkColor);
         }
 
-        // Set skin if possible
-        if (null != skinClass) {
-            try {
-                final Constructor<Skin> CONSTRUCTOR = skinClass.getConstructors()[0];
-                final Skin              SKIN        = CONSTRUCTOR.newInstance(CONTROL);
-                CONTROL.setSkin(SKIN);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                System.out.println(e);
-            }
-        }
         return CONTROL;
     }
 }
