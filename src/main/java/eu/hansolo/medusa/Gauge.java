@@ -522,6 +522,7 @@ public class Gauge extends Control {
     public double getMinValue() { return null == minValue ? _minValue : minValue.get(); }
     public void setMinValue(final double VALUE) {
         if (null == minValue) {
+            if (VALUE > getMaxValue()) { setMaxValue(VALUE); }
             _minValue = Helper.clamp(-Double.MAX_VALUE, getMaxValue(), VALUE).doubleValue();
             setRange(getMaxValue() - _minValue);
             if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = _minValue;
@@ -536,6 +537,7 @@ public class Gauge extends Control {
         if (null == minValue) {
             minValue = new DoublePropertyBase(_minValue) {
                 @Override public void set(final double VALUE) {
+                    if (VALUE > getMaxValue()) { setMaxValue(VALUE); }
                     super.set(Helper.clamp(-Double.MAX_VALUE, getMaxValue(), VALUE).doubleValue());
                     setRange(getMaxValue() - get());
                     if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = get();
@@ -552,6 +554,7 @@ public class Gauge extends Control {
     public double getMaxValue() { return null == maxValue ? _maxValue : maxValue.get(); }
     public void setMaxValue(final double VALUE) {
         if (null == maxValue) {
+            if (VALUE < getMinValue()) { setMinValue(VALUE); }
             _maxValue = Helper.clamp(getMinValue(), Double.MAX_VALUE, VALUE).doubleValue();
             setRange(_maxValue - getMinValue());
             if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = _maxValue;
@@ -565,6 +568,7 @@ public class Gauge extends Control {
         if (null == maxValue) {
             maxValue = new DoublePropertyBase(_maxValue) {
                 @Override public void set(final double VALUE) {
+                    if (VALUE < getMinValue()) { setMinValue(VALUE); }
                     super.set(Helper.clamp(getMinValue(), Double.MAX_VALUE, VALUE).doubleValue());
                     setRange(get() - getMinValue());
                     if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = get();

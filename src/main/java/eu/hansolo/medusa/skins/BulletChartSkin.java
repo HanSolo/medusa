@@ -76,7 +76,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public BulletChartSkin(Gauge gauge) {
         super(gauge);
-
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
         orientation      = gauge.getOrientation();
         barTooltip       = new Tooltip();
         thresholdTooltip = new Tooltip();
@@ -90,8 +90,6 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             preferredHeight = 64;
         }
         gauge.setPrefSize(preferredWidth, preferredHeight);
-
-        if (gauge.isAutoScale()) gauge.calcAutoScale();
 
         init();
         initGraphics();

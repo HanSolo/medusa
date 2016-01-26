@@ -144,6 +144,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public VSkin(Gauge gauge) {
         super(gauge);
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleRange   = Helper.clamp(90d, 180d, gauge.getAngleRange());
         startAngle   = getStartAngle();
         angleStep    = angleRange / gauge.getRange();
@@ -155,7 +156,6 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sections     = gauge.getSections();
         areas        = gauge.getAreas();
         mouseHandler = event -> handleMouseEvent(event);
-        if (gauge.isAutoScale()) gauge.calcAutoScale();
         updateMarkers();
 
         init();
@@ -441,7 +441,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 double sectionStartAngle;
                 if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
                     if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
-                        sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? minValue * angleStep : -minValue * angleStep;
+                        sectionStartAngle = 0;
                     } else {
                         sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStart() - minValue) * angleStep : -(section.getStart() - minValue) * angleStep;
                     }
@@ -478,7 +478,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 double areaStartAngle;
                 if (Double.compare(area.getStart(), maxValue) <= 0 && Double.compare(area.getStop(), minValue) >= 0) {
                     if (area.getStart() < minValue && area.getStop() < maxValue) {
-                        areaStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? minValue * angleStep : -minValue * angleStep;
+                        areaStartAngle = 0;
                     } else {
                         areaStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStart() - minValue) * angleStep : -(area.getStart() - minValue) * angleStep;
                     }

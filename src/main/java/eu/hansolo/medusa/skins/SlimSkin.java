@@ -67,6 +67,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public SlimSkin(Gauge gauge) {
         super(gauge);
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
         minValue             = gauge.getMinValue();
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;

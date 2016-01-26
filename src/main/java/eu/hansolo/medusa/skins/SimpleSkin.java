@@ -83,6 +83,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public SimpleSkin(Gauge gauge) {
         super(gauge);
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleStep    = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
         formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
         sections     = gauge.getSections();
@@ -200,7 +201,6 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Private Methods ***********************************
     private void rotateNeedle(final double VALUE) {
-        angleStep          = ANGLE_RANGE / (getSkinnable().getRange());
         double targetAngle = 180 - START_ANGLE + (VALUE - getSkinnable().getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
         valueText.setText(String.format(Locale.US, formatString, VALUE) + getSkinnable().getUnit());
@@ -210,54 +210,54 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void drawSections() {
         sectionsCtx.clearRect(0, 0, size, size);
-        final double MIN_VALUE       = getSkinnable().getMinValue();
-        final double MAX_VALUE       = getSkinnable().getMaxValue();
-        final double OFFSET          = START_ANGLE - 90;
-        final int NO_OF_SECTIONS     = getSkinnable().getSections().size();
-        final double SECTIONS_OFFSET = size * 0.015;
-        final double SECTIONS_SIZE   = size - (size * 0.03);
-        angleStep                    = ANGLE_RANGE / (getSkinnable().getRange());
+        double minValue       = getSkinnable().getMinValue();
+        double maxValue       = getSkinnable().getMaxValue();
+        double offset         = START_ANGLE - 90;
+        int noOfSections      = getSkinnable().getSections().size();
+        double sectionsOffset = size * 0.015;
+        double sectionsSize   = size - (size * 0.03);
+        angleStep             = ANGLE_RANGE / (getSkinnable().getRange());
         double sinValue;
         double cosValue;
-        for (int i = 0 ; i < NO_OF_SECTIONS ; i++) {
-            final Section SECTION = getSkinnable().getSections().get(i);
+        for (int i = 0 ; i < noOfSections ; i++) {
+            Section section = getSkinnable().getSections().get(i);
             final double SECTION_START_ANGLE;
-            if (SECTION.getStart() > MAX_VALUE || SECTION.getStop() < MIN_VALUE) continue;
+            if (section.getStart() > maxValue || section.getStop() < minValue) continue;
 
-            if (SECTION.getStart() < MIN_VALUE && SECTION.getStop() < MAX_VALUE) {
-                SECTION_START_ANGLE = MIN_VALUE * angleStep;
+            if (section.getStart() < minValue && section.getStop() < maxValue) {
+                SECTION_START_ANGLE = 0;
             } else {
-                SECTION_START_ANGLE = (SECTION.getStart() - MIN_VALUE) * angleStep;
+                SECTION_START_ANGLE = (section.getStart() - minValue) * angleStep;
             }
             final double SECTION_ANGLE_EXTEND;
-            if (SECTION.getStop() > MAX_VALUE) {
-                SECTION_ANGLE_EXTEND = (MAX_VALUE - SECTION.getStart()) * angleStep;
+            if (section.getStop() > maxValue) {
+                SECTION_ANGLE_EXTEND = (maxValue - section.getStart()) * angleStep;
             } else {
-                SECTION_ANGLE_EXTEND = (SECTION.getStop() - SECTION.getStart()) * angleStep;
+                SECTION_ANGLE_EXTEND = (section.getStop() - section.getStart()) * angleStep;
             }
             sectionsCtx.save();
-            sectionsCtx.setFill(SECTION.getColor());
-            sectionsCtx.fillArc(SECTIONS_OFFSET, SECTIONS_OFFSET, SECTIONS_SIZE, SECTIONS_SIZE, (OFFSET - SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.ROUND);
+            sectionsCtx.setFill(section.getColor());
+            sectionsCtx.fillArc(sectionsOffset, sectionsOffset, sectionsSize, sectionsSize, (offset - SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.ROUND);
 
             // Draw Section Text
             if (getSkinnable().isSectionTextVisible()) {
-                sinValue = -Math.sin(Math.toRadians(OFFSET - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
-                cosValue = -Math.cos(Math.toRadians(OFFSET - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
+                sinValue = -Math.sin(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
+                cosValue = -Math.cos(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
                 Point2D textPoint = new Point2D(size * 0.5 + size * 0.365 * sinValue, size * 0.5 + size * 0.365 * cosValue);
                 sectionsCtx.setFont(Fonts.robotoMedium(0.08 * size));
                 sectionsCtx.setTextAlign(TextAlignment.CENTER);
                 sectionsCtx.setTextBaseline(VPos.CENTER);
-                sectionsCtx.setFill(SECTION.getTextColor());
-                sectionsCtx.fillText(SECTION.getText(), textPoint.getX(), textPoint.getY());
+                sectionsCtx.setFill(section.getTextColor());
+                sectionsCtx.fillText(section.getText(), textPoint.getX(), textPoint.getY());
             }
 
             // Draw Section Icon
             if (size > 0) {
                 if (getSkinnable().getSectionIconsVisible() && !getSkinnable().isSectionTextVisible()) {
-                    if (null != SECTION.getImage()) {
-                        Image icon = SECTION.getImage();
-                        sinValue = -Math.sin(Math.toRadians(OFFSET - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
-                        cosValue = -Math.cos(Math.toRadians(OFFSET - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
+                    if (null != section.getImage()) {
+                        Image icon = section.getImage();
+                        sinValue = -Math.sin(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
+                        cosValue = -Math.cos(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
                         Point2D iconPoint = new Point2D(size * 0.5 + size * 0.365 * sinValue, size * 0.5 + size * 0.365 * cosValue);
                         sectionsCtx.drawImage(icon, iconPoint.getX() - size * 0.06, iconPoint.getY() - size * 0.06, size * 0.12, size * 0.12);
                     }
@@ -268,7 +268,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Draw white border around area
         sectionsCtx.setStroke(getSkinnable().getBorderPaint());
         sectionsCtx.setLineWidth(size * 0.025);
-        sectionsCtx.strokeArc(SECTIONS_OFFSET, SECTIONS_OFFSET, SECTIONS_SIZE, SECTIONS_SIZE, OFFSET + 90, ANGLE_RANGE, ArcType.ROUND);
+        sectionsCtx.strokeArc(sectionsOffset, sectionsOffset, sectionsSize, sectionsSize, offset + 90, ANGLE_RANGE, ArcType.ROUND);
     }
 
     private void resizeText() {

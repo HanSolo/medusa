@@ -100,6 +100,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public SpaceXSkin(Gauge gauge) {
         super(gauge);
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
         range             = gauge.getRange();
         angleStep         = ANGLE_RANGE / range;
         minValue          = gauge.getMinValue();

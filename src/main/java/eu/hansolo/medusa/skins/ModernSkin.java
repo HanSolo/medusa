@@ -115,12 +115,11 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public ModernSkin(Gauge gauge) {
         super(gauge);
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleStep     = ANGLE_RANGE / (gauge.getRange());
         mouseHandler  = event -> handleMouseEvent(event);
         buttonTooltip = new Tooltip();
         formatString  = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
-
-        if (gauge.isAutoScale()) gauge.calcAutoScale();
 
         init();
         initGraphics();
@@ -483,7 +482,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 final double SECTION_START_ANGLE;
                 if (Double.compare(SECTION.getStart(), maxValue) <= 0 && Double.compare(SECTION.getStop(), minValue) >= 0) {
                     if (Double.compare(SECTION.getStart(), minValue) < 0 && Double.compare(SECTION.getStop(), maxValue) < 0) {
-                        SECTION_START_ANGLE = minValue * angleStep;
+                        SECTION_START_ANGLE = 0;
                     } else {
                         SECTION_START_ANGLE = (SECTION.getStart() - minValue) * angleStep;
                     }

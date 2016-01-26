@@ -96,6 +96,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public IndicatorSkin(Gauge gauge) {
         super(gauge);
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleRange           = Helper.clamp(90d, 180d, gauge.getAngleRange());
         startAngle           = getStartAngle();
         oldValue             = gauge.getValue();

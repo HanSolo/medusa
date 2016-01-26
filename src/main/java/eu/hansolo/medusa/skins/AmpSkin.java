@@ -116,12 +116,11 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public AmpSkin(Gauge gauge) {
         super(gauge);
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleStep        = gauge.getAngleRange() / gauge.getRange();
         oldValue         = gauge.getValue();
         limitString      = "";
         formatString     = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
-
-        if (gauge.isAutoScale()) gauge.calcAutoScale();
 
         init();
         initGraphics();
@@ -399,7 +398,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 final double  SECTION_START_ANGLE;
                 if (Double.compare(SECTION.getStart(), MAX_VALUE) <= 0 && Double.compare(SECTION.getStop(), MIN_VALUE) >= 0) {
                     if (SECTION.getStart() < MIN_VALUE && SECTION.getStop() < MAX_VALUE) {
-                        SECTION_START_ANGLE = MIN_VALUE * angleStep;
+                        SECTION_START_ANGLE = 0;
                     } else {
                         SECTION_START_ANGLE = (SECTION.getStart() - MIN_VALUE) * angleStep;
                     }

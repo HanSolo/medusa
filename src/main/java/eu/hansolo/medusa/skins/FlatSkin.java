@@ -73,6 +73,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public FlatSkin(Gauge gauge) {
         super(gauge);
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
         minValue             = gauge.getMinValue();
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;

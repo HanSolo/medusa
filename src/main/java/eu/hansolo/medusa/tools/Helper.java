@@ -403,7 +403,6 @@ public class Helper {
         double triangleMinorOuterPoint2X;
         double triangleMinorOuterPoint2Y;
 
-
         // Main loop
         ScaleDirection scaleDirection = GAUGE.getScaleDirection();
         BigDecimal     tmpStepBD      = new BigDecimal(tmpAngleStep);

@@ -104,6 +104,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public TinySkin(Gauge gauge) {
         super(gauge);
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
         oldValue             = gauge.getValue();
         minValue             = gauge.getMinValue();
         maxValue             = gauge.getMaxValue();
@@ -234,7 +235,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 double sectionStartAngle;
                 if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
                     if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
-                        sectionStartAngle = minValue * angleStep;
+                        sectionStartAngle = 0;
                     } else {
                         sectionStartAngle = (section.getStart() - minValue) * angleStep;
                     }

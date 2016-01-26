@@ -94,6 +94,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public DashboardSkin(Gauge gauge) {
         super(gauge);
+        if (gauge.isAutoScale()) gauge.calcAutoScale();
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;
         colorGradientEnabled = gauge.isGradientBarEnabled();
