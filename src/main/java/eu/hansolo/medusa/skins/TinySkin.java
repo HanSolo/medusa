@@ -56,7 +56,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 
 /**
@@ -225,35 +224,34 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Resizing ******************************************
     private void drawSections() {
         if (sections.isEmpty()) return;
-        double xy     = size * 0.1875;
-        double wh     = size * 0.625;
-        double offset = -ANGLE_RANGE * 0.5 - 90;
         sectionCtx.clearRect(0, 0, size, size);
-        IntStream.range(0, sections.size()).parallel().forEachOrdered(
-            i -> {
-                Section section = sections.get(i);
-                double sectionStartAngle;
-                if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
-                    if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
-                        sectionStartAngle = 0;
-                    } else {
-                        sectionStartAngle = (section.getStart() - minValue) * angleStep;
-                    }
-                    double sectionAngleExtend;
-                    if (Double.compare(section.getStop(), maxValue) > 0) {
-                        sectionAngleExtend = (maxValue - section.getStart()) * angleStep;
-                    } else {
-                        sectionAngleExtend = (section.getStop() - section.getStart()) * angleStep;
-                    }
-                    sectionCtx.save();
-                    sectionCtx.setStroke(section.getColor());
-                    sectionCtx.setLineWidth(size * 0.18382353);
-                    sectionCtx.setLineCap(StrokeLineCap.BUTT);
-                    sectionCtx.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
-                    sectionCtx.restore();
+        double xy       = size * 0.1875;
+        double wh       = size * 0.625;
+        double offset   = -ANGLE_RANGE * 0.5 - 90;
+        int    listSize = sections.size();
+        for (int i = 0 ; i < listSize ; i++) {
+            Section section = sections.get(i);
+            double sectionStartAngle;
+            if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
+                if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
+                    sectionStartAngle = 0;
+                } else {
+                    sectionStartAngle = (section.getStart() - minValue) * angleStep;
                 }
+                double sectionAngleExtend;
+                if (Double.compare(section.getStop(), maxValue) > 0) {
+                    sectionAngleExtend = (maxValue - section.getStart()) * angleStep;
+                } else {
+                    sectionAngleExtend = (section.getStop() - section.getStart()) * angleStep;
+                }
+                sectionCtx.save();
+                sectionCtx.setStroke(section.getColor());
+                sectionCtx.setLineWidth(size * 0.18382353);
+                sectionCtx.setLineCap(StrokeLineCap.BUTT);
+                sectionCtx.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
+                sectionCtx.restore();
             }
-                                                                                         );
+        }
     }
     
     private void drawGradientBar() {

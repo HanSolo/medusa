@@ -60,7 +60,6 @@ import javafx.scene.transform.Rotate;
 
 import java.math.BigDecimal;
 import java.util.Locale;
-import java.util.stream.IntStream;
 
 
 /**
@@ -392,32 +391,31 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         final double MAX_VALUE = getSkinnable().getMaxValue();
         final double OFFSET    = 90 - START_ANGLE;
 
-        IntStream.range(0, getSkinnable().getSections().size()).parallel().forEachOrdered(
-            i -> {
-                final Section SECTION = getSkinnable().getSections().get(i);
-                final double  SECTION_START_ANGLE;
-                if (Double.compare(SECTION.getStart(), MAX_VALUE) <= 0 && Double.compare(SECTION.getStop(), MIN_VALUE) >= 0) {
-                    if (SECTION.getStart() < MIN_VALUE && SECTION.getStop() < MAX_VALUE) {
-                        SECTION_START_ANGLE = 0;
-                    } else {
-                        SECTION_START_ANGLE = (SECTION.getStart() - MIN_VALUE) * angleStep;
-                    }
-                    final double SECTION_ANGLE_EXTEND;
-                    if (SECTION.getStop() > MAX_VALUE) {
-                        SECTION_ANGLE_EXTEND = (MAX_VALUE - SECTION.getStart()) * angleStep;
-                    } else {
-                        SECTION_ANGLE_EXTEND = (SECTION.getStop() - SECTION.getStart()) * angleStep;
-                    }
-
-                    CTX.save();
-                    CTX.setStroke(SECTION.getColor());
-                    CTX.setLineWidth(height * 0.0415);
-                    CTX.setLineCap(StrokeLineCap.BUTT);
-                    CTX.strokeArc(x, y, w, h, -(OFFSET + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
-                    CTX.restore();
+        int listSize = getSkinnable().getSections().size();
+        for (int i = 0 ; i < listSize ; i++) {
+            final Section SECTION = getSkinnable().getSections().get(i);
+            final double  SECTION_START_ANGLE;
+            if (Double.compare(SECTION.getStart(), MAX_VALUE) <= 0 && Double.compare(SECTION.getStop(), MIN_VALUE) >= 0) {
+                if (SECTION.getStart() < MIN_VALUE && SECTION.getStop() < MAX_VALUE) {
+                    SECTION_START_ANGLE = 0;
+                } else {
+                    SECTION_START_ANGLE = (SECTION.getStart() - MIN_VALUE) * angleStep;
                 }
+                final double SECTION_ANGLE_EXTEND;
+                if (SECTION.getStop() > MAX_VALUE) {
+                    SECTION_ANGLE_EXTEND = (MAX_VALUE - SECTION.getStart()) * angleStep;
+                } else {
+                    SECTION_ANGLE_EXTEND = (SECTION.getStop() - SECTION.getStart()) * angleStep;
+                }
+
+                CTX.save();
+                CTX.setStroke(SECTION.getColor());
+                CTX.setLineWidth(height * 0.0415);
+                CTX.setLineCap(StrokeLineCap.BUTT);
+                CTX.strokeArc(x, y, w, h, -(OFFSET + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
+                CTX.restore();
             }
-                                                                                         );
+        }
     }
 
     private void drawLed(final GraphicsContext CTX) {

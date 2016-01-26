@@ -40,7 +40,6 @@ import javafx.scene.text.TextAlignment;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.IntStream;
 
 
 /**
@@ -204,78 +203,6 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void drawTickMarks1(final GraphicsContext CTX) {
-        tickMarkCanvas.setCache(false);
-        CTX.clearRect(0, 0, tickMarkCanvas.getWidth(), tickMarkCanvas.getHeight());
-        CTX.setFill(getSkinnable().getMajorTickMarkColor());
-
-        List<Section> tickMarkSections         = getSkinnable().getTickMarkSections();
-        List<Section> tickLabelSections        = getSkinnable().getTickLabelSections();
-        Color         majorTickMarkColor       = getSkinnable().getTickMarkColor();
-        Color         tickLabelColor           = getSkinnable().getTickLabelColor();
-        boolean       smallRange               = Double.compare(getSkinnable().getRange(), 10d) <= 0;
-        double        tmpMinValue              = smallRange ? getSkinnable().getMinValue() * 10 : getSkinnable().getMinValue();
-        double        tmpMaxValue              = smallRange ? getSkinnable().getMaxValue() * 10 : getSkinnable().getMaxValue();
-        double        tmpStepSize              = smallRange ? stepSize / 10 : stepSize;
-        Font          tickLabelFont            = Fonts.robotoRegular(0.15 * (Orientation.VERTICAL == orientation ? width : height));
-        boolean       tickMarkSectionsVisible  = getSkinnable().getTickMarkSectionsVisible();
-        boolean       tickLabelSectionsVisible = getSkinnable().getTickLabelSectionsVisible();
-        double        offsetX                  = 0.18345865 * width;
-        double        offsetY                  = 0.1 * height;
-        double        innerPointX              = 0;
-        double        innerPointY              = 0;
-        double        outerPointX              = 0.07 * width;
-        double        outerPointY              = 0.08 * height;
-        double        textPointX               = 0.55 * tickMarkCanvas.getWidth();
-        double        textPointY               = 0.7 * tickMarkCanvas.getHeight();
-        double        smallCounter             = tmpMinValue;
-
-        for (double counter = tmpMinValue ; Double.compare(counter, tmpMaxValue) <= 0 ; counter++) {
-            smallCounter = counter / 10;
-
-            if (Orientation.VERTICAL == orientation) {
-                innerPointY = counter * tmpStepSize + offsetY;
-                outerPointY = innerPointY;
-                textPointY  = innerPointY;
-            } else {
-                innerPointX = counter * tmpStepSize + offsetX;
-                outerPointX = innerPointX;
-                textPointX  = innerPointX;
-            }
-
-            // Set the general tickmark color
-            CTX.setStroke(getSkinnable().getTickMarkColor());
-
-            if (counter % getSkinnable().getMajorTickSpace() == 0) {
-                // Draw major tick mark
-                if (getSkinnable().getMajorTickMarksVisible()) {
-                    CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, smallRange ? smallCounter : counter, majorTickMarkColor) : majorTickMarkColor);
-                    CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, smallRange ? smallCounter : counter, majorTickMarkColor) : majorTickMarkColor);
-                    CTX.setLineWidth(1);
-                    CTX.strokeLine(innerPointX, innerPointY, outerPointX, outerPointY);
-                }
-                // Draw tick label text
-                if (getSkinnable().getTickLabelsVisible()) {
-                    CTX.save();
-                    CTX.translate(textPointX, textPointY);
-                    CTX.setFont(tickLabelFont);
-                    CTX.setTextAlign(TextAlignment.CENTER);
-                    CTX.setTextBaseline(VPos.CENTER);
-                    CTX.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, smallRange ? smallCounter : counter, tickLabelColor) : tickLabelColor);
-                    if (Orientation.VERTICAL == orientation) {
-                        CTX.fillText(Integer.toString((int) (tmpMaxValue - (smallRange ? smallCounter : counter))), 0, 0);
-                    } else {
-                        CTX.fillText(Integer.toString((int) (smallRange ? smallCounter : counter)), 0, 0);
-                    }
-                    CTX.restore();
-                }
-            }
-        }
-
-        tickMarkCanvas.setCache(true);
-        tickMarkCanvas.setCacheHint(CacheHint.QUALITY);
-    }
-
     private void drawTickMarks(final GraphicsContext CTX) {
         tickMarkCanvas.setCache(false);
         CTX.clearRect(0, 0, tickMarkCanvas.getWidth(), tickMarkCanvas.getHeight());
@@ -364,32 +291,33 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         double minValue = getSkinnable().getMinValue();
         double maxValue = getSkinnable().getMaxValue();
-        IntStream.range(0, getSkinnable().getSections().size()).parallel().forEachOrdered(
-            i -> {
-                final Section SECTION = getSkinnable().getSections().get(i);
-                final double SECTION_START;
-                if (Double.compare(SECTION.getStart(), maxValue) <= 0 && Double.compare(SECTION.getStop(), minValue) >= 0) {
-                    if (Double.compare(SECTION.getStart(), minValue) < 0 && Double.compare(SECTION.getStop(), maxValue) < 0) {
-                        SECTION_START = minValue * stepSize;
-                    } else {
-                        SECTION_START = (SECTION.getStart() - minValue) * stepSize;
-                    }
-                    final double SECTION_SIZE;
-                    if (Double.compare(SECTION.getStop(), maxValue) > 0) {
-                        SECTION_SIZE = (maxValue - SECTION.getStart()) * stepSize;
-                    } else {
-                        SECTION_SIZE = (SECTION.getStop() - SECTION.getStart()) * stepSize;
-                    }
-                    CTX.save();
-                    CTX.setFill(SECTION.getColor());
-                    if (Orientation.VERTICAL == orientation) {
-                        CTX.fillRect(0.0, 0.89 * height - SECTION_START - SECTION_SIZE, 0.5 * width, SECTION_SIZE);
-                    } else {
-                        CTX.fillRect(SECTION_START, 0.0, SECTION_SIZE, 0.5 * height);
-                    }
-                    CTX.restore();
+
+        int listSize = getSkinnable().getSections().size();
+        for (int i = 0 ; i < listSize ; i++) {
+            final Section SECTION = getSkinnable().getSections().get(i);
+            final double SECTION_START;
+            if (Double.compare(SECTION.getStart(), maxValue) <= 0 && Double.compare(SECTION.getStop(), minValue) >= 0) {
+                if (Double.compare(SECTION.getStart(), minValue) < 0 && Double.compare(SECTION.getStop(), maxValue) < 0) {
+                    SECTION_START = minValue * stepSize;
+                } else {
+                    SECTION_START = (SECTION.getStart() - minValue) * stepSize;
                 }
-            });
+                final double SECTION_SIZE;
+                if (Double.compare(SECTION.getStop(), maxValue) > 0) {
+                    SECTION_SIZE = (maxValue - SECTION.getStart()) * stepSize;
+                } else {
+                    SECTION_SIZE = (SECTION.getStop() - SECTION.getStart()) * stepSize;
+                }
+                CTX.save();
+                CTX.setFill(SECTION.getColor());
+                if (Orientation.VERTICAL == orientation) {
+                    CTX.fillRect(0.0, 0.89 * height - SECTION_START - SECTION_SIZE, 0.5 * width, SECTION_SIZE);
+                } else {
+                    CTX.fillRect(SECTION_START, 0.0, SECTION_SIZE, 0.5 * height);
+                }
+                CTX.restore();
+            }
+        }
         sectionsCanvas.setCache(true);
         sectionsCanvas.setCacheHint(CacheHint.QUALITY);
     }

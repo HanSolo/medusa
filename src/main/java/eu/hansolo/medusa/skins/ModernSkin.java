@@ -58,7 +58,6 @@ import javafx.scene.transform.Rotate;
 
 import java.math.BigDecimal;
 import java.util.Locale;
-import java.util.stream.IntStream;
 
 
 /**
@@ -476,31 +475,30 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double maxValue         = getSkinnable().getMaxValue();
         double offset           = 90 - START_ANGLE;
         double sectionWidth     = size * 0.05;
-        IntStream.range(0, getSkinnable().getSections().size()).parallel().forEachOrdered(
-            i -> {
-                final Section SECTION = getSkinnable().getSections().get(i);
-                final double SECTION_START_ANGLE;
-                if (Double.compare(SECTION.getStart(), maxValue) <= 0 && Double.compare(SECTION.getStop(), minValue) >= 0) {
-                    if (Double.compare(SECTION.getStart(), minValue) < 0 && Double.compare(SECTION.getStop(), maxValue) < 0) {
-                        SECTION_START_ANGLE = 0;
-                    } else {
-                        SECTION_START_ANGLE = (SECTION.getStart() - minValue) * angleStep;
-                    }
-                    final double SECTION_ANGLE_EXTEND;
-                    if (Double.compare(SECTION.getStop(), maxValue) > 0) {
-                        SECTION_ANGLE_EXTEND = (maxValue - SECTION.getStart()) * angleStep;
-                    } else {
-                        SECTION_ANGLE_EXTEND = (SECTION.getStop() - SECTION.getStart()) * angleStep;
-                    }
-                    mainCtx.save();
-                    mainCtx.setStroke(SECTION.getColor());
-                    mainCtx.setLineWidth(sectionWidth);
-                    mainCtx.setLineCap(StrokeLineCap.BUTT);
-                    mainCtx.strokeArc(sectionsXY, sectionsXY, sectionsWH, sectionsWH, -(offset + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
-                    mainCtx.restore();
+        int    listSize         = getSkinnable().getSections().size();
+        for (int i = 0 ; i < listSize ; i++) {
+            final Section SECTION = getSkinnable().getSections().get(i);
+            final double SECTION_START_ANGLE;
+            if (Double.compare(SECTION.getStart(), maxValue) <= 0 && Double.compare(SECTION.getStop(), minValue) >= 0) {
+                if (Double.compare(SECTION.getStart(), minValue) < 0 && Double.compare(SECTION.getStop(), maxValue) < 0) {
+                    SECTION_START_ANGLE = 0;
+                } else {
+                    SECTION_START_ANGLE = (SECTION.getStart() - minValue) * angleStep;
                 }
+                final double SECTION_ANGLE_EXTEND;
+                if (Double.compare(SECTION.getStop(), maxValue) > 0) {
+                    SECTION_ANGLE_EXTEND = (maxValue - SECTION.getStart()) * angleStep;
+                } else {
+                    SECTION_ANGLE_EXTEND = (SECTION.getStop() - SECTION.getStart()) * angleStep;
+                }
+                mainCtx.save();
+                mainCtx.setStroke(SECTION.getColor());
+                mainCtx.setLineWidth(sectionWidth);
+                mainCtx.setLineCap(StrokeLineCap.BUTT);
+                mainCtx.strokeArc(sectionsXY, sectionsXY, sectionsWH, sectionsWH, -(offset + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
+                mainCtx.restore();
             }
-        );
+        }
 
         // Draw tickmarks
         mainCtx.save();

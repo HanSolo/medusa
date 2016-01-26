@@ -82,7 +82,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.IntStream;
 
 
 /**
@@ -926,31 +925,30 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double            offsetY           = Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.475 : 0;
         double            offset            = 90 - startAngle;
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
-        IntStream.range(0, getSkinnable().getSections().size()).parallel().forEachOrdered(
-            i -> {
-                Section section = getSkinnable().getSections().get(i);
-                double sectionStartAngle;
-                if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
-                    if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
-                        sectionStartAngle = 0;
-                    } else {
-                        sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStart() - minValue) * angleStep : -(section.getStart() - minValue) * angleStep;
-                    }
-                    double sectionAngleExtend;
-                    if (Double.compare(section.getStop(), maxValue) > 0) {
-                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - section.getStart()) * angleStep : -(maxValue - section.getStart()) * angleStep;
-                    } else {
-                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStop() - section.getStart()) * angleStep : -(section.getStop() - section.getStart()) * angleStep;
-                    }
-                    ticksAndSections.save();
-                    ticksAndSections.setStroke(section.getColor());
-                    ticksAndSections.setLineWidth(scaledSize * 0.052);
-                    ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-                    ticksAndSections.strokeArc(xy + offsetX, xy + offsetY, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
-                    ticksAndSections.restore();
+        int               listSize          = sections.size();
+        for (int i = 0 ; i < listSize ; i++) {
+            Section section = getSkinnable().getSections().get(i);
+            double sectionStartAngle;
+            if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
+                if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
+                    sectionStartAngle = 0;
+                } else {
+                    sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStart() - minValue) * angleStep : -(section.getStart() - minValue) * angleStep;
                 }
+                double sectionAngleExtend;
+                if (Double.compare(section.getStop(), maxValue) > 0) {
+                    sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - section.getStart()) * angleStep : -(maxValue - section.getStart()) * angleStep;
+                } else {
+                    sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStop() - section.getStart()) * angleStep : -(section.getStop() - section.getStart()) * angleStep;
+                }
+                ticksAndSections.save();
+                ticksAndSections.setStroke(section.getColor());
+                ticksAndSections.setLineWidth(scaledSize * 0.052);
+                ticksAndSections.setLineCap(StrokeLineCap.BUTT);
+                ticksAndSections.strokeArc(xy + offsetX, xy + offsetY, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
+                ticksAndSections.restore();
             }
-                                                                                         );
+        }
     }
 
     private void drawAreas() {
@@ -964,30 +962,28 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double            offsetY           = Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.475 : 0;
         double            offset            = 90 - startAngle;
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
-
-        IntStream.range(0, getSkinnable().getAreas().size()).parallel().forEachOrdered(
-            i -> {
-                Section area = getSkinnable().getAreas().get(i);
-                double areaStartAngle;
-                if (Double.compare(area.getStart(), maxValue) <= 0 && Double.compare(area.getStop(), minValue) >= 0) {
-                    if (area.getStart() < minValue && area.getStop() < maxValue) {
-                        areaStartAngle = 0;
-                    } else {
-                        areaStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStart() - minValue) * angleStep : -(area.getStart() - minValue) * angleStep;
-                    }
-                    double areaAngleExtend;
-                    if (area.getStop() > maxValue) {
-                        areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - area.getStart()) * angleStep : -(maxValue - area.getStart()) * angleStep;
-                    } else {
-                        areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStop() - area.getStart()) * angleStep : -(area.getStop() - area.getStart()) * angleStep;
-                    }
-                    ticksAndSections.save();
-                    ticksAndSections.setFill(area.getColor());
-                    ticksAndSections.fillArc(xy + offsetX, xy + offsetY, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
-                    ticksAndSections.restore();
+        int               listSize          = areas.size();
+        for (int i = 0 ; i < listSize ; i++) {
+            Section area = getSkinnable().getAreas().get(i);
+            double areaStartAngle;
+            if (Double.compare(area.getStart(), maxValue) <= 0 && Double.compare(area.getStop(), minValue) >= 0) {
+                if (area.getStart() < minValue && area.getStop() < maxValue) {
+                    areaStartAngle = 0;
+                } else {
+                    areaStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStart() - minValue) * angleStep : -(area.getStart() - minValue) * angleStep;
                 }
+                double areaAngleExtend;
+                if (area.getStop() > maxValue) {
+                    areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - area.getStart()) * angleStep : -(maxValue - area.getStart()) * angleStep;
+                } else {
+                    areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStop() - area.getStart()) * angleStep : -(area.getStop() - area.getStart()) * angleStep;
+                }
+                ticksAndSections.save();
+                ticksAndSections.setFill(area.getColor());
+                ticksAndSections.fillArc(xy + offsetX, xy + offsetY, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
+                ticksAndSections.restore();
             }
-                                                                                      );
+        }
     }
 
     private void drawLed() {

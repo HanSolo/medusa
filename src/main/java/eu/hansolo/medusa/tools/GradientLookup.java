@@ -44,8 +44,8 @@ public class GradientLookup {
     private void init() {
         if (stops.isEmpty()) return;
 
-        double minFraction = stops.keySet().stream().mapToDouble(offset -> offset).min().getAsDouble();
-        double maxFraction = stops.keySet().stream().mapToDouble(offset -> offset).max().getAsDouble();
+        double minFraction = Collections.min(stops.keySet());
+        double maxFraction = Collections.max(stops.keySet());
 
         if (Double.compare(minFraction, 0) > 0) { stops.put(0.0, new Stop(0.0, stops.get(minFraction).getColor())); }
         if (Double.compare(maxFraction, 1) < 0) { stops.put(1.0, new Stop(1.0, stops.get(maxFraction).getColor())); }
