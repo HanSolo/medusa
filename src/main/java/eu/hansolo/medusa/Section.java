@@ -33,7 +33,7 @@ import javafx.scene.paint.Color;
 /**
  * Created by hansolo on 11.12.15.
  */
-public class Section {
+public class Section implements Comparable<Section> {
     public final SectionEvent ENTERED_EVENT = new SectionEvent(this, null, SectionEvent.SECTION_ENTERED);
     public final SectionEvent LEFT_EVENT    = new SectionEvent(this, null, SectionEvent.SECTION_LEFT);
     private double                _start;
@@ -60,6 +60,9 @@ public class Section {
     }
     public Section(final double START, final double STOP, final Color COLOR) {
         this(START, STOP, "", null, COLOR, Color.TRANSPARENT);
+    }
+    public Section(final double START, final double STOP, final Image ICON, final Color COLOR) {
+        this(START, STOP, "", ICON, COLOR, Color.WHITE);
     }
     public Section(final double START, final double STOP, final String TEXT, final Color COLOR) {
         this(START, STOP, TEXT, null, COLOR, Color.WHITE);
@@ -178,6 +181,12 @@ public class Section {
         return (Double.compare(SECTION.getStart(), getStart()) == 0 &&
                 Double.compare(SECTION.getStop(), getStop()) == 0 &&
                 SECTION.getText().equals(getText()));
+    }
+
+    @Override public int compareTo(final Section SECTION) {
+        if (Double.compare(getStart(), SECTION.getStart()) < 0) return -1;
+        if (Double.compare(getStart(), SECTION.getStart()) > 0) return 1;
+        return 0;
     }
 
     @Override public String toString() {

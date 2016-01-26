@@ -34,7 +34,7 @@ import javafx.scene.paint.Color;
 /**
  * Created by hansolo on 11.12.15.
  */
-public class Marker {
+public class Marker implements Comparable<Marker>{
     public enum MarkerType { STANDARD, DOT, TRIANGLE }
     private static final Color DEFAULT_MARKER_COLOR = Color.rgb(123, 30, 202);
     public final MarkerEvent MARKER_PRESSED_EVENT  = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_PRESSED);
@@ -167,6 +167,12 @@ public class Marker {
             fireMarkerEvent(UNDERRUN_EVENT);
         }
         checkedValue = VALUE;
+    }
+
+    @Override public int compareTo(final Marker MARKER) {
+        if (Double.compare(getValue(), MARKER.getValue()) < 0) return -1;
+        if (Double.compare(getValue(), MARKER.getValue()) > 0) return 1;
+        return 0;
     }
 
     @Override public String toString() {
