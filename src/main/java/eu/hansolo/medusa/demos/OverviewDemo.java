@@ -32,7 +32,6 @@ import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Marker.MarkerType;
 import eu.hansolo.medusa.Section;
-import eu.hansolo.medusa.skins.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
@@ -158,7 +157,7 @@ public class OverviewDemo extends Application {
                              .build();
 
         gauge3 = GaugeBuilder.create()
-                             .skin(SimpleSkin.class)
+                             .skinType(SkinType.SIMPLE)
                              .sections(new Section(0, 16.66666, "0", Color.web("#11632f")),
                                        new Section(16.66666, 33.33333, "1", Color.web("#36843d")),
                                        new Section(33.33333, 50.0, "2", Color.web("#67a328")),
@@ -171,7 +170,7 @@ public class OverviewDemo extends Application {
                              .build();
 
         gauge4 = GaugeBuilder.create()
-                             .skin(BulletChartSkin.class)
+                             .skinType(SkinType.BULLET_CHART)
                              .backgroundPaint(Color.rgb(204, 204, 204))
                              .sections(new Section(0, 16.66666, "0", Color.web("#11632f")),
                                        new Section(16.66666, 33.33333, "1", Color.web("#36843d")),
@@ -191,7 +190,7 @@ public class OverviewDemo extends Application {
                              .build();
 
         gauge5 = GaugeBuilder.create()
-                             .skin(DashboardSkin.class)
+                             .skinType(SkinType.DASHBOARD)
                              .backgroundPaint(Color.web("#eff3f3"))
                              .animated(true)
                              .title("Dashboard")
@@ -211,7 +210,7 @@ public class OverviewDemo extends Application {
                              .build();
 
         gauge6 = GaugeBuilder.create()
-                             .skin(SpaceXSkin.class)
+                             .skinType(SkinType.SPACE_X)
                              .animated(true)
                              .decimals(0)
                              .title("SpaceX")
@@ -221,7 +220,7 @@ public class OverviewDemo extends Application {
                              .build();
 
         gauge7 = GaugeBuilder.create()
-                             .skin(AmpSkin.class)
+                             .skinType(SkinType.AMP)
                              .prefSize(250, 210)
                              .minValue(-1)
                              .maxValue(1)
@@ -236,7 +235,7 @@ public class OverviewDemo extends Application {
                              .build();
 
         gauge8 = GaugeBuilder.create()
-                             .skin(ModernSkin.class)
+                             .skinType(SkinType.MODERN)
                              .prefSize(400, 400)
                              .sections(new Section(85, 90, "", Color.rgb(204, 0, 0, 0.5)),
                                        new Section(90, 95, "", Color.rgb(204, 0, 0, 0.75)),
@@ -290,7 +289,7 @@ public class OverviewDemo extends Application {
                              .build();
 
         gauge10 = GaugeBuilder.create()
-                              .skin(FlatSkin.class)
+                              .skinType(SkinType.FLAT)
                               .title("Flat")
                               .unit("Unit")
                               .foregroundBaseColor(Color.WHITE)
@@ -298,7 +297,7 @@ public class OverviewDemo extends Application {
                               .build();
 
         gauge11 = GaugeBuilder.create()
-                              .skin(SlimSkin.class)
+                              .skinType(SkinType.SLIM)
                               .animated(true)
                               .maxValue(10000)
                               .decimals(0)
@@ -306,7 +305,7 @@ public class OverviewDemo extends Application {
                               .build();
 
         gauge12 = GaugeBuilder.create()
-                              .skin(KpiSkin.class)
+                              .skinType(SkinType.KPI)
                               .foregroundBaseColor(Color.WHITE)
                               .needleColor(Color.WHITE)
                               .animated(true)
@@ -315,30 +314,30 @@ public class OverviewDemo extends Application {
                               .build();
 
         gauge13 = GaugeBuilder.create()
-                              .skin(IndicatorSkin.class)
+                              .skinType(SkinType.INDICATOR)
                               .animated(true)
                               .build();
 
         gauge14 = GaugeBuilder.create()
-                              .skin(QuarterSkin.class)
+                              .skinType(SkinType.QUARTER)
                               .animated(true)
                               .foregroundBaseColor(Color.WHITE)
                               .build();
 
         gauge15 = GaugeBuilder.create()
-                              .skin(HSkin.class)
+                              .skinType(SkinType.HORIZONTAL)
                               .animated(true)
                               .foregroundBaseColor(Color.WHITE)
                               .build();
 
         gauge16 = GaugeBuilder.create()
-                              .skin(VSkin.class)
+                              .skinType(SkinType.VERTICAL)
                               .animated(true)
                               .foregroundBaseColor(Color.WHITE)
                               .build();
 
         gauge17 = GaugeBuilder.create()
-                              .skin(LcdSkin.class)
+                              .skinType(SkinType.LCD)
                               .animated(true)
                               .title("Temperature")
                               .subTitle("Office")
@@ -347,7 +346,7 @@ public class OverviewDemo extends Application {
                               .build();
 
         gauge18 = GaugeBuilder.create()
-                              .skin(TinySkin.class)
+                              .skinType(SkinType.TINY)
                               .animated(true)
                               .minValue(0)
                               .sections(new Section(0, 33, Color.rgb(0, 200, 0, 0.75)),
@@ -356,7 +355,7 @@ public class OverviewDemo extends Application {
                               .build();
 
         gauge19 = GaugeBuilder.create()
-                              .skin(BatterySkin.class)
+                              .skinType(SkinType.BATTERY)
                               .animated(true)
                               .sectionsVisible(true)
                               .sections(new Section(0, 10, Color.rgb(200, 0, 0, 0.8)),
@@ -365,7 +364,7 @@ public class OverviewDemo extends Application {
                               .build();
 
         gauge20 = GaugeBuilder.create()
-                              .skin(LevelSkin.class)
+                              .skinType(SkinType.LEVEL)
                               .title("Capacity")
                               .titleColor(Color.WHITE)
                               .animated(true)
