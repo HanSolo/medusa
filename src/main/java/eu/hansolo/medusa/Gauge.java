@@ -18,20 +18,7 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEventListener;
-import eu.hansolo.medusa.skins.AmpSkin;
-import eu.hansolo.medusa.skins.BulletChartSkin;
-import eu.hansolo.medusa.skins.DashboardSkin;
-import eu.hansolo.medusa.skins.FlatSkin;
-import eu.hansolo.medusa.skins.GaugeSkin;
-import eu.hansolo.medusa.skins.HSkin;
-import eu.hansolo.medusa.skins.IndicatorSkin;
-import eu.hansolo.medusa.skins.KpiSkin;
-import eu.hansolo.medusa.skins.ModernSkin;
-import eu.hansolo.medusa.skins.QuarterSkin;
-import eu.hansolo.medusa.skins.SimpleSkin;
-import eu.hansolo.medusa.skins.SlimSkin;
-import eu.hansolo.medusa.skins.SpaceXSkin;
-import eu.hansolo.medusa.skins.VSkin;
+import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.GradientLookup;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.MarkerComparator;
@@ -344,6 +331,10 @@ public class Gauge extends Control {
 
     // ******************** Constructors **************************************
     public Gauge() {
+        this(SkinType.GAUGE);
+    }
+    public Gauge(final SkinType SKIN_TYPE) {
+        skinType = SKIN_TYPE;
         getStyleClass().add("gauge");
 
         init();
@@ -411,7 +402,7 @@ public class Gauge extends Control {
         tickLabelSections                 = FXCollections.observableArrayList();
         markers                           = FXCollections.observableArrayList();
 
-        skinType                          = SkinType.GAUGE;
+        //skinType                          = SkinType.GAUGE;
         _startFromZero                    = false;
         _returnToZero                     = false;
         _zeroColor                        = DARK_COLOR;
@@ -2168,12 +2159,150 @@ public class Gauge extends Control {
 
     
     // ******************** Style related *************************************
-    @Override protected Skin createDefaultSkin() { return new GaugeSkin(this); }
+    @Override protected Skin createDefaultSkin() {
+        switch(skinType) {
+            case AMP         :
+                setKnobPosition(Pos.BOTTOM_CENTER);
+                setTitleColor(Color.WHITE);
+                setLedVisible(true);
+                setBackgroundPaint(Color.WHITE);
+                setForegroundPaint(Color.BLACK);
+                setLcdVisible(true);
+                setShadowsEnabled(true);
+                return new AmpSkin(Gauge.this);
+            case BULLET_CHART:
+                setKnobPosition(Pos.CENTER);
+                setBarColor(Color.BLACK);
+                setThresholdColor(Color.BLACK);
+                return new BulletChartSkin(Gauge.this);
+            case DASHBOARD   :
+                setKnobPosition(Pos.BOTTOM_CENTER);
+                setDecimals(0);
+                setBarBackgroundColor(Color.LIGHTGRAY);
+                setBarColor(Color.rgb(93,190,205));
+                return new DashboardSkin(Gauge.this);
+            case FLAT        :
+                setKnobPosition(Pos.CENTER);
+                setBarColor(Color.CYAN);
+                setBackgroundPaint(Color.TRANSPARENT);
+                setTitleColor(Gauge.DARK_COLOR);
+                setValueColor(Gauge.DARK_COLOR);
+                setUnitColor(Gauge.DARK_COLOR);
+                setBorderPaint(Color.rgb(208, 208, 208));
+                setDecimals(0);
+                return new FlatSkin(Gauge.this);
+            case INDICATOR   :
+                setKnobPosition(Pos.BOTTOM_CENTER);
+                setValueVisible(false);
+                setGradientBarEnabled(false);
+                setGradientBarStops(new Stop(0.0, Color.rgb(34,180,11)),
+                                    new Stop(0.5, Color.rgb(255,146,0)),
+                                    new Stop(1.0, Color.rgb(255,0,39)));
+                setTickLabelsVisible(false);
+                setNeedleColor(Color.rgb(71,71,71));
+                setBarBackgroundColor(Color.rgb(232,231,223));
+                setBarColor(Color.rgb(255,0,39));
+                setAngleRange(180);
+                return new IndicatorSkin(Gauge.this);
+            case KPI         :
+                setKnobPosition(Pos.BOTTOM_CENTER);
+                setDecimals(0);
+                setForegroundBaseColor(Color.rgb(126,126,127));
+                setBarColor(Color.rgb(168,204,254));
+                setThresholdVisible(true);
+                setThresholdColor(Color.rgb(45,86,184));
+                setNeedleColor(Color.rgb(74,74,74));
+                setAngleRange(128);
+                return new KpiSkin(Gauge.this);
+            case MODERN      :
+                setKnobPosition(Pos.CENTER);
+                setDecimals(0);
+                setValueColor(Color.WHITE);
+                setTitleColor(Color.WHITE);
+                setSubTitleColor(Color.WHITE);
+                setUnitColor(Color.WHITE);
+                setBarColor(Color.rgb(0, 214, 215));
+                setNeedleColor(Color.WHITE);
+                setThresholdColor(Color.rgb(204, 0, 0));
+                setTickLabelColor(Color.rgb(151, 151, 151));
+                setTickMarkColor(Color.BLACK);
+                setTickLabelOrientation(TickLabelOrientation.ORTHOGONAL);
+                return new ModernSkin(Gauge.this);
+            case SIMPLE      :
+                setKnobPosition(Pos.CENTER);
+                setBorderPaint(Color.WHITE);
+                setBackgroundPaint(Color.DARKGRAY);
+                setDecimals(0);
+                setNeedleColor(Color.web("#5a615f"));
+                setValueColor(Color.WHITE);
+                setTitleColor(Color.WHITE);
+                return new SimpleSkin(Gauge.this);
+            case SLIM        :
+                setKnobPosition(Pos.CENTER);
+                setDecimals(2);
+                setBarBackgroundColor(Color.rgb(62, 67, 73));
+                setBarColor(Color.rgb(93,190,205));
+                setTitleColor(Color.rgb(142,147,151));
+                setValueColor(Color.rgb(228,231,238));
+                setUnitColor(Color.rgb(142,147,151));
+                return new SlimSkin(Gauge.this);
+            case SPACE_X     :
+                setKnobPosition(Pos.CENTER);
+                setDecimals(0);
+                setThresholdColor(Color.rgb(180, 0, 0));
+                setBarBackgroundColor(Color.rgb(169, 169, 169, 0.25));
+                setBarColor(Color.rgb(169, 169, 169));
+                setTitleColor(Color.WHITE);
+                setValueColor(Color.WHITE);
+                setUnitColor(Color.WHITE);
+                return new SpaceXSkin(Gauge.this);
+            case QUARTER     :
+                setKnobPosition(Pos.BOTTOM_RIGHT);
+                setAngleRange(90);
+                return new QuarterSkin(Gauge.this);
+            case HORIZONTAL:
+                setKnobPosition(Pos.BOTTOM_CENTER);
+                setAngleRange(180);
+                return new HSkin(Gauge.this);
+            case VERTICAL:
+                setKnobPosition(Pos.CENTER_RIGHT);
+                setAngleRange(180);
+                return new VSkin(Gauge.this);
+            case LCD:
+                setDecimals(1);
+                setTickLabelDecimals(1);
+                setMinMeasuredValueVisible(true);
+                setMaxMeasuredValueVisible(true);
+                setOldValueVisible(true);
+                return new LcdSkin(Gauge.this);
+            case TINY:
+                setBackgroundPaint(Color.rgb(216,216,216));
+                setBorderPaint(Color.rgb(76,76,76));
+                setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));
+                setNeedleColor(Color.rgb(76, 76, 76));
+                setSectionsVisible(true);
+                setMajorTickMarksVisible(true);
+                setMajorTickMarkColor(Color.WHITE);
+                return new TinySkin(Gauge.this);
+            case BATTERY:
+                setBarBackgroundColor(Color.BLACK);
+                setBarColor(Color.BLACK);
+                setValueColor(Color.WHITE);
+                return new BatterySkin(Gauge.this);
+            case LEVEL:
+                setValueColor(Color.WHITE);
+                setBarColor(Color.CYAN);
+                return new LevelSkin(Gauge.this);
+            case GAUGE       :
+            default          : return new GaugeSkin(Gauge.this);
+        }
+    }
 
     @Override public String getUserAgentStylesheet() { return getClass().getResource("gauge.css").toExternalForm(); }
 
     public SkinType getSkinType() { return skinType; }
     public void setSkinType(final SkinType SKIN_TYPE) {
+        skinType = SKIN_TYPE;
         switch(SKIN_TYPE) {
             case AMP         :
                 setKnobPosition(Pos.BOTTOM_CENTER);
@@ -2301,6 +2430,7 @@ public class Gauge extends Control {
                 setMinMeasuredValueVisible(true);
                 setMaxMeasuredValueVisible(true);
                 setOldValueVisible(true);
+                super.setSkin(new LcdSkin(Gauge.this));
                 break;
             case TINY:
                 setBackgroundPaint(Color.rgb(216,216,216));
@@ -2310,18 +2440,23 @@ public class Gauge extends Control {
                 setSectionsVisible(true);
                 setMajorTickMarksVisible(true);
                 setMajorTickMarkColor(Color.WHITE);
+                super.setSkin(new TinySkin(Gauge.this));
                 break;
             case BATTERY:
                 setBarBackgroundColor(Color.BLACK);
                 setBarColor(Color.BLACK);
                 setValueColor(Color.WHITE);
+                super.setSkin(new BatterySkin(Gauge.this));
                 break;
             case LEVEL:
                 setValueColor(Color.WHITE);
                 setBarColor(Color.CYAN);
+                super.setSkin(new LevelSkin(Gauge.this));
                 break;
             case GAUGE       :
-            default          : super.setSkin(new GaugeSkin(Gauge.this)); break;
+            default          :
+                super.setSkin(new GaugeSkin(Gauge.this));
+                break;
         }
     }
 
