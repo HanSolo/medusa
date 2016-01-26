@@ -34,6 +34,8 @@ import eu.hansolo.medusa.skins.SpaceXSkin;
 import eu.hansolo.medusa.skins.VSkin;
 import eu.hansolo.medusa.tools.GradientLookup;
 import eu.hansolo.medusa.tools.Helper;
+import eu.hansolo.medusa.tools.MarkerComparator;
+import eu.hansolo.medusa.tools.SectionComparator;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -57,6 +59,7 @@ import javafx.util.Duration;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Callable;
@@ -660,17 +663,20 @@ public class Gauge extends Control {
     public ObservableList<Section> getSections() { return sections; }
     public void setSections(final List<Section> SECTIONS) {
         sections.setAll(SECTIONS);
+        Collections.sort(sections, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
     public void setSections(final Section... SECTIONS) { setSections(Arrays.asList(SECTIONS)); }
     public void addSection(final Section SECTION) {
         if (null == SECTION) return;
         sections.add(SECTION);
+        Collections.sort(sections, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
     public void removeSection(final Section SECTION) {
         if (null == SECTION) return;
         sections.remove(SECTION);
+        Collections.sort(sections, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
     public void clearSections() {
@@ -681,17 +687,20 @@ public class Gauge extends Control {
     public ObservableList<Section> getAreas() { return areas; }
     public void setAreas(final List<Section> AREAS) {
         areas.setAll(AREAS);
+        Collections.sort(areas, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
     public void setAreas(final Section... AREAS) { setAreas(Arrays.asList(AREAS)); }
     public void addArea(final Section AREA) {
         if (null == AREA) return;
         areas.add(AREA);
+        Collections.sort(areas, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
     public void removeArea(final Section AREA) {
         if (null == AREA) return;
         areas.remove(AREA);
+        Collections.sort(areas, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
     public void clearAreas() {
@@ -702,17 +711,20 @@ public class Gauge extends Control {
     public ObservableList<Section> getTickMarkSections() { return tickMarkSections; }
     public void setTickMarkSections(final List<Section> SECTIONS) {
         tickMarkSections.setAll(SECTIONS);
+        Collections.sort(tickMarkSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
     public void setTickMarkSections(final Section... SECTIONS) { setTickMarkSections(Arrays.asList(SECTIONS)); }
     public void addTickMarkSection(final Section SECTION) {
         if (null == SECTION) return;
         tickMarkSections.add(SECTION);
+        Collections.sort(tickMarkSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
     public void removeTickMarkSection(final Section SECTION) {
         if (null == SECTION) return;
         tickMarkSections.remove(SECTION);
+        Collections.sort(tickMarkSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
     public void clearTickMarkSections() {
@@ -723,17 +735,20 @@ public class Gauge extends Control {
     public ObservableList<Section> getTickLabelSections() { return tickLabelSections; }
     public void setTickLabelSections(final List<Section> SECTIONS) {
         tickLabelSections.setAll(SECTIONS);
+        Collections.sort(tickLabelSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
     public void setTickLabelSections(final Section... SECTIONS) { setTickLabelSections(Arrays.asList(SECTIONS)); }
     public void addTickLabelSection(final Section SECTION) {
         if (null == SECTION) return;
         tickLabelSections.add(SECTION);
+        Collections.sort(tickLabelSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
     public void removeTickLabelSection(final Section SECTION) {
         if (null == SECTION) return;
         tickLabelSections.remove(SECTION);
+        Collections.sort(tickLabelSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
     public void clearTickLabelSections() {
@@ -744,17 +759,20 @@ public class Gauge extends Control {
     public ObservableList<Marker> getMarkers() { return markers; }
     public void setMarkers(final List<Marker> MARKERS) {
         markers.setAll(MARKERS);
+        Collections.sort(markers, new MarkerComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
     public void setMarkers(final Marker... MARKERS) { setMarkers(Arrays.asList(MARKERS)); }
     public void addMarker(final Marker MARKER) {
         if (null == MARKER) return;
         markers.add(MARKER);
+        Collections.sort(markers, new MarkerComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
     public void removeMarker(final Marker MARKER) {
         if (null == MARKER) return;
         markers.remove(MARKER);
+        Collections.sort(markers, new MarkerComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
     public void clearMarkers() {
@@ -2236,7 +2254,6 @@ public class Gauge extends Control {
                 setBorderPaint(Color.WHITE);
                 setBackgroundPaint(Color.DARKGRAY);
                 setDecimals(0);
-                setSectionTextVisible(true);
                 setNeedleColor(Color.web("#5a615f"));
                 setValueColor(Color.WHITE);
                 setTitleColor(Color.WHITE);
