@@ -80,7 +80,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         orientation      = gauge.getOrientation();
         barTooltip       = new Tooltip();
         thresholdTooltip = new Tooltip();
-        formatString     = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        formatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
         if (Orientation.VERTICAL == orientation) {
             preferredWidth  = 64;
@@ -420,7 +420,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
 
         double currentValue = getSkinnable().getCurrentValue();
-        formatString        = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        formatString        = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
 
         orientation = getSkinnable().getOrientation();
         if (Orientation.VERTICAL == orientation) {

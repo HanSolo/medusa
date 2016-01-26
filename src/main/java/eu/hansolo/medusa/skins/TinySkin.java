@@ -113,7 +113,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         colorGradientEnabled = gauge.isGradientBarEnabled();
         noOfGradientStops    = gauge.getGradientBarStops().size();
         sections             = gauge.getSections();
-        formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
         init();
         initGraphics();
@@ -325,7 +325,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void redraw() {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
-        formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
 

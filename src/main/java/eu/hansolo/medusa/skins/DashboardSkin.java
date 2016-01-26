@@ -102,8 +102,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
         currentValueAngle    = 0;
-        formatString         = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
-        otherFormatString    = String.join("", "%.", Integer.toString(gauge.getTickLabelDecimals()), "f");
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        otherFormatString    = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
 
         init();
         initGraphics();
@@ -261,8 +261,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
-        otherFormatString    = String.join("", "%.", Integer.toString(getSkinnable().getTickLabelDecimals()), "f");
+        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        otherFormatString    = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
         sectionsVisible      = getSkinnable().getSectionsVisible();

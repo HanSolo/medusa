@@ -105,7 +105,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep         = ANGLE_RANGE / range;
         minValue          = gauge.getMinValue();
         currentValueAngle = 0;
-        formatString      = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
         init();
         initGraphics();
@@ -277,7 +277,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        formatString             = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        formatString             = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
         barColor                 = getSkinnable().getBarColor();

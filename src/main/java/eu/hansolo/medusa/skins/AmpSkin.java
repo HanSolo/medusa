@@ -120,7 +120,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep        = gauge.getAngleRange() / gauge.getRange();
         oldValue         = gauge.getValue();
         limitString      = "";
-        formatString     = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        formatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
         init();
         initGraphics();
@@ -602,7 +602,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
 
         Color backgroundColor = getSkinnable().getBackgroundPaint() instanceof Color ? (Color) getSkinnable().getBackgroundPaint() : Color.WHITE;
         ticksAndSectionsCanvas.setCache(false);

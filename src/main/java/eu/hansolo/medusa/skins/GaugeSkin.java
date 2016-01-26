@@ -152,7 +152,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         minValue     = gauge.getMinValue();
         maxValue     = gauge.getMaxValue();
         limitString  = "";
-        formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         sections     = gauge.getSections();
         areas        = gauge.getAreas();
         mouseHandler = event -> handleMouseEvent(event);
@@ -641,7 +641,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 if (marker.getText().isEmpty()) {
                     markerTooltip = new Tooltip(Double.toString(marker.getValue()));
                 } else {
-                    markerTooltip = new Tooltip(String.join("", marker.getText(), "\n(", Double.toString(marker.getValue()), ")"));
+                    markerTooltip = new Tooltip(new StringBuilder(marker.getText()).append("\n(").append(Double.toString(marker.getValue())).append(")").toString());
                 }
                 markerTooltip.setTextAlignment(TextAlignment.CENTER);
                 Tooltip.install(shape, markerTooltip);
@@ -958,7 +958,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
 
         // Background stroke and fill

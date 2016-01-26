@@ -85,7 +85,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleStep    = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
-        formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         sections     = gauge.getSections();
 
         init();
@@ -337,7 +337,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         titleText.setText(getSkinnable().getTitle());
         titleText.setFill(getSkinnable().getTitleColor());
         valueText.setFill(getSkinnable().getValueColor());

@@ -16,20 +16,17 @@
 
 package eu.hansolo.medusa;
 
-import eu.hansolo.medusa.Gauge.ButtonEvent;
 import eu.hansolo.medusa.Gauge.KnobType;
 import eu.hansolo.medusa.Gauge.LcdFont;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.NeedleType;
-import eu.hansolo.medusa.Gauge.NumberFormat;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
-import eu.hansolo.medusa.Gauge.ThresholdEvent;
-import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
+import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.GradientLookup;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -49,10 +46,13 @@ import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -248,17 +248,17 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
-    public final B tickLabelOrientation(final TickLabelOrientation ORIENTATION) {
+    public final B tickLabelOrientation(final Gauge.TickLabelOrientation ORIENTATION) {
         properties.put("tickLabelOrientation", new SimpleObjectProperty<>(ORIENTATION));
         return (B)this;
     }
 
-    public final B tickLabelLocation(final TickLabelLocation LOCATION) {
+    public final B tickLabelLocation(final Gauge.TickLabelLocation LOCATION) {
         properties.put("tickLabelLocation", new SimpleObjectProperty<>(LOCATION));
         return (B)this;
     }
 
-    public final B numberFormat(final NumberFormat FORMAT) {
+    public final B numberFormat(final Gauge.NumberFormat FORMAT) {
         properties.put("numberFormat", new SimpleObjectProperty<>(FORMAT));
         return (B)this;
     }
@@ -598,22 +598,22 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
-    public final B onButtonPressed(final EventHandler<ButtonEvent> HANDLER) {
+    public final B onButtonPressed(final EventHandler<Gauge.ButtonEvent> HANDLER) {
         properties.put("onButtonPressed", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
 
-    public final B onButtonReleased(final EventHandler<ButtonEvent> HANDLER) {
+    public final B onButtonReleased(final EventHandler<Gauge.ButtonEvent> HANDLER) {
         properties.put("onButtonReleased", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
 
-    public final B onThresholdExceeded(final EventHandler<ThresholdEvent> HANDLER) {
+    public final B onThresholdExceeded(final EventHandler<Gauge.ThresholdEvent> HANDLER) {
         properties.put("onThresholdExceeded", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
 
-    public final B onThresholdUnderrun(final EventHandler<ThresholdEvent> HANDLER) {
+    public final B onThresholdUnderrun(final EventHandler<Gauge.ThresholdEvent> HANDLER) {
         properties.put("onThresholdUnderrun", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
@@ -688,7 +688,142 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
     public final Gauge build() {
         final Gauge CONTROL;
         if (properties.containsKey("skinType")) {
-            CONTROL = new Gauge(((ObjectProperty<SkinType>) properties.get("skinType")).get());
+            SkinType skinType = ((ObjectProperty<SkinType>) properties.get("skinType")).get();
+            CONTROL = new Gauge(skinType);
+            switch(skinType) {
+                case AMP         :
+                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
+                    CONTROL.setTitleColor(Color.WHITE);
+                    CONTROL.setLedVisible(true);
+                    CONTROL.setBackgroundPaint(Color.WHITE);
+                    CONTROL.setForegroundPaint(Color.BLACK);
+                    CONTROL.setLcdVisible(true);
+                    CONTROL.setShadowsEnabled(true);
+                    break;
+                case BULLET_CHART:
+                    CONTROL.setKnobPosition(Pos.CENTER);
+                    CONTROL.setBarColor(Color.BLACK);
+                    CONTROL.setThresholdColor(Color.BLACK);
+                    break;
+                case DASHBOARD   :
+                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
+                    CONTROL.setDecimals(0);
+                    CONTROL.setBarBackgroundColor(Color.LIGHTGRAY);
+                    CONTROL.setBarColor(Color.rgb(93,190,205));
+                    break;
+                case FLAT        :
+                    CONTROL.setKnobPosition(Pos.CENTER);
+                    CONTROL.setBarColor(Color.CYAN);
+                    CONTROL.setBackgroundPaint(Color.TRANSPARENT);
+                    CONTROL.setTitleColor(Gauge.DARK_COLOR);
+                    CONTROL.setValueColor(Gauge.DARK_COLOR);
+                    CONTROL.setUnitColor(Gauge.DARK_COLOR);
+                    CONTROL.setBorderPaint(Color.rgb(208, 208, 208));
+                    CONTROL.setDecimals(0);
+                    break;
+                case INDICATOR   :
+                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
+                    CONTROL.setValueVisible(false);
+                    CONTROL.setGradientBarEnabled(false);
+                    CONTROL.setGradientBarStops(new Stop(0.0, Color.rgb(34,180,11)),
+                                        new Stop(0.5, Color.rgb(255,146,0)),
+                                        new Stop(1.0, Color.rgb(255,0,39)));
+                    CONTROL.setTickLabelsVisible(false);
+                    CONTROL.setNeedleColor(Color.rgb(71,71,71));
+                    CONTROL.setBarBackgroundColor(Color.rgb(232,231,223));
+                    CONTROL.setBarColor(Color.rgb(255,0,39));
+                    CONTROL.setAngleRange(180);
+                    break;
+                case KPI         :
+                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
+                    CONTROL.setDecimals(0);
+                    CONTROL.setForegroundBaseColor(Color.rgb(126,126,127));
+                    CONTROL.setBarColor(Color.rgb(168,204,254));
+                    CONTROL.setThresholdVisible(true);
+                    CONTROL.setThresholdColor(Color.rgb(45,86,184));
+                    CONTROL.setNeedleColor(Color.rgb(74,74,74));
+                    CONTROL.setAngleRange(128);
+                    break;
+                case MODERN      :
+                    CONTROL.setKnobPosition(Pos.CENTER);
+                    CONTROL.setDecimals(0);
+                    CONTROL.setValueColor(Color.WHITE);
+                    CONTROL.setTitleColor(Color.WHITE);
+                    CONTROL.setSubTitleColor(Color.WHITE);
+                    CONTROL.setUnitColor(Color.WHITE);
+                    CONTROL.setBarColor(Color.rgb(0, 214, 215));
+                    CONTROL.setNeedleColor(Color.WHITE);
+                    CONTROL.setThresholdColor(Color.rgb(204, 0, 0));
+                    CONTROL.setTickLabelColor(Color.rgb(151, 151, 151));
+                    CONTROL.setTickMarkColor(Color.BLACK);
+                    CONTROL.setTickLabelOrientation(TickLabelOrientation.ORTHOGONAL);
+                    break;
+                case SIMPLE      :
+                    CONTROL.setKnobPosition(Pos.CENTER);
+                    CONTROL.setBorderPaint(Color.WHITE);
+                    CONTROL.setBackgroundPaint(Color.DARKGRAY);
+                    CONTROL.setDecimals(0);
+                    CONTROL.setNeedleColor(Color.web("#5a615f"));
+                    CONTROL.setValueColor(Color.WHITE);
+                    CONTROL.setTitleColor(Color.WHITE);
+                    break;
+                case SLIM        :
+                    CONTROL.setKnobPosition(Pos.CENTER);
+                    CONTROL.setDecimals(2);
+                    CONTROL.setBarBackgroundColor(Color.rgb(62, 67, 73));
+                    CONTROL.setBarColor(Color.rgb(93,190,205));
+                    CONTROL.setTitleColor(Color.rgb(142,147,151));
+                    CONTROL.setValueColor(Color.rgb(228,231,238));
+                    CONTROL.setUnitColor(Color.rgb(142,147,151));
+                    break;
+                case SPACE_X     :
+                    CONTROL.setKnobPosition(Pos.CENTER);
+                    CONTROL.setDecimals(0);
+                    CONTROL.setThresholdColor(Color.rgb(180, 0, 0));
+                    CONTROL.setBarBackgroundColor(Color.rgb(169, 169, 169, 0.25));
+                    CONTROL.setBarColor(Color.rgb(169, 169, 169));
+                    CONTROL.setTitleColor(Color.WHITE);
+                    CONTROL.setValueColor(Color.WHITE);
+                    CONTROL.setUnitColor(Color.WHITE);
+                    break;
+                case QUARTER     :
+                    CONTROL.setKnobPosition(Pos.BOTTOM_RIGHT);
+                    CONTROL.setAngleRange(90);
+                    break;
+                case HORIZONTAL:
+                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
+                    CONTROL.setAngleRange(180);
+                    break;
+                case VERTICAL:
+                    CONTROL.setKnobPosition(Pos.CENTER_RIGHT);
+                    CONTROL.setAngleRange(180);
+                    break;
+                case LCD:
+                    CONTROL.setDecimals(1);
+                    CONTROL.setTickLabelDecimals(1);
+                    CONTROL.setMinMeasuredValueVisible(true);
+                    CONTROL.setMaxMeasuredValueVisible(true);
+                    CONTROL.setOldValueVisible(true);
+                    break;
+                case TINY:
+                    CONTROL.setBackgroundPaint(Color.rgb(216,216,216));
+                    CONTROL.setBorderPaint(Color.rgb(76,76,76));
+                    CONTROL.setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));
+                    CONTROL.setNeedleColor(Color.rgb(76, 76, 76));
+                    CONTROL.setSectionsVisible(true);
+                    CONTROL.setMajorTickMarksVisible(true);
+                    CONTROL.setMajorTickMarkColor(Color.WHITE);
+                    break;
+                case BATTERY:
+                    CONTROL.setBarBackgroundColor(Color.BLACK);
+                    CONTROL.setBarColor(Color.BLACK);
+                    CONTROL.setValueColor(Color.WHITE);
+                    break;
+                case LEVEL:
+                    CONTROL.setValueColor(Color.WHITE);
+                    CONTROL.setBarColor(Color.CYAN);
+                    break;
+            }
         } else {
             CONTROL = new Gauge();
         }
@@ -851,11 +986,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             } else if ("barBackgroundColor".equals(key)) {
                 CONTROL.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("tickLabelOrientation".equals(key)) {
-                CONTROL.setTickLabelOrientation(((ObjectProperty<TickLabelOrientation>) properties.get(key)).get());
+                CONTROL.setTickLabelOrientation(((ObjectProperty<Gauge.TickLabelOrientation>) properties.get(key)).get());
             } else if("tickLabelLocation".equals(key)) {
-                CONTROL.setTickLabelLocation(((ObjectProperty<TickLabelLocation>) properties.get(key)).get());
+                CONTROL.setTickLabelLocation(((ObjectProperty<Gauge.TickLabelLocation>) properties.get(key)).get());
             } else if("numberFormat".equals(key)) {
-                CONTROL.setNumberFormat(((ObjectProperty<NumberFormat>) properties.get(key)).get());
+                CONTROL.setNumberFormat(((ObjectProperty<Gauge.NumberFormat>) properties.get(key)).get());
             } else if("majorTickSpace".equals(key)) {
                 CONTROL.setMajorTickSpace(((DoubleProperty) properties.get(key)).get());
             } else if("minorTickSpace".equals(key)) {

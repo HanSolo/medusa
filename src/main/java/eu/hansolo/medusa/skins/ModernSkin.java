@@ -119,7 +119,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep     = ANGLE_RANGE / (gauge.getRange());
         mouseHandler  = event -> handleMouseEvent(event);
         buttonTooltip = new Tooltip();
-        formatString  = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        formatString  = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
         init();
         initGraphics();
@@ -791,7 +791,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         needle.setFill(getSkinnable().getNeedleColor());
         titleText.setFill(getSkinnable().getTitleColor());
         subTitleText.setFill(getSkinnable().getSubTitleColor());

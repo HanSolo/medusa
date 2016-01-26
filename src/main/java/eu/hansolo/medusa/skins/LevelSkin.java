@@ -83,7 +83,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public LevelSkin(Gauge gauge) {
         super(gauge);
-        formatString = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         sections     = getSkinnable().getSections();
         barTooltip   = new Tooltip();
         barTooltip.setTextAlignment(TextAlignment.CENTER);
@@ -372,7 +372,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        formatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
 
         // Background stroke and fill
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));

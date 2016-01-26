@@ -126,8 +126,8 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueOffsetRight      = 0.0;
         digitalFontSizeFactor = 1.0;
         backgroundTextBuilder = new StringBuilder();
-        valueFormatString     = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
-        otherFormatString     = String.join("", "%.", Integer.toString(gauge.getTickLabelDecimals()), "f");
+        valueFormatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        otherFormatString     = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
         sections              = gauge.getSections();
         sectionColorMap       = new HashMap<>(sections.size());
         updateSectionColors();
@@ -505,8 +505,8 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        valueFormatString = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
-        otherFormatString = String.join("", "%.", Integer.toString(getSkinnable().getTickLabelDecimals()), "f");
+        valueFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        otherFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
 
         LcdDesign lcdDesign = getSkinnable().getLcdDesign();
         backgroundText.setFill(lcdDesign.lcdBackgroundColor);

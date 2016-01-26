@@ -75,7 +75,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         noOfGradientStops    = gauge.getGradientBarStops().size();
         sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
-        formatString         = String.join("", "%.", Integer.toString(gauge.getDecimals()), "f");
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
         init();
         initGraphics();
@@ -185,7 +185,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Resizing ******************************************
     private void redraw() {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        formatString         = String.join("", "%.", Integer.toString(getSkinnable().getDecimals()), "f");
+        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
         sectionsVisible      = getSkinnable().getSectionsVisible();
