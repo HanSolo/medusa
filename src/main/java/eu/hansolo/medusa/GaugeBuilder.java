@@ -746,7 +746,6 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setBorderPaint(Color.WHITE);
                 CONTROL.setBackgroundPaint(Color.DARKGRAY);
                 CONTROL.setDecimals(0);
-                CONTROL.setSectionTextVisible(true);
                 CONTROL.setNeedleColor(Color.web("#5a615f"));
                 CONTROL.setValueColor(Color.WHITE);
                 CONTROL.setTitleColor(Color.WHITE);
