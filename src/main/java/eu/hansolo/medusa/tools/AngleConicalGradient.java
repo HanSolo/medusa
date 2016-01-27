@@ -46,7 +46,9 @@ public class AngleConicalGradient {
         final double ANGLE_FACTOR = 1d / 360d;
         double       offset       = Helper.clamp(0d, 1d, (OFFSET_ANGLE % 360d) * ANGLE_FACTOR);
         List<Stop>   stops        = new ArrayList<>();
-        ANGLE_STOP_MAP.keySet().forEach(fraction -> stops.add(new Stop(Helper.clamp(0d, 1d, (fraction % 360d) * ANGLE_FACTOR), ANGLE_STOP_MAP.get(fraction))));
+        for (double fraction : ANGLE_STOP_MAP.keySet()) {
+            stops.add(new Stop(Helper.clamp(0d, 1d, (fraction % 360d) * ANGLE_FACTOR), ANGLE_STOP_MAP.get(fraction)));
+        }
         gradient = new ConicalGradient(CENTER_X, CENTER_Y, offset, DIRECTION, stops);
     }
 

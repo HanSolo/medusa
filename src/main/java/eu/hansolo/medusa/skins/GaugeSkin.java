@@ -331,10 +331,11 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             lcd.setManaged(getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
             lcd.setVisible(getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
 
-            markerMap.values().forEach(shape -> {
-                shape.setManaged(getSkinnable().getMarkersVisible());
-                shape.setVisible(getSkinnable().getMarkersVisible());
-            });
+            boolean markersVisible = getSkinnable().getMarkersVisible();
+            for (Shape shape : markerMap.values()) {
+                shape.setManaged(markersVisible);
+                shape.setVisible(markersVisible);
+            }
 
             threshold.setManaged(getSkinnable().isThresholdVisible());
             threshold.setVisible(getSkinnable().isThresholdVisible());
@@ -421,8 +422,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
         List<Stop>         stops             = getSkinnable().getGradientBarStops();
         Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
-
-        stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()));
+        for (Stop stop : stops) { stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()); }
         double                  offsetFactor        = ScaleDirection.CLOCKWISE == scaleDirection ? (startAngle - 90) : (startAngle + 180);
         AngleConicalGradient    gradient            = new AngleConicalGradient(size * 0.5, size * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
 
@@ -445,7 +445,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
         int               listSize          = sections.size();
         for (int i = 0 ; i < listSize ; i++) {
-            Section section = getSkinnable().getSections().get(i);
+            Section section = sections.get(i);
             double sectionStartAngle;
             if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
                 if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
@@ -479,7 +479,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         int listSize = areas.size();
         for (int i = 0; i < listSize ; i++) {
-            Section area = getSkinnable().getAreas().get(i);
+            Section area = areas.get(i);
             double areaStartAngle;
             if (Double.compare(area.getStart(), maxValue) <= 0 && Double.compare(area.getStop(), minValue) >= 0) {
                 if (area.getStart() < minValue && area.getStop() < maxValue) {
@@ -545,8 +545,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double         centerY        = size * 0.5;
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
         if (getSkinnable().getMarkersVisible()) {
-            markerMap.keySet().forEach(marker -> {
-                Shape  shape = markerMap.get(marker);
+
+            for (Map.Entry<Marker, Shape> entry : markerMap.entrySet()) {
+                Marker marker = entry.getKey();
+                Shape  shape  = entry.getValue();
                 double valueAngle;
                 if (ScaleDirection.CLOCKWISE == scaleDirection) {
                     valueAngle = startAngle - (marker.getValue() - minValue) * angleStep;
@@ -644,7 +646,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 Tooltip.install(shape, markerTooltip);
                 shape.setOnMousePressed(e -> marker.fireMarkerEvent(marker.MARKER_PRESSED_EVENT));
                 shape.setOnMouseReleased(e -> marker.fireMarkerEvent(marker.MARKER_RELEASED_EVENT));
-            });
+            }
         }
 
         if (getSkinnable().isThresholdVisible()) {
@@ -689,14 +691,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void updateMarkers() {
         markerMap.clear();
-        getSkinnable().getMarkers().forEach(marker -> {
+        for (Marker marker : getSkinnable().getMarkers()) {
             switch(marker.getMarkerType()) {
                 case TRIANGLE: markerMap.put(marker, new Path()); break;
                 case DOT     : markerMap.put(marker, new Circle()); break;
                 case STANDARD:
                 default:       markerMap.put(marker, new Path()); break;
             }
-        });
+        }
     }
 
     private void drawKnob(final boolean PRESSED) {

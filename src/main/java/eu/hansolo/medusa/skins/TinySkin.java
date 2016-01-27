@@ -261,8 +261,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double             startAngle   = 315;
         List<Stop>         stops        = getSkinnable().getGradientBarStops();
         Map<Double, Color> stopAngleMap = new HashMap<>(stops.size());
-
-        stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
+        for (Stop stop : stops) { stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()); }
         double               offsetFactor = startAngle - 90;
         AngleConicalGradient gradient     = new AngleConicalGradient(size * 0.5, size * 0.5, offsetFactor, stopAngleMap, ScaleDirection.CLOCKWISE);
 

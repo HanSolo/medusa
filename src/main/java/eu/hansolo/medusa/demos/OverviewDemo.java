@@ -470,7 +470,7 @@ public class OverviewDemo extends Application {
             if (((Parent) node).getChildrenUnmodifiable().size() != 0) {
                 ObservableList<Node> tempChildren = ((Parent) node).getChildrenUnmodifiable();
                 noOfNodes += tempChildren.size();
-                tempChildren.forEach(n -> calcNoOfNodes(n));
+                for (Node n : tempChildren) { calcNoOfNodes(n); }
             }
         }
     }

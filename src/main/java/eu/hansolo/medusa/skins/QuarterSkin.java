@@ -337,10 +337,11 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             lcd.setManaged(getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
             lcd.setVisible(getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
 
-            markerMap.values().forEach(shape -> {
-                shape.setManaged(getSkinnable().getMarkersVisible());
-                shape.setVisible(getSkinnable().getMarkersVisible());
-            });
+            boolean markersVisible = getSkinnable().getMarkersVisible();
+            for (Shape shape : markerMap.values()) {
+                shape.setManaged(markersVisible);
+                shape.setVisible(markersVisible);
+            }
 
             threshold.setManaged(getSkinnable().isThresholdVisible());
             threshold.setVisible(getSkinnable().isThresholdVisible());
@@ -899,8 +900,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
         List<Stop>         stops             = getSkinnable().getGradientBarStops();
         Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
-
-        stops.forEach(stop -> stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()));
+        for (Stop stop : stops) { stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()); }
         double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? (Pos.TOP_LEFT == knobPosition || Pos.BOTTOM_RIGHT == knobPosition ? startAngle : 180 - startAngle) : (startAngle + 180);
         AngleConicalGradient gradient     = new AngleConicalGradient(scaledSize * 0.5, scaledSize * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
 
@@ -927,7 +927,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
         int               listSize          = sections.size();
         for (int i = 0 ; i < listSize ; i++) {
-            Section section = getSkinnable().getSections().get(i);
+            Section section = sections.get(i);
             double sectionStartAngle;
             if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
                 if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
@@ -964,7 +964,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
         int               listSize          = areas.size();
         for (int i = 0 ; i < listSize ; i++) {
-            Section area = getSkinnable().getAreas().get(i);
+            Section area = areas.get(i);
             double areaStartAngle;
             if (Double.compare(area.getStart(), maxValue) <= 0 && Double.compare(area.getStop(), minValue) >= 0) {
                 if (area.getStart() < minValue && area.getStop() < maxValue) {
@@ -1029,8 +1029,9 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double         pathHalf       = markerSize * 0.3;
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
         if (getSkinnable().getMarkersVisible()) {
-            markerMap.keySet().forEach(marker -> {
-                Shape  shape = markerMap.get(marker);
+            for (Map.Entry<Marker, Shape> entry : markerMap.entrySet()) {
+                Marker marker = entry.getKey();
+                Shape  shape  = entry.getValue();
                 double valueAngle;
                 if (ScaleDirection.CLOCKWISE == scaleDirection) {
                     valueAngle = startAngle - (marker.getValue() - minValue) * angleStep;
@@ -1128,7 +1129,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 Tooltip.install(shape, markerTooltip);
                 shape.setOnMousePressed(e -> marker.fireMarkerEvent(marker.MARKER_PRESSED_EVENT));
                 shape.setOnMouseReleased(e -> marker.fireMarkerEvent(marker.MARKER_RELEASED_EVENT));
-            });
+            }
         }
 
         if (getSkinnable().isThresholdVisible()) {
@@ -1173,20 +1174,14 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void updateMarkers() {
         markerMap.clear();
-        getSkinnable().getMarkers().forEach(marker -> {
+        for (Marker marker : getSkinnable().getMarkers()) {
             switch(marker.getMarkerType()) {
-                case TRIANGLE:
-                    markerMap.put(marker, new Path());
-                    break;
-                case DOT:
-                    markerMap.put(marker, new Circle());
-                    break;
+                case TRIANGLE: markerMap.put(marker, new Path()); break;
+                case DOT     : markerMap.put(marker, new Circle()); break;
                 case STANDARD:
-                default:
-                    markerMap.put(marker, new Path());
-                    break;
+                default:       markerMap.put(marker, new Path()); break;
             }
-        });
+        }
     }
 
     private void drawKnob(final boolean PRESSED) {

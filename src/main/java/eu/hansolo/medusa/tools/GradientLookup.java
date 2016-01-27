@@ -35,7 +35,7 @@ public class GradientLookup {
     }
     public GradientLookup(final Stop... STOPS) {
         stops = new TreeMap<>();
-        Arrays.asList(STOPS).forEach(stop -> stops.put(stop.getOffset(), stop));
+        for (Stop stop : STOPS) { stops.put(stop.getOffset(), stop); }
         init();
     }
 
@@ -82,7 +82,7 @@ public class GradientLookup {
     public void setStops(final Stop... STOPS) { setStops(Arrays.asList(STOPS)); }
     public void setStops(final List<Stop> STOPS) {
         stops.clear();
-        STOPS.forEach(stop -> stops.put(stop.getOffset(), stop));
+        for (Stop stop : STOPS) { stops.put(stop.getOffset(), stop); }
         init();
     }
 

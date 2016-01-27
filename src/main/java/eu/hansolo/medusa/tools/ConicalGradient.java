@@ -81,7 +81,7 @@ public class ConicalGradient {
         }
 
         HashMap<Double, Color> stopMap = new LinkedHashMap<>(stops.size());
-        stops.forEach(stop -> stopMap.put(stop.getOffset(), stop.getColor()));
+        for (Stop stop : stops) { stopMap.put(stop.getOffset(), stop.getColor()); }
 
         sortedStops = calculate(stops, offset);
 
@@ -89,7 +89,7 @@ public class ConicalGradient {
         if (ScaleDirection.COUNTER_CLOCKWISE == scaleDirection) {
             List<Stop> sortedStops3 = new ArrayList<>();
             Collections.reverse(sortedStops);
-            sortedStops.forEach(stop -> sortedStops3.add(new Stop(1d - stop.getOffset(), stop.getColor())));
+            for (Stop stop : sortedStops) { sortedStops3.add(new Stop(1d - stop.getOffset(), stop.getColor())); }
             sortedStops = sortedStops3;
         }
     }
@@ -111,7 +111,7 @@ public class ConicalGradient {
         }
 
         HashMap<Double, Color> stopMap = new LinkedHashMap<>(stops.size());
-        stops.forEach(stop -> stopMap.put(stop.getOffset(), stop.getColor()));
+        for (Stop stop : stops) { stopMap.put(stop.getOffset(), stop.getColor()); }
 
         List<Stop>        sortedStops     = new ArrayList<>(stops.size());
         SortedSet<Double> sortedFractions = new TreeSet<>(stopMap.keySet());
@@ -123,7 +123,7 @@ public class ConicalGradient {
             stopMap.put(0.0, stopMap.get(sortedFractions.last()));
             sortedFractions.add(0.0);
         }
-        sortedFractions.forEach(fraction -> sortedStops.add(new Stop(fraction, stopMap.get(fraction))));
+        for (double fraction : sortedFractions) { sortedStops.add(new Stop(fraction, stopMap.get(fraction))); }
 
         return sortedStops;
     }
