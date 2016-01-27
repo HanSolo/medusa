@@ -263,6 +263,8 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarLineToInnerArc.setY(centerY + (centerX - barWidth) * Math.cos(-Math.toRadians(valueAngle)));
 
         double dataBarThresholdAngle = VALUE > getSkinnable().getThreshold() ? currentValueAngle : thresholdAngle;
+        dataBarThresholdOuterArc.setLargeArcFlag(dataBarThresholdAngle > 180 + thresholdAngle);
+        dataBarThresholdInnerArc.setLargeArcFlag(dataBarThresholdAngle > 180 + thresholdAngle);
 
         dataBarThresholdOuterArc.setX(centerX + centerX * Math.sin(-Math.toRadians(dataBarThresholdAngle)));
         dataBarThresholdOuterArc.setY(centerY + centerX * Math.cos(-Math.toRadians(dataBarThresholdAngle)));
@@ -334,10 +336,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             thresholdAngle    = (getSkinnable().getThreshold() - minValue) * angleStep;
             currentValueAngle = (getSkinnable().getCurrentValue() - minValue) * angleStep;
-            currentValueAngle = currentValueAngle > thresholdAngle ? thresholdAngle : currentValueAngle;
 
-            thresholdAngle    = (getSkinnable().getThreshold() - minValue) * angleStep;
-            currentValueAngle = (getSkinnable().getCurrentValue() - minValue) * angleStep;
             barBackgroundOuterArc.setLargeArcFlag(thresholdAngle > 180);
             barBackgroundInnerArc.setLargeArcFlag(thresholdAngle > 180);
 
@@ -353,6 +352,9 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barBackgroundInnerArc.setRadiusY(0.375 * width);
             barBackgroundInnerArc.setX(centerX);
             barBackgroundInnerArc.setY(height - barWidth);
+
+            thresholdBarOuterArc.setLargeArcFlag(thresholdAngle < 180);
+            thresholdBarInnerArc.setLargeArcFlag(thresholdAngle < 180);
 
             thresholdBarStart.setX(centerX + centerX * Math.sin(-Math.toRadians(thresholdAngle)));
             thresholdBarStart.setY(centerY + centerX * Math.cos(-Math.toRadians(thresholdAngle)));
