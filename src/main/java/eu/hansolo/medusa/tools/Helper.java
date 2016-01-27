@@ -23,7 +23,6 @@ import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
 import eu.hansolo.medusa.Section;
-import javafx.application.Platform;
 import javafx.geometry.VPos;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
