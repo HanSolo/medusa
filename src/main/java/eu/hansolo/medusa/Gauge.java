@@ -324,6 +324,7 @@ public class Gauge extends Control {
     // others
     private double                               originalMinValue;
     private double                               originalMaxValue;
+    private double                               originalThreshold;
     private Timeline                             timeline;
     private Instant                              lastCall;
     private boolean                              withinSpeedLimit;
@@ -488,6 +489,7 @@ public class Gauge extends Control {
 
         originalMinValue                  = -Double.MAX_VALUE;
         originalMaxValue                  = Double.MAX_VALUE;
+        originalThreshold                 = Double.MAX_VALUE;
         lastCall                          = Instant.now();
         timeline                          = new Timeline();
         timeline.setOnFinished(e -> {
@@ -521,7 +523,7 @@ public class Gauge extends Control {
             setRange(getMaxValue() - _minValue);
             if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = _minValue;
             setValue(isStartFromZero() && _minValue < 0 ? 0 : _minValue);
-            if (Double.compare(getThreshold(), _minValue) < 0) setThreshold(_minValue);
+            if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(_minValue, getMaxValue(), originalThreshold)); }
         } else {
             minValue.set(VALUE);
         }
@@ -536,7 +538,7 @@ public class Gauge extends Control {
                     setRange(getMaxValue() - get());
                     if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = get();
                     Gauge.this.setValue(isStartFromZero() && get() < 0 ? 0 : get());
-                    if (Double.compare(getThreshold(), get()) < 0) setThreshold(get());
+                    if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(get(), getMaxValue(), originalThreshold)); }
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minValue";}
@@ -552,7 +554,7 @@ public class Gauge extends Control {
             _maxValue = Helper.clamp(getMinValue(), Double.MAX_VALUE, VALUE).doubleValue();
             setRange(_maxValue - getMinValue());
             if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = _maxValue;
-            if (Double.compare(getThreshold(), _maxValue) > 0) setThreshold(_maxValue);
+            if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(Helper.clamp(getMinValue(), _maxValue, originalThreshold)); }
         } else {
             maxValue.set(VALUE);
         }
@@ -566,7 +568,7 @@ public class Gauge extends Control {
                     super.set(Helper.clamp(getMinValue(), Double.MAX_VALUE, VALUE).doubleValue());
                     setRange(get() - getMinValue());
                     if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = get();
-                    if (Double.compare(getThreshold(), get()) > 0) setThreshold(get());
+                    if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(Helper.clamp(getMinValue(), get(), originalThreshold)); }
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "maxValue"; }
@@ -591,6 +593,7 @@ public class Gauge extends Control {
 
     public double getThreshold() { return null == threshold ? _threshold : threshold.get(); }
     public void setThreshold(final double THRESHOLD) {
+        originalThreshold = THRESHOLD;
         if (null == threshold) {
             _threshold = Helper.clamp(getMinValue(), getMaxValue(), THRESHOLD).doubleValue();
         } else {
