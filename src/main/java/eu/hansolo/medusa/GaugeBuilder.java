@@ -26,7 +26,6 @@ import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Gauge.TickMarkType;
-import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.GradientLookup;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -925,8 +924,6 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setMaxValue(((DoubleProperty) properties.get(key)).get());
             } else if ("autoScale".equals(key)) {
                 CONTROL.setAutoScale(((BooleanProperty) properties.get(key)).get());
-            } else if ("threshold".equals(key)) {
-                CONTROL.setThreshold(((DoubleProperty) properties.get(key)).get());
             } else if("value".equals(key)) {
                 CONTROL.setValue(((DoubleProperty) properties.get(key)).get());
             } else if("decimals".equals(key)) {
@@ -1103,6 +1100,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setButtonTooltipText(((StringProperty) properties.get(key)).get());
             } else if ("keepAspect".equals(key)) {
                 CONTROL.setKeepAspect(((BooleanProperty) properties.get(key)).get());
+            } else if ("threshold".equals(key)) {
+                CONTROL.setThreshold(((DoubleProperty) properties.get(key)).get());
             }
         }
 
