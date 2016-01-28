@@ -19,15 +19,17 @@ package eu.hansolo.medusa.tools;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
-import eu.hansolo.medusa.Gauge.TickLabelLocation;
-import eu.hansolo.medusa.Gauge.TickLabelOrientation;
-import eu.hansolo.medusa.Gauge.TickMarkType;
+import eu.hansolo.medusa.TickLabelLocation;
+import eu.hansolo.medusa.TickLabelOrientation;
+import eu.hansolo.medusa.TickMarkType;
 import eu.hansolo.medusa.Section;
 import javafx.geometry.VPos;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.ImagePattern;
@@ -41,6 +43,7 @@ import javafx.scene.text.TextAlignment;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 
@@ -302,17 +305,17 @@ public class Helper {
         boolean       onlyFirstAndLastLabelVisible = GAUGE.isOnlyFirstAndLastTickLabelVisible();
         boolean       customTickLabelsEnabled      = GAUGE.getCustomTickLabelsEnabled();
         List<String>  customTickLabels             = customTickLabelsEnabled ? GAUGE.getCustomTickLabels() : null;
-        double       textDisplacementFactor        = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
-        double       majorDotSize;
-        double       majorHalfDotSize;
-        double       mediumDotSize;
-        double       mediumHalfDotSize;
-        double       minorDotSize;
-        double       minorHalfDotSize;
+        double        textDisplacementFactor       = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
+        double        majorDotSize;
+        double        majorHalfDotSize;
+        double        mediumDotSize;
+        double        mediumHalfDotSize;
+        double        minorDotSize;
+        double        minorHalfDotSize;
 
         double orthTextFactor;
         if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
-            orthTextFactor    = Gauge.TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.45 * textDisplacementFactor : 0.45 * textDisplacementFactor;
+            orthTextFactor    = TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.45 * textDisplacementFactor : 0.45 * textDisplacementFactor;
             majorDotSize      = 0.02 * SIZE;
             majorHalfDotSize  = majorDotSize * 0.5;
             mediumDotSize     = 0.01375 * SIZE;
@@ -320,7 +323,7 @@ public class Helper {
             minorDotSize      = 0.0075 * SIZE;
             minorHalfDotSize  = minorDotSize * 0.5;
         } else {
-            orthTextFactor    = Gauge.TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.38 * textDisplacementFactor : 0.37 * textDisplacementFactor;
+            orthTextFactor    = TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.38 * textDisplacementFactor : 0.37 * textDisplacementFactor;
             majorDotSize      = 0.025 * SIZE;
             majorHalfDotSize  = majorDotSize * 0.5;
             mediumDotSize     = 0.01875 * SIZE;
@@ -722,5 +725,26 @@ public class Helper {
             if (counter > MAX_VALUE) break;
             angle     = ScaleDirection.CLOCKWISE == scaleDirection ? (angle - tmpAngleStep) : (angle + tmpAngleStep);
         }
+    }
+
+    public static Image createNoiseImage(final double WIDTH, final double HEIGHT, final Color DARK_COLOR, final Color BRIGHT_COLOR, final double ALPHA_VARIATION_IN_PERCENT) {
+        if (Double.compare(WIDTH, 0) <= 0 || Double.compare(HEIGHT, 0) <= 0) return null;
+        int                 width                   = (int) WIDTH;
+        int                 height                  = (int) HEIGHT;
+        double              alphaVariationInPercent = Helper.clamp(0d, 100d, ALPHA_VARIATION_IN_PERCENT);
+        final WritableImage IMAGE                   = new WritableImage(width, height);
+        final PixelWriter   PIXEL_WRITER            = IMAGE.getPixelWriter();
+        final Random        BW_RND                  = new Random();
+        final Random        ALPHA_RND               = new Random();
+        final double        ALPHA_START             = alphaVariationInPercent / 100 / 2;
+        final double        ALPHA_VARIATION         = alphaVariationInPercent / 100;
+        for (int y = 0 ; y < height ; y++) {
+            for (int x = 0 ; x < width ; x++) {
+                final Color  NOISE_COLOR = BW_RND.nextBoolean() == true ? BRIGHT_COLOR : DARK_COLOR;
+                final double NOISE_ALPHA = Helper.clamp(0d, 1d, ALPHA_START + ALPHA_RND.nextDouble() * ALPHA_VARIATION);
+                PIXEL_WRITER.setColor(x, y, Color.color(NOISE_COLOR.getRed(), NOISE_COLOR.getGreen(), NOISE_COLOR.getBlue(), NOISE_ALPHA));
+            }
+        }
+        return IMAGE;
     }
 }
