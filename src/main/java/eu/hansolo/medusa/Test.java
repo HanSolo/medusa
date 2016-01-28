@@ -95,12 +95,12 @@ public class Test extends Application {
 
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.LCD)
-                            .prefSize(400, 200)
+                            .skinType(ClockSkinType.CLOCK)
+                            .prefSize(400, 400)
                             .lcdFont(LcdFont.DIGITAL_BOLD)
                             //.time(LocalDateTime.now(ZoneId.of("America/New_York")))
                             .dateVisible(true)
-                            .locale(Locale.GERMAN)
+                            //.locale(Locale.GERMAN)
                             .lcdDesign(LcdDesign.STANDARD_GREEN)
                             .title("Münster")
                             .titleVisible(true)
@@ -126,8 +126,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        HBox pane = new HBox(clock, gauge);
-        pane.setSpacing(20);
+        StackPane pane = new StackPane(clock);
         pane.setPadding(new Insets(10));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,

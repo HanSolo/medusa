@@ -16,6 +16,9 @@
 
 package eu.hansolo.medusa.demos;
 
+import eu.hansolo.medusa.Clock;
+import eu.hansolo.medusa.Clock.ClockSkinType;
+import eu.hansolo.medusa.ClockBuilder;
 import eu.hansolo.medusa.FGauge;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.NeedleSize;
@@ -81,6 +84,8 @@ public class OverviewDemo extends Application {
     private Gauge          gauge18;
     private Gauge          gauge19;
     private Gauge          gauge20;
+    private Clock          clock1;
+    private Clock          clock2;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -376,6 +381,22 @@ public class OverviewDemo extends Application {
                                                 new Stop(1.0, Color.LIME))
                               .build();
 
+        clock1 = ClockBuilder.create()
+                             .skinType(ClockSkinType.YOTA2)
+                             .running(true)
+                             .build();
+
+        clock2 = ClockBuilder.create()
+                             .skinType(ClockSkinType.LCD)
+                             .lcdDesign(LcdDesign.DARKBLUE)
+                             .title("Münster")
+                             .titleVisible(true)
+                             .secondsVisible(true)
+                             .alarmsEnabled(true)
+                             .dateVisible(true)
+                             .running(true)
+                             .build();
+
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO, GaugeBackground.DARK_GRAY);
 
         framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
@@ -417,11 +438,13 @@ public class OverviewDemo extends Application {
         pane.add(gauge3, 2, 0);
         pane.add(gauge4, 3, 0);
         pane.add(gauge5, 4, 0);
+        pane.add(clock1, 5, 0);
         pane.add(gauge6, 0, 1);
         pane.add(gauge7, 1, 1);
         pane.add(gauge8, 2, 1);
         pane.add(gauge9, 3, 1);
         pane.add(gauge10, 4, 1);
+        pane.add(clock2, 5, 1);
         pane.add(gauge11, 0, 2);
         pane.add(gauge12, 1, 2);
         pane.add(gauge13, 2, 2);
@@ -440,6 +463,8 @@ public class OverviewDemo extends Application {
         pane.getColumnConstraints().add(new ColumnConstraints(180));
         pane.getColumnConstraints().add(new ColumnConstraints(180));
         pane.getColumnConstraints().add(new ColumnConstraints(180));
+        pane.getColumnConstraints().add(new ColumnConstraints(180));
+        pane.getRowConstraints().add(new RowConstraints(180));
         pane.getRowConstraints().add(new RowConstraints(180));
         pane.getRowConstraints().add(new RowConstraints(180));
         pane.getRowConstraints().add(new RowConstraints(180));
