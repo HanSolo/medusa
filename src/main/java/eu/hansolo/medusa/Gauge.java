@@ -76,8 +76,6 @@ public class Gauge extends Control {
     }
     public enum KnobType { STANDARD, PLAIN, METAL, FLAT }
     public enum LedType { STANDARD, FLAT }
-    public enum TickLabelOrientation { ORTHOGONAL,  HORIZONTAL, TANGENT }
-    public enum TickMarkType { LINE, DOT, TRIANGLE, BOX, TICK_LABEL }
     public enum NumberFormat {
         AUTO("0"),
         STANDARD("0"),
@@ -95,8 +93,6 @@ public class Gauge extends Control {
 
         public String format(final Number NUMBER) { return DF.format(NUMBER); }
     }
-    public enum TickLabelLocation { INSIDE, OUTSIDE }
-    public enum LcdFont { STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA }
     public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE, LEFT_TO_RIGHT, RIGHT_TO_LEFT, BOTTOM_TO_TOP, TOP_TO_BOTTOM }
     public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
                            MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL,
@@ -334,8 +330,8 @@ public class Gauge extends Control {
     public Gauge() {
         this(SkinType.GAUGE);
     }
-    public Gauge(final SkinType SKIN_TYPE) {
-        skinType = SKIN_TYPE;
+    public Gauge(final SkinType SKIN) {
+        skinType = SKIN;
         getStyleClass().add("gauge");
 
         init();
@@ -403,7 +399,6 @@ public class Gauge extends Control {
         tickLabelSections                 = FXCollections.observableArrayList();
         markers                           = FXCollections.observableArrayList();
 
-        //skinType                          = SkinType.GAUGE;
         _startFromZero                    = false;
         _returnToZero                     = false;
         _zeroColor                        = DARK_COLOR;
@@ -1028,9 +1023,11 @@ public class Gauge extends Control {
             knobPosition = new ObjectPropertyBase<Pos>(_knobPosition) {
                 @Override public void set(final Pos POSITION) {
                     if (null == POSITION) {
-                        switch(getSkinType()) {
-                            case QUARTER: super.set(Pos.BOTTOM_RIGHT); break;
-                            default     : super.set(Pos.CENTER);
+                        switch(skinType) {
+                            case HORIZONTAL: super.set(Pos.CENTER_RIGHT); break;
+                            case VERTICAL  : super.set(Pos.BOTTOM_CENTER); break;
+                            case QUARTER   : super.set(Pos.BOTTOM_RIGHT); break;
+                            default        : super.set(Pos.CENTER);
                         }
                     } else {
                         super.set(POSITION);
@@ -1931,7 +1928,7 @@ public class Gauge extends Control {
     }
 
     public boolean isLcdCrystalEnabled() { return null == lcdCrystalEnabled ? _lcdCrystalEnabled : lcdCrystalEnabled.get(); }
-    public void set_lcdCrystalEnabled(final boolean ENABLED) {
+    public void setLcdCrystalEnabled(final boolean ENABLED) {
         if (null == lcdCrystalEnabled) {
             _lcdCrystalEnabled = ENABLED;
         } else {

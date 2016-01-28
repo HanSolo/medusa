@@ -20,6 +20,7 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -308,7 +309,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void drawTickMarks(final GraphicsContext CTX) {
         double     sinValue;
         double     cosValue;
-        double     orthText         = Gauge.TickLabelOrientation.ORTHOGONAL == getSkinnable().getTickLabelOrientation() ? 0.51 : 0.52;
+        double     orthText         = TickLabelOrientation.ORTHOGONAL == getSkinnable().getTickLabelOrientation() ? 0.51 : 0.52;
         Point2D    center           = new Point2D(width * 0.5, height * 0.77);
         double     minorTickSpace   = getSkinnable().getMinorTickSpace();
         double     minValue         = getSkinnable().getMinValue();

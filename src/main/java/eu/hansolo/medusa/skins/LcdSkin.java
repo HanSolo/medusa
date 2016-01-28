@@ -18,8 +18,8 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.Gauge.LcdFont;
 import eu.hansolo.medusa.LcdDesign;
+import eu.hansolo.medusa.LcdFont;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
@@ -68,8 +68,8 @@ import java.util.Random;
  * Created by hansolo on 21.01.16.
  */
 public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double                PREFERRED_WIDTH    = 132;
-    private static final double                PREFERRED_HEIGHT   = 48;
+    private static final double                PREFERRED_WIDTH    = 275;
+    private static final double                PREFERRED_HEIGHT   = 100;
     private static final double                MINIMUM_WIDTH      = 5;
     private static final double                MINIMUM_HEIGHT     = 5;
     private static final double                MAXIMUM_WIDTH      = 1024;
@@ -170,15 +170,15 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         mainInnerShadow0 = new InnerShadow();
         mainInnerShadow0.setOffsetX(0.0);
         mainInnerShadow0.setOffsetY(0.0);
-        mainInnerShadow0.setRadius(3.0 / 132.0 * PREFERRED_WIDTH);
-        mainInnerShadow0.setColor(Color.web("0xffffff80"));
+        mainInnerShadow0.setRadius(0.0625 * PREFERRED_HEIGHT);
+        mainInnerShadow0.setColor(Color.rgb(255, 255, 255, 0.5));
         mainInnerShadow0.setBlurType(BlurType.TWO_PASS_BOX);
 
         mainInnerShadow1 = new InnerShadow();
         mainInnerShadow1.setOffsetX(0.0);
         mainInnerShadow1.setOffsetY(1.0);
-        mainInnerShadow1.setRadius(2.0 / 132.0 * PREFERRED_WIDTH);
-        mainInnerShadow1.setColor(Color.web("0x000000a6"));
+        mainInnerShadow1.setRadius(0.04166667 * PREFERRED_HEIGHT);
+        mainInnerShadow1.setColor(Color.rgb(0, 0, 0, 0.65));
         mainInnerShadow1.setBlurType(BlurType.TWO_PASS_BOX);
         mainInnerShadow1.setInput(mainInnerShadow0);
 
@@ -186,11 +186,12 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         crystalClip.setArcWidth(5);
         crystalClip.setArcHeight(5);
 
-        crystalImage = createNoiseImage(PREFERRED_WIDTH, PREFERRED_HEIGHT, DARK_NOISE_COLOR, BRIGHT_NOISE_COLOR, 8);
+        crystalImage   = Helper.createNoiseImage(PREFERRED_WIDTH, PREFERRED_HEIGHT, DARK_NOISE_COLOR, BRIGHT_NOISE_COLOR, 8);
         crystalOverlay = new ImageView(crystalImage);
         crystalOverlay.setClip(crystalClip);
-        crystalOverlay.setManaged(getSkinnable().isLcdCrystalEnabled());
-        crystalOverlay.setVisible(getSkinnable().isLcdCrystalEnabled());
+        boolean crystalEnabled = getSkinnable().isLcdCrystalEnabled();
+        crystalOverlay.setManaged(crystalEnabled);
+        crystalOverlay.setVisible(crystalEnabled);
 
         threshold = new Path();
         threshold.setManaged(getSkinnable().isThresholdVisible());
@@ -250,7 +251,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         pane.getChildren().setAll(crystalOverlay,
                                   backgroundText,
                                   shadowGroup);
-
         getChildren().setAll(pane);
     }
 
@@ -342,7 +342,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         pane.setBackground(new Background(new BackgroundFill(lcdPaint, new CornerRadii(0.10416667 * HEIGHT), Insets.EMPTY)));
-        pane.setBorder(new Border(new BorderStroke(lcdFramePaint, BorderStrokeStyle.SOLID, new CornerRadii(0.10416667 * HEIGHT), new BorderWidths(0.02083333 * HEIGHT))));
+        pane.setBorder(new Border(new BorderStroke(lcdFramePaint, BorderStrokeStyle.SOLID, new CornerRadii(0.05 * HEIGHT), new BorderWidths(0.02083333 * HEIGHT))));
 
         backgroundText.setFill(lcdDesign.lcdBackgroundColor);
         valueText.setFill(lcdDesign.lcdForegroundColor);
@@ -369,26 +369,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             Color lcdBackgroundColor = Color.color(sectionColor.getRed(), sectionColor.getGreen(), sectionColor.getBlue(), 0.1);
             sectionColorMap.put(sections.get(i), getSectionColors(lcdBackgroundColor, lcdForegroundColor));
         }
-    }
-
-    private Image createNoiseImage(final double WIDTH, final double HEIGHT, final Color DARK_COLOR, final Color BRIGHT_COLOR, final double ALPHA_VARIATION_IN_PERCENT) {
-        int                 width                   = WIDTH <= 0 ? (int) PREFERRED_WIDTH : (int) WIDTH;
-        int                 height                  = HEIGHT <= 0 ? (int) PREFERRED_HEIGHT : (int) HEIGHT;
-        double              alphaVariationInPercent = Helper.clamp(0d, 100d, ALPHA_VARIATION_IN_PERCENT);
-        final WritableImage IMAGE                   = new WritableImage(width, height);
-        final PixelWriter   PIXEL_WRITER            = IMAGE.getPixelWriter();
-        final Random        BW_RND                  = new Random();
-        final Random        ALPHA_RND               = new Random();
-        final double        ALPHA_START             = alphaVariationInPercent / 100 / 2;
-        final double        ALPHA_VARIATION         = alphaVariationInPercent / 100;
-        for (int y = 0 ; y < height ; y++) {
-            for (int x = 0 ; x < width ; x++) {
-                final Color  NOISE_COLOR = BW_RND.nextBoolean() == true ? BRIGHT_COLOR : DARK_COLOR;
-                final double NOISE_ALPHA = Helper.clamp(0d, 1d, ALPHA_START + ALPHA_RND.nextDouble() * ALPHA_VARIATION);
-                PIXEL_WRITER.setColor(x, y, Color.color(NOISE_COLOR.getRed(), NOISE_COLOR.getGreen(), NOISE_COLOR.getBlue(), NOISE_ALPHA));
-            }
-        }
-        return IMAGE;
     }
 
     private Color[] getSectionColors(final Color LCD_BACKGROUND_COLOR, final Color LCD_FOREGROUND_COLOR) {
@@ -504,6 +484,127 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         backgroundText.setCacheHint(CacheHint.SCALE);
     }
 
+    private void resize() {
+        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
+        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+
+        if (aspectRatio * width > height) {
+            width = 1 / (aspectRatio / height);
+        } else if (1 / (aspectRatio / height) > width) {
+            height = aspectRatio * width;
+        }
+
+        if (width > 0 && height > 0) {
+            pane.setMaxSize(width, height);
+            pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+
+            updateLcdDesign(height);
+
+            mainInnerShadow0.setRadius(0.0625 * height);
+            mainInnerShadow1.setRadius(0.04166667 * height);
+
+            if (crystalOverlay.isVisible()) {
+                crystalClip.setWidth(width);
+                crystalClip.setHeight(height);
+                crystalOverlay.setImage(Helper.createNoiseImage(width, height, DARK_NOISE_COLOR, BRIGHT_NOISE_COLOR, 8));
+                crystalOverlay.setCache(true);
+            }
+
+            double tSize = 0.2 * height;
+            threshold.getElements().clear();
+            threshold.getElements().add(new MoveTo(0.41666667 * tSize, 0.75 * tSize));
+            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.75 * tSize));
+            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.916666666666667 * tSize));
+            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.916666666666667 * tSize));
+            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.75 * tSize));
+            threshold.getElements().add(new ClosePath());
+            threshold.getElements().add(new MoveTo(0.416666666666667 * tSize, 0.333333333333333 * tSize));
+            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.333333333333333 * tSize));
+            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.666666666666667 * tSize));
+            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.666666666666667 * tSize));
+            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.333333333333333 * tSize));
+            threshold.getElements().add(new ClosePath());
+            threshold.getElements().add(new MoveTo(tSize, tSize));
+            threshold.getElements().add(new LineTo(0.5 * tSize, 0));
+            threshold.getElements().add(new LineTo(0, tSize));
+            threshold.getElements().add(new LineTo(tSize, tSize));
+            threshold.getElements().add(new ClosePath());
+            threshold.relocate(0.027961994662429348 * width, 0.75 * height - 2);
+
+            updateFonts();
+
+            // Setup the lcd unit
+            unitText.setFont(unitFont);
+            unitText.setTextOrigin(VPos.BASELINE);
+            unitText.setTextAlignment(TextAlignment.RIGHT);
+
+            unitText.setText(getSkinnable().getUnit());
+            if (unitText.visibleProperty().isBound()) {
+                unitText.visibleProperty().unbind();
+            }
+
+            valueOffsetLeft = height * 0.04;
+
+            if (getSkinnable().getUnit().isEmpty()) {
+                valueOffsetRight = height * 0.0833333333;
+                valueText.setX((width - valueText.getLayoutBounds().getWidth()) - valueOffsetRight);
+            } else {
+                unitText.setX((width - unitText.getLayoutBounds().getWidth()) - height * 0.04);
+                unitText.setY(height - (valueText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
+                valueOffsetRight = (unitText.getLayoutBounds().getWidth() + height * 0.0833333333); // distance between value and unit
+                valueText.setX(width - 2 - valueText.getLayoutBounds().getWidth() - valueOffsetRight);
+            }
+            valueText.setY(height - (valueText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
+
+            // Visualize the lcd semitransparent background text
+            updateBackgroundText();
+
+            if (getSkinnable().getUnit().isEmpty()) {
+                backgroundText.setX((width - backgroundText.getLayoutBounds().getWidth()) - valueOffsetRight);
+            } else {
+                backgroundText.setX(width - 2 - backgroundText.getLayoutBounds().getWidth() - valueOffsetRight);
+            }
+            backgroundText.setY(height - (backgroundText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
+
+            // Setup the font for the lcd title, number system, min measured, max measure and former value
+            // Title
+            title.setFont(titleFont);
+            title.setTextOrigin(VPos.BASELINE);
+            title.setTextAlignment(TextAlignment.CENTER);
+            title.setText(getSkinnable().getTitle());
+            title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
+            title.setY(pane.getLayoutBounds().getMinY() + title.getLayoutBounds().getHeight() - 0.04 * height + 4);
+
+            // Info Text
+            lowerRightText.setFont(smallFont);
+            lowerRightText.setTextOrigin(VPos.BASELINE);
+            lowerRightText.setTextAlignment(TextAlignment.RIGHT);
+            lowerRightText.setText(getSkinnable().getSubTitle());
+            lowerRightText.setX(pane.getLayoutBounds().getMinX() + (pane.getLayoutBounds().getWidth() - lowerRightText.getLayoutBounds().getWidth()) * 0.5);
+            lowerRightText.setY(pane.getLayoutBounds().getMinY() + height - 4 - 0.0416666667 * height);
+
+            // Min measured value
+            upperLeftText.setFont(smallFont);
+            upperLeftText.setTextOrigin(VPos.BASELINE);
+            upperLeftText.setTextAlignment(TextAlignment.RIGHT);
+            upperLeftText.setX(pane.getLayoutBounds().getMinX() + 0.0416666667 * height);
+            upperLeftText.setY(pane.getLayoutBounds().getMinY() + upperLeftText.getLayoutBounds().getHeight() - 0.04 * height + 4);
+
+            // Max measured value
+            upperRightText.setFont(smallFont);
+            upperRightText.setTextOrigin(VPos.BASELINE);
+            upperRightText.setTextAlignment(TextAlignment.RIGHT);
+            upperRightText.setY(pane.getLayoutBounds().getMinY() + upperRightText.getLayoutBounds().getHeight() - 0.04 * height + 4);
+
+            // Former value
+            lowerCenterText.setFont(smallFont);
+            lowerCenterText.setTextOrigin(VPos.BASELINE);
+            lowerCenterText.setTextAlignment(TextAlignment.CENTER);
+            lowerCenterText.setX((width - lowerCenterText.getLayoutBounds().getWidth()) * 0.5);
+            lowerCenterText.setY(pane.getLayoutBounds().getMinY() + height - 4 - 0.0416666667 * height);
+        }
+    }
+
     private void redraw() {
         valueFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         otherFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
@@ -572,127 +673,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (lowerRightText.getX() < lowerCenterText.getX() + lowerCenterText.getLayoutBounds().getWidth()) {
             lowerRightText.setText("...");
             lowerRightText.setX(width - lowerRightText.getLayoutBounds().getWidth() - 0.0416666667 * height);
-        }
-    }
-
-    private void resize() {
-        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
-
-        if (aspectRatio * width > height) {
-            width = 1 / (aspectRatio / height);
-        } else if (1 / (aspectRatio / height) > width) {
-            height = aspectRatio * width;
-        }
-
-        if (width > 0 && height > 0) {
-            pane.setMaxSize(width, height);
-            pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
-
-            updateLcdDesign(height);
-
-            mainInnerShadow0.setRadius(3.0 / 132.0 * height);
-            mainInnerShadow1.setRadius(2.0 / 132.0 * height);
-
-            if (crystalOverlay.isVisible()) {
-                crystalClip.setWidth(width);
-                crystalClip.setHeight(height);
-                crystalOverlay.setImage(createNoiseImage(width, height, DARK_NOISE_COLOR, BRIGHT_NOISE_COLOR, 8));
-                crystalOverlay.setCache(true);
-            }
-
-            double tSize = 0.2 * height;
-            threshold.getElements().clear();
-            threshold.getElements().add(new MoveTo(0.41666667 * tSize, 0.75 * tSize));
-            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.75 * tSize));
-            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.916666666666667 * tSize));
-            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.916666666666667 * tSize));
-            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.75 * tSize));
-            threshold.getElements().add(new ClosePath());
-            threshold.getElements().add(new MoveTo(0.416666666666667 * tSize, 0.333333333333333 * tSize));
-            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.333333333333333 * tSize));
-            threshold.getElements().add(new LineTo(0.583333333333333 * tSize, 0.666666666666667 * tSize));
-            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.666666666666667 * tSize));
-            threshold.getElements().add(new LineTo(0.416666666666667 * tSize, 0.333333333333333 * tSize));
-            threshold.getElements().add(new ClosePath());
-            threshold.getElements().add(new MoveTo(tSize, tSize));
-            threshold.getElements().add(new LineTo(0.5 * tSize, 0));
-            threshold.getElements().add(new LineTo(0, tSize));
-            threshold.getElements().add(new LineTo(tSize, tSize));
-            threshold.getElements().add(new ClosePath());
-            threshold.relocate(0.027961994662429348 * width, 0.75 * height - 2);
-
-            updateFonts();
-
-            // Setup the lcd unit
-            unitText.setFont(unitFont);
-            unitText.setTextOrigin(VPos.BASELINE);
-            unitText.setTextAlignment(TextAlignment.RIGHT);
-
-            unitText.setText(getSkinnable().getUnit());
-            if (unitText.visibleProperty().isBound()) {
-                unitText.visibleProperty().unbind();
-            }
-
-            valueOffsetLeft = height * 0.04;
-
-            if (getSkinnable().getUnit().isEmpty()) {
-                valueOffsetRight = height * 0.0833333333;
-                valueText.setX((width - valueText.getLayoutBounds().getWidth()) - valueOffsetRight);
-            } else {
-                unitText.setX((width - unitText.getLayoutBounds().getWidth()) - height * 0.04);
-                unitText.setY(height - (valueText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
-                valueOffsetRight = (unitText.getLayoutBounds().getWidth() + height * 0.0833333333); // distance between value and unit
-                valueText.setX(width - 2 - valueText.getLayoutBounds().getWidth() - valueOffsetRight);
-            }
-            valueText.setY(height - (valueText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
-
-            // Visualize the lcd semitransparent background text
-            updateBackgroundText();
-
-            if (getSkinnable().getUnit().isEmpty()) {
-                backgroundText.setX((width - backgroundText.getLayoutBounds().getWidth()) - valueOffsetRight);
-            } else {
-                backgroundText.setX(width - 2 - backgroundText.getLayoutBounds().getWidth() - valueOffsetRight);
-            }
-            backgroundText.setY(height - (backgroundText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
-
-            // Setup the font for the lcd title, number system, min measured, max measure and former value
-            // Title
-            title.setFont(titleFont);
-            title.setTextOrigin(VPos.BASELINE);
-            title.setTextAlignment(TextAlignment.CENTER);
-            title.setText(getSkinnable().getTitle());
-            title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
-            title.setY(pane.getLayoutBounds().getMinY() + title.getLayoutBounds().getHeight() - 0.04 * height + 2);
-
-            // Info Text
-            lowerRightText.setFont(smallFont);
-            lowerRightText.setTextOrigin(VPos.BASELINE);
-            lowerRightText.setTextAlignment(TextAlignment.RIGHT);
-            lowerRightText.setText(getSkinnable().getSubTitle());
-            lowerRightText.setX(pane.getLayoutBounds().getMinX() + (pane.getLayoutBounds().getWidth() - lowerRightText.getLayoutBounds().getWidth()) * 0.5);
-            lowerRightText.setY(pane.getLayoutBounds().getMinY() + height - 3 - 0.0416666667 * height);
-
-            // Min measured value
-            upperLeftText.setFont(smallFont);
-            upperLeftText.setTextOrigin(VPos.BASELINE);
-            upperLeftText.setTextAlignment(TextAlignment.RIGHT);
-            upperLeftText.setX(pane.getLayoutBounds().getMinX() + 0.0416666667 * height);
-            upperLeftText.setY(pane.getLayoutBounds().getMinY() + upperLeftText.getLayoutBounds().getHeight() - 0.04 * height + 2);
-
-            // Max measured value
-            upperRightText.setFont(smallFont);
-            upperRightText.setTextOrigin(VPos.BASELINE);
-            upperRightText.setTextAlignment(TextAlignment.RIGHT);
-            upperRightText.setY(pane.getLayoutBounds().getMinY() + upperRightText.getLayoutBounds().getHeight() - 0.04 * height + 2);
-
-            // Former value
-            lowerCenterText.setFont(smallFont);
-            lowerCenterText.setTextOrigin(VPos.BASELINE);
-            lowerCenterText.setTextAlignment(TextAlignment.CENTER);
-            lowerCenterText.setX((width - lowerCenterText.getLayoutBounds().getWidth()) * 0.5);
-            lowerCenterText.setY(pane.getLayoutBounds().getMinY() + height - 3 - 0.0416666667 * height);
         }
     }
 }

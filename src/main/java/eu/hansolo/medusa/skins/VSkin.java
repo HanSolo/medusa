@@ -20,7 +20,7 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
-import eu.hansolo.medusa.Gauge.TickLabelLocation;
+import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.AngleConicalGradient;

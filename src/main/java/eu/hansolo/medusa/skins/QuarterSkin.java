@@ -20,9 +20,9 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
-import eu.hansolo.medusa.Gauge.TickLabelLocation;
-import eu.hansolo.medusa.Gauge.TickLabelOrientation;
-import eu.hansolo.medusa.Gauge.TickMarkType;
+import eu.hansolo.medusa.TickLabelLocation;
+import eu.hansolo.medusa.TickLabelOrientation;
+import eu.hansolo.medusa.TickMarkType;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
@@ -476,7 +476,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         double orthTextFactor;
         if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
-            orthTextFactor    = Gauge.TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.45 * textDisplacementFactor : 0.45 * textDisplacementFactor;
+            orthTextFactor    = TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.45 * textDisplacementFactor : 0.45 * textDisplacementFactor;
             majorDotSize      = 0.02 * size;
             majorHalfDotSize  = majorDotSize * 0.5;
             mediumDotSize     = 0.01375 * size;
@@ -484,7 +484,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             minorDotSize      = 0.0075 * size;
             minorHalfDotSize  = minorDotSize * 0.5;
         } else {
-            orthTextFactor    = Gauge.TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.40 * textDisplacementFactor : 0.39 * textDisplacementFactor;
+            orthTextFactor    = TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.40 * textDisplacementFactor : 0.39 * textDisplacementFactor;
             majorDotSize      = 0.025 * size;
             majorHalfDotSize  = majorDotSize * 0.5;
             mediumDotSize     = 0.01875 * size;

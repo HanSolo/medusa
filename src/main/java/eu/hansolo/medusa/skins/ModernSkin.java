@@ -19,8 +19,8 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ButtonEvent;
-import eu.hansolo.medusa.Gauge.TickLabelOrientation;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -575,7 +575,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double textPointX;
         double textPointY;
 
-        double orthTextFactor = Gauge.TickLabelOrientation.ORTHOGONAL == getSkinnable().getTickLabelOrientation() ? 0.46 : 0.46;
+        double orthTextFactor = TickLabelOrientation.ORTHOGONAL == getSkinnable().getTickLabelOrientation() ? 0.46 : 0.46;
 
         Font tickLabelFont = Fonts.robotoCondensedLight((decimals == 0 ? 0.047 : 0.040) * size);
         CTX.setFont(tickLabelFont);

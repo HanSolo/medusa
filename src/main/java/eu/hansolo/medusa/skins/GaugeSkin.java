@@ -19,11 +19,11 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
-import eu.hansolo.medusa.Gauge.TickLabelLocation;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.tools.AngleConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.collections.ListChangeListener;
@@ -415,13 +415,13 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawGradientBar() {
-        TickLabelLocation  tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * size : 0.0515 * size;
-        double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
-        double             offset            = 90 - startAngle;
-        ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
-        List<Stop>         stops             = getSkinnable().getGradientBarStops();
-        Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
+        TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
+        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * size : 0.0515 * size;
+        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
+        double            offset            = 90 - startAngle;
+        ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
+        List<Stop>        stops             = getSkinnable().getGradientBarStops();
+        Map<Double, Color> stopAngleMap     = new HashMap<>(stops.size());
         for (Stop stop : stops) { stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()); }
         double                  offsetFactor        = ScaleDirection.CLOCKWISE == scaleDirection ? (startAngle - 90) : (startAngle + 180);
         AngleConicalGradient    gradient            = new AngleConicalGradient(size * 0.5, size * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());

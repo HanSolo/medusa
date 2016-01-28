@@ -17,15 +17,12 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Gauge.KnobType;
-import eu.hansolo.medusa.Gauge.LcdFont;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
-import eu.hansolo.medusa.Gauge.TickLabelOrientation;
-import eu.hansolo.medusa.Gauge.TickMarkType;
 import eu.hansolo.medusa.tools.GradientLookup;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -45,13 +42,10 @@ import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -247,12 +241,12 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
-    public final B tickLabelOrientation(final Gauge.TickLabelOrientation ORIENTATION) {
+    public final B tickLabelOrientation(final TickLabelOrientation ORIENTATION) {
         properties.put("tickLabelOrientation", new SimpleObjectProperty<>(ORIENTATION));
         return (B)this;
     }
 
-    public final B tickLabelLocation(final Gauge.TickLabelLocation LOCATION) {
+    public final B tickLabelLocation(final TickLabelLocation LOCATION) {
         properties.put("tickLabelLocation", new SimpleObjectProperty<>(LOCATION));
         return (B)this;
     }
@@ -983,9 +977,9 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             } else if ("barBackgroundColor".equals(key)) {
                 CONTROL.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("tickLabelOrientation".equals(key)) {
-                CONTROL.setTickLabelOrientation(((ObjectProperty<Gauge.TickLabelOrientation>) properties.get(key)).get());
+                CONTROL.setTickLabelOrientation(((ObjectProperty<TickLabelOrientation>) properties.get(key)).get());
             } else if("tickLabelLocation".equals(key)) {
-                CONTROL.setTickLabelLocation(((ObjectProperty<Gauge.TickLabelLocation>) properties.get(key)).get());
+                CONTROL.setTickLabelLocation(((ObjectProperty<TickLabelLocation>) properties.get(key)).get());
             } else if("numberFormat".equals(key)) {
                 CONTROL.setNumberFormat(((ObjectProperty<Gauge.NumberFormat>) properties.get(key)).get());
             } else if("majorTickSpace".equals(key)) {
@@ -1017,7 +1011,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             } else if ("lcdVisible".equals(key)) {
                 CONTROL.setLcdVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("lcdCrystalEnabled".equals(key)) {
-                CONTROL.set_lcdCrystalEnabled(((BooleanProperty) properties.get(key)).get());
+                CONTROL.setLcdCrystalEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("lcdDesign".equals(key)) {
                 CONTROL.setLcdDesign(((ObjectProperty<LcdDesign>) properties.get(key)).get());
             } else if ("lcdFont".equals(key)) {
