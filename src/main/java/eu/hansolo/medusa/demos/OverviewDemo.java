@@ -86,6 +86,9 @@ public class OverviewDemo extends Application {
     private Gauge          gauge20;
     private Clock          clock1;
     private Clock          clock2;
+    private Clock          clock3;
+    private Clock          clock4;
+    private Clock          clock5;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -397,6 +400,22 @@ public class OverviewDemo extends Application {
                              .running(true)
                              .build();
 
+        clock3 = ClockBuilder.create()
+                             .skinType(ClockSkinType.PEAR)
+                             .running(true)
+                             .build();
+
+        clock4 = ClockBuilder.create()
+                             .skinType(ClockSkinType.PLAIN)
+                             .running(true)
+                             .build();
+
+        clock5 = ClockBuilder.create()
+                             .skinType(ClockSkinType.DB)
+                             .backgroundPaint(Color.WHITE)
+                             .running(true)
+                             .build();
+
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO, GaugeBackground.DARK_GRAY);
 
         framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
@@ -439,6 +458,7 @@ public class OverviewDemo extends Application {
         pane.add(gauge4, 3, 0);
         pane.add(gauge5, 4, 0);
         pane.add(clock1, 5, 0);
+        pane.add(clock5, 6, 0);
         pane.add(gauge6, 0, 1);
         pane.add(gauge7, 1, 1);
         pane.add(gauge8, 2, 1);
@@ -450,11 +470,13 @@ public class OverviewDemo extends Application {
         pane.add(gauge13, 2, 2);
         pane.add(gauge14, 3, 2);
         pane.add(gauge15, 4, 2);
+        pane.add(clock3, 5, 2);
         pane.add(gauge16, 0, 3);
         pane.add(gauge17, 1, 3);
         pane.add(gauge18, 2, 3);
         pane.add(gauge19, 3, 3);
         pane.add(gauge20, 4, 3);
+        pane.add(clock4, 5, 3);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));
@@ -464,6 +486,8 @@ public class OverviewDemo extends Application {
         pane.getColumnConstraints().add(new ColumnConstraints(180));
         pane.getColumnConstraints().add(new ColumnConstraints(180));
         pane.getColumnConstraints().add(new ColumnConstraints(180));
+        pane.getColumnConstraints().add(new ColumnConstraints(180));
+        pane.getRowConstraints().add(new RowConstraints(180));
         pane.getRowConstraints().add(new RowConstraints(180));
         pane.getRowConstraints().add(new RowConstraints(180));
         pane.getRowConstraints().add(new RowConstraints(180));
@@ -473,7 +497,7 @@ public class OverviewDemo extends Application {
 
         Scene scene = new Scene(pane);
 
-        stage.setTitle("Medusa Gauges");
+        stage.setTitle("Medusa Gauges and Clocks");
         stage.setScene(scene);
         stage.show();
 

@@ -18,38 +18,13 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Alarm.Repetition;
 import eu.hansolo.medusa.Clock.ClockSkinType;
-import eu.hansolo.medusa.Gauge.ButtonEvent;
-import eu.hansolo.medusa.Gauge.KnobType;
-import eu.hansolo.medusa.Gauge.LedType;
-import eu.hansolo.medusa.Gauge.NeedleShape;
-import eu.hansolo.medusa.Gauge.NeedleSize;
-import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
-import eu.hansolo.medusa.Gauge.ThresholdEvent;
-import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
-import eu.hansolo.medusa.Marker.MarkerType;
-import eu.hansolo.medusa.events.AlarmEvent;
-import eu.hansolo.medusa.events.AlarmEventListener;
-import eu.hansolo.medusa.skins.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -59,8 +34,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Locale;
 import java.util.Random;
 
 
@@ -80,10 +53,6 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LCD)
-                            .prefSize(400, 200)
-                            .title("Münster")
-                            .lcdDesign(LcdDesign.STANDARD_GREEN)
                             .build();
 
         class Command1 implements Command {
@@ -95,18 +64,6 @@ public class Test extends Application {
 
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.CLOCK)
-                            .prefSize(400, 400)
-                            .lcdFont(LcdFont.DIGITAL_BOLD)
-                            //.time(LocalDateTime.now(ZoneId.of("America/New_York")))
-                            .dateVisible(true)
-                            //.locale(Locale.GERMAN)
-                            .lcdDesign(LcdDesign.STANDARD_GREEN)
-                            .title("Münster")
-                            .titleVisible(true)
-                            .secondsVisible(true)
-                            .textVisible(true)
-                            .discreteSteps(true)
                             .alarms(new Alarm(Repetition.ONCE, LocalDateTime.now().plusSeconds(5), Alarm.ARMED, "5 sec after Start"),
                                     new Alarm(Repetition.ONCE, LocalDateTime.now().plusSeconds(10), Alarm.ARMED, "10 sec after Start", command1))
                             .alarmsEnabled(false)
