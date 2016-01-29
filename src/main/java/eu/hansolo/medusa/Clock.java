@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -74,8 +74,10 @@ public class Clock extends Control {
     private StringProperty                    title;
     private String                            _text;
     private StringProperty                    text;
-    private boolean                           _discreteSteps;
-    private BooleanProperty                   discreteSteps;
+    private boolean                           _discreteSeconds;
+    private BooleanProperty                   discreteSeconds;
+    private boolean                           _discreteMinutes;
+    private BooleanProperty                   discreteMinutes;
     private boolean                           _secondsVisible;
     private BooleanProperty                   secondsVisible;
     private boolean                           _titleVisible;
@@ -149,9 +151,10 @@ public class Clock extends Control {
 
     private void init(final LocalDateTime TIME) {
         time                 = new SimpleObjectProperty<>(Clock.this, "time", TIME);
-        updateInterval       = SHORT_INTERVAL;
+        updateInterval       = LONG_INTERVAL;
         _text                = "";
-        _discreteSteps       = false;
+        _discreteSeconds     = true;
+        _discreteMinutes     = true;
         _secondsVisible      = false;
         _titleVisible        = false;
         _textVisible         = false;
@@ -214,31 +217,54 @@ public class Clock extends Control {
         return text; 
     }
 
-    public boolean isDiscreteSteps() { return null == discreteSteps ? _discreteSteps : discreteSteps.get(); }
-    public void setDiscreteSteps(boolean DISCRETE) {
-        if (null == discreteSteps) {
-            _discreteSteps = DISCRETE;
-            updateInterval = DISCRETE ? LONG_INTERVAL : SHORT_INTERVAL;
+    public boolean isDiscreteSeconds() { return null == discreteSeconds ? _discreteSeconds : discreteSeconds.get(); }
+    public void setDiscreteSeconds(boolean DISCRETE) {
+        if (null == discreteSeconds) {
+            _discreteSeconds = DISCRETE;
             stopTask(periodicTickTask);
             scheduleTickTask();
         } else {
-            discreteSteps.set(DISCRETE);
+            discreteSeconds.set(DISCRETE);
         }
     }
-    public BooleanProperty discreteStepsProperty() {
-        if (null == discreteSteps) {
-            discreteSteps = new BooleanPropertyBase() {
+    public BooleanProperty discreteSecondsProperty() {
+        if (null == discreteSeconds) {
+            discreteSeconds = new BooleanPropertyBase() {
                 @Override public void set(boolean DISCRETE) {
                     super.set(DISCRETE);
-                    updateInterval  = DISCRETE ? LONG_INTERVAL : SHORT_INTERVAL;
                     stopTask(periodicTickTask);
                     scheduleTickTask();
                 }
                 @Override public Object getBean() { return Clock.this; }
-                @Override public String getName() { return "discreteSteps"; }
+                @Override public String getName() { return "discreteSeconds"; }
             };
         }
-        return discreteSteps;
+        return discreteSeconds;
+    }
+
+    public boolean isDiscreteMinutes() { return null == discreteMinutes ? _discreteMinutes : discreteMinutes.get(); }
+    public void setDiscreteMinutes(boolean DISCRETE) {
+        if (null == discreteMinutes) {
+            _discreteMinutes = DISCRETE;
+            stopTask(periodicTickTask);
+            scheduleTickTask();
+        } else {
+            discreteMinutes.set(DISCRETE);
+        }
+    }
+    public BooleanProperty discreteMinutesProperty() {
+        if (null == discreteMinutes) {
+            discreteMinutes = new BooleanPropertyBase() {
+                @Override public void set(boolean DISCRETE) {
+                    super.set(DISCRETE);
+                    stopTask(periodicTickTask);
+                    scheduleTickTask();
+                }
+                @Override public Object getBean() { return Clock.this; }
+                @Override public String getName() { return "discreteMinutes"; }
+            };
+        }
+        return discreteMinutes;
     }
 
     public boolean isSecondsVisible() { return null == secondsVisible ? _secondsVisible : secondsVisible.get(); }
@@ -685,6 +711,9 @@ public class Clock extends Control {
     private synchronized void scheduleTickTask() {
         enableTickExecutorService();
         stopTask(periodicTickTask);
+
+        updateInterval   = (isDiscreteMinutes() && isDiscreteSeconds()) ? LONG_INTERVAL : SHORT_INTERVAL;
+
         periodicTickTask = periodicTickExecutorService.scheduleAtFixedRate(() -> tick(), 0, updateInterval, TimeUnit.MILLISECONDS);
     }
 
@@ -711,6 +740,7 @@ public class Clock extends Control {
             case LCD  : return new LcdClockSkin(Clock.this);
             case PEAR : return new PearClockSkin(Clock.this);
             case PLAIN: return new PlainClockSkin(Clock.this);
+            case DB: return new DBClockSkin(Clock.this);
             case CLOCK:
             default:
                 return new ClockSkin(Clock.this);
@@ -749,7 +779,6 @@ public class Clock extends Control {
                 setSecondsVisible(true);
                 setTextVisible(false);
                 setTitleVisible(false);
-                setDiscreteSteps(false);
                 super.setSkin(new PearClockSkin(Clock.this));
                 break;
             case PLAIN:
@@ -762,6 +791,12 @@ public class Clock extends Control {
                 setHourTickMarkColor(Color.rgb(240, 240, 240));
                 setMinuteTickMarkColor(Color.rgb(240, 240, 240));
                 super.setSkin(new PlainClockSkin(Clock.this));
+                break;
+            case DB:
+                setDiscreteSeconds(false);
+                setDiscreteMinutes(true);
+                setSecondNeedleColor(Color.rgb(167, 0, 0));
+                setSecondsVisible(true);
                 break;
             case CLOCK:
             default:

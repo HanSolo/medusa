@@ -73,8 +73,13 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B)this;
     }
 
-    public final B discreteSteps(final boolean DISCRETE) {
-        properties.put("discrete", new SimpleBooleanProperty(DISCRETE));
+    public final B discreteSeconds(final boolean DISCRETE) {
+        properties.put("discreteSeconds", new SimpleBooleanProperty(DISCRETE));
+        return (B)this;
+    }
+
+    public final B discreteMinutes(final boolean DISCRETE) {
+        properties.put("discreteMinutes", new SimpleBooleanProperty(DISCRETE));
         return (B)this;
     }
 
@@ -316,7 +321,6 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setSecondsVisible(true);
                     CONTROL.setTextVisible(false);
                     CONTROL.setTitleVisible(false);
-                    CONTROL.setDiscreteSteps(false);
                     break;
                 case PLAIN:
                     CONTROL.setBackgroundPaint(Color.rgb(29, 29, 29));
@@ -327,6 +331,12 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setSecondsVisible(true);
                     CONTROL.setHourTickMarkColor(Color.rgb(240, 240, 240));
                     CONTROL.setMinuteTickMarkColor(Color.rgb(240, 240, 240));
+                    break;
+                case DB:
+                    CONTROL.setDiscreteSeconds(false);
+                    CONTROL.setDiscreteMinutes(true);
+                    CONTROL.setSecondNeedleColor(Color.rgb(167, 0, 0));
+                    CONTROL.setSecondsVisible(true);
                     break;
             }
         } else {
@@ -383,8 +393,10 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setTitle(((StringProperty) properties.get(key)).get());
             } else if ("text".equals(key)) {
                 CONTROL.setText(((StringProperty) properties.get(key)).get());
-            } else if ("discrete".equals(key)) {
-                CONTROL.setDiscreteSteps(((BooleanProperty) properties.get(key)).get());
+            } else if ("discreteSeconds".equals(key)) {
+                CONTROL.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
+            } else if ("discreteMinutes".equals(key)) {
+                CONTROL.setDiscreteMinutes(((BooleanProperty) properties.get(key)).get());
             } else if ("secondsVisible".equals(key)) {
                 CONTROL.setSecondsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("titleVisible".equals(key)) {

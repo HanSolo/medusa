@@ -23,10 +23,13 @@ import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -69,20 +72,22 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private static final DateTimeFormatter DATE_TEXT_FORMATER   = DateTimeFormatter.ofPattern("EE");
     private static final DateTimeFormatter DATE_NUMBER_FORMATER = DateTimeFormatter.ofPattern("d");
     private static final DateTimeFormatter TIME_FORMATTER       = DateTimeFormatter.ofPattern("HH:mm");
-    private double          size;
-    private Canvas          ticks;
-    private GraphicsContext ctx;
-    private Path            hour;
-    private Path            minute;
-    private Path            second;
-    private Text            title;
-    private Text            dateText;
-    private Text            dateNumber;
-    private Text            text;
-    private Pane            pane;
-    private Rotate          hourRotate;
-    private Rotate          minuteRotate;
-    private Rotate          secondRotate;
+    private              double            size;
+    private              Canvas            ticks;
+    private              GraphicsContext   ctx;
+    private              Path              hour;
+    private              Path              minute;
+    private              Path              second;
+    private              Text              title;
+    private              Text              dateText;
+    private              Text              dateNumber;
+    private              Text              text;
+    private              Pane              pane;
+    private              Rotate            hourRotate;
+    private              Rotate            minuteRotate;
+    private              Rotate            secondRotate;
+    private              Group             shadowGroup;
+    private              DropShadow        dropShadow;
 
 
     // ******************** Constructors **************************************
@@ -136,6 +141,15 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         second.setStroke(null);
         second.getTransforms().setAll(secondRotate);
 
+        dropShadow = new DropShadow();
+        dropShadow.setColor(Color.rgb(0, 0, 0, 0.25));
+        dropShadow.setBlurType(BlurType.TWO_PASS_BOX);
+        dropShadow.setRadius(0.015 * PREFERRED_WIDTH);
+        dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
+
+        shadowGroup = new Group(hour, minute, second);
+        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+
         title = new Text("");
         title.setVisible(getSkinnable().isTitleVisible());
         title.setManaged(getSkinnable().isTitleVisible());
@@ -155,7 +169,7 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         pane = new Pane();
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.getChildren().addAll(ticks, title, dateText, dateNumber, text, hour, minute, second);
+        pane.getChildren().addAll(ticks, title, dateText, dateNumber, text, shadowGroup);
 
         getChildren().setAll(pane);
     }
@@ -448,13 +462,18 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
     // ******************** Resizing ******************************************
     public void updateTime(final LocalDateTime TIME) {
-        if (getSkinnable().isDiscreteSteps()) {
+        if (getSkinnable().isDiscreteMinutes()) {
             minuteRotate.setAngle(TIME.getMinute() * 6);
-            secondRotate.setAngle(TIME.getSecond() * 6);
         } else {
             minuteRotate.setAngle(TIME.getMinute() * 6 + TIME.getSecond() * 0.1);
+        }
+
+        if (getSkinnable().isDiscreteSeconds()) {
+            secondRotate.setAngle(TIME.getSecond() * 6);
+        } else {
             secondRotate.setAngle(TIME.getSecond() * 6 + TIME.get(ChronoField.MILLI_OF_SECOND) * 0.006);
         }
+
         hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
 
         text.setText(TIME_FORMATTER.format(TIME));
@@ -470,31 +489,6 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.51), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
     }
 
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-
-        LocalDateTime time = getSkinnable().getTime();
-
-        updateTime(time);
-
-        title.setText(getSkinnable().getTitle());
-        Helper.adjustTextSize(title, 0.6 * size, size * 0.12);
-        title.relocate((size - title.getLayoutBounds().getWidth()) * 0.5, size * 0.25);
-
-        text.setText(TIME_FORMATTER.format(time));
-        Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
-        text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
-
-        dateText.setText(DATE_TEXT_FORMATER.format(time).toUpperCase());
-        Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
-        dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.4), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
-
-        dateNumber.setText(DATE_NUMBER_FORMATER.format(time).toUpperCase());
-        Helper.adjustTextSize(dateNumber, 0.3 * size, size * 0.05);
-        dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.51), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
-    }
-
     private void resize() {
         double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
@@ -505,6 +499,9 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
             pane.setMaxSize(size, size);
             pane.relocate((getSkinnable().getWidth() - size) * 0.5, (getSkinnable().getHeight() - size) * 0.5);
+
+            dropShadow.setRadius(0.008 * size);
+            dropShadow.setOffsetY(0.008 * size);
 
             ticks.setWidth(size);
             ticks.setHeight(size);
@@ -545,5 +542,32 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             secondRotate.setPivotX(second.getLayoutBounds().getWidth() * 0.5);
             secondRotate.setPivotY(second.getLayoutBounds().getHeight() * 0.86009174);
         }
+    }
+
+    private void redraw() {
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+
+        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+
+        LocalDateTime time = getSkinnable().getTime();
+
+        updateTime(time);
+
+        title.setText(getSkinnable().getTitle());
+        Helper.adjustTextSize(title, 0.6 * size, size * 0.12);
+        title.relocate((size - title.getLayoutBounds().getWidth()) * 0.5, size * 0.25);
+
+        text.setText(TIME_FORMATTER.format(time));
+        Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
+        text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
+
+        dateText.setText(DATE_TEXT_FORMATER.format(time).toUpperCase());
+        Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
+        dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.4), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
+
+        dateNumber.setText(DATE_NUMBER_FORMATER.format(time).toUpperCase());
+        Helper.adjustTextSize(dateNumber, 0.3 * size, size * 0.05);
+        dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.51), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
     }
 }

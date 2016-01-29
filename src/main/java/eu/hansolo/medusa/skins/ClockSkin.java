@@ -21,10 +21,13 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -57,19 +60,22 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private static final double            MAXIMUM_HEIGHT           = 1024;
     private static final DateTimeFormatter DATE_FORMATER            = DateTimeFormatter.ofPattern("EE d");
     private static final DateTimeFormatter TIME_FORMATTER           = DateTimeFormatter.ofPattern("HH:mm");
-    private          double          size;
-    private          Canvas          ticks;
-    private          GraphicsContext ctx;
-    private          Rectangle       hour;
-    private          Rectangle       minute;
-    private          Circle          knob;
-    private          Text            title;
-    private          Text            dateText;
-    private          Text            text;
-    private          Pane            pane;
-    private          Rotate          hourRotate;
-    private          Rotate          minuteRotate;
-    private          Rotate          secondRotate;
+    private              double            size;
+    private              Canvas            ticks;
+    private              GraphicsContext   ctx;
+    private              Rectangle         hour;
+    private              Rectangle         minute;
+    private              Rectangle         second;
+    private              Circle            knob;
+    private              Text              title;
+    private              Text              dateText;
+    private              Text              text;
+    private              Pane              pane;
+    private              Rotate            hourRotate;
+    private              Rotate            minuteRotate;
+    private              Rotate            secondRotate;
+    private              Group             shadowGroup;
+    private              DropShadow        dropShadow;
 
 
     // ******************** Constructors **************************************
@@ -111,17 +117,34 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         hour  = new Rectangle(3, 60);
         hour.setArcHeight(3);
         hour.setArcWidth(3);
-        hour.setStroke(Color.web("#282a3280"));
+        hour.setStroke(getSkinnable().getHourNeedleColor());
         hour.getTransforms().setAll(hourRotate);
 
         minute = new Rectangle(3, 96);
         minute.setArcHeight(3);
         minute.setArcWidth(3);
-        minute.setStroke(Color.web("#282a3280"));
+        minute.setStroke(getSkinnable().getMinuteNeedleColor());
         minute.getTransforms().setAll(minuteRotate);
+
+        second = new Rectangle(1, 96);
+        second.setArcHeight(1);
+        second.setArcWidth(1);
+        second.setStroke(getSkinnable().getSecondNeedleColor());
+        second.getTransforms().setAll(secondRotate);
+        second.setVisible(getSkinnable().isSecondsVisible());
+        second.setManaged(getSkinnable().isSecondsVisible());
 
         knob = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, 4.5);
         knob.setStroke(Color.web("#282a3280"));
+
+        dropShadow = new DropShadow();
+        dropShadow.setColor(Color.rgb(0, 0, 0, 0.25));
+        dropShadow.setBlurType(BlurType.TWO_PASS_BOX);
+        dropShadow.setRadius(0.015 * PREFERRED_WIDTH);
+        dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
+
+        shadowGroup = new Group(hour, minute, second, knob);
+        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
 
         title = new Text("");
         title.setVisible(getSkinnable().isTitleVisible());
@@ -138,7 +161,7 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         pane = new Pane();
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.getChildren().addAll(ticks, title, dateText, text, hour, minute, knob);
+        pane.getChildren().addAll(ticks, title, dateText, text, shadowGroup);
 
         getChildren().setAll(pane);
     }
@@ -165,6 +188,8 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             text.setManaged(getSkinnable().isTextVisible());
             dateText.setVisible(getSkinnable().isDateVisible());
             dateText.setManaged(getSkinnable().isDateVisible());
+            second.setVisible(getSkinnable().isSecondsVisible());
+            second.setManaged(getSkinnable().isSecondsVisible());
         }
     }
 
@@ -205,13 +230,18 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
     // ******************** Resizing ******************************************
     public void updateTime(final LocalDateTime TIME) {
-        if (getSkinnable().isDiscreteSteps()) {
+        if (getSkinnable().isDiscreteMinutes()) {
             minuteRotate.setAngle(TIME.getMinute() * 6);
-            secondRotate.setAngle(TIME.getSecond() * 6);
         } else {
             minuteRotate.setAngle(TIME.getMinute() * 6 + TIME.getSecond() * 0.1);
+        }
+
+        if (getSkinnable().isDiscreteSeconds()) {
+            secondRotate.setAngle(TIME.getSecond() * 6);
+        } else {
             secondRotate.setAngle(TIME.getSecond() * 6 + TIME.get(ChronoField.MILLI_OF_SECOND) * 0.006);
         }
+
         hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
 
         text.setText(TIME_FORMATTER.format(TIME));
@@ -219,27 +249,6 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
 
         dateText.setText(DATE_FORMATER.format(TIME).toUpperCase());
-        Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
-        dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.45), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
-    }
-
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-
-        LocalDateTime time = getSkinnable().getTime();
-
-        updateTime(time);
-
-        title.setText(getSkinnable().getTitle());
-        Helper.adjustTextSize(title, 0.6 * size, size * 0.12);
-        title.relocate((size - title.getLayoutBounds().getWidth()) * 0.5, size * 0.25);
-
-        text.setText(TIME_FORMATTER.format(time));
-        Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
-        text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
-
-        dateText.setText(DATE_FORMATER.format(time).toUpperCase());
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.45), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
     }
@@ -254,6 +263,9 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
             pane.setMaxSize(size, size);
             pane.relocate((getSkinnable().getWidth() - size) * 0.5, (getSkinnable().getHeight() - size) * 0.5);
+
+            dropShadow.setRadius(0.008 * size);
+            dropShadow.setOffsetY(0.008 * size);
 
             ticks.setWidth(size);
             ticks.setHeight(size);
@@ -272,6 +284,13 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             minute.setArcWidth(size * 0.015);
             minute.setArcHeight(size * 0.015);
             minute.relocate((size - minute.getWidth()) * 0.5, size * 0.03);
+
+            second.setFill(getSkinnable().getSecondNeedleColor());
+            second.setWidth(size * 0.005);
+            second.setHeight(size * 0.47);
+            second.setArcWidth(size * 0.015);
+            second.setArcHeight(size * 0.015);
+            second.relocate((size - second.getWidth()) * 0.5, size * 0.03);
 
             knob.setFill(getSkinnable().getKnobColor());
             knob.setRadius(size * 0.0225);
@@ -294,6 +313,31 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             minuteRotate.setPivotY(minute.getHeight());
             hourRotate.setPivotX(hour.getWidth() * 0.5);
             hourRotate.setPivotY(hour.getHeight());
+            secondRotate.setPivotX(second.getWidth() * 0.5);
+            secondRotate.setPivotY(second.getHeight());
         }
+    }
+
+    private void redraw() {
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+
+        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+
+        LocalDateTime time = getSkinnable().getTime();
+
+        updateTime(time);
+
+        title.setText(getSkinnable().getTitle());
+        Helper.adjustTextSize(title, 0.6 * size, size * 0.12);
+        title.relocate((size - title.getLayoutBounds().getWidth()) * 0.5, size * 0.25);
+
+        text.setText(TIME_FORMATTER.format(time));
+        Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
+        text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
+
+        dateText.setText(DATE_FORMATER.format(time).toUpperCase());
+        Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
+        dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.45), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
     }
 }
