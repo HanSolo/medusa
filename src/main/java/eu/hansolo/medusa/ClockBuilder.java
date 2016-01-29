@@ -290,6 +290,7 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         if (properties.containsKey("skinType")) {
             ClockSkinType skinType = ((ObjectProperty<ClockSkinType>) properties.get("skinType")).get();
             CONTROL = new Clock(skinType);
+
             switch(skinType) {
                 case YOTA2:
                     CONTROL.setBackgroundPaint(Color.rgb(40, 42, 48));
@@ -298,9 +299,34 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setHourNeedleColor(Color.WHITE);
                     CONTROL.setMinuteNeedleColor(Color.WHITE);
                     CONTROL.setKnobColor(Color.WHITE);
+                    CONTROL.setTextColor(Color.rgb(255, 255, 255, 0.5));
+                    CONTROL.setDateColor(Color.rgb(255, 255, 255));
                     break;
                 case LCD:
-
+                    break;
+                case PEAR:
+                    CONTROL.setBackgroundPaint(Color.BLACK);
+                    CONTROL.setHourNeedleColor(Color.WHITE);
+                    CONTROL.setMinuteNeedleColor(Color.WHITE);
+                    CONTROL.setSecondNeedleColor(Color.rgb(255, 165, 24));
+                    CONTROL.setHourTickMarkColor(Color.WHITE);
+                    CONTROL.setMinuteTickMarkColor(Color.rgb(115, 115, 115));
+                    CONTROL.setDateColor(Color.WHITE);
+                    CONTROL.setDateVisible(true);
+                    CONTROL.setSecondsVisible(true);
+                    CONTROL.setTextVisible(false);
+                    CONTROL.setTitleVisible(false);
+                    CONTROL.setDiscreteSteps(false);
+                    break;
+                case PLAIN:
+                    CONTROL.setBackgroundPaint(Color.rgb(29, 29, 29));
+                    CONTROL.setHourNeedleColor(Color.rgb(190, 190, 190));
+                    CONTROL.setMinuteNeedleColor(Color.rgb(190, 190, 190));
+                    CONTROL.setSecondNeedleColor(Color.rgb(0, 244, 0));
+                    CONTROL.setDateColor(Color.rgb(190, 190, 190));
+                    CONTROL.setSecondsVisible(true);
+                    CONTROL.setHourTickMarkColor(Color.rgb(240, 240, 240));
+                    CONTROL.setMinuteTickMarkColor(Color.rgb(240, 240, 240));
                     break;
             }
         } else {

@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -149,7 +149,7 @@ public class Clock extends Control {
 
     private void init(final LocalDateTime TIME) {
         time                 = new SimpleObjectProperty<>(Clock.this, "time", TIME);
-        updateInterval       = LONG_INTERVAL;
+        updateInterval       = SHORT_INTERVAL;
         _text                = "";
         _discreteSteps       = false;
         _secondsVisible      = false;
@@ -218,7 +218,9 @@ public class Clock extends Control {
     public void setDiscreteSteps(boolean DISCRETE) {
         if (null == discreteSteps) {
             _discreteSteps = DISCRETE;
-            updateInterval  = DISCRETE ? LONG_INTERVAL : SHORT_INTERVAL;
+            updateInterval = DISCRETE ? LONG_INTERVAL : SHORT_INTERVAL;
+            stopTask(periodicTickTask);
+            scheduleTickTask();
         } else {
             discreteSteps.set(DISCRETE);
         }
@@ -229,6 +231,8 @@ public class Clock extends Control {
                 @Override public void set(boolean DISCRETE) {
                     super.set(DISCRETE);
                     updateInterval  = DISCRETE ? LONG_INTERVAL : SHORT_INTERVAL;
+                    stopTask(periodicTickTask);
+                    scheduleTickTask();
                 }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "discreteSteps"; }
@@ -703,20 +707,12 @@ public class Clock extends Control {
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {
         switch(skinType) {
-            case YOTA2       :
-                setBackgroundPaint(Color.rgb(40, 42, 48));
-                setHourTickMarkColor(Color.rgb(255, 255, 255));
-                setMinuteTickMarkColor(Color.rgb(255, 255, 255, 0.5));
-                setHourNeedleColor(Color.WHITE);
-                setMinuteNeedleColor(Color.WHITE);
-                setKnobColor(Color.WHITE);
-                setTextColor(Color.rgb(255, 255, 255, 0.5));
-                setDateColor(Color.rgb(255, 255, 255));
-                return new ClockSkin(Clock.this);
-            case LCD         :
-                return new LcdClockSkin(Clock.this);
-            case CLOCK       :
-            default          :
+            case YOTA2: return new ClockSkin(Clock.this);
+            case LCD  : return new LcdClockSkin(Clock.this);
+            case PEAR : return new PearClockSkin(Clock.this);
+            case PLAIN: return new PlainClockSkin(Clock.this);
+            case CLOCK:
+            default:
                 return new ClockSkin(Clock.this);
         }
     }
@@ -729,7 +725,7 @@ public class Clock extends Control {
     public void setSkinType(ClockSkinType SKIN) {
         skinType = SKIN;
         switch(SKIN) {
-            case YOTA2       :
+            case YOTA2:
                 setBackgroundPaint(Color.rgb(40, 42, 48));
                 setHourTickMarkColor(Color.rgb(255, 255, 255));
                 setMinuteTickMarkColor(Color.rgb(255, 255, 255, 0.5));
@@ -738,11 +734,37 @@ public class Clock extends Control {
                 setKnobColor(Color.WHITE);
                 super.setSkin(new ClockSkin(Clock.this));
                 break;
-            case LCD         :
+            case LCD:
                 super.setSkin(new LcdClockSkin(Clock.this));
                 break;
-            case CLOCK       :
-            default          :
+            case PEAR:
+                setBackgroundPaint(Color.BLACK);
+                setHourNeedleColor(Color.WHITE);
+                setMinuteNeedleColor(Color.WHITE);
+                setSecondNeedleColor(Color.rgb(255, 165, 24));
+                setHourTickMarkColor(Color.WHITE);
+                setMinuteTickMarkColor(Color.rgb(115, 115, 115));
+                setDateColor(Color.WHITE);
+                setDateVisible(true);
+                setSecondsVisible(true);
+                setTextVisible(false);
+                setTitleVisible(false);
+                setDiscreteSteps(false);
+                super.setSkin(new PearClockSkin(Clock.this));
+                break;
+            case PLAIN:
+                setBackgroundPaint(Color.rgb(29, 29, 29));
+                setHourNeedleColor(Color.rgb(190, 190, 190));
+                setMinuteNeedleColor(Color.rgb(190, 190, 190));
+                setSecondNeedleColor(Color.rgb(0, 244, 0));
+                setDateColor(Color.rgb(190, 190, 190));
+                setSecondsVisible(true);
+                setHourTickMarkColor(Color.rgb(240, 240, 240));
+                setMinuteTickMarkColor(Color.rgb(240, 240, 240));
+                super.setSkin(new PlainClockSkin(Clock.this));
+                break;
+            case CLOCK:
+            default:
                 super.setSkin(new ClockSkin(Clock.this));
                 break;
         }
