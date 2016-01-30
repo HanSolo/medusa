@@ -39,6 +39,10 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.FillRule;
@@ -74,6 +78,7 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private              Path              hour;
     private              Path              minute;
     private              Path              second;
+    private              Circle            knob;
     private              Text              title;
     private              Text              dateNumber;
     private              Text              text;
@@ -136,13 +141,16 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         second.setStroke(null);
         second.getTransforms().setAll(secondRotate);
 
+        knob = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.0148448);
+        knob.setStroke(null);
+
         dropShadow = new DropShadow();
         dropShadow.setColor(Color.rgb(0, 0, 0, 0.25));
         dropShadow.setBlurType(BlurType.TWO_PASS_BOX);
         dropShadow.setRadius(0.015 * PREFERRED_WIDTH);
         dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
 
-        shadowGroup = new Group(hour, minute, second);
+        shadowGroup = new Group(hour, minute, second, knob);
         shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
 
         title = new Text("");
@@ -407,6 +415,10 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             second.setFill(getSkinnable().getSecondNeedleColor());
             second.relocate((size - second.getLayoutBounds().getWidth()) * 0.5, size * 0.01956815);
 
+            knob.setCenterX(center);
+            knob.setCenterY(center);
+            knob.setRadius(size * 0.0148448);
+
             title.setFill(getSkinnable().getTextColor());
             title.setFont(Fonts.latoLight(size * 0.12));
             title.relocate((size - title.getLayoutBounds().getWidth()) * 0.5, size * 0.25);
@@ -449,5 +461,13 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         dateNumber.setText(DATE_NUMBER_FORMATER.format(time).toUpperCase());
         Helper.adjustTextSize(dateNumber, 0.3 * size, size * 0.05);
         dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.6), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
+
+        knob.setFill(new RadialGradient(0, 0, size * 0.5, size * 0.5, size * 0.0148448,
+                                        false, CycleMethod.NO_CYCLE,
+                                        new Stop(0.0, Color.rgb(1, 2, 1)),
+                                        new Stop(0.4, Color.rgb(15, 15, 15)),
+                                        new Stop(0.6, Color.rgb(153, 153, 153)),
+                                        new Stop(0.8, Color.rgb(27, 10, 27)),
+                                        new Stop(1.0, Color.rgb(27, 10, 27))));
     }
 }
