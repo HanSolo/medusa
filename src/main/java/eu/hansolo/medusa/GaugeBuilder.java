@@ -816,6 +816,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setValueColor(Color.WHITE);
                     CONTROL.setBarColor(Color.CYAN);
                     break;
+                case LINEAR:
+                    CONTROL.setOrientation(Orientation.VERTICAL);
+                    CONTROL.setBarColor(Color.RED);
+                    break;
             }
         } else {
             CONTROL = new Gauge();
