@@ -122,6 +122,8 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public LcdSkin(Gauge gauge) {
         super(gauge);
+        width                 = PREFERRED_WIDTH;
+        height                = PREFERRED_HEIGHT;
         valueOffsetLeft       = 0.0;
         valueOffsetRight      = 0.0;
         digitalFontSizeFactor = 1.0;
