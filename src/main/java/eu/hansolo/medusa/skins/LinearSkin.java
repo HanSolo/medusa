@@ -20,6 +20,7 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.LcdDesign;
+import eu.hansolo.medusa.Section;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
@@ -51,6 +52,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
+import java.util.List;
 import java.util.Locale;
 
 
@@ -273,6 +275,8 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double minValue       = getSkinnable().getMinValue();
         double maxValue       = getSkinnable().getMaxValue();
 
+        if (getSkinnable().getSectionsVisible()) drawSections(CTX);
+
         int counter = 0;
         for (double i = minPosition ; Double.compare(i, maxPosition + 1) <= 0 ; i += stepSize) {
             if (Orientation.VERTICAL == orientation) {
@@ -312,6 +316,37 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
             counter++;
         }
+    }
+
+    private void drawSections(final GraphicsContext CTX) {
+        if (getSkinnable().getSections().isEmpty()) return;
+        List<Section> sections = getSkinnable().getSections();
+        int           listSize = sections.size();
+        double        minValue = getSkinnable().getMinValue();
+        double        minPosition;
+        CTX.save();
+        if (Orientation.VERTICAL == orientation) {
+            minPosition    = barBackground.getLayoutY() + barBackground.getLayoutBounds().getHeight() - size * 0.0035;
+            double anchorX = barBackground.getLayoutX() - 0.079 * width;
+            double sectionHeight;
+            for (int i = 0 ; i < listSize ;i++) {
+                Section section = sections.get(i);
+                sectionHeight   = (section.getStop() - section.getStart()) * stepSize;
+                CTX.setFill(section.getColor());
+                CTX.fillRect(anchorX, minPosition - sectionHeight - (section.getStart() - minValue) * stepSize, 0.057 * width, sectionHeight);
+            }
+        } else {
+            minPosition    = barBackground.getLayoutX();
+            double anchorY = barBackground.getLayoutY() + barBackground.getHeight() + 0.021 * height;
+            double sectionWidth;
+            for (int i = 0 ; i < listSize ;i++) {
+                Section section = sections.get(i);
+                sectionWidth    = (section.getStop() - section.getStart()) * stepSize;
+                CTX.setFill(section.getColor());
+                CTX.fillRect(minPosition + (section.getStart() - minValue) * stepSize, anchorY, sectionWidth, 0.059 * height);
+            }
+        }
+        CTX.restore();
     }
 
     private void setBar(final double VALUE) {
