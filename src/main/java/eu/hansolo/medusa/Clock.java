@@ -16,14 +16,12 @@
 
 package eu.hansolo.medusa;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import eu.hansolo.medusa.events.AlarmEvent;
 import eu.hansolo.medusa.events.AlarmEventListener;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEvent.EventType;
 import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.skins.*;
-import eu.hansolo.medusa.tools.SectionComparator;
 import eu.hansolo.medusa.tools.TimeSectionComparator;
 import javafx.application.Platform;
 import javafx.beans.property.*;
@@ -36,6 +34,7 @@ import javafx.scene.paint.Paint;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -837,8 +836,17 @@ public class Clock extends Control {
 
     private void tick() { Platform.runLater(() -> {
         setTime(getTime().plus(Duration.ofMillis(updateInterval)));
-        if (isAlarmsEnabled()) checkAlarms(time.get());
-        if (isAutoNightMode()) checkForNight(time.get());
+        LocalDateTime now = time.get();
+        if (isAlarmsEnabled()) checkAlarms(now);
+        if (isAutoNightMode()) checkForNight(now);
+        if (getCheckSectionsForValue()) {
+            int listSize = sections.size();
+            for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(LocalTime.from(now)); }
+        }
+        if (getCheckAreasForValue()) {
+            int listSize = areas.size();
+            for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(LocalTime.from(now)); }
+        }
     }); }
 
 
