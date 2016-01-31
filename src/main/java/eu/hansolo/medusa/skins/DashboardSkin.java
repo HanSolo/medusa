@@ -169,7 +169,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         barBackground.getElements().add(new ClosePath());
         barBackground.setFill(getSkinnable().getBarBackgroundColor());
         barBackground.setStroke(getSkinnable().getBorderPaint());
-        barBackground.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
+        barBackground.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
 
         dataBarStart          = new MoveTo(0, 0.675 * PREFERRED_HEIGHT);
         dataBarOuterArc       = new ArcTo(0.675 * PREFERRED_HEIGHT, 0.675 * PREFERRED_HEIGHT, 0, 0, 0, false, true);
@@ -185,7 +185,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBar.getElements().add(new ClosePath());
         dataBar.setFill(getSkinnable().getBarColor());
         dataBar.setStroke(getSkinnable().getBorderPaint());
-        dataBar.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
+        dataBar.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
 
         threshold = new Line();
         threshold.setStrokeLineCap(StrokeLineCap.BUTT);
@@ -268,7 +268,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sectionsVisible      = getSkinnable().getSectionsVisible();
 
         barBackground.setFill(getSkinnable().getBarBackgroundColor());
-        barBackground.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
+        barBackground.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
 
         setBarColor(getSkinnable().getCurrentValue());
 
@@ -292,7 +292,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setText(getSkinnable().getUnit());
         unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.5 * height);
 
-        dataBar.setEffect(getSkinnable().getShadowsEnabled() ? innerShadow : null);
+        dataBar.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
 
         threshold.setStroke(getSkinnable().getThresholdColor());
     }
@@ -337,7 +337,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             maxText.setFont(smallFont);
             maxText.relocate(((0.27778 * width) - maxText.getLayoutBounds().getWidth()) * 0.5 + 0.72222 * width, 0.7 * height);
 
-            if (getSkinnable().getShadowsEnabled()) {
+            if (getSkinnable().isShadowsEnabled()) {
                 innerShadow.setRadius(0.075 * height);
                 innerShadow.setOffsetY(0.025 * height);
             }

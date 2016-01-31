@@ -33,8 +33,6 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -61,7 +59,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 
 
 /**
@@ -238,7 +235,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         lowerCenterText.setVisible(getSkinnable().isOldValueVisible());
 
         shadowGroup = new Group();
-        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? FOREGROUND_SHADOW : null);
+        shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? FOREGROUND_SHADOW : null);
         shadowGroup.getChildren().setAll(threshold,
                                          valueText,
                                          unitText,
@@ -249,7 +246,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                          lowerCenterText);
 
         pane = new Pane();
-        pane.setEffect(getSkinnable().getShadowsEnabled() ? mainInnerShadow1 : null);
+        pane.setEffect(getSkinnable().isShadowsEnabled() ? mainInnerShadow1 : null);
         pane.getChildren().setAll(crystalOverlay,
                                   backgroundText,
                                   shadowGroup);
@@ -267,8 +264,8 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Methods *******************************************
     protected void handleEvents(final String EVENT_TYPE) {
         if ("REDRAW".equals(EVENT_TYPE)) {
-            pane.setEffect(getSkinnable().getShadowsEnabled() ? mainInnerShadow1 : null);
-            shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? FOREGROUND_SHADOW : null);
+            pane.setEffect(getSkinnable().isShadowsEnabled() ? mainInnerShadow1 : null);
+            shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? FOREGROUND_SHADOW : null);
             updateLcdDesign(height);
             redraw();
         } else if ("RESIZE".equals(EVENT_TYPE)) {

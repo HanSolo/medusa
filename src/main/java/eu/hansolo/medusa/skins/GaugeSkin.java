@@ -234,7 +234,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
 
         shadowGroup = new Group(needle, knobCanvas);
-        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
@@ -958,7 +958,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void redraw() {
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
 
         // Background stroke and fill
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));

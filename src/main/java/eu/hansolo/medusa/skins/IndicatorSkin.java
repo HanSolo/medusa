@@ -34,6 +34,7 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.ClosePath;
@@ -91,6 +92,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private List<Section> sections;
     private Tooltip       needleTooltip;
     private String        formatString;
+    private Color         barColor;
 
 
     // ******************** Constructors **************************************
@@ -107,7 +109,8 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         noOfGradientStops    = gauge.getGradientBarStops().size();
         sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        barColor             = gauge.getBarColor();
 
         init();
         initGraphics();
@@ -245,10 +248,11 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
     private void setBarColor(final double VALUE) {
         if (!sectionsVisible && !colorGradientEnabled) {
-            bar.setStroke(getSkinnable().getBarColor());
+            bar.setStroke(barColor);
         } else if (colorGradientEnabled && noOfGradientStops > 1) {
             bar.setStroke(getSkinnable().getGradientLookup().getColorAt((VALUE - minValue) / range));
         } else {
+            bar.setStroke(barColor);
             for (Section section : sections) {
                 if (section.contains(VALUE)) {
                     bar.setStroke(section.getColor());
@@ -262,6 +266,8 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Resizing ******************************************
     private void redraw() {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+
+        barColor             = getSkinnable().getBarColor();
 
         formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
