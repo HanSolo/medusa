@@ -44,6 +44,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -762,11 +763,12 @@ public class Helper {
         int               listSize          = SECTIONS.size();
         double            angleStep         = 360d / 60d;
         for (int i = 0 ; i < listSize ; i++) {
-            TimeSection section = SECTIONS.get(i);
-            double      sectionStartAngle;
-            sectionStartAngle = (section.getStart().getHour() % 12 * 5 + section.getStart().getMinute()) * angleStep + 180;
-            double sectionAngleExtend;
-            sectionAngleExtend = ((section.getStop().getHour() - section.getStart().getHour()) % 12 * 5 + (section.getStop().getMinute() - section.getStart().getMinute())) * angleStep;
+            TimeSection section           = SECTIONS.get(i);
+            LocalTime   start             = section.getStart();
+            LocalTime   stop              = section.getStop();
+            double      sectionStartAngle = (start.getHour() % 12 * 5d + start.getMinute() / 12d + start.getSecond() / 300d) * angleStep + 180;
+            double      sectionAngleExtend;
+            sectionAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5d + (stop.getMinute() - start.getMinute()) / 12d + (stop.getSecond() - start.getSecond()) / 300d) * angleStep;
             CTX.save();
             CTX.setStroke(section.getColor());
             CTX.setLineWidth(SIZE * LINE_WIDTH);
@@ -786,11 +788,12 @@ public class Helper {
         double            angleStep         = 360d / 60d;
         int listSize = AREAS.size();
         for (int i = 0; i < listSize ; i++) {
-            TimeSection area = AREAS.get(i);
-            double areaStartAngle;
-            areaStartAngle = (area.getStart().getHour() % 12 * 5 + area.getStart().getMinute()) * angleStep + 180;
-            double areaAngleExtend;
-            areaAngleExtend = ((area.getStop().getHour() - area.getStart().getHour()) % 12 * 5 + (area.getStop().getMinute() - area.getStart().getMinute())) * angleStep;
+            TimeSection area           = AREAS.get(i);
+            LocalTime   start          = area.getStart();
+            LocalTime   stop           = area.getStop();
+            double      areaStartAngle = (start.getHour() % 12 * 5d + start.getMinute() / 12d + start.getSecond() / 300d) * angleStep + 180;
+            double      areaAngleExtend;
+            areaAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5d + (stop.getMinute() - start.getMinute()) / 12d + (stop.getSecond() - start.getSecond()) / 300d) * angleStep;
             CTX.save();
             CTX.setFill(area.getColor());
             CTX.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
