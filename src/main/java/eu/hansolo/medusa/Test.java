@@ -36,6 +36,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Random;
 
 
@@ -57,6 +58,18 @@ public class Test extends Application {
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.LINEAR)
                             .animated(true)
+                            .minValue(-10)
+                            .orientation(Orientation.HORIZONTAL)
+                            .gradientBarEnabled(true)
+                            .gradientBarStops(new Stop(0, Color.LIME),
+                                              new Stop(0.5, Color.YELLOW),
+                                              new Stop(1.0, Color.RED))
+                            .sectionsVisible(true)
+                            .sections(new Section(20, 40, Color.ORANGE),
+                                      new Section(60, 80, Color.YELLOW))
+                            .areasVisible(true)
+                            .areas(new Section(20, 40, Color.ORANGE),
+                                   new Section(60, 80, Color.YELLOW))
                             .build();
 
         class Command1 implements Command {
@@ -73,6 +86,13 @@ public class Test extends Application {
                                     new Alarm(Repetition.ONCE, LocalDateTime.now().plusSeconds(10), Alarm.ARMED, "10 sec after Start", command1))
                             .alarmsEnabled(false)
                             .onAlarm(alarmEvent -> System.out.println(alarmEvent.ALARM.getText()))
+                            .sectionsVisible(true)
+                            .sections(new TimeSection(LocalTime.of(8, 0, 0), LocalTime.of(12, 0, 0), Color.rgb(0, 200, 0, 0.5)),
+                                      new TimeSection(LocalTime.of(13, 0, 0), LocalTime.of(17, 0, 0), Color.rgb(0, 200, 0, 0.5)))
+                            .areasVisible(true)
+                            .areas(new TimeSection(LocalTime.of(12, 0, 0), LocalTime.of(13, 0, 0), Color.rgb(200, 0, 0, 0.5)))
+                            .secondsVisible(true)
+                            .secondNeedleColor(Color.MAGENTA)
                             .running(true)
                             .build();
 
@@ -88,7 +108,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(gauge);
+        StackPane pane = new StackPane(clock);
         pane.setPadding(new Insets(10));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
