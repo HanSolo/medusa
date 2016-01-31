@@ -56,60 +56,6 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LINEAR)
-                            .animated(true)
-                            .minValue(-10)
-                            .orientation(Orientation.HORIZONTAL)
-                            .gradientBarEnabled(true)
-                            .gradientBarStops(new Stop(0, Color.LIME),
-                                              new Stop(0.5, Color.YELLOW),
-                                              new Stop(1.0, Color.RED))
-                            .sectionsVisible(true)
-                            .sections(new Section(20, 40, Color.ORANGE),
-                                      new Section(60, 80, Color.YELLOW))
-                            .areasVisible(true)
-                            .areas(new Section(20, 40, Color.ORANGE),
-                                   new Section(60, 80, Color.YELLOW))
-                            .build();
-
-        class Command1 implements Command {
-            @Override public void execute() {
-                System.out.println("Command in other class executed");
-            }
-        }
-        Command1 command1 = new Command1();
-
-        TimeSection floorLightOn = TimeSectionBuilder.create()
-                                                     .start(LocalTime.of(18, 00, 00))
-                                                     .stop(LocalTime.of(19, 00, 00))
-                                                     .onTimeSectionEntered(event -> System.out.println("Floor light on"))
-                                                     .onTimeSectionLeft(event -> System.out.println("Floor light off"))
-                                                     .color(Color.rgb(0, 255, 0, 0.5))
-                                                     .build();
-
-        TimeSection gardenLightOn = TimeSectionBuilder.create()
-                                                      .start(LocalTime.of(19, 00, 00))
-                                                      .stop(LocalTime.of(22, 00, 00))
-                                                      .onTimeSectionEntered(event -> System.out.println("Garden light on"))
-                                                      .onTimeSectionLeft(event -> System.out.println("Garden light off"))
-                                                      .color(Color.rgb(255, 128, 0, 0.5))
-                                                      .build();
-
-        clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.YOTA2)
-                            .alarms(new Alarm(Repetition.ONCE, LocalDateTime.now().plusSeconds(5), Alarm.ARMED, "5 sec after Start"),
-                                    new Alarm(Repetition.ONCE, LocalDateTime.now().plusSeconds(10), Alarm.ARMED, "10 sec after Start", command1))
-                            .alarmsEnabled(false)
-                            .onAlarm(alarmEvent -> System.out.println(alarmEvent.ALARM.getText()))
-                            .sectionsVisible(true)
-                            .sections(floorLightOn)
-                            .checkSectionsForValue(true)
-                            .areasVisible(true)
-                            .areas(gardenLightOn)
-                            .checkAreasForValue(true)
-                            .secondsVisible(true)
-                            .secondNeedleColor(Color.MAGENTA)
-                            .running(true)
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -124,7 +70,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(clock);
+        StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(10));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
