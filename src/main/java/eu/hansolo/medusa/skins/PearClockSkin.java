@@ -19,10 +19,12 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.TickLabelOrientation;
+import eu.hansolo.medusa.TimeSection;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
+import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -39,14 +41,12 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.FillRule;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -54,9 +54,10 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
-import java.util.Locale;
+import java.util.List;
 
 
 /**
@@ -73,8 +74,8 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private static final DateTimeFormatter DATE_NUMBER_FORMATER = DateTimeFormatter.ofPattern("d");
     private static final DateTimeFormatter TIME_FORMATTER       = DateTimeFormatter.ofPattern("HH:mm");
     private              double            size;
-    private              Canvas            ticks;
-    private              GraphicsContext   ctx;
+    private              Canvas            ticksAndSectionsCanvas;
+    private              GraphicsContext   ticksAndSections;
     private              Path              hour;
     private              Path              minute;
     private              Path              second;
@@ -88,6 +89,8 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private              Rotate            secondRotate;
     private              Group             shadowGroup;
     private              DropShadow        dropShadow;
+    private              List<TimeSection> sections;
+    private              List<TimeSection> areas;
 
 
     // ******************** Constructors **************************************
@@ -97,6 +100,9 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         minuteRotate = new Rotate();
         hourRotate   = new Rotate();
         secondRotate = new Rotate();
+
+        sections     = clock.getSections();
+        areas        = clock.getAreas();
 
         init();
         initGraphics();
@@ -123,8 +129,8 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     }
 
     private void initGraphics() {
-        ticks = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-        ctx   = ticks.getGraphicsContext2D();
+        ticksAndSectionsCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+        ticksAndSections = ticksAndSectionsCanvas.getGraphicsContext2D();
 
         hour  = new Path();
         hour.setFillRule(FillRule.EVEN_ODD);
@@ -169,7 +175,7 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         pane = new Pane();
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.getChildren().addAll(ticks, title, dateText, dateNumber, text, shadowGroup);
+        pane.getChildren().addAll(ticksAndSectionsCanvas, title, dateText, dateNumber, text, shadowGroup);
 
         getChildren().setAll(pane);
     }
@@ -183,13 +189,13 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Methods *******************************************
-    private void handleEvents(final String EVENT_tYPE) {
-        if ("RESIZE".equals(EVENT_tYPE)) {
+    private void handleEvents(final String EVENT_TYPE) {
+        if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
             redraw();
-        } else if ("REDRAW".equals(EVENT_tYPE)) {
+        } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
-        } else if ("VISIBILITY".equals(EVENT_tYPE)) {
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             title.setVisible(getSkinnable().isTitleVisible());
             title.setManaged(getSkinnable().isTitleVisible());
             text.setVisible(getSkinnable().isTextVisible());
@@ -198,13 +204,25 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             dateText.setManaged(getSkinnable().isDateVisible());
             dateNumber.setVisible(getSkinnable().isDateVisible());
             dateNumber.setManaged(getSkinnable().isDateVisible());
+        } else if ("FINISHED".equals(EVENT_TYPE)) {
+            LocalTime time = LocalTime.from(getSkinnable().getTime());
+            // Check sections for value and fire section events
+            if (getSkinnable().getCheckSectionsForValue()) {
+                int listSize = sections.size();
+                for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(time); }
+            }
+
+            // Check areas for value and fire section events
+            if (getSkinnable().getCheckAreasForValue()) {
+                int listSize = areas.size();
+                for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(time); }
+            }
         }
     }
 
 
     // ******************** Canvas ********************************************
     private void drawTicks() {
-        ctx.clearRect(0, 0, size, size);
         double  sinValue;
         double  cosValue;
         double  startAngle          = 180;
@@ -213,9 +231,9 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         Color   hourTickMarkColor   = getSkinnable().getHourTickMarkColor();
         Color   minuteTickMarkColor = getSkinnable().getMinuteTickMarkColor();
         Font    font                = Fonts.robotoLight(size * 0.084);
-        ctx.setLineCap(StrokeLineCap.BUTT);
-        ctx.setFont(font);
-        ctx.setLineWidth(size * 0.005);
+        ticksAndSections.setLineCap(StrokeLineCap.BUTT);
+        ticksAndSections.setFont(font);
+        ticksAndSections.setLineWidth(size * 0.005);
         for (double angle = 0, counter = 0 ; Double.compare(counter, 239) <= 0 ; angle -= angleStep, counter++) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
@@ -226,29 +244,29 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             Point2D textPoint        = new Point2D(center.getX() + size * 0.405 * sinValue, center.getY() + size * 0.405 * cosValue);
             
             if (counter % 20 == 0) {
-                ctx.setStroke(hourTickMarkColor);
-                ctx.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
+                ticksAndSections.setStroke(hourTickMarkColor);
+                ticksAndSections.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
 
-                ctx.save();
-                ctx.translate(textPoint.getX(), textPoint.getY());
+                ticksAndSections.save();
+                ticksAndSections.translate(textPoint.getX(), textPoint.getY());
 
-                Helper.rotateContextForText(ctx, startAngle, angle, TickLabelOrientation.HORIZONTAL);
-                ctx.setTextAlign(TextAlignment.CENTER);
-                ctx.setTextBaseline(VPos.CENTER);
-                ctx.setFill(hourTickMarkColor);
+                Helper.rotateContextForText(ticksAndSections, startAngle, angle, TickLabelOrientation.HORIZONTAL);
+                ticksAndSections.setTextAlign(TextAlignment.CENTER);
+                ticksAndSections.setTextBaseline(VPos.CENTER);
+                ticksAndSections.setFill(hourTickMarkColor);
                 if (counter == 0) {
-                    ctx.fillText("12", 0, 0);
+                    ticksAndSections.fillText("12", 0, 0);
                 } else {
-                    ctx.fillText(Integer.toString((int) (counter / 20)), 0, 0);
+                    ticksAndSections.fillText(Integer.toString((int) (counter / 20)), 0, 0);
                 }
 
-                ctx.restore();
+                ticksAndSections.restore();
             } else if (counter % 4 == 0) {
-                ctx.setStroke(minuteTickMarkColor);
-                ctx.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
+                ticksAndSections.setStroke(minuteTickMarkColor);
+                ticksAndSections.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
             } else if (counter % 1 == 0) {
-                ctx.setStroke(minuteTickMarkColor);
-                ctx.strokeLine(innerMinutePoint.getX(), innerMinutePoint.getY(), outerPoint.getX(), outerPoint.getY());
+                ticksAndSections.setStroke(minuteTickMarkColor);
+                ticksAndSections.strokeLine(innerMinutePoint.getX(), innerMinutePoint.getY(), outerPoint.getX(), outerPoint.getY());
             }
         }
     }
@@ -503,9 +521,8 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             dropShadow.setRadius(0.008 * size);
             dropShadow.setOffsetY(0.008 * size);
 
-            ticks.setWidth(size);
-            ticks.setHeight(size);
-            drawTicks();
+            ticksAndSectionsCanvas.setWidth(size);
+            ticksAndSectionsCanvas.setHeight(size);
 
             createHourPointer();
             hour.setFill(getSkinnable().getHourNeedleColor());
@@ -549,6 +566,15 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+
+        // Areas, Sections and Tick Marks
+        ticksAndSectionsCanvas.setCache(false);
+        ticksAndSections.clearRect(0, 0, size, size);
+        if (getSkinnable().getAreasVisible()) Helper.drawTimeAreas(getSkinnable(), ticksAndSections, areas, size, 0, 0, 1, 1);
+        if (getSkinnable().getSectionsVisible()) Helper.drawTimeSections(getSkinnable(), ticksAndSections, sections, size, 0.02, 0.02, 0.96, 0.96, 0.04);
+        drawTicks();
+        ticksAndSectionsCanvas.setCache(true);
+        ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
         LocalDateTime time = getSkinnable().getTime();
 

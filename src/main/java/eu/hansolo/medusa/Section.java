@@ -70,9 +70,7 @@ public class Section implements Comparable<Section> {
     public Section(final double START, final double STOP, final String TEXT, final Color COLOR, final Color TEXT_COLOR) {
         this(START, STOP, TEXT, null, COLOR, TEXT_COLOR);
     }
-    public Section(final double START, final double STOP,
-                   final String TEXT, final Image ICON,
-                   final Color COLOR, final Color TEXT_COLOR) {
+    public Section(final double START, final double STOP, final String TEXT, final Image ICON, final Color COLOR, final Color TEXT_COLOR) {
         _start       = START;
         _stop        = STOP;
         _text        = TEXT;

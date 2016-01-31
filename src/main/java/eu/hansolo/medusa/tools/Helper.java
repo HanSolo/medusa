@@ -16,6 +16,7 @@
 
 package eu.hansolo.medusa.tools;
 
+import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
@@ -23,6 +24,7 @@ import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TickMarkType;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.TimeSection;
 import javafx.geometry.VPos;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
@@ -35,6 +37,7 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.ArcType;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -746,5 +749,52 @@ public class Helper {
             }
         }
         return IMAGE;
+    }
+
+    public static void drawTimeSections(final Clock CLOCK, final GraphicsContext CTX, final List<TimeSection> SECTIONS, final double SIZE,
+                                        final double XY_INSIDE, final double XY_OUTSIDE, final double WH_INSIDE, final double WH_OUTSIDE,
+                                        final double LINE_WIDTH) {
+        if (SECTIONS.isEmpty()) return;
+        TickLabelLocation tickLabelLocation = CLOCK.getTickLabelLocation();
+        double            xy                = TickLabelLocation.INSIDE == tickLabelLocation ? XY_INSIDE * SIZE : XY_OUTSIDE * SIZE;
+        double            wh                = TickLabelLocation.INSIDE == tickLabelLocation ? WH_INSIDE * SIZE : WH_OUTSIDE * SIZE;
+        double            offset            = 90;
+        int               listSize          = SECTIONS.size();
+        double            angleStep         = 360d / 60d;
+        for (int i = 0 ; i < listSize ; i++) {
+            TimeSection section = SECTIONS.get(i);
+            double      sectionStartAngle;
+            sectionStartAngle = (section.getStart().getHour() % 12 * 5 + section.getStart().getMinute()) * angleStep + 180;
+            double sectionAngleExtend;
+            sectionAngleExtend = ((section.getStop().getHour() - section.getStart().getHour()) % 12 * 5 + (section.getStop().getMinute() - section.getStart().getMinute())) * angleStep;
+            CTX.save();
+            CTX.setStroke(section.getColor());
+            CTX.setLineWidth(SIZE * LINE_WIDTH);
+            CTX.setLineCap(StrokeLineCap.BUTT);
+            CTX.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
+            CTX.restore();
+        }
+    }
+
+    public static void drawTimeAreas(final Clock CLOCK, final GraphicsContext CTX, final List<TimeSection> AREAS, final double SIZE,
+                                     final double XY_INSIDE, final double XY_OUTSIDE, final double WH_INSIDE, final double WH_OUTSIDE) {
+        if (AREAS.isEmpty()) return;
+        TickLabelLocation tickLabelLocation = CLOCK.getTickLabelLocation();
+        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? XY_OUTSIDE * SIZE : XY_INSIDE * SIZE;
+        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? WH_OUTSIDE * SIZE : WH_INSIDE * SIZE;
+        double            offset            = 90;
+        double            angleStep         = 360d / 60d;
+        int listSize = AREAS.size();
+        for (int i = 0; i < listSize ; i++) {
+            TimeSection area = AREAS.get(i);
+            double areaStartAngle;
+            areaStartAngle = (area.getStart().getHour() % 12 * 5 + area.getStart().getMinute()) * angleStep + 180;
+            double areaAngleExtend;
+            areaAngleExtend = ((area.getStop().getHour() - area.getStart().getHour()) % 12 * 5 + (area.getStop().getMinute() - area.getStart().getMinute())) * angleStep;
+            CTX.save();
+            CTX.setFill(area.getColor());
+            CTX.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
+            CTX.restore();
+        }
     }
 }

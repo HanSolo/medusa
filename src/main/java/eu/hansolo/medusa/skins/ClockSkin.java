@@ -18,9 +18,14 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
+import eu.hansolo.medusa.Gauge.ScaleDirection;
+import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.TickLabelLocation;
+import eu.hansolo.medusa.TimeSection;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
+import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -37,6 +42,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
@@ -44,8 +50,10 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.util.List;
 
 
 /**
@@ -61,8 +69,8 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private static final DateTimeFormatter DATE_FORMATER            = DateTimeFormatter.ofPattern("EE d");
     private static final DateTimeFormatter TIME_FORMATTER           = DateTimeFormatter.ofPattern("HH:mm");
     private              double            size;
-    private              Canvas            ticks;
-    private              GraphicsContext   ctx;
+    private              Canvas            ticksAndSectionsCanvas;
+    private              GraphicsContext   ticksAndSections;
     private              Rectangle         hour;
     private              Rectangle         minute;
     private              Rectangle         second;
@@ -76,6 +84,8 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private              Rotate            secondRotate;
     private              Group             shadowGroup;
     private              DropShadow        dropShadow;
+    private              List<TimeSection> sections;
+    private              List<TimeSection> areas;
 
 
     // ******************** Constructors **************************************
@@ -85,6 +95,9 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         minuteRotate = new Rotate();
         hourRotate   = new Rotate();
         secondRotate = new Rotate();
+
+        sections     = clock.getSections();
+        areas        = clock.getAreas();
 
         init();
         initGraphics();
@@ -111,8 +124,8 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     }
 
     private void initGraphics() {
-        ticks = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-        ctx   = ticks.getGraphicsContext2D();
+        ticksAndSectionsCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+        ticksAndSections = ticksAndSectionsCanvas.getGraphicsContext2D();
 
         hour  = new Rectangle(3, 60);
         hour.setArcHeight(3);
@@ -161,7 +174,7 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         pane = new Pane();
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.getChildren().addAll(ticks, title, dateText, text, shadowGroup);
+        pane.getChildren().addAll(ticksAndSectionsCanvas, title, dateText, text, shadowGroup);
 
         getChildren().setAll(pane);
     }
@@ -175,13 +188,13 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Methods *******************************************
-    private void handleEvents(final String EVENT_tYPE) {
-        if ("RESIZE".equals(EVENT_tYPE)) {
+    private void handleEvents(final String EVENT_TYPE) {
+        if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
             redraw();
-        } else if ("REDRAW".equals(EVENT_tYPE)) {
+        } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
-        } else if ("VISIBILITY".equals(EVENT_tYPE)) {
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             title.setVisible(getSkinnable().isTitleVisible());
             title.setManaged(getSkinnable().isTitleVisible());
             text.setVisible(getSkinnable().isTextVisible());
@@ -190,13 +203,29 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             dateText.setManaged(getSkinnable().isDateVisible());
             second.setVisible(getSkinnable().isSecondsVisible());
             second.setManaged(getSkinnable().isSecondsVisible());
+        } else if ("SECTION".equals(EVENT_TYPE)) {
+            sections = getSkinnable().getSections();
+            areas    = getSkinnable().getAreas();
+            redraw();
+        } else if ("FINISHED".equals(EVENT_TYPE)) {
+            LocalTime time = LocalTime.from(getSkinnable().getTime());
+            // Check sections for value and fire section events
+            if (getSkinnable().getCheckSectionsForValue()) {
+                int listSize = sections.size();
+                for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(time); }
+            }
+
+            // Check areas for value and fire section events
+            if (getSkinnable().getCheckAreasForValue()) {
+                int listSize = areas.size();
+                for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(time); }
+            }
         }
     }
 
 
     // ******************** Canvas ********************************************
     private void drawTicks() {
-        ctx.clearRect(0, 0, size, size);
         double  sinValue;
         double  cosValue;
         double  startAngle          = 180;
@@ -204,7 +233,7 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         Point2D center              = new Point2D(size * 0.5, size * 0.5);
         Color   hourTickMarkColor   = getSkinnable().getHourTickMarkColor();
         Color   minuteTickMarkColor = getSkinnable().getMinuteTickMarkColor();
-        ctx.setLineCap(StrokeLineCap.ROUND);
+        ticksAndSections.setLineCap(StrokeLineCap.ROUND);
         for (double angle = 0, counter = 0 ; Double.compare(counter, 59) <= 0 ; angle -= angleStep, counter++) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
@@ -215,14 +244,14 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
             if (counter % 5 == 0) {
                 // Draw hour tickmark
-                ctx.setLineWidth(size * 0.01);
-                ctx.setStroke(hourTickMarkColor);
-                ctx.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
+                ticksAndSections.setLineWidth(size * 0.01);
+                ticksAndSections.setStroke(hourTickMarkColor);
+                ticksAndSections.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
             } else if (counter % 1 == 0) {
                 // Draw minute tickmark
-                ctx.setLineWidth(size * 0.005);
-                ctx.setStroke(minuteTickMarkColor);
-                ctx.strokeLine(innerMinutePoint.getX(), innerMinutePoint.getY(), outerPoint.getX(), outerPoint.getY());
+                ticksAndSections.setLineWidth(size * 0.005);
+                ticksAndSections.setStroke(minuteTickMarkColor);
+                ticksAndSections.strokeLine(innerMinutePoint.getX(), innerMinutePoint.getY(), outerPoint.getX(), outerPoint.getY());
             }
         }
     }
@@ -267,9 +296,8 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             dropShadow.setRadius(0.008 * size);
             dropShadow.setOffsetY(0.008 * size);
 
-            ticks.setWidth(size);
-            ticks.setHeight(size);
-            drawTicks();
+            ticksAndSectionsCanvas.setWidth(size);
+            ticksAndSectionsCanvas.setHeight(size);
 
             hour.setFill(getSkinnable().getHourNeedleColor());
             hour.setWidth(size * 0.015);
@@ -323,6 +351,15 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+
+        // Areas, Sections and Tick Marks
+        ticksAndSectionsCanvas.setCache(false);
+        ticksAndSections.clearRect(0, 0, size, size);
+        if (getSkinnable().getAreasVisible()) Helper.drawTimeAreas(getSkinnable(), ticksAndSections, areas, size, 0.035, 0.035, 0.93, 0.93);
+        if (getSkinnable().getSectionsVisible()) Helper.drawTimeSections(getSkinnable(), ticksAndSections, sections, size, 0.065, 0.065, 0.87, 0.87, 0.06);
+        drawTicks();
+        ticksAndSectionsCanvas.setCache(true);
+        ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
         LocalDateTime time = getSkinnable().getTime();
 

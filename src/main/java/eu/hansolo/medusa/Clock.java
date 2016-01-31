@@ -16,12 +16,15 @@
 
 package eu.hansolo.medusa;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import eu.hansolo.medusa.events.AlarmEvent;
 import eu.hansolo.medusa.events.AlarmEventListener;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEvent.EventType;
 import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.skins.*;
+import eu.hansolo.medusa.tools.SectionComparator;
+import eu.hansolo.medusa.tools.TimeSectionComparator;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -35,6 +38,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -59,11 +63,12 @@ public class Clock extends Control {
     private        final UpdateEvent          VISIBILITY_EVENT = new UpdateEvent(Clock.this, EventType.VISIBILITY);
     private        final UpdateEvent          LCD_EVENT        = new UpdateEvent(Clock.this, EventType.LCD);
     private        final UpdateEvent          RECALC_EVENT     = new UpdateEvent(Clock.this, EventType.RECALC);
+    private        final UpdateEvent          SECTION_EVENT        = new UpdateEvent(Clock.this, UpdateEvent.EventType.SECTION);
 
     private volatile ScheduledFuture<?>       periodicTickTask;
     private static   ScheduledExecutorService periodicTickExecutorService;
 
-    // Update events
+    // Alarm events
     private List<UpdateEventListener>         listenerList      = new CopyOnWriteArrayList();
     private List<AlarmEventListener>          alarmListenerList = new CopyOnWriteArrayList();
 
@@ -72,6 +77,16 @@ public class Clock extends Control {
     private ClockSkinType                     skinType;
     private String                            _title;
     private StringProperty                    title;
+    private boolean                           _checkSectionsForValue;
+    private BooleanProperty                   checkSectionsForValue;
+    private boolean                           _checkAreasForValue;
+    private BooleanProperty                   checkAreasForValue;
+    private ObservableList<TimeSection>       sections;
+    private boolean                           _sectionsVisible;
+    private BooleanProperty                   sectionsVisible;
+    private ObservableList<TimeSection>       areas;
+    private boolean                           _areasVisible;
+    private BooleanProperty                   areasVisible;
     private String                            _text;
     private StringProperty                    text;
     private boolean                           _discreteSeconds;
@@ -130,6 +145,8 @@ public class Clock extends Control {
     private ObjectProperty<LcdFont>           lcdFont;
     private Locale                            _locale;
     private ObjectProperty<Locale>            locale;
+    private TickLabelLocation                 _tickLabelLocation;
+    private ObjectProperty<TickLabelLocation> tickLabelLocation;
 
 
     // ******************** Constructors **************************************
@@ -150,37 +167,44 @@ public class Clock extends Control {
     }
 
     private void init(final LocalDateTime TIME) {
-        time                 = new SimpleObjectProperty<>(Clock.this, "time", TIME);
-        updateInterval       = LONG_INTERVAL;
-        _text                = "";
-        _discreteSeconds     = true;
-        _discreteMinutes     = true;
-        _secondsVisible      = false;
-        _titleVisible        = false;
-        _textVisible         = false;
-        _dateVisible         = false;
-        _nightMode           = false;
-        _running             = false;
-        _autoNightMode       = false;
-        _backgroundPaint     = Color.TRANSPARENT;
-        _borderPaint         = Color.TRANSPARENT;
-        _foregroundPaint     = Color.TRANSPARENT;
-        _titleColor          = DARK_COLOR;
-        _textColor           = DARK_COLOR;
-        _dateColor           = DARK_COLOR;
-        _hourTickMarkColor   = DARK_COLOR;
-        _hourNeedleColor     = DARK_COLOR;
-        _minuteNeedleColor   = DARK_COLOR;
-        _secondNeedleColor   = DARK_COLOR;
-        _knobColor           = DARK_COLOR;
-        _lcdDesign           = LcdDesign.STANDARD;
-        _alarmsEnabled       = false;
-        alarms               = FXCollections.observableArrayList();
-        alarmsToRemove       = new ArrayList<>();
-        _lcdCrystalEnabled   = false;
-        _shadowsEnabled      = false;
-        _lcdFont             = LcdFont.DIGITAL_BOLD;
-        _locale              = Locale.US;
+        time                   = new SimpleObjectProperty<>(Clock.this, "time", TIME);
+        updateInterval         = LONG_INTERVAL;
+        _checkSectionsForValue = false;
+        _checkAreasForValue    = false;
+        sections               = FXCollections.observableArrayList();
+        _secondsVisible        = false;
+        areas                  = FXCollections.observableArrayList();
+        _areasVisible          = false;
+        _text                  = "";
+        _discreteSeconds       = true;
+        _discreteMinutes       = true;
+        _secondsVisible        = false;
+        _titleVisible          = false;
+        _textVisible           = false;
+        _dateVisible           = false;
+        _nightMode             = false;
+        _running               = false;
+        _autoNightMode         = false;
+        _backgroundPaint       = Color.TRANSPARENT;
+        _borderPaint           = Color.TRANSPARENT;
+        _foregroundPaint       = Color.TRANSPARENT;
+        _titleColor            = DARK_COLOR;
+        _textColor             = DARK_COLOR;
+        _dateColor             = DARK_COLOR;
+        _hourTickMarkColor     = DARK_COLOR;
+        _hourNeedleColor       = DARK_COLOR;
+        _minuteNeedleColor     = DARK_COLOR;
+        _secondNeedleColor     = DARK_COLOR;
+        _knobColor             = DARK_COLOR;
+        _lcdDesign             = LcdDesign.STANDARD;
+        _alarmsEnabled         = false;
+        alarms                 = FXCollections.observableArrayList();
+        alarmsToRemove         = new ArrayList<>();
+        _lcdCrystalEnabled     = false;
+        _shadowsEnabled        = false;
+        _lcdFont               = LcdFont.DIGITAL_BOLD;
+        _locale                = Locale.US;
+        _tickLabelLocation     = TickLabelLocation.INSIDE;
     }
 
 
@@ -215,6 +239,108 @@ public class Clock extends Control {
     public StringProperty textProperty() {
         if (null == text) { text = new SimpleStringProperty(Clock.this, "text", _text); }
         return text; 
+    }
+
+    public boolean getCheckSectionsForValue() { return null == checkSectionsForValue ? _checkSectionsForValue : checkSectionsForValue.get(); }
+    public void setCheckSectionsForValue(final boolean CHECK) {
+        if (null == checkSectionsForValue) {
+            _checkSectionsForValue = CHECK;
+        } else {
+            checkSectionsForValue.set(CHECK);
+        }
+    }
+    public BooleanProperty checkSectionsForValueProperty() {
+        if (null == checkSectionsForValue) { checkSectionsForValue = new SimpleBooleanProperty(Clock.this, "checkSectionsForValue", _checkSectionsForValue); }
+        return checkSectionsForValue;
+    }
+
+    public boolean getCheckAreasForValue() { return null == checkAreasForValue ? _checkAreasForValue : checkAreasForValue.get(); }
+    public void setCheckAreasForValue(final boolean CHECK) {
+        if (null == checkAreasForValue) {
+            _checkAreasForValue = CHECK;
+        } else {
+            checkAreasForValue.set(CHECK);
+        }
+    }
+    public BooleanProperty checkAreasForValueProperty() {
+        if (null == checkAreasForValue) { checkAreasForValue = new SimpleBooleanProperty(Clock.this, "checkAreasForValue", _checkAreasForValue); }
+        return checkAreasForValue;
+    }
+    
+    public ObservableList<TimeSection> getSections() { return sections; }
+    public void setSections(final List<TimeSection> SECTIONS) {
+        sections.setAll(SECTIONS);
+        Collections.sort(sections, new TimeSectionComparator());
+        fireUpdateEvent(SECTION_EVENT);
+    }
+    public void setSections(final TimeSection... SECTIONS) { setSections(Arrays.asList(SECTIONS)); }
+    public void addSection(final TimeSection SECTION) {
+        if (null == SECTION) return;
+        sections.add(SECTION);
+        Collections.sort(sections, new TimeSectionComparator());
+        fireUpdateEvent(SECTION_EVENT);
+    }
+    public void removeSection(final TimeSection SECTION) {
+        if (null == SECTION) return;
+        sections.remove(SECTION);
+        Collections.sort(sections, new TimeSectionComparator());
+        fireUpdateEvent(SECTION_EVENT);
+    }
+    public void clearSections() {
+        sections.clear();
+        fireUpdateEvent(SECTION_EVENT);
+    }
+
+    public boolean getSectionsVisible() { return null == sectionsVisible ? _sectionsVisible : sectionsVisible.get(); }
+    public void setSectionsVisible(final boolean VISIBLE) {
+        if (null == sectionsVisible) {
+            _sectionsVisible = VISIBLE;
+        } else {
+            sectionsVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty sectionsVisibleProperty() {
+        if (null == sectionsVisible) { sectionsVisible = new SimpleBooleanProperty(Clock.this, "sectionsVisible", _sectionsVisible); }
+        return sectionsVisible;
+    }
+
+    public ObservableList<TimeSection> getAreas() { return areas; }
+    public void setAreas(final List<TimeSection> AREAS) {
+        areas.setAll(AREAS);
+        Collections.sort(areas, new TimeSectionComparator());
+        fireUpdateEvent(SECTION_EVENT);
+    }
+    public void setAreas(final TimeSection... AREAS) { setAreas(Arrays.asList(AREAS)); }
+    public void addArea(final TimeSection AREA) {
+        if (null == AREA) return;
+        areas.add(AREA);
+        Collections.sort(areas, new TimeSectionComparator());
+        fireUpdateEvent(SECTION_EVENT);
+    }
+    public void removeArea(final TimeSection AREA) {
+        if (null == AREA) return;
+        areas.remove(AREA);
+        Collections.sort(areas, new TimeSectionComparator());
+        fireUpdateEvent(SECTION_EVENT);
+    }
+    public void clearAreas() {
+        areas.clear();
+        fireUpdateEvent(SECTION_EVENT);
+    }
+
+    public boolean getAreasVisible() { return null == areasVisible ? _areasVisible : areasVisible.get(); }
+    public void setAreasVisible(final boolean VISIBLE) {
+        if (null == areasVisible) {
+            _areasVisible = VISIBLE;
+        } else {
+            areasVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty areasVisibleProperty() {
+        if (null == areasVisible) { areasVisible = new SimpleBooleanProperty(Clock.this, "areasVisible", _areasVisible); }
+        return areasVisible;
     }
 
     public boolean isDiscreteSeconds() { return null == discreteSeconds ? _discreteSeconds : discreteSeconds.get(); }
@@ -628,6 +754,20 @@ public class Clock extends Control {
     public ObjectProperty<Locale> localeProperty() {
         if (null == locale) { locale = new SimpleObjectProperty<>(Clock.this, "locale", _locale); }
         return locale;
+    }
+
+    public TickLabelLocation getTickLabelLocation() { return null == tickLabelLocation ? _tickLabelLocation : tickLabelLocation.get(); }
+    public void setTickLabelLocation(final TickLabelLocation LOCATION) {
+        if (null == tickLabelLocation) {
+            _tickLabelLocation = LOCATION;
+        } else {
+            tickLabelLocation.set(LOCATION);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public ObjectProperty<TickLabelLocation> tickLabelLocationProperty() {
+        if (null == tickLabelLocation) { tickLabelLocation = new SimpleObjectProperty<>(Clock.this, "tickLabelLocation", _tickLabelLocation); }
+        return tickLabelLocation;
     }
 
 

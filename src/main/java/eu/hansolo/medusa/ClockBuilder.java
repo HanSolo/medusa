@@ -73,6 +73,46 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B)this;
     }
 
+    public final B checkSectionsForValue(final boolean CHECK) {
+        properties.put("checkSectionsForValue", new SimpleBooleanProperty(CHECK));
+        return (B)this;
+    }
+
+    public final B checkAreasForValue(final boolean CHECK) {
+        properties.put("checkAreasForValue", new SimpleBooleanProperty(CHECK));
+        return (B)this;
+    }
+
+    public final B sections(final TimeSection... SECTIONS) {
+        properties.put("sectionsArray", new SimpleObjectProperty<>(SECTIONS));
+        return (B)this;
+    }
+
+    public final B sections(final List<TimeSection> SECTIONS) {
+        properties.put("sectionsList", new SimpleObjectProperty<>(SECTIONS));
+        return (B)this;
+    }
+
+    public final B sectionsVisible(final boolean VISIBLE) {
+        properties.put("sectionsVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B areas(final TimeSection... AREAS) {
+        properties.put("areasArray", new SimpleObjectProperty<>(AREAS));
+        return (B)this;
+    }
+
+    public final B areas(final List<TimeSection> AREAS) {
+        properties.put("areasList", new SimpleObjectProperty<>(AREAS));
+        return (B)this;
+    }
+
+    public final B areasVisible(final boolean VISIBLE) {
+        properties.put("areasVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B discreteSeconds(final boolean DISCRETE) {
         properties.put("discreteSeconds", new SimpleBooleanProperty(DISCRETE));
         return (B)this;
@@ -343,12 +383,28 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
             CONTROL = new Clock();
         }
 
+        // Make sure that alarms, sections, areas and markers will be added first
         if (properties.keySet().contains("alarmsArray")) {
             CONTROL.setAlarms(((ObjectProperty<Alarm[]>) properties.get("alarmsArray")).get());
         }
         if(properties.keySet().contains("alarmsList")) {
             CONTROL.setAlarms(((ObjectProperty<List<Alarm>>) properties.get("alarmsList")).get());
         }
+
+        if (properties.keySet().contains("sectionsArray")) {
+            CONTROL.setSections(((ObjectProperty<TimeSection[]>) properties.get("sectionsArray")).get());
+        }
+        if(properties.keySet().contains("sectionsList")) {
+            CONTROL.setSections(((ObjectProperty<List<TimeSection>>) properties.get("sectionsList")).get());
+        }
+
+        if (properties.keySet().contains("areasArray")) {
+            CONTROL.setAreas(((ObjectProperty<TimeSection[]>) properties.get("areasArray")).get());
+        }
+        if(properties.keySet().contains("areasList")) {
+            CONTROL.setAreas(((ObjectProperty<List<TimeSection>>) properties.get("areasList")).get());
+        }
+
 
         for (String key : properties.keySet()) {
             if ("prefSize".equals(key)) {
@@ -393,6 +449,14 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setTitle(((StringProperty) properties.get(key)).get());
             } else if ("text".equals(key)) {
                 CONTROL.setText(((StringProperty) properties.get(key)).get());
+            } else if ("checkSectionsForValue".equals(key)) {
+                CONTROL.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
+            } else if ("checkAreasForValue".equals(key)) {
+                CONTROL.setCheckAreasForValue(((BooleanProperty) properties.get(key)).get());
+            } else if ("sectionsVisible".equals(key)) {
+                CONTROL.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("areasVisible".equals(key)) {
+                CONTROL.setAreasVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("discreteSeconds".equals(key)) {
                 CONTROL.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
             } else if ("discreteMinutes".equals(key)) {
