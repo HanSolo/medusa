@@ -207,19 +207,6 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             sections = getSkinnable().getSections();
             areas    = getSkinnable().getAreas();
             redraw();
-        } else if ("FINISHED".equals(EVENT_TYPE)) {
-            LocalTime time = LocalTime.from(getSkinnable().getTime());
-            // Check sections for value and fire section events
-            if (getSkinnable().getCheckSectionsForValue()) {
-                int listSize = sections.size();
-                for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(time); }
-            }
-
-            // Check areas for value and fire section events
-            if (getSkinnable().getCheckAreasForValue()) {
-                int listSize = areas.size();
-                for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(time); }
-            }
         }
     }
 
@@ -355,8 +342,8 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         // Areas, Sections and Tick Marks
         ticksAndSectionsCanvas.setCache(false);
         ticksAndSections.clearRect(0, 0, size, size);
-        if (getSkinnable().getAreasVisible()) Helper.drawTimeAreas(getSkinnable(), ticksAndSections, areas, size, 0.035, 0.035, 0.93, 0.93);
-        if (getSkinnable().getSectionsVisible()) Helper.drawTimeSections(getSkinnable(), ticksAndSections, sections, size, 0.065, 0.065, 0.87, 0.87, 0.06);
+        if (getSkinnable().getAreasVisible()) Helper.drawTimeAreas(getSkinnable(), ticksAndSections, areas, size, 0.03, 0.03, 0.94, 0.94);
+        if (getSkinnable().getSectionsVisible()) Helper.drawTimeSections(getSkinnable(), ticksAndSections, sections, size, 0.065, 0.065, 0.87, 0.87, 0.07);
         drawTicks();
         ticksAndSectionsCanvas.setCache(true);
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);

@@ -204,19 +204,10 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             dateText.setManaged(getSkinnable().isDateVisible());
             dateNumber.setVisible(getSkinnable().isDateVisible());
             dateNumber.setManaged(getSkinnable().isDateVisible());
-        } else if ("FINISHED".equals(EVENT_TYPE)) {
-            LocalTime time = LocalTime.from(getSkinnable().getTime());
-            // Check sections for value and fire section events
-            if (getSkinnable().getCheckSectionsForValue()) {
-                int listSize = sections.size();
-                for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(time); }
-            }
-
-            // Check areas for value and fire section events
-            if (getSkinnable().getCheckAreasForValue()) {
-                int listSize = areas.size();
-                for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(time); }
-            }
+        } else if ("SECTION".equals(EVENT_TYPE)) {
+            sections = getSkinnable().getSections();
+            areas    = getSkinnable().getAreas();
+            redraw();
         }
     }
 
