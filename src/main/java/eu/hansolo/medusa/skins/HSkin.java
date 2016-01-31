@@ -453,7 +453,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawSections() {
-        if (getSkinnable().getSections().isEmpty()) return;
+        if (sections.isEmpty()) return;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double            scaledWidth       = width * 0.9;
         double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1705 * scaledWidth : 0.107 * scaledWidth;
@@ -488,7 +488,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawAreas() {
-        if (getSkinnable().getAreas().isEmpty()) return;
+        if (areas.isEmpty()) return;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double            scaledWidth       = width * 0.9;
         double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1445 * scaledWidth : 0.081 * scaledWidth;

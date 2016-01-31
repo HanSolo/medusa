@@ -915,8 +915,8 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawSections() {
+        if (sections.isEmpty()) return;
         Pos               knobPosition      = getSkinnable().getKnobPosition();
-        if (getSkinnable().getSections().isEmpty()) return;
         double            scaledSize        = size * 1.9;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.105 * scaledSize : 0.03875 * scaledSize;
@@ -952,8 +952,8 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawAreas() {
+        if (areas.isEmpty()) return;
         Pos               knobPosition      = getSkinnable().getKnobPosition();
-        if (getSkinnable().getAreas().isEmpty()) return;
         double            scaledSize        = size * 1.9;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.078 * scaledSize : 0.0125 * scaledSize;

@@ -426,7 +426,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawSections() {
-        if (getSkinnable().getSections().isEmpty()) return;
+        if (sections.isEmpty()) return;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double            scaledHeight      = height * 0.9;
         double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1705 * scaledHeight : 0.107 * scaledHeight;
@@ -461,7 +461,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawAreas() {
-        if (getSkinnable().getAreas().isEmpty()) return;
+        if (areas.isEmpty()) return;
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double            scaledHeight      = height * 0.9;
         double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0895 * scaledHeight : 0.025 * scaledHeight;
