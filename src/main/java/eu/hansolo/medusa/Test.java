@@ -79,18 +79,34 @@ public class Test extends Application {
         }
         Command1 command1 = new Command1();
 
+        TimeSection floorLightOn = TimeSectionBuilder.create()
+                                                     .start(LocalTime.of(18, 00, 00))
+                                                     .stop(LocalTime.of(19, 00, 00))
+                                                     .onTimeSectionEntered(event -> System.out.println("Floor light on"))
+                                                     .onTimeSectionLeft(event -> System.out.println("Floor light off"))
+                                                     .color(Color.rgb(0, 255, 0, 0.5))
+                                                     .build();
+
+        TimeSection gardenLightOn = TimeSectionBuilder.create()
+                                                      .start(LocalTime.of(19, 00, 00))
+                                                      .stop(LocalTime.of(22, 00, 00))
+                                                      .onTimeSectionEntered(event -> System.out.println("Garden light on"))
+                                                      .onTimeSectionLeft(event -> System.out.println("Garden light off"))
+                                                      .color(Color.rgb(255, 128, 0, 0.5))
+                                                      .build();
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.PLAIN)
+                            .skinType(ClockSkinType.YOTA2)
                             .alarms(new Alarm(Repetition.ONCE, LocalDateTime.now().plusSeconds(5), Alarm.ARMED, "5 sec after Start"),
                                     new Alarm(Repetition.ONCE, LocalDateTime.now().plusSeconds(10), Alarm.ARMED, "10 sec after Start", command1))
                             .alarmsEnabled(false)
                             .onAlarm(alarmEvent -> System.out.println(alarmEvent.ALARM.getText()))
                             .sectionsVisible(true)
-                            .sections(new TimeSection(LocalTime.of(8, 0, 0), LocalTime.of(12, 0, 0), Color.rgb(0, 200, 0, 0.5)),
-                                      new TimeSection(LocalTime.of(13, 0, 0), LocalTime.of(17, 0, 0), Color.rgb(0, 200, 0, 0.5)))
+                            .sections(floorLightOn)
+                            .checkSectionsForValue(true)
                             .areasVisible(true)
-                            .areas(new TimeSection(LocalTime.of(12, 0, 0), LocalTime.of(13, 0, 0), Color.rgb(200, 0, 0, 0.5)))
+                            .areas(gardenLightOn)
+                            .checkAreasForValue(true)
                             .secondsVisible(true)
                             .secondNeedleColor(Color.MAGENTA)
                             .running(true)
