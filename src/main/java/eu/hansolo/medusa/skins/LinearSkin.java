@@ -16,6 +16,7 @@
 
 package eu.hansolo.medusa.skins;
 
+import com.sun.tools.doclets.formats.html.SectionName;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LedType;
@@ -98,15 +99,19 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double              minValuePosition;
     private double              maxValuePosition;
     private double              zeroPosition;
+    private List<Section>       sections;
+    private List<Section>       areas;
 
 
     // ******************** Constructors **************************************
     public LinearSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        orientation           = getSkinnable().getOrientation();
+        orientation           = gauge.getOrientation();
         formatString          = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
+        sections              = gauge.getSections();
+        areas                 = gauge.getAreas();
 
         if (Orientation.VERTICAL == orientation) {
             preferredWidth  = 140;
@@ -227,6 +232,8 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("LCD".equals(EVENT_TYPE)) {
             if (getSkinnable().isLcdVisible()) redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
+            sections = getSkinnable().getSections();
+            areas    = getSkinnable().getAreas();
             resize();
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
@@ -319,8 +326,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawSections(final GraphicsContext CTX) {
-        if (getSkinnable().getSections().isEmpty()) return;
-        List<Section> sections = getSkinnable().getSections();
+        if (sections.isEmpty()) return;
         int           listSize = sections.size();
         double        minValue = getSkinnable().getMinValue();
         double        minPosition;
@@ -403,6 +409,17 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             } else {
                 valueText.setText(String.format(Locale.US, formatString, VALUE));
                 valueText.setLayoutX((width - valueText.getLayoutBounds().getWidth()) * 0.5);
+            }
+        }
+        if (getSkinnable().getAreasVisible()) {
+            bar.setFill(getSkinnable().getBarColor());
+            int listSize = areas.size();
+            for (int i = 0 ; i < listSize ; i++) {
+                Section area = areas.get(i);
+                if (area.contains(VALUE)) {
+                    bar.setFill(area.getColor());
+                    break;
+                }
             }
         }
     }
