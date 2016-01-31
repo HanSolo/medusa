@@ -176,7 +176,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
 
         shadowGroup = new Group(needle);
-        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
@@ -651,7 +651,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         if (getSkinnable().isLedVisible()) drawLed(led);
 
-        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
 
         foreground.setFill(getSkinnable().getForegroundPaint());
     }
