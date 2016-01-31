@@ -65,8 +65,10 @@ public class Alarm {
 
     // ******************** Methods *******************************************
     public Repetition getRepetition() { return repetition; }
+    public void setRepetition(final Repetition REPETITION) { repetition = REPETITION; }
 
     public LocalDateTime getTime() { return time; }
+    public void setTime(final LocalDateTime TIME) { time = TIME; }
 
     public boolean isArmed() { return armed; }
     public void setArmed(final boolean ARMED) { armed = ARMED; }
