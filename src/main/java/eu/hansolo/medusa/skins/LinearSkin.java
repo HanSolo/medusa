@@ -16,7 +16,6 @@
 
 package eu.hansolo.medusa.skins;
 
-import com.sun.tools.doclets.formats.html.SectionName;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LedType;
@@ -170,6 +169,9 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         barHighlight = new Rectangle();
         barHighlight.setStroke(null);
+        boolean barEffectEnabled = getSkinnable().isBarEffectEnabled();
+        barHighlight.setVisible(barEffectEnabled);
+        barHighlight.setManaged(barEffectEnabled);
 
         titleText = new Text(getSkinnable().getTitle());
 
@@ -213,20 +215,29 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            ledCanvas.setManaged(getSkinnable().isLedVisible());
-            ledCanvas.setVisible(getSkinnable().isLedVisible());
+            boolean ledVisible = getSkinnable().isLedVisible();
+            ledCanvas.setManaged(ledVisible);
+            ledCanvas.setVisible(ledVisible);
 
-            titleText.setVisible(!getSkinnable().getTitle().isEmpty());
-            titleText.setManaged(!getSkinnable().getTitle().isEmpty());
+            boolean titleVisible = !getSkinnable().getTitle().isEmpty();
+            titleText.setVisible(titleVisible);
+            titleText.setManaged(titleVisible);
 
-            unitText.setVisible(!getSkinnable().getUnit().isEmpty());
-            unitText.setManaged(!getSkinnable().getUnit().isEmpty());
+            boolean unitVisible = !getSkinnable().getUnit().isEmpty();
+            unitText.setVisible(unitVisible);
+            unitText.setManaged(unitVisible);
 
-            valueText.setManaged(getSkinnable().isValueVisible());
-            valueText.setVisible(getSkinnable().isValueVisible());
+            boolean valueVisible = getSkinnable().isValueVisible();
+            valueText.setManaged(valueVisible);
+            valueText.setVisible(valueVisible);
 
-            lcd.setManaged(getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
-            lcd.setVisible(getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
+            boolean lcdVisible = getSkinnable().isLcdVisible() && getSkinnable().isValueVisible();
+            lcd.setManaged(lcdVisible);
+            lcd.setVisible(lcdVisible);
+
+            boolean barEffectEnabled = getSkinnable().isBarEffectEnabled();
+            barHighlight.setVisible(barEffectEnabled);
+            barHighlight.setManaged(barEffectEnabled);
         } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }
         } else if ("LCD".equals(EVENT_TYPE)) {
@@ -403,15 +414,18 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setWidth(valueWidth);
             barHighlight.setWidth(valueWidth);
 
-            if (getSkinnable().isLcdVisible()) {
-                valueText.setText(String.format(Locale.US, formatString, VALUE));
-                valueText.setLayoutX((0.98 * width - valueText.getLayoutBounds().getWidth()));
-            } else {
-                valueText.setText(String.format(Locale.US, formatString, VALUE));
-                valueText.setLayoutX((width - valueText.getLayoutBounds().getWidth()) * 0.5);
-            }
+            valueText.setText(String.format(Locale.US, formatString, VALUE));
+            valueText.setLayoutX((0.98 * width - valueText.getLayoutBounds().getWidth()));
         }
-        if (getSkinnable().getAreasVisible()) {
+
+        setBarColor(VALUE);
+    }
+    private void setBarColor(final double VALUE) {
+        if (!getSkinnable().getAreasVisible() && !getSkinnable().isGradientBarEnabled()) {
+            bar.setFill(getSkinnable().getBarColor());
+        } else if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientBarStops().size() > 1) {
+            bar.setFill(getSkinnable().getGradientLookup().getColorAt((VALUE - getSkinnable().getMinValue()) / getSkinnable().getRange()));
+        } else {
             bar.setFill(getSkinnable().getBarColor());
             int listSize = areas.size();
             for (int i = 0 ; i < listSize ; i++) {
