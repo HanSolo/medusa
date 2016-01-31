@@ -271,6 +271,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B barEffectEnabled(final boolean ENABLED) {
+        properties.put("barEffectEnabled", new SimpleBooleanProperty(ENABLED));
+        return (B)this;
+    }
+
     public final B scaleDirection(final ScaleDirection DIRECTION) {
         properties.put("scaleDirection", new SimpleObjectProperty<>(DIRECTION));
         return (B)this;
@@ -818,7 +823,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     break;
                 case LINEAR:
                     CONTROL.setOrientation(Orientation.VERTICAL);
-                    CONTROL.setBarColor(Color.RED);
+                    CONTROL.setBarColor(Gauge.DARK_COLOR);
+                    CONTROL.setBarEffectEnabled(true);
                     break;
             }
         } else {
@@ -992,6 +998,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setMinorTickSpace(((DoubleProperty) properties.get(key)).get());
             } else if("shadowsEnabled".equals(key)) {
                 CONTROL.setShadowsEnabled(((BooleanProperty) properties.get(key)).get());
+            } else if ("barEffectEnabled".equals(key)) {
+                CONTROL.setBarEffectEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("scaleDirection".equals(key)) {
                 CONTROL.setScaleDirection(((ObjectProperty<ScaleDirection>) properties.get(key)).get());
             } else if("tickLabelColor".equals(key)) {

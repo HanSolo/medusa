@@ -196,6 +196,8 @@ public class Gauge extends Control {
     private BooleanProperty                      autoScale;
     private boolean                              _shadowsEnabled;
     private BooleanProperty                      shadowsEnabled;
+    private boolean                              _barEffectEnabled;
+    private BooleanProperty                      barEffectEnabled;
     private ScaleDirection                       _scaleDirection;
     private ObjectProperty<ScaleDirection>       scaleDirection;
     private TickLabelLocation                    _tickLabelLocation;
@@ -421,6 +423,7 @@ public class Gauge extends Control {
         _angleStep                        = _angleRange / _range;
         _autoScale                        = true;
         _shadowsEnabled                   = false;
+        _barEffectEnabled                 = false;
         _scaleDirection                   = ScaleDirection.CLOCKWISE;
         _tickLabelLocation                = TickLabelLocation.INSIDE;
         _tickLabelOrientation             = TickLabelOrientation.HORIZONTAL;
@@ -1145,7 +1148,7 @@ public class Gauge extends Control {
         return autoScale;
     }
 
-    public boolean getShadowsEnabled() { return null == shadowsEnabled ? _shadowsEnabled : shadowsEnabled.get(); }
+    public boolean isShadowsEnabled() { return null == shadowsEnabled ? _shadowsEnabled : shadowsEnabled.get(); }
     public void setShadowsEnabled(final boolean ENABLED) {
         if (null == shadowsEnabled) {
             _shadowsEnabled = ENABLED;
@@ -1157,6 +1160,20 @@ public class Gauge extends Control {
     public BooleanProperty shadowsEnabledProperty() {
         if (null == shadowsEnabled) { shadowsEnabled = new SimpleBooleanProperty(Gauge.this, "shadowsEnabled", _shadowsEnabled); }
         return shadowsEnabled;
+    }
+
+    public boolean isBarEffectEnabled() { return null == barEffectEnabled ? _barEffectEnabled : barEffectEnabled.get(); }
+    public void setBarEffectEnabled(final boolean ENABLED) {
+        if (null == barEffectEnabled) {
+            _barEffectEnabled = ENABLED;
+        } else {
+            barEffectEnabled.set(ENABLED);
+        }
+        fireUpdateEvent(VISIBILITY_EVENT);
+    }
+    public BooleanProperty barEffectEnabledProperty() {
+        if (null == barEffectEnabled) { barEffectEnabled = new SimpleBooleanProperty(Gauge.this, "barEffectEnabled", _barEffectEnabled); }
+        return barEffectEnabled;
     }
 
     public ScaleDirection getScaleDirection() { return null == scaleDirection ? _scaleDirection : scaleDirection.get(); }
@@ -2341,7 +2358,8 @@ public class Gauge extends Control {
                 break;
             case LINEAR:
                 setOrientation(Orientation.VERTICAL);
-                setBarColor(Color.RED);
+                setBarColor(DARK_COLOR);
+                setBarEffectEnabled(true);
                 super.setSkin(new LinearSkin(Gauge.this));
             case GAUGE:
             default:
