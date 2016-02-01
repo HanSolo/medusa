@@ -185,6 +185,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 unitText.setManaged(true);
                 unitText.setVisible(true);
             }
+            redraw();
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
         } else if ("RECALC".equals(EVENT_TYPE)) {

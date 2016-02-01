@@ -210,6 +210,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             boolean hasTitle = !getSkinnable().getTitle().isEmpty();
             titleText.setVisible(hasTitle);
             titleText.setManaged(hasTitle);
+            redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             StringBuilder content = new StringBuilder(String.format(Locale.US, formatString, getSkinnable().getValue()))
                 .append("\n(").append(valueText.getText()).append(")");

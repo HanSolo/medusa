@@ -229,6 +229,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("VISBILITY".equals(EVENT_TYPE)) {
             threshold.setVisible(getSkinnable().isThresholdVisible());
             threshold.setManaged(getSkinnable().isThresholdVisible());
+            redraw();
         }
     }
 

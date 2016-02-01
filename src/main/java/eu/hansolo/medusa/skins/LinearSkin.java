@@ -238,6 +238,8 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             boolean barEffectEnabled = getSkinnable().isBarEffectEnabled();
             barHighlight.setVisible(barEffectEnabled);
             barHighlight.setManaged(barEffectEnabled);
+
+            redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }
         } else if ("LCD".equals(EVENT_TYPE)) {

@@ -343,6 +343,8 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             threshold.setManaged(getSkinnable().isThresholdVisible());
             threshold.setVisible(getSkinnable().isThresholdVisible());
+
+            redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }
         } else if ("LCD".equals(EVENT_TYPE)) {

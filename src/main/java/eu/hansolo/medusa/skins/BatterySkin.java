@@ -150,6 +150,7 @@ public class BatterySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             valueText.setVisible(getSkinnable().isValueVisible());
             valueText.setManaged(getSkinnable().isValueVisible());
+            redraw();
         }
     }
 

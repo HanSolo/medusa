@@ -275,6 +275,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 lcdText.setVisible(false);
                 lcdText.setManaged(false);
             }
+            redraw();
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
             redraw();
