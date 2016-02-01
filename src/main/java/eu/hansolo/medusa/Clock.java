@@ -885,6 +885,7 @@ public class Clock extends Control {
         stopTask(periodicTickTask);
     }
 
+
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {
         switch(skinType) {
