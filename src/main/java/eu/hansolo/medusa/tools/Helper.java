@@ -270,7 +270,6 @@ public class Helper {
 
     public static void drawRadialTickMarks(final Gauge GAUGE, final GraphicsContext CTX, final double MIN_VALUE, final double MAX_VALUE,
                                            final double START_ANGLE, final double ANGLE_RANGE, final double ANGLE_STEP, final double CENTER_X, final double CENTER_Y, final double SIZE) {
-        CTX.setLineCap(StrokeLineCap.BUTT);
         double               sinValue;
         double               cosValue;
         double               centerX               = CENTER_X;
@@ -553,6 +552,7 @@ public class Helper {
             // Set the general tickmark color
             CTX.setStroke(tickMarkColor);
             CTX.setFill(tickMarkColor);
+            CTX.setLineCap(StrokeLineCap.BUTT);
 
             if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
                 // Draw major tick mark
@@ -562,12 +562,14 @@ public class Helper {
                     tickMarkType = majorTickMarkType;
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
                     CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
-                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType ? 0.016 : 0.0055));
+                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.016 : 0.0055));
+                    CTX.setLineCap(TickMarkType.PILL == tickMarkType ? StrokeLineCap.ROUND : StrokeLineCap.BUTT);
                 } else if (minorTickMarksVisible) {
                     tickMarkType = minorTickMarkType;
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
-                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType ? 0.007 : 0.00225));
+                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.007 : 0.00225));
+                    CTX.setLineCap(TickMarkType.PILL == tickMarkType ? StrokeLineCap.ROUND : StrokeLineCap.BUTT);
                 }
                 if (fullRange && !isNotZero) {
                     CTX.setFill(zeroColor);
@@ -681,6 +683,15 @@ public class Helper {
                             Helper.drawLine(CTX, innerMediumPointX, innerMediumPointY, outerPointX, outerPointY);
                         }
                         break;
+                    case PILL:
+                        CTX.setLineCap(StrokeLineCap.ROUND);
+                        CTX.setLineWidth(SIZE * 0.009);
+                        if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
+                            Helper.drawLine(CTX, innerPointX, innerPointY, outerMediumPointX, outerMediumPointY);
+                        } else {
+                            Helper.drawLine(CTX, innerMediumPointX, innerMediumPointY, outerPointX, outerPointY);
+                        }
+                        break;
                     case LINE:
                     default:
                         CTX.setLineWidth(SIZE * 0.0035);
@@ -705,6 +716,15 @@ public class Helper {
                             Helper.drawDot(CTX, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
                             break;
                         case BOX:
+                            CTX.setLineWidth(SIZE * 0.007);
+                            if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
+                                Helper.drawLine(CTX, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
+                            } else {
+                                Helper.drawLine(CTX, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
+                            }
+                            break;
+                        case PILL:
+                            CTX.setLineCap(StrokeLineCap.ROUND);
                             CTX.setLineWidth(SIZE * 0.007);
                             if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
                                 Helper.drawLine(CTX, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
