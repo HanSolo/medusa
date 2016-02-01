@@ -576,6 +576,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B customTickLabelFontSize(final double SIZE) {
+        properties.put("customTickLabelFontSize", new SimpleDoubleProperty(SIZE));
+        return (B)this;
+    }
+
     public final B interactive(final boolean INTERACTIVE) {
         properties.put("interactive", new SimpleBooleanProperty(INTERACTIVE));
         return (B)this;
@@ -1084,6 +1089,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setGradientLookup(((ObjectProperty<GradientLookup>) properties.get(key)).get());
             } else if ("customTickLabelsEnabled".equals(key)) {
                 CONTROL.setCustomTickLabelsEnabled(((BooleanProperty) properties.get(key)).get());
+            } else if ("customTickLabelFontSize".equals(key)) {
+                CONTROL.setCustomTickLabelFontSize(((DoubleProperty) properties.get(key)).get());
             } else if ("interactive".equals(key)) {
                 CONTROL.setInteractive(((BooleanProperty) properties.get(key)).get());
             } else if ("checkSectionsForValue".equals(key)) {

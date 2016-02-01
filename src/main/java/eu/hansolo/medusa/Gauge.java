@@ -61,7 +61,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 11.12.15.
  */
 public class Gauge extends Control {
-    public enum NeedleType { STANDARD }
+    public enum NeedleType { FAT, STANDARD }
     public enum NeedleShape { ANGLED, ROUND, FLAT }
     public enum NeedleSize {
         THIN(0.015),
@@ -312,6 +312,8 @@ public class Gauge extends Control {
     private boolean                              _customTickLabelsEnabled;
     private BooleanProperty                      customTickLabelsEnabled;
     private ObservableList<String>               customTickLabels;
+    private double                               _customTickLabelFontSize;
+    private DoubleProperty                       customTickLabelFontSize;
     private boolean                              _interactive;
     private BooleanProperty                      interactive;
     private String                               _buttonTooltipText;
@@ -481,6 +483,7 @@ public class Gauge extends Control {
         _gradientBarEnabled               = false;
         _customTickLabelsEnabled          = false;
         customTickLabels                  = FXCollections.observableArrayList();
+        _customTickLabelFontSize          = 10;
         _interactive                      = false;
         _buttonTooltipText                = "";
         _keepAspect                       = true;
@@ -617,7 +620,7 @@ public class Gauge extends Control {
         } else {
             title.set(TITLE);
         }
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(VISIBILITY_EVENT);
     }
     public StringProperty titleProperty() {
         if (null == title) { title = new SimpleStringProperty(Gauge.this, "title", _title); }
@@ -631,7 +634,7 @@ public class Gauge extends Control {
         } else {
             subTitle.set(SUBTITLE);
         }
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(VISIBILITY_EVENT);
     }
     public StringProperty subTitleProperty() {
         if (null == subTitle) { subTitle = new SimpleStringProperty(Gauge.this, "subTitle", _subTitle); }
@@ -645,7 +648,7 @@ public class Gauge extends Control {
         } else {
             unit.set(UNIT);
         }
-        fireUpdateEvent(REDRAW_EVENT);
+        fireUpdateEvent(VISIBILITY_EVENT);
     }
     public StringProperty unitProperty() {
         if (null == unit) { unit = new SimpleStringProperty(Gauge.this, "unit", _unit); }
@@ -2081,6 +2084,26 @@ public class Gauge extends Control {
     public void clearCustomTickLabels() {
         customTickLabels.clear();
         fireUpdateEvent(REDRAW_EVENT);
+    }
+
+    public double getCustomTickLabelFontSize() { return null == customTickLabelFontSize ? _customTickLabelFontSize : customTickLabelFontSize.get(); }
+    public void setCustomTickLabelFontSize(final double SIZE) {
+        if (null == customTickLabelFontSize) {
+            _customTickLabelFontSize = Helper.clamp(0d, 72d, SIZE);
+        } else {
+            customTickLabelFontSize.set(SIZE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public DoubleProperty customTickLabelFontSizeProperty() {
+        if (null == customTickLabelFontSize) {
+            customTickLabelFontSize = new DoublePropertyBase(_customTickLabelFontSize) {
+                @Override public void set(final double SIZE) { super.set(Helper.clamp(0d, 72d, SIZE)); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "customTickLabelFontSize";}
+            };
+        }
+        return customTickLabelFontSize;
     }
 
     public boolean isInteractive() { return null == interactive ? _interactive : interactive.get(); }
