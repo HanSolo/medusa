@@ -2183,6 +2183,11 @@ public class Gauge extends Control {
         blinkFuture = blinkService.schedule(blinkTask, LED_BLINK_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
+    public void stop() {
+        setLedOn(false);
+        blinkFuture.cancel(true);
+    }
+
     @Override public String toString() {
         return new StringBuilder("{")
             .append("\"title\":").append("\"").append(getTitle()).append("\",")

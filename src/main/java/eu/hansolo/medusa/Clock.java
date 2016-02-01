@@ -880,6 +880,10 @@ public class Clock extends Control {
         task = null;
     }
 
+    public void stop() {
+        if (null == periodicTickTask) return;
+        stopTask(periodicTickTask);
+    }
 
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {
