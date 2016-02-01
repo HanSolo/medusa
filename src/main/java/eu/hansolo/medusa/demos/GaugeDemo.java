@@ -17,27 +17,35 @@
 package eu.hansolo.medusa.demos;
 
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Gauge.ButtonEvent;
 import eu.hansolo.medusa.Gauge.KnobType;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
+import eu.hansolo.medusa.Gauge.ThresholdEvent;
 import eu.hansolo.medusa.GaugeBuilder;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.LcdFont;
 import eu.hansolo.medusa.Marker;
+import eu.hansolo.medusa.Marker.MarkerEvent;
 import eu.hansolo.medusa.Marker.MarkerType;
 import eu.hansolo.medusa.MarkerBuilder;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.Section.SectionEvent;
 import eu.hansolo.medusa.SectionBuilder;
 import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TickMarkType;
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
@@ -68,16 +76,24 @@ public class GaugeDemo extends Application {
                                          .start(50)
                                          .stop(75)
                                          .color(Color.rgb(255, 200, 0))
-                                         .onSectionEntered(sectionEvent -> System.out.println("Entered Section 1"))
-                                         .onSectionLeft(sectionEvent -> System.out.println("Left Section 1"))
+                                         .onSectionEntered(new EventHandler<SectionEvent>() {
+                                             @Override public void handle(SectionEvent sectionEvent) {System.out.println("Entered Section 1");}
+                                         })
+                                         .onSectionLeft(new EventHandler<SectionEvent>() {
+                                             @Override public void handle(SectionEvent sectionEvent) {System.out.println("Left Section 1");}
+                                         })
                                          .build();
 
         Section section2 = SectionBuilder.create()
                                          .start(75)
                                          .stop(100)
                                          .color(Color.rgb(255, 0, 0))
-                                         .onSectionEntered(sectionEvent -> System.out.println("Entered Section 2"))
-                                         .onSectionLeft(sectionEvent -> System.out.println("Left Section 2"))
+                                         .onSectionEntered(new EventHandler<SectionEvent>() {
+                                             @Override public void handle(SectionEvent sectionEvent) {System.out.println("Entered Section 2");}
+                                         })
+                                         .onSectionLeft(new EventHandler<SectionEvent>() {
+                                             @Override public void handle(SectionEvent sectionEvent) {System.out.println("Left Section 2");}
+                                         })
                                          .build();
 
         /**
@@ -96,8 +112,12 @@ public class GaugeDemo extends Application {
                                       .text("Marker 1")
                                       .color(Color.HOTPINK)
                                       .markerType(MarkerType.DOT)
-                                      .onMarkerPressed(markerEvent -> System.out.println("Marker 1 pressed"))
-                                      .onMarkerReleased(markerEvent -> System.out.println("Marker 1 released"))
+                                      .onMarkerPressed(new EventHandler<MarkerEvent>() {
+                                          @Override public void handle(MarkerEvent markerEvent) {System.out.println("Marker 1 pressed");}
+                                      })
+                                      .onMarkerReleased(new EventHandler<MarkerEvent>() {
+                                          @Override public void handle(MarkerEvent markerEvent) {System.out.println("Marker 1 released");}
+                                      })
                                       .build();
 
         Marker marker2 = MarkerBuilder.create()
@@ -105,8 +125,12 @@ public class GaugeDemo extends Application {
                                       .text("Marker 2")
                                       .color(Color.PURPLE)
                                       .markerType(MarkerType.STANDARD)
-                                      .onMarkerPressed(markerEvent -> System.out.println("Marker 2 pressed"))
-                                      .onMarkerReleased(markerEvent -> System.out.println("Marker 2 released"))
+                                      .onMarkerPressed(new EventHandler<MarkerEvent>() {
+                                          @Override public void handle(MarkerEvent markerEvent) {System.out.println("Marker 2 pressed");}
+                                      })
+                                      .onMarkerReleased(new EventHandler<MarkerEvent>() {
+                                          @Override public void handle(MarkerEvent markerEvent) {System.out.println("Marker 2 released");}
+                                      })
                                       .build();
 
         /**
@@ -180,15 +204,23 @@ public class GaugeDemo extends Application {
                         .knobType(KnobType.STANDARD)                                                     // Type for center knob (STANDARD, PLAIN, METAL, FLAT)
                         .knobColor(Color.LIGHTGRAY)                                                      // Color of center knob
                         .interactive(false)                                                              // Should center knob be act as button
-                        .onButtonPressed(buttonEvent -> System.out.println("Knob pressed"))              // Handler (triggered when the center knob was pressed)
-                        .onButtonReleased(buttonEvent -> System.out.println("Knob released"))            // Handler (triggered when the center knob was released)
+                        .onButtonPressed(new EventHandler<ButtonEvent>() {
+                            @Override public void handle(ButtonEvent buttonEvent) {System.out.println("Knob pressed");}
+                        })              // Handler (triggered when the center knob was pressed)
+                        .onButtonReleased(new EventHandler<ButtonEvent>() {
+                            @Override public void handle(ButtonEvent buttonEvent) {System.out.println("Knob released");}
+                        })            // Handler (triggered when the center knob was released)
                         // Related to Threshold
                         .thresholdVisible(false)                                                         // Should threshold indicator be visible
                         .threshold(50)                                                                   // Value of threshold
                         .thresholdColor(Color.RED)                                                       // Color of threshold indicator
                         .checkThreshold(false)                                                           // Should each value be checked against threshold
-                        .onThresholdExceeded(thresholdEvent -> System.out.println("Threshold exceeded")) // Handler (triggered if checkThreshold==true and the threshold is exceeded)
-                        .onThresholdUnderrun(thresholdEvent -> System.out.println("Threshold underrun")) // Handler (triggered if checkThreshold==true and the threshold is underrun)
+                        .onThresholdExceeded(new EventHandler<ThresholdEvent>() {
+                            @Override public void handle(ThresholdEvent thresholdEvent) {System.out.println("Threshold exceeded");}
+                        }) // Handler (triggered if checkThreshold==true and the threshold is exceeded)
+                        .onThresholdUnderrun(new EventHandler<ThresholdEvent>() {
+                            @Override public void handle(ThresholdEvent thresholdEvent) {System.out.println("Threshold underrun");}
+                        }) // Handler (triggered if checkThreshold==true and the threshold is underrun)
                         // Related to Gradient Bar
                         .gradientBarEnabled(false)                                                       // Should gradient filled bar be visible to visualize a range
                         .gradientBarStops(new Stop(0.0, Color.BLUE),                                     // Color gradient that will be use to color fill bar
@@ -209,11 +241,15 @@ public class GaugeDemo extends Application {
                         // Related to Value
                         .animated(false)                                                                 // Should needle be animated
                         .animationDuration(500)                                                          // Speed of needle in milliseconds (10 - 10000 ms)
-                        .onValueChanged(o -> System.out.println(((DoubleProperty) o).get()))             // InvalidationListener (triggered each time the value changed)
+                        .onValueChanged(new InvalidationListener() {
+                            @Override public void invalidated(Observable o) {System.out.println(((DoubleProperty) o).get());}
+                        })             // InvalidationListener (triggered each time the value changed)
                         .build();
 
         button = new Button("Set Value");
-        button.setOnMousePressed(event -> gauge.setValue(RND.nextDouble() * gauge.getRange() + gauge.getMinValue()));
+        button.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent event) {gauge.setValue(RND.nextDouble() * gauge.getRange() + gauge.getMinValue());}
+        });
     }
 
     @Override public void start(Stage stage) {

@@ -19,29 +19,35 @@ package eu.hansolo.medusa.demos;
 import eu.hansolo.medusa.FGauge;
 import eu.hansolo.medusa.FGaugeBuilder;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Gauge.ButtonEvent;
 import eu.hansolo.medusa.Gauge.KnobType;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
+import eu.hansolo.medusa.Gauge.ThresholdEvent;
 import eu.hansolo.medusa.GaugeBuilder;
 import eu.hansolo.medusa.GaugeDesign;
 import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.LcdFont;
 import eu.hansolo.medusa.Marker;
+import eu.hansolo.medusa.Marker.MarkerEvent;
 import eu.hansolo.medusa.Marker.MarkerType;
 import eu.hansolo.medusa.MarkerBuilder;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.Section.SectionEvent;
 import eu.hansolo.medusa.SectionBuilder;
 import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TickMarkType;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
@@ -73,16 +79,24 @@ public class FGaugeDemo extends Application {
                                          .start(50)
                                          .stop(75)
                                          .color(Color.rgb(255, 200, 0, 0.7))
-                                         .onSectionEntered(sectionEvent -> System.out.println("Entered Section 1"))
-                                         .onSectionLeft(sectionEvent -> System.out.println("Left Section 1"))
+                                         .onSectionEntered(new EventHandler<SectionEvent>() {
+                                             @Override public void handle(SectionEvent sectionEvent) {System.out.println("Entered Section 1");}
+                                         })
+                                         .onSectionLeft(new EventHandler<SectionEvent>() {
+                                             @Override public void handle(SectionEvent sectionEvent) {System.out.println("Left Section 1");}
+                                         })
                                          .build();
 
         Section section2 = SectionBuilder.create()
                                          .start(75)
                                          .stop(100)
                                          .color(Color.rgb(255, 0, 0, 0.7))
-                                         .onSectionEntered(sectionEvent -> System.out.println("Entered Section 2"))
-                                         .onSectionLeft(sectionEvent -> System.out.println("Left Section 2"))
+                                         .onSectionEntered(new EventHandler<SectionEvent>() {
+                                             @Override public void handle(SectionEvent sectionEvent) {System.out.println("Entered Section 2");}
+                                         })
+                                         .onSectionLeft(new EventHandler<SectionEvent>() {
+                                             @Override public void handle(SectionEvent sectionEvent) {System.out.println("Left Section 2");}
+                                         })
                                          .build();
 
         /**
@@ -101,8 +115,12 @@ public class FGaugeDemo extends Application {
                                       .text("Marker 1")
                                       .color(Color.HOTPINK)
                                       .markerType(MarkerType.DOT)
-                                      .onMarkerPressed(markerEvent -> System.out.println("Marker 1 pressed"))
-                                      .onMarkerReleased(markerEvent -> System.out.println("Marker 1 released"))
+                                      .onMarkerPressed(new EventHandler<MarkerEvent>() {
+                                          @Override public void handle(MarkerEvent markerEvent) {System.out.println("Marker 1 pressed");}
+                                      })
+                                      .onMarkerReleased(new EventHandler<MarkerEvent>() {
+                                          @Override public void handle(MarkerEvent markerEvent) {System.out.println("Marker 1 released");}
+                                      })
                                       .build();
 
         Marker marker2 = MarkerBuilder.create()
@@ -110,8 +128,12 @@ public class FGaugeDemo extends Application {
                                       .text("Marker 2")
                                       .color(Color.CYAN)
                                       .markerType(MarkerType.STANDARD)
-                                      .onMarkerPressed(markerEvent -> System.out.println("Marker 2 pressed"))
-                                      .onMarkerReleased(markerEvent -> System.out.println("Marker 2 released"))
+                                      .onMarkerPressed(new EventHandler<MarkerEvent>() {
+                                          @Override public void handle(MarkerEvent markerEvent) {System.out.println("Marker 2 pressed");}
+                                      })
+                                      .onMarkerReleased(new EventHandler<MarkerEvent>() {
+                                          @Override public void handle(MarkerEvent markerEvent) {System.out.println("Marker 2 released");}
+                                      })
                                       .build();
 
         /**
@@ -176,15 +198,23 @@ public class FGaugeDemo extends Application {
                             .knobType(KnobType.METAL)                                                           // Defines the type for the center knob (STANDARD, PLAIN, METAL, FLAT)
                             .knobColor(Color.LIGHTGRAY)                                                         // Defines the color that should be used for the center knob
                             .interactive(false)                                                                 // Defines if it should be possible to press the center knob
-                            .onButtonPressed(buttonEvent -> System.out.println("Knob pressed"))                 // Defines a handler that will be triggered when the center knob was pressed
-                            .onButtonReleased(buttonEvent -> System.out.println("Knob released"))               // Defines a handler that will be triggered when the center knob was released
+                            .onButtonPressed(new EventHandler<ButtonEvent>() {
+                                @Override public void handle(ButtonEvent buttonEvent) {System.out.println("Knob pressed");}
+                            })                 // Defines a handler that will be triggered when the center knob was pressed
+                            .onButtonReleased(new EventHandler<ButtonEvent>() {
+                                @Override public void handle(ButtonEvent buttonEvent) {System.out.println("Knob released");}
+                            })               // Defines a handler that will be triggered when the center knob was released
                             // Related to Threshold
                             .thresholdVisible(true)                                                            // Defines if the threshold indicator should be visible
                             .threshold(50)                                                                      // Defines the value for the threshold
                             .thresholdColor(Color.RED)                                                          // Defines the color for the threshold
                             .checkThreshold(true)                                                              // Defines if each value should be checked against the threshold
-                            .onThresholdExceeded(thresholdEvent -> System.out.println("Threshold exceeded"))    // Defines a handler that will be triggered if checkThreshold==true and the threshold is exceeded
-                            .onThresholdUnderrun(thresholdEvent -> System.out.println("Threshold underrun"))    // Defines a handler that will be triggered if checkThreshold==true and the threshold is underrun
+                            .onThresholdExceeded(new EventHandler<ThresholdEvent>() {
+                                @Override public void handle(ThresholdEvent thresholdEvent) {System.out.println("Threshold exceeded");}
+                            })    // Defines a handler that will be triggered if checkThreshold==true and the threshold is exceeded
+                            .onThresholdUnderrun(new EventHandler<ThresholdEvent>() {
+                                @Override public void handle(ThresholdEvent thresholdEvent) {System.out.println("Threshold underrun");}
+                            })    // Defines a handler that will be triggered if checkThreshold==true and the threshold is underrun
                             // Related to Gradient Bar
                             .gradientBarEnabled(true)                                                         // Defines if a gradient filled bar should be visible to visualize a range
                             .gradientBarStops(new Stop(0.0, Color.BLUE),// Defines a conical color gradient that will be use to color the gradient bar
@@ -234,7 +264,9 @@ public class FGaugeDemo extends Application {
             .build();
 
         button = new Button("Set Value");
-        button.setOnMousePressed(event -> gauge.setValue(RND.nextDouble() * gauge.getRange() + gauge.getMinValue()));
+        button.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent event) {gauge.setValue(RND.nextDouble() * gauge.getRange() + gauge.getMinValue());}
+        });
     }
 
     @Override public void start(Stage stage) {

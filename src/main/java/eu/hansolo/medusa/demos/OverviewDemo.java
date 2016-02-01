@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Clock.ClockSkinType;
 import eu.hansolo.medusa.ClockBuilder;
 import eu.hansolo.medusa.FGauge;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Gauge.ButtonEvent;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
@@ -39,6 +40,7 @@ import eu.hansolo.medusa.TimeSection;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -286,8 +288,12 @@ public class OverviewDemo extends Application {
                              .buttonTooltipText("Test")
                              .needleSize(NeedleSize.THIN)
                              .tickLabelLocation(TickLabelLocation.OUTSIDE)
-                             .onButtonPressed(event -> System.out.println("Button pressed"))
-                             .onButtonReleased(event -> System.out.println("Button released"))
+                             .onButtonPressed(new EventHandler<ButtonEvent>() {
+                                 @Override public void handle(ButtonEvent event) {System.out.println("Button pressed");}
+                             })
+                             .onButtonReleased(new EventHandler<ButtonEvent>() {
+                                 @Override public void handle(ButtonEvent event) {System.out.println("Button released");}
+                             })
                              .scaleDirection(ScaleDirection.COUNTER_CLOCKWISE)
                              .sectionsVisible(true)
                              .sections(new Section(0, 1, Color.rgb(200, 150, 0, 0.5)))

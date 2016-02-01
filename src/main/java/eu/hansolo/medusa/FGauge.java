@@ -18,6 +18,8 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import eu.hansolo.medusa.skins.GaugeSkin;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.scene.control.Skin;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.InnerShadow;
@@ -107,8 +109,12 @@ public class FGauge extends Region {
     }
 
     private void registerListeners() {
-        widthProperty().addListener(o -> redraw());
-        heightProperty().addListener(o -> redraw());
+        widthProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {FGauge.this.redraw();}
+        });
+        heightProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {FGauge.this.redraw();}
+        });
     }
 
 

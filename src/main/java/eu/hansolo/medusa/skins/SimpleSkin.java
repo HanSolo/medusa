@@ -19,7 +19,11 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.events.UpdateEvent;
+import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
@@ -161,12 +165,23 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().getSections().addListener((ListChangeListener<Section>) change -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(event -> handleEvents(event.eventType.name()));
-
-        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle(getSkinnable().getCurrentValue()));
+        getSkinnable().widthProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {SimpleSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().heightProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {SimpleSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().getSections().addListener((ListChangeListener<Section>) new ListChangeListener<Section>() {
+            @Override public void onChanged(Change<? extends Section> change) {SimpleSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().setOnUpdate(new UpdateEventListener() {
+            @Override public void onUpdateEvent(UpdateEvent event) {SimpleSkin.this.handleEvents(event.eventType.name());}
+        });
+        getSkinnable().currentValueProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable observable) {
+                rotateNeedle(getSkinnable().getCurrentValue());
+            }
+        });
     }
 
 

@@ -20,7 +20,11 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.events.UpdateEvent;
+import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
@@ -152,15 +156,31 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().getSections().addListener((ListChangeListener<Section>) c -> redraw());
-        getSkinnable().getTickMarkSections().addListener((ListChangeListener<Section>) c -> redraw());
-        getSkinnable().getTickLabelSections().addListener((ListChangeListener<Section>) c -> redraw());
-        getSkinnable().getMarkers().addListener((ListChangeListener<Marker>) c -> redraw());
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
+        getSkinnable().widthProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {BulletChartSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().heightProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {BulletChartSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().getSections().addListener((ListChangeListener<Section>) new ListChangeListener<Section>() {
+            @Override public void onChanged(Change<? extends Section> c) {BulletChartSkin.this.redraw();}
+        });
+        getSkinnable().getTickMarkSections().addListener((ListChangeListener<Section>) new ListChangeListener<Section>() {
+            @Override public void onChanged(Change<? extends Section> c) {BulletChartSkin.this.redraw();}
+        });
+        getSkinnable().getTickLabelSections().addListener((ListChangeListener<Section>) new ListChangeListener<Section>() {
+            @Override public void onChanged(Change<? extends Section> c) {BulletChartSkin.this.redraw();}
+        });
+        getSkinnable().getMarkers().addListener((ListChangeListener<Marker>) new ListChangeListener<Marker>() {
+            @Override public void onChanged(Change<? extends Marker> c) {BulletChartSkin.this.redraw();}
+        });
+        getSkinnable().setOnUpdate(new UpdateEventListener() {
+            @Override public void onUpdateEvent(UpdateEvent e) {BulletChartSkin.this.handleEvents(e.eventType.name());}
+        });
 
-        getSkinnable().currentValueProperty().addListener(o -> updateBar());
+        getSkinnable().currentValueProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {BulletChartSkin.this.updateBar();}
+        });
     }
 
 

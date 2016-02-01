@@ -250,7 +250,9 @@ public class Marker implements Comparable<Marker>{
             HANDLER = null;
         }
         if (null == HANDLER) return;
-        Platform.runLater(() -> HANDLER.handle(EVENT));
+        Platform.runLater(new Runnable() {
+            @Override public void run() {HANDLER.handle(EVENT);}
+        });
     }
 
 

@@ -21,7 +21,11 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.LcdFont;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.events.UpdateEvent;
+import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
@@ -254,10 +258,18 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(e -> handleEvents("REDRAW"));
+        getSkinnable().widthProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {LcdSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().heightProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {LcdSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().setOnUpdate(new UpdateEventListener() {
+            @Override public void onUpdateEvent(UpdateEvent e) {LcdSkin.this.handleEvents(e.eventType.name());}
+        });
+        getSkinnable().currentValueProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable e) {LcdSkin.this.handleEvents("REDRAW");}
+        });
     }
 
 

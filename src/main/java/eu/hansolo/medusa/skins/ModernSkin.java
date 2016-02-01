@@ -21,7 +21,11 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ButtonEvent;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelOrientation;
+import eu.hansolo.medusa.events.UpdateEvent;
+import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -116,7 +120,9 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleStep     = ANGLE_RANGE / (gauge.getRange());
-        mouseHandler  = event -> handleMouseEvent(event);
+        mouseHandler  = new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent event) {ModernSkin.this.handleMouseEvent(event);}
+        };
         buttonTooltip = new Tooltip();
         formatString  = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
@@ -253,16 +259,32 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().animatedProperty().addListener(o -> handleEvents("ANIMATED"));
-        getSkinnable().getSections().addListener((ListChangeListener<Section>) change -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().setOnButtonPressed(e -> handleButtonEvent(e));
-        getSkinnable().setOnButtonReleased(e -> handleButtonEvent(e));
-
-        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle(getSkinnable().getCurrentValue()));
-
+        getSkinnable().widthProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {ModernSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().heightProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {ModernSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().animatedProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {ModernSkin.this.handleEvents("ANIMATED");}
+        });
+        getSkinnable().getSections().addListener((ListChangeListener<Section>) new ListChangeListener<Section>() {
+            @Override public void onChanged(Change<? extends Section> change) {ModernSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().setOnUpdate(new UpdateEventListener() {
+            @Override public void onUpdateEvent(UpdateEvent e) {ModernSkin.this.handleEvents(e.eventType.name());}
+        });
+        getSkinnable().setOnButtonPressed(new EventHandler<ButtonEvent>() {
+            @Override public void handle(ButtonEvent e) {ModernSkin.this.handleButtonEvent(e);}
+        });
+        getSkinnable().setOnButtonReleased(new EventHandler<ButtonEvent>() {
+            @Override public void handle(ButtonEvent e) {ModernSkin.this.handleButtonEvent(e);}
+        });
+        getSkinnable().currentValueProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable observable) {
+                rotateNeedle(getSkinnable().getCurrentValue());
+            }
+        });
         handleEvents("INTERACTIVITY");
     }
 

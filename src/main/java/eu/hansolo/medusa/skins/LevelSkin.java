@@ -19,7 +19,11 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.events.UpdateEvent;
+import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
@@ -178,11 +182,19 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
+        getSkinnable().widthProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {LevelSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().heightProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {LevelSkin.this.handleEvents("RESIZE");}
+        });
 
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(e -> setBar(getSkinnable().getCurrentValue()));
+        getSkinnable().setOnUpdate(new UpdateEventListener() {
+            @Override public void onUpdateEvent(UpdateEvent e) {LevelSkin.this.handleEvents(e.eventType.name());}
+        });
+        getSkinnable().currentValueProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable e) {LevelSkin.this.setBar(getSkinnable().getCurrentValue());}
+        });
 
         handleEvents("VISIBILITY");
     }

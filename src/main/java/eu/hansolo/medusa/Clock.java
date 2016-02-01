@@ -834,18 +834,20 @@ public class Clock extends Control {
         }
     }
 
-    private void tick() { Platform.runLater(() -> {
-        setTime(getTime().plus(Duration.ofMillis(updateInterval)));
-        LocalDateTime now = time.get();
-        if (isAlarmsEnabled()) checkAlarms(now);
-        if (isAutoNightMode()) checkForNight(now);
-        if (getCheckSectionsForValue()) {
-            int listSize = sections.size();
-            for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(LocalTime.from(now)); }
-        }
-        if (getCheckAreasForValue()) {
-            int listSize = areas.size();
-            for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(LocalTime.from(now)); }
+    private void tick() { Platform.runLater(new Runnable() {
+        @Override public void run() {
+            Clock.this.setTime(getTime().plus(Duration.ofMillis(updateInterval)));
+            LocalDateTime now = time.get();
+            if (Clock.this.isAlarmsEnabled()) Clock.this.checkAlarms(now);
+            if (Clock.this.isAutoNightMode()) Clock.this.checkForNight(now);
+            if (Clock.this.getCheckSectionsForValue()) {
+                int listSize = sections.size();
+                for (int i = 0; i < listSize; i++) { sections.get(i).checkForValue(LocalTime.from(now)); }
+            }
+            if (Clock.this.getCheckAreasForValue()) {
+                int listSize = areas.size();
+                for (int i = 0; i < listSize; i++) { areas.get(i).checkForValue(LocalTime.from(now)); }
+            }
         }
     }); }
 
@@ -862,14 +864,20 @@ public class Clock extends Control {
 
         updateInterval   = (isDiscreteMinutes() && isDiscreteSeconds()) ? LONG_INTERVAL : SHORT_INTERVAL;
 
-        periodicTickTask = periodicTickExecutorService.scheduleAtFixedRate(() -> tick(), 0, updateInterval, TimeUnit.MILLISECONDS);
+        periodicTickTask = periodicTickExecutorService.scheduleAtFixedRate(new Runnable() {
+            @Override public void run() {
+                Clock.this.tick();
+            }
+        }, 0, updateInterval, TimeUnit.MILLISECONDS);
     }
 
     private static ThreadFactory getThreadFactory(final String THREAD_NAME, final boolean IS_DAEMON) {
-        return runnable -> {
-            Thread thread = new Thread(runnable, THREAD_NAME);
-            thread.setDaemon(IS_DAEMON);
-            return thread;
+        return new ThreadFactory() {
+            @Override public Thread newThread(Runnable runnable) {
+                Thread thread = new Thread(runnable, THREAD_NAME);
+                thread.setDaemon(IS_DAEMON);
+                return thread;
+            }
         };
     }
 

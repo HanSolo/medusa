@@ -26,8 +26,12 @@ import eu.hansolo.medusa.TickMarkType;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.events.UpdateEvent;
+import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.tools.AngleConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -160,7 +164,9 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         sections     = gauge.getSections();
         areas        = gauge.getAreas();
-        mouseHandler = event -> handleMouseEvent(event);
+        mouseHandler = new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent event) {QuarterSkin.this.handleMouseEvent(event);}
+        };
         updateMarkers();
 
         init();
@@ -283,15 +289,25 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().getMarkers().addListener((ListChangeListener<Marker>) c -> {
-            updateMarkers();
-            redraw();
+        getSkinnable().widthProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {QuarterSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().heightProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {QuarterSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().getMarkers().addListener((ListChangeListener<Marker>) new ListChangeListener<Marker>() {
+            @Override public void onChanged(Change<? extends Marker> c) {
+                QuarterSkin.this.updateMarkers();
+                QuarterSkin.this.redraw();
+            }
         });
 
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle(getSkinnable().getCurrentValue()));
+        getSkinnable().setOnUpdate(new UpdateEventListener() {
+            @Override public void onUpdateEvent(UpdateEvent e) {QuarterSkin.this.handleEvents(e.eventType.name());}
+        });
+        getSkinnable().currentValueProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable e) {QuarterSkin.this.rotateNeedle(getSkinnable().getCurrentValue());}
+        });
 
         handleEvents("INTERACTIVITY");
         handleEvents("VISIBILITY");
@@ -1032,7 +1048,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
         if (getSkinnable().getMarkersVisible()) {
             for (Map.Entry<Marker, Shape> entry : markerMap.entrySet()) {
-                Marker marker = entry.getKey();
+                final Marker marker = entry.getKey();
                 Shape  shape  = entry.getValue();
                 double valueAngle;
                 if (ScaleDirection.CLOCKWISE == scaleDirection) {
@@ -1129,8 +1145,12 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 }
                 markerTooltip.setTextAlignment(TextAlignment.CENTER);
                 Tooltip.install(shape, markerTooltip);
-                shape.setOnMousePressed(e -> marker.fireMarkerEvent(marker.MARKER_PRESSED_EVENT));
-                shape.setOnMouseReleased(e -> marker.fireMarkerEvent(marker.MARKER_RELEASED_EVENT));
+                shape.setOnMousePressed(new EventHandler<MouseEvent>() {
+                    @Override public void handle(MouseEvent e) {marker.fireMarkerEvent(marker.MARKER_PRESSED_EVENT);}
+                });
+                shape.setOnMouseReleased(new EventHandler<MouseEvent>() {
+                    @Override public void handle(MouseEvent e) {marker.fireMarkerEvent(marker.MARKER_RELEASED_EVENT);}
+                });
             }
         }
 

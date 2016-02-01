@@ -159,10 +159,12 @@ public class Helper {
     }
 
     public static final ThreadFactory getThreadFactory(final String THREAD_NAME, final boolean IS_DAEMON) {
-        return runnable -> {
-            Thread thread = new Thread(runnable, THREAD_NAME);
-            thread.setDaemon(IS_DAEMON);
-            return thread;
+        return new ThreadFactory() {
+            @Override public Thread newThread(Runnable runnable) {
+                Thread thread = new Thread(runnable, THREAD_NAME);
+                thread.setDaemon(IS_DAEMON);
+                return thread;
+            }
         };
     }
 

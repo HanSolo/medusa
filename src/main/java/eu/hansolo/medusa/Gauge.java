@@ -30,6 +30,7 @@ import javafx.animation.Timeline;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
@@ -493,14 +494,16 @@ public class Gauge extends Control {
         originalThreshold                 = Double.MAX_VALUE;
         lastCall                          = Instant.now();
         timeline                          = new Timeline();
-        timeline.setOnFinished(e -> {
-            if (isReturnToZero() && Double.compare(currentValue.get(), 0d) != 0d) {
-                final KeyValue KEY_VALUE2 = new KeyValue(value, 0, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
-                final KeyFrame KEY_FRAME2 = new KeyFrame(Duration.millis((long) (0.8 * getAnimationDuration())), KEY_VALUE2);
-                timeline.getKeyFrames().setAll(KEY_FRAME2);
-                timeline.play();
+        timeline.setOnFinished(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                if (Gauge.this.isReturnToZero() && Double.compare(currentValue.get(), 0d) != 0d) {
+                    final KeyValue KEY_VALUE2 = new KeyValue(value, 0, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
+                    final KeyFrame KEY_FRAME2 = new KeyFrame(Duration.millis((long) (0.8 * Gauge.this.getAnimationDuration())), KEY_VALUE2);
+                    timeline.getKeyFrames().setAll(KEY_FRAME2);
+                    timeline.play();
+                }
+                Gauge.this.fireUpdateEvent(FINISHED_EVENT);
             }
-            fireUpdateEvent(FINISHED_EVENT);
         });
     }
 

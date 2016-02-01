@@ -21,7 +21,11 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelOrientation;
+import eu.hansolo.medusa.events.UpdateEvent;
+import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -223,14 +227,26 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().getSections().addListener((ListChangeListener<Section>) c -> redraw());
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
+        getSkinnable().widthProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {AmpSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().heightProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {AmpSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().getSections().addListener((ListChangeListener<Section>) new ListChangeListener<Section>() {
+            @Override public void onChanged(Change<? extends Section> c) {AmpSkin.this.redraw();}
+        });
+        getSkinnable().setOnUpdate(new UpdateEventListener() {
+            @Override public void onUpdateEvent(UpdateEvent e) {AmpSkin.this.handleEvents(e.eventType.name());}
+        });
 
-        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle());
+        getSkinnable().currentValueProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable e) {AmpSkin.this.rotateNeedle();}
+        });
 
-        needleRotate.angleProperty().addListener(observable -> handleEvents("ANGLE"));
+        needleRotate.angleProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable observable) {AmpSkin.this.handleEvents("ANGLE");}
+        });
     }
 
 

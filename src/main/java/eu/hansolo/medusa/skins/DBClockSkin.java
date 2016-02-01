@@ -19,7 +19,11 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.TimeSection;
+import eu.hansolo.medusa.events.UpdateEvent;
+import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.CacheHint;
@@ -175,10 +179,18 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
+        getSkinnable().widthProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {DBClockSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().heightProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {DBClockSkin.this.handleEvents("RESIZE");}
+        });
+        getSkinnable().setOnUpdate(new UpdateEventListener() {
+            @Override public void onUpdateEvent(UpdateEvent e) {DBClockSkin.this.handleEvents(e.eventType.name());}
+        });
+        getSkinnable().timeProperty().addListener(new InvalidationListener() {
+            @Override public void invalidated(Observable o) {DBClockSkin.this.updateTime(getSkinnable().getTime());}
+        });
     }
 
 
