@@ -50,7 +50,6 @@ public class Test extends Application {
     private static final Random         RND = new Random();
     private static       int            noOfNodes = 0;
     private              Gauge          gauge;
-    private              Clock          clock;
     private              long           lastTimerCall;
     private              AnimationTimer timer;
 
