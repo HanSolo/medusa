@@ -53,7 +53,9 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
@@ -146,6 +148,8 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         second.setFillRule(FillRule.EVEN_ODD);
         second.setStroke(null);
         second.getTransforms().setAll(secondRotate);
+        second.setVisible(getSkinnable().isSecondsVisible());
+        second.setManaged(getSkinnable().isSecondsVisible());
 
         dropShadow = new DropShadow();
         dropShadow.setColor(Color.rgb(0, 0, 0, 0.25));
@@ -184,7 +188,10 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
+        //getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
+        getSkinnable().currentTimeProperty().addListener(o ->
+             updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())))
+        );
     }
 
 
@@ -204,6 +211,8 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             dateText.setManaged(getSkinnable().isDateVisible());
             dateNumber.setVisible(getSkinnable().isDateVisible());
             dateNumber.setManaged(getSkinnable().isDateVisible());
+            second.setVisible(getSkinnable().isSecondsVisible());
+            second.setManaged(getSkinnable().isSecondsVisible());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = getSkinnable().getSections();
             areas    = getSkinnable().getAreas();
@@ -216,12 +225,15 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private void drawTicks() {
         double  sinValue;
         double  cosValue;
-        double  startAngle          = 180;
-        double  angleStep           = 360 / 240 +0.5;
-        Point2D center              = new Point2D(size * 0.5, size * 0.5);
-        Color   hourTickMarkColor   = getSkinnable().getHourTickMarkColor();
-        Color   minuteTickMarkColor = getSkinnable().getMinuteTickMarkColor();
-        Font    font                = Fonts.robotoLight(size * 0.084);
+        double  startAngle             = 180;
+        double  angleStep              = 360 / 240 +0.5;
+        Point2D center                 = new Point2D(size * 0.5, size * 0.5);
+        Color   hourTickMarkColor      = getSkinnable().getHourTickMarkColor();
+        Color   minuteTickMarkColor    = getSkinnable().getMinuteTickMarkColor();
+        boolean hourTickMarksVisible   = getSkinnable().isHourTickMarksVisible();
+        boolean minuteTickMarksVisible = getSkinnable().isMinuteTickMarksVisible();
+        boolean tickLabelsVisible      = getSkinnable().isTickLabelsVisible();
+        Font    font                   = Fonts.robotoLight(size * 0.084);
         ticksAndSections.setLineCap(StrokeLineCap.BUTT);
         ticksAndSections.setFont(font);
         ticksAndSections.setLineWidth(size * 0.005);
@@ -236,26 +248,31 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             
             if (counter % 20 == 0) {
                 ticksAndSections.setStroke(hourTickMarkColor);
-                ticksAndSections.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
-
-                ticksAndSections.save();
-                ticksAndSections.translate(textPoint.getX(), textPoint.getY());
-
-                Helper.rotateContextForText(ticksAndSections, startAngle, angle, TickLabelOrientation.HORIZONTAL);
-                ticksAndSections.setTextAlign(TextAlignment.CENTER);
-                ticksAndSections.setTextBaseline(VPos.CENTER);
-                ticksAndSections.setFill(hourTickMarkColor);
-                if (counter == 0) {
-                    ticksAndSections.fillText("12", 0, 0);
-                } else {
-                    ticksAndSections.fillText(Integer.toString((int) (counter / 20)), 0, 0);
+                if (hourTickMarksVisible) {
+                    ticksAndSections.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
+                } else if (minuteTickMarksVisible) {
+                    ticksAndSections.strokeLine(innerMinutePoint.getX(), innerMinutePoint.getY(), outerPoint.getX(), outerPoint.getY());
                 }
+                if (tickLabelsVisible) {
+                    ticksAndSections.save();
+                    ticksAndSections.translate(textPoint.getX(), textPoint.getY());
 
-                ticksAndSections.restore();
-            } else if (counter % 4 == 0) {
+                    Helper.rotateContextForText(ticksAndSections, startAngle, angle, TickLabelOrientation.HORIZONTAL);
+                    ticksAndSections.setTextAlign(TextAlignment.CENTER);
+                    ticksAndSections.setTextBaseline(VPos.CENTER);
+                    ticksAndSections.setFill(hourTickMarkColor);
+                    if (counter == 0) {
+                        ticksAndSections.fillText("12", 0, 0);
+                    } else {
+                        ticksAndSections.fillText(Integer.toString((int) (counter / 20)), 0, 0);
+                    }
+
+                    ticksAndSections.restore();
+                }
+            } else if (counter % 4 == 0 && minuteTickMarksVisible) {
                 ticksAndSections.setStroke(minuteTickMarkColor);
                 ticksAndSections.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
-            } else if (counter % 1 == 0) {
+            } else if (counter % 1 == 0 && minuteTickMarksVisible) {
                 ticksAndSections.setStroke(minuteTickMarkColor);
                 ticksAndSections.strokeLine(innerMinutePoint.getX(), innerMinutePoint.getY(), outerPoint.getX(), outerPoint.getY());
             }
@@ -470,32 +487,40 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Resizing ******************************************
-    public void updateTime(final LocalDateTime TIME) {
+    public void updateTime(final ZonedDateTime TIME) {
         if (getSkinnable().isDiscreteMinutes()) {
             minuteRotate.setAngle(TIME.getMinute() * 6);
         } else {
             minuteRotate.setAngle(TIME.getMinute() * 6 + TIME.getSecond() * 0.1);
         }
 
-        if (getSkinnable().isDiscreteSeconds()) {
-            secondRotate.setAngle(TIME.getSecond() * 6);
-        } else {
-            secondRotate.setAngle(TIME.getSecond() * 6 + TIME.get(ChronoField.MILLI_OF_SECOND) * 0.006);
+        if (second.isVisible()) {
+            if (getSkinnable().isDiscreteSeconds()) {
+                secondRotate.setAngle(TIME.getSecond() * 6);
+            } else {
+                secondRotate.setAngle(TIME.getSecond() * 6 + TIME.get(ChronoField.MILLI_OF_SECOND) * 0.006);
+            }
         }
 
         hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
 
-        text.setText(TIME_FORMATTER.format(TIME));
-        Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
-        text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
+        if (text.isVisible()) {
+            text.setText(TIME_FORMATTER.format(TIME));
+            Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
+            text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
+        }
 
-        dateText.setText(DATE_TEXT_FORMATER.format(TIME).toUpperCase());
-        Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
-        dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.4), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
+        if (dateText.isVisible()) {
+            dateText.setText(DATE_TEXT_FORMATER.format(TIME).toUpperCase());
+            Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
+            dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.4), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
+        }
 
-        dateNumber.setText(DATE_NUMBER_FORMATER.format(TIME).toUpperCase());
-        Helper.adjustTextSize(dateNumber, 0.3 * size, size * 0.05);
-        dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.51), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
+        if (dateNumber.isVisible()) {
+            dateNumber.setText(DATE_NUMBER_FORMATER.format(TIME).toUpperCase());
+            Helper.adjustTextSize(dateNumber, 0.3 * size, size * 0.05);
+            dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.51), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
+        }
     }
 
     private void resize() {
@@ -567,7 +592,7 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         ticksAndSectionsCanvas.setCache(true);
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
-        LocalDateTime time = getSkinnable().getTime();
+        ZonedDateTime time = getSkinnable().getTime();
 
         updateTime(time);
 

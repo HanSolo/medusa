@@ -25,7 +25,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 
 
@@ -45,8 +45,8 @@ public class AlarmBuilder<B extends AlarmBuilder<B>> {
         return new AlarmBuilder();
     }
 
-    public final B time(final LocalDateTime DATE_TIME) {
-        properties.put("time", new SimpleObjectProperty<LocalDateTime>(DATE_TIME));
+    public final B time(final ZonedDateTime DATE_TIME) {
+        properties.put("time", new SimpleObjectProperty<ZonedDateTime>(DATE_TIME));
         return (B)this;
     }
 
@@ -74,7 +74,7 @@ public class AlarmBuilder<B extends AlarmBuilder<B>> {
         final Alarm ALARM = new Alarm();
         for (String key : properties.keySet()) {
             if ("time".equals(key)) {
-                ALARM.setTime(((ObjectProperty<LocalDateTime>) properties.get(key)).get());
+                ALARM.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
             } else if("repetition".equals(key)) {
                 ALARM.setRepetition(((ObjectProperty<Repetition>) properties.get(key)).get());
             } else if("text".equals(key)) {

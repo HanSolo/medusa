@@ -20,10 +20,12 @@ import eu.hansolo.medusa.Clock.ClockSkinType;
 import eu.hansolo.medusa.events.AlarmEventListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -31,7 +33,7 @@ import javafx.geometry.Dimension2D;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -58,7 +60,7 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B) this;
     }
 
-    public final B time(final LocalDateTime TIME) {
+    public final B time(final ZonedDateTime TIME) {
         properties.put("time", new SimpleObjectProperty<>(TIME));
         return (B)this;
     }
@@ -198,6 +200,21 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B)this;
     }
 
+    public final B hourTickMarksVisible(final boolean VISIBLE) {
+        properties.put("hourTickMarksVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B minuteTickMarksVisible(final boolean VISIBLE) {
+        properties.put("minuteTickMarksVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B tickLabelsVisible(final boolean VISIBLE) {
+        properties.put("tickLabelsVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B hourNeedleColor(final Color COLOR) {
         properties.put("hourNeedleColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -260,6 +277,16 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
 
     public final B locale(final Locale LOCALE) {
         properties.put("locale", new SimpleObjectProperty<>(LOCALE));
+        return (B)this;
+    }
+
+    public final B animated(final boolean ANIMATED) {
+        properties.put("animated", new SimpleBooleanProperty(ANIMATED));
+        return (B)this;
+    }
+
+    public final B animationDuration(final long DURATION) {
+        properties.put("animationDuration", new SimpleLongProperty(DURATION));
         return (B)this;
     }
 
@@ -378,6 +405,9 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setSecondNeedleColor(Color.rgb(167, 0, 0));
                     CONTROL.setSecondsVisible(true);
                     break;
+                case FAT:
+                    CONTROL.setDiscreteMinutes(true);
+                    break;
             }
         } else {
             CONTROL = new Clock();
@@ -444,7 +474,7 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.getStyleClass().setAll("gauge");
                 CONTROL.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
             } else if ("time".equals(key)) {
-                CONTROL.setTime(((ObjectProperty<LocalDateTime>) properties.get(key)).get());
+                CONTROL.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
             } else if ("title".equals(key)) {
                 CONTROL.setTitle(((StringProperty) properties.get(key)).get());
             } else if ("text".equals(key)) {
@@ -491,6 +521,12 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setHourTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("minuteTickMarkColor".equals(key)) {
                 CONTROL.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("hourTickMarksVisible".equals(key)) {
+                CONTROL.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("minuteTickMarksVisible".equals(key)) {
+                CONTROL.setMinuteTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("tickLabelsVisible".equals(key)) {
+                CONTROL.setTickLabelsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("hourNeedleColor".equals(key)) {
                 CONTROL.setHourNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("minuteNeedleColor".equals(key)) {
@@ -513,6 +549,10 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setLcdFont(((ObjectProperty<LcdFont>) properties.get(key)).get());
             } else if ("locale".equals(key)) {
                 CONTROL.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
+            } else if("animated".equals(key)) {
+                CONTROL.setAnimated(((BooleanProperty) properties.get(key)).get());
+            } else if("animationDuration".equals(key)) {
+                CONTROL.setAnimationDuration(((LongProperty) properties.get(key)).get());
             }
         }
         return CONTROL;

@@ -22,7 +22,12 @@ import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEvent.EventType;
 import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.skins.*;
+import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.TimeSectionComparator;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -33,7 +38,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +57,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -62,7 +67,8 @@ public class Clock extends Control {
     private        final UpdateEvent          VISIBILITY_EVENT = new UpdateEvent(Clock.this, EventType.VISIBILITY);
     private        final UpdateEvent          LCD_EVENT        = new UpdateEvent(Clock.this, EventType.LCD);
     private        final UpdateEvent          RECALC_EVENT     = new UpdateEvent(Clock.this, EventType.RECALC);
-    private        final UpdateEvent          SECTION_EVENT        = new UpdateEvent(Clock.this, UpdateEvent.EventType.SECTION);
+    private        final UpdateEvent          SECTION_EVENT    = new UpdateEvent(Clock.this, UpdateEvent.EventType.SECTION);
+    private        final UpdateEvent          FINISHED_EVENT   = new UpdateEvent(Clock.this, UpdateEvent.EventType.FINISHED);
 
     private volatile ScheduledFuture<?>       periodicTickTask;
     private static   ScheduledExecutorService periodicTickExecutorService;
@@ -71,7 +77,9 @@ public class Clock extends Control {
     private List<UpdateEventListener>         listenerList      = new CopyOnWriteArrayList();
     private List<AlarmEventListener>          alarmListenerList = new CopyOnWriteArrayList();
 
-    private ObjectProperty<LocalDateTime>     time;
+    private ObjectProperty<ZonedDateTime>     time;
+    private LongProperty                      currentTime;
+    private Timeline                          timeline;
     private int                               updateInterval;
     private ClockSkinType                     skinType;
     private String                            _title;
@@ -122,6 +130,12 @@ public class Clock extends Control {
     private ObjectProperty<Color>             hourTickMarkColor;
     private Color                             _minuteTickMarkColor;
     private ObjectProperty<Color>             minuteTickMarkColor;
+    private boolean                           _hourTickMarksVisible;
+    private BooleanProperty                   hourTickMarksVisible;
+    private boolean                           _minuteTickMarksVisible;
+    private BooleanProperty                   minuteTickMarksVisible;
+    private boolean                           _tickLabelsVisible;
+    private BooleanProperty                   tickLabelsVisible;
     private Color                             _hourNeedleColor;
     private ObjectProperty<Color>             hourNeedleColor;
     private Color                             _minuteNeedleColor;
@@ -146,71 +160,105 @@ public class Clock extends Control {
     private ObjectProperty<Locale>            locale;
     private TickLabelLocation                 _tickLabelLocation;
     private ObjectProperty<TickLabelLocation> tickLabelLocation;
+    private boolean                           _animated;
+    private BooleanProperty                   animated;
+    private long                              animationDuration;
 
 
     // ******************** Constructors **************************************
     public Clock() {
-        this(ClockSkinType.CLOCK, LocalDateTime.now());
+        this(ClockSkinType.CLOCK, ZonedDateTime.now());
     }
     public Clock(final ClockSkinType SKIN) {
-        this(SKIN, LocalDateTime.now());
+        this(SKIN, ZonedDateTime.now());
     }
-    public Clock(final LocalDateTime TIME) {
+    public Clock(final ZonedDateTime TIME) {
         this(ClockSkinType.CLOCK, TIME);
     }
-    public Clock(final ClockSkinType SKIN, final LocalDateTime TIME) {
+    public Clock(final ClockSkinType SKIN, final ZonedDateTime TIME) {
         skinType = SKIN;
         getStyleClass().add("clock");
 
         init(TIME);
     }
 
-    private void init(final LocalDateTime TIME) {
-        time                   = new SimpleObjectProperty<>(Clock.this, "time", TIME);
-        updateInterval         = LONG_INTERVAL;
-        _checkSectionsForValue = false;
-        _checkAreasForValue    = false;
-        sections               = FXCollections.observableArrayList();
-        _secondsVisible        = false;
-        areas                  = FXCollections.observableArrayList();
-        _areasVisible          = false;
-        _text                  = "";
-        _discreteSeconds       = true;
-        _discreteMinutes       = true;
-        _secondsVisible        = false;
-        _titleVisible          = false;
-        _textVisible           = false;
-        _dateVisible           = false;
-        _nightMode             = false;
-        _running               = false;
-        _autoNightMode         = false;
-        _backgroundPaint       = Color.TRANSPARENT;
-        _borderPaint           = Color.TRANSPARENT;
-        _foregroundPaint       = Color.TRANSPARENT;
-        _titleColor            = DARK_COLOR;
-        _textColor             = DARK_COLOR;
-        _dateColor             = DARK_COLOR;
-        _hourTickMarkColor     = DARK_COLOR;
-        _hourNeedleColor       = DARK_COLOR;
-        _minuteNeedleColor     = DARK_COLOR;
-        _secondNeedleColor     = DARK_COLOR;
-        _knobColor             = DARK_COLOR;
-        _lcdDesign             = LcdDesign.STANDARD;
-        _alarmsEnabled         = false;
-        alarms                 = FXCollections.observableArrayList();
-        alarmsToRemove         = new ArrayList<>();
-        _lcdCrystalEnabled     = false;
-        _shadowsEnabled        = false;
-        _lcdFont               = LcdFont.DIGITAL_BOLD;
-        _locale                = Locale.US;
-        _tickLabelLocation     = TickLabelLocation.INSIDE;
+    private void init(final ZonedDateTime TIME) {
+        time                    = new ObjectPropertyBase<ZonedDateTime>(TIME) {
+            @Override public void set(final ZonedDateTime TIME) {
+                super.set(TIME);
+
+                if (!isRunning() && isAnimated()) {
+                    long animationDuration = getAnimationDuration();
+                    timeline.stop();
+                    final KeyValue KEY_VALUE = new KeyValue(currentTime, TIME.toEpochSecond());
+                    final KeyFrame KEY_FRAME = new KeyFrame(javafx.util.Duration.millis(animationDuration), KEY_VALUE);
+                    timeline.getKeyFrames().setAll(KEY_FRAME);
+                    timeline.setOnFinished(e -> fireUpdateEvent(FINISHED_EVENT));
+                    timeline.play();
+                } else {
+                    currentTime.set(TIME.toEpochSecond());
+                    fireUpdateEvent(FINISHED_EVENT);
+                }
+            }
+            @Override public Object getBean() { return Clock.this; }
+            @Override public String getName() { return "time"; }
+        };
+        currentTime             = new SimpleLongProperty(Clock.this, "currentTime", time.get().toEpochSecond());
+        timeline                = new Timeline();
+        timeline.setOnFinished(e -> fireUpdateEvent(FINISHED_EVENT));
+        updateInterval          = LONG_INTERVAL;
+        _checkSectionsForValue  = false;
+        _checkAreasForValue     = false;
+        sections                = FXCollections.observableArrayList();
+        _secondsVisible         = false;
+        areas                   = FXCollections.observableArrayList();
+        _areasVisible           = false;
+        _text                   = "";
+        _discreteSeconds        = true;
+        _discreteMinutes        = true;
+        _secondsVisible         = false;
+        _titleVisible           = false;
+        _textVisible            = false;
+        _dateVisible            = false;
+        _nightMode              = false;
+        _running                = false;
+        _autoNightMode          = false;
+        _backgroundPaint        = Color.TRANSPARENT;
+        _borderPaint            = Color.TRANSPARENT;
+        _foregroundPaint        = Color.TRANSPARENT;
+        _titleColor             = DARK_COLOR;
+        _textColor              = DARK_COLOR;
+        _dateColor              = DARK_COLOR;
+        _hourTickMarkColor      = DARK_COLOR;
+        _minuteTickMarkColor    = DARK_COLOR;
+        _hourTickMarksVisible   = true;
+        _minuteTickMarksVisible = true;
+        _tickLabelsVisible      = true;
+        _hourNeedleColor        = DARK_COLOR;
+        _minuteNeedleColor      = DARK_COLOR;
+        _secondNeedleColor      = DARK_COLOR;
+        _knobColor              = DARK_COLOR;
+        _lcdDesign              = LcdDesign.STANDARD;
+        _alarmsEnabled          = false;
+        alarms                  = FXCollections.observableArrayList();
+        alarmsToRemove          = new ArrayList<>();
+        _lcdCrystalEnabled      = false;
+        _shadowsEnabled         = false;
+        _lcdFont                = LcdFont.DIGITAL_BOLD;
+        _locale                 = Locale.US;
+        _tickLabelLocation      = TickLabelLocation.INSIDE;
+        _animated               = false;
+        animationDuration       = 10000;
     }
 
 
     // ******************** Methods *******************************************
-    public LocalDateTime getTime() { return time.get(); }
-    public void setTime(LocalDateTime TIME) { time.set(TIME); }
-    public ObjectProperty<LocalDateTime> timeProperty() { return time; }
+    public ZonedDateTime getTime() { return time.get(); }
+    public void setTime(ZonedDateTime TIME) { time.set(TIME); }
+    public ObjectProperty<ZonedDateTime> timeProperty() { return time; }
+
+    public long getCurrentTime() { return currentTime.get(); }
+    public ReadOnlyLongProperty currentTimeProperty() { return currentTime; }
 
     public String getTitle() { return null == title ? _title : title.get(); }
     public void setTitle(String TITLE) {
@@ -347,6 +395,7 @@ public class Clock extends Control {
         if (null == discreteSeconds) {
             _discreteSeconds = DISCRETE;
             stopTask(periodicTickTask);
+            if (isAnimated()) return;
             scheduleTickTask();
         } else {
             discreteSeconds.set(DISCRETE);
@@ -358,6 +407,7 @@ public class Clock extends Control {
                 @Override public void set(boolean DISCRETE) {
                     super.set(DISCRETE);
                     stopTask(periodicTickTask);
+                    if (isAnimated()) return;
                     scheduleTickTask();
                 }
                 @Override public Object getBean() { return Clock.this; }
@@ -372,6 +422,7 @@ public class Clock extends Control {
         if (null == discreteMinutes) {
             _discreteMinutes = DISCRETE;
             stopTask(periodicTickTask);
+            if (isAnimated()) return;
             scheduleTickTask();
         } else {
             discreteMinutes.set(DISCRETE);
@@ -383,6 +434,7 @@ public class Clock extends Control {
                 @Override public void set(boolean DISCRETE) {
                     super.set(DISCRETE);
                     stopTask(periodicTickTask);
+                    if (isAnimated()) return;
                     scheduleTickTask();
                 }
                 @Override public Object getBean() { return Clock.this; }
@@ -466,7 +518,7 @@ public class Clock extends Control {
     public void setRunning(boolean RUNNING) { 
         if (null == running) {
             _running = RUNNING;
-            if (RUNNING) { scheduleTickTask(); } else { stopTask(periodicTickTask); }
+            if (RUNNING && !isAnimated()) { scheduleTickTask(); } else { stopTask(periodicTickTask); }
         } else {
             running.set(RUNNING);
         }
@@ -475,7 +527,7 @@ public class Clock extends Control {
         if (null == running) { new BooleanPropertyBase(_running) {
             @Override public void set(boolean RUNNING) {
                 super.set(RUNNING);
-                if (RUNNING) { scheduleTickTask(); } else { stopTask(periodicTickTask); }
+                if (RUNNING && !isAnimated()) { scheduleTickTask(); } else { stopTask(periodicTickTask); }
             }
             @Override public Object getBean() { return Clock.this; }
             @Override public String getName() { return "running"; }
@@ -606,6 +658,48 @@ public class Clock extends Control {
     public ObjectProperty<Color> minuteTickMarkColorProperty() {
         if (null == minuteTickMarkColor) { minuteTickMarkColor = new SimpleObjectProperty<>(Clock.this, "minuteTickMarkColor", _minuteTickMarkColor); }
         return minuteTickMarkColor;
+    }
+
+    public boolean isHourTickMarksVisible() { return null == hourTickMarksVisible ? _hourTickMarksVisible : hourTickMarksVisible.get(); }
+    public void setHourTickMarksVisible(final boolean VISIBLE) {
+        if (null == hourTickMarksVisible) {
+            _hourTickMarksVisible = VISIBLE;
+        } else {
+            hourTickMarksVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty hourTickMarksVisibleProperty() {
+        if (null == hourTickMarksVisible) { hourTickMarksVisible = new SimpleBooleanProperty(Clock.this, "hourTickMarksVisible", _hourTickMarksVisible); }
+        return hourTickMarksVisible;
+    }
+
+    public boolean isMinuteTickMarksVisible() { return null == minuteTickMarksVisible ? _minuteTickMarksVisible : minuteTickMarksVisible.get(); }
+    public void setMinuteTickMarksVisible(final boolean VISIBLE) {
+        if (null == minuteTickMarksVisible) {
+            _minuteTickMarksVisible = VISIBLE;
+        } else {
+            minuteTickMarksVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty minuteTickMarksVisibleProperty() {
+        if (null == minuteTickMarksVisible) { minuteTickMarksVisible = new SimpleBooleanProperty(Clock.this, "minuteTickMarksVisible", _minuteTickMarksVisible); }
+        return minuteTickMarksVisible;
+    }
+
+    public boolean isTickLabelsVisible() { return null == tickLabelsVisible ? _tickLabelsVisible : tickLabelsVisible.get(); }
+    public void setTickLabelsVisible(final boolean VISIBLE) {
+        if (null == tickLabelsVisible) {
+            _tickLabelsVisible = VISIBLE;
+        } else {
+            tickLabelsVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty tickLabelsVisibleProperty() {
+        if (null == tickLabelsVisible) { tickLabelsVisible = new SimpleBooleanProperty(Clock.this, "tickLabelsVisible", _tickLabelsVisible); }
+        return tickLabelsVisible;
     }
 
     public Color getHourNeedleColor() { return null == hourNeedleColor ? _hourNeedleColor : hourNeedleColor.get(); }
@@ -769,11 +863,27 @@ public class Clock extends Control {
         return tickLabelLocation;
     }
 
+    public boolean isAnimated() { return null == animated ? _animated : animated.get(); }
+    public void setAnimated(final boolean ANIMATED) {
+        if (null == animated) {
+            _animated = ANIMATED;
+        } else {
+            animated.set(ANIMATED);
+        }
+    }
+    public BooleanProperty animatedProperty() {
+        if (null == animated) { animated = new SimpleBooleanProperty(Clock.this, "animated", _animated); }
+        return animated;
+    }
 
-    private void checkAlarms(final LocalDateTime TIME) {
+    public long getAnimationDuration() { return animationDuration; }
+    public void setAnimationDuration(final long ANIMATION_DURATION) { animationDuration = Helper.clamp(10l, 20000l, ANIMATION_DURATION); }
+
+
+    private void checkAlarms(final ZonedDateTime TIME) {
         alarmsToRemove.clear();
         for (Alarm alarm : alarms) {
-            final LocalDateTime ALARM_TIME = alarm.getTime();
+            final ZonedDateTime ALARM_TIME = alarm.getTime();
             switch (alarm.getRepetition()) {
                 case ONCE:
                     if (TIME.isAfter(ALARM_TIME)) {
@@ -821,7 +931,7 @@ public class Clock extends Control {
         }
     }
 
-    private void checkForNight(final LocalDateTime TIME) {
+    private void checkForNight(final ZonedDateTime TIME) {
         int hour   = TIME.getHour();
         int minute = TIME.getMinute();
 
@@ -835,8 +945,9 @@ public class Clock extends Control {
     }
 
     private void tick() { Platform.runLater(() -> {
+        if (isAnimated()) return;
         setTime(getTime().plus(Duration.ofMillis(updateInterval)));
-        LocalDateTime now = time.get();
+        ZonedDateTime now = time.get();
         if (isAlarmsEnabled()) checkAlarms(now);
         if (isAutoNightMode()) checkForNight(now);
         if (getCheckSectionsForValue()) {
@@ -893,7 +1004,8 @@ public class Clock extends Control {
             case LCD  : return new LcdClockSkin(Clock.this);
             case PEAR : return new PearClockSkin(Clock.this);
             case PLAIN: return new PlainClockSkin(Clock.this);
-            case DB: return new DBClockSkin(Clock.this);
+            case DB   : return new DBClockSkin(Clock.this);
+            case FAT  : return new FatClockSkin(Clock.this);
             case CLOCK:
             default:
                 return new ClockSkin(Clock.this);
@@ -950,6 +1062,9 @@ public class Clock extends Control {
                 setDiscreteMinutes(true);
                 setSecondNeedleColor(Color.rgb(167, 0, 0));
                 setSecondsVisible(true);
+                break;
+            case FAT:
+                setDiscreteMinutes(true);
                 break;
             case CLOCK:
             default:

@@ -55,7 +55,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -408,7 +408,7 @@ public class LcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         backgroundSecondText.setText(backgroundSegment + backgroundSegment);
     }
 
-    private void updateLcd(final LocalDateTime TIME) {
+    private void updateLcd(final ZonedDateTime TIME) {
         timeText.setText(ensureTwoDigits(TIME.getHour()) + ":" + ensureTwoDigits(TIME.getMinute()));
         secondText.setText(ensureTwoDigits(TIME.getSecond()));
         updateBackgroundText();
@@ -566,7 +566,7 @@ public class LcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             mainInnerShadow0.setRadius(0.0625 * height);
             mainInnerShadow1.setRadius(0.04166667 * height);
 
-            LocalDateTime time = getSkinnable().getTime();
+            ZonedDateTime time = getSkinnable().getTime();
 
             if (crystalOverlay.isVisible()) {
                 crystalClip.setWidth(width);
@@ -641,7 +641,7 @@ public class LcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         backgroundSecondText.setX((width - 3 - secondText.getLayoutBounds().getWidth()) - height * 0.04);
         backgroundSecondText.setY(height - (timeText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
 
-        LocalDateTime time = getSkinnable().getTime();
+        ZonedDateTime time = getSkinnable().getTime();
         timeText.setText(ensureTwoDigits(time.getHour()) + ":" + ensureTwoDigits(time.getMinute()));
         timeText.setX(width - 2 - timeText.getLayoutBounds().getWidth() - valueOffsetRight);
         secondText.setText(ensureTwoDigits(time.getSecond()));

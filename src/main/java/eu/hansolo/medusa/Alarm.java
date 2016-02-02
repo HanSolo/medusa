@@ -17,7 +17,7 @@
 package eu.hansolo.medusa;
 
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 
@@ -35,7 +35,7 @@ public class Alarm {
     public static final boolean UNARMED = false;
 
     private Repetition    repetition;
-    private LocalDateTime time;
+    private ZonedDateTime time;
     private boolean       armed;
     private String        text;
     private Command       command;
@@ -43,18 +43,18 @@ public class Alarm {
 
     // ******************** Constructors **************************************
     public Alarm() {
-        this(Repetition.ONCE, LocalDateTime.now().plus(5, ChronoUnit.MINUTES));
+        this(Repetition.ONCE, ZonedDateTime.now().plus(5, ChronoUnit.MINUTES));
     }
-    public Alarm(final Repetition REPETITION, final LocalDateTime TIME) {
+    public Alarm(final Repetition REPETITION, final ZonedDateTime TIME) {
         this(REPETITION, TIME, true);
     }
-    public Alarm(final Repetition REPETITION, final LocalDateTime TIME, final boolean ARMED) {
+    public Alarm(final Repetition REPETITION, final ZonedDateTime TIME, final boolean ARMED) {
         this(REPETITION, TIME, ARMED, "");
     }
-    public Alarm(final Repetition REPETITION, final LocalDateTime TIME, final boolean ARMED, final String TEXT) {
+    public Alarm(final Repetition REPETITION, final ZonedDateTime TIME, final boolean ARMED, final String TEXT) {
         this(REPETITION, TIME, ARMED, TEXT, null);
     }
-    public Alarm(final Repetition REPETITION, final LocalDateTime TIME, final boolean ARMED, final String TEXT, final Command COMMAND) {
+    public Alarm(final Repetition REPETITION, final ZonedDateTime TIME, final boolean ARMED, final String TEXT, final Command COMMAND) {
         repetition = REPETITION;
         time       = TIME;
         armed      = ARMED;
@@ -67,8 +67,8 @@ public class Alarm {
     public Repetition getRepetition() { return repetition; }
     public void setRepetition(final Repetition REPETITION) { repetition = REPETITION; }
 
-    public LocalDateTime getTime() { return time; }
-    public void setTime(final LocalDateTime TIME) { time = TIME; }
+    public ZonedDateTime getTime() { return time; }
+    public void setTime(final ZonedDateTime TIME) { time = TIME; }
 
     public boolean isArmed() { return armed; }
     public void setArmed(final boolean ARMED) { armed = ARMED; }

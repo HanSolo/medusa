@@ -54,7 +54,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
@@ -146,6 +148,8 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         second.setFillRule(FillRule.EVEN_ODD);
         second.setStroke(null);
         second.getTransforms().setAll(secondRotate);
+        second.setVisible(getSkinnable().isSecondsVisible());
+        second.setManaged(getSkinnable().isSecondsVisible());
 
         knob = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.0148448);
         knob.setStroke(null);
@@ -183,7 +187,10 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
+        //getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
+        getSkinnable().currentTimeProperty().addListener(o ->
+             updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())))
+        );
     }
 
 
@@ -201,6 +208,8 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             text.setManaged(getSkinnable().isTextVisible());
             dateNumber.setVisible(getSkinnable().isDateVisible());
             dateNumber.setManaged(getSkinnable().isDateVisible());
+            second.setVisible(getSkinnable().isSecondsVisible());
+            second.setManaged(getSkinnable().isSecondsVisible());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = getSkinnable().getSections();
             areas    = getSkinnable().getAreas();
@@ -213,14 +222,14 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private void drawTicks() {
         double  sinValue;
         double  cosValue;
-        double  startAngle          = 180;
-        double  angleStep           = 360 / 60;
-        Point2D center              = new Point2D(size * 0.5, size * 0.5);
-        Color   hourTickMarkColor   = getSkinnable().getHourTickMarkColor();
-        Color   minuteTickMarkColor = getSkinnable().getMinuteTickMarkColor();
-        Font    font                = Fonts.robotoLight(size * 0.084);
+        double  startAngle             = 180;
+        double  angleStep              = 360 / 60;
+        Point2D center                 = new Point2D(size * 0.5, size * 0.5);
+        Color   hourTickMarkColor      = getSkinnable().getHourTickMarkColor();
+        Color   minuteTickMarkColor    = getSkinnable().getMinuteTickMarkColor();
+        boolean hourTickMarksVisible   = getSkinnable().isHourTickMarksVisible();
+        boolean minuteTickMarksVisible = getSkinnable().isMinuteTickMarksVisible();
         ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-        ticksAndSections.setFont(font);
         ticksAndSections.setLineWidth(size * 0.00539811);
         for (double angle = 0, counter = 0 ; Double.compare(counter, 59) <= 0 ; angle -= angleStep, counter++) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
@@ -232,8 +241,12 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
             if (counter % 5 == 0) {
                 ticksAndSections.setStroke(hourTickMarkColor);
-                ticksAndSections.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
-            } else if (counter % 1 == 0) {
+                if (hourTickMarksVisible) {
+                    ticksAndSections.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
+                } else if (minuteTickMarksVisible) {
+                    ticksAndSections.strokeLine(innerMinutePoint.getX(), innerMinutePoint.getY(), outerPoint.getX(), outerPoint.getY());
+                }
+            } else if (counter % 1 == 0 && minuteTickMarksVisible) {
                 ticksAndSections.setStroke(minuteTickMarkColor);
                 ticksAndSections.strokeLine(innerMinutePoint.getX(), innerMinutePoint.getY(), outerPoint.getX(), outerPoint.getY());
             }
@@ -370,28 +383,34 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Resizing ******************************************
-    public void updateTime(final LocalDateTime TIME) {
+    public void updateTime(final ZonedDateTime TIME) {
         if (getSkinnable().isDiscreteMinutes()) {
             minuteRotate.setAngle(TIME.getMinute() * 6);
         } else {
             minuteRotate.setAngle(TIME.getMinute() * 6 + TIME.getSecond() * 0.1);
         }
 
-        if (getSkinnable().isDiscreteSeconds()) {
-            secondRotate.setAngle(TIME.getSecond() * 6);
-        } else {
-            secondRotate.setAngle(TIME.getSecond() * 6 + TIME.get(ChronoField.MILLI_OF_SECOND) * 0.006);
+        if (second.isVisible()) {
+            if (getSkinnable().isDiscreteSeconds()) {
+                secondRotate.setAngle(TIME.getSecond() * 6);
+            } else {
+                secondRotate.setAngle(TIME.getSecond() * 6 + TIME.get(ChronoField.MILLI_OF_SECOND) * 0.006);
+            }
         }
 
         hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
 
-        text.setText(TIME_FORMATTER.format(TIME));
-        Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
-        text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
+        if (text.isVisible()) {
+            text.setText(TIME_FORMATTER.format(TIME));
+            Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
+            text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
+        }
 
-        dateNumber.setText(DATE_NUMBER_FORMATER.format(TIME).toUpperCase());
-        Helper.adjustTextSize(dateNumber, 0.3 * size, size * 0.05);
-        dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.6), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
+        if (dateNumber.isVisible()) {
+            dateNumber.setText(DATE_NUMBER_FORMATER.format(TIME).toUpperCase());
+            Helper.adjustTextSize(dateNumber, 0.3 * size, size * 0.05);
+            dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.6), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
+        }
     }
 
     private void resize() {
@@ -463,7 +482,7 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         ticksAndSectionsCanvas.setCache(true);
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
-        LocalDateTime time = getSkinnable().getTime();
+        ZonedDateTime time = getSkinnable().getTime();
 
         updateTime(time);
 
