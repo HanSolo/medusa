@@ -342,8 +342,6 @@ public class Gauge extends Control {
         getStyleClass().add("gauge");
 
         init();
-
-        createBlinkTask();
     }
 
 
@@ -2219,16 +2217,19 @@ public class Gauge extends Control {
             }
         };
     }
-    private synchronized static void startBlinkExecutorService() {
-        if (null == blinkService) {
-            blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
-        }
+    private synchronized void startBlinkExecutorService() {
+        if (null == blinkTask) { createBlinkTask(); }
+        if (null == blinkService) { blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false)); }
         blinkFuture = blinkService.schedule(blinkTask, LED_BLINK_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
     public void stop() {
         setLedOn(false);
-        blinkFuture.cancel(true);
+        if (null != blinkFuture) { blinkFuture.cancel(true); }
+        if (null != blinkService) {
+            blinkService.shutdownNow();
+            blinkService = null;
+        }
     }
 
     @Override public String toString() {
