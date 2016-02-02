@@ -100,6 +100,8 @@ public class Clock extends Control {
     private BooleanProperty                   discreteSeconds;
     private boolean                           _discreteMinutes;
     private BooleanProperty                   discreteMinutes;
+    private boolean                           _discreteHours;
+    private BooleanProperty                   discreteHours;
     private boolean                           _secondsVisible;
     private BooleanProperty                   secondsVisible;
     private boolean                           _titleVisible;
@@ -130,6 +132,8 @@ public class Clock extends Control {
     private ObjectProperty<Color>             hourTickMarkColor;
     private Color                             _minuteTickMarkColor;
     private ObjectProperty<Color>             minuteTickMarkColor;
+    private Color                             _tickLabelColor;
+    private ObjectProperty<Color>            tickLabelColor;
     private boolean                           _hourTickMarksVisible;
     private BooleanProperty                   hourTickMarksVisible;
     private boolean                           _minuteTickMarksVisible;
@@ -216,6 +220,7 @@ public class Clock extends Control {
         _text                   = "";
         _discreteSeconds        = true;
         _discreteMinutes        = true;
+        _discreteHours          = false;
         _secondsVisible         = false;
         _titleVisible           = false;
         _textVisible            = false;
@@ -231,6 +236,7 @@ public class Clock extends Control {
         _dateColor              = DARK_COLOR;
         _hourTickMarkColor      = DARK_COLOR;
         _minuteTickMarkColor    = DARK_COLOR;
+        _tickLabelColor         = DARK_COLOR;
         _hourTickMarksVisible   = true;
         _minuteTickMarksVisible = true;
         _tickLabelsVisible      = true;
@@ -442,6 +448,19 @@ public class Clock extends Control {
             };
         }
         return discreteMinutes;
+    }
+
+    public boolean isDiscreteHours() { return null == discreteHours ? _discreteHours : discreteHours.get(); }
+    public void setDiscreteHours(final boolean DISCRETE) {
+        if (null == discreteHours) {
+            _discreteHours = DISCRETE;
+        } else {
+            discreteHours.set(DISCRETE);
+        }
+    }
+    public BooleanProperty discreteHoursProperty() {
+        if (null == discreteHours) { discreteHours = new SimpleBooleanProperty(Clock.this, "discreteHours", _discreteHours); }
+        return discreteHours;
     }
 
     public boolean isSecondsVisible() { return null == secondsVisible ? _secondsVisible : secondsVisible.get(); }
@@ -658,6 +677,20 @@ public class Clock extends Control {
     public ObjectProperty<Color> minuteTickMarkColorProperty() {
         if (null == minuteTickMarkColor) { minuteTickMarkColor = new SimpleObjectProperty<>(Clock.this, "minuteTickMarkColor", _minuteTickMarkColor); }
         return minuteTickMarkColor;
+    }
+
+    public Color getTickLabelColor() { return null == tickLabelColor ? _tickLabelColor : tickLabelColor.get(); }
+    public void setTickLabelColor(final Color COLOR) {
+        if (null == tickLabelColor) {
+            _tickLabelColor = COLOR;
+        } else {
+            tickLabelColor.set(COLOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public ObjectProperty<Color> tickLabelColorProperty() {
+        if (null == tickLabelColor) { tickLabelColor = new SimpleObjectProperty<>(Clock.this, "tickLabelColor", _tickLabelColor); }
+        return tickLabelColor;
     }
 
     public boolean isHourTickMarksVisible() { return null == hourTickMarksVisible ? _hourTickMarksVisible : hourTickMarksVisible.get(); }

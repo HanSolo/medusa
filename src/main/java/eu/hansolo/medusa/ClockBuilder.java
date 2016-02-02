@@ -125,6 +125,11 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B)this;
     }
 
+    public final B discreteHours(final boolean DISCRETE) {
+        properties.put("discreteHours", new SimpleBooleanProperty(DISCRETE));
+        return (B)this;
+    }
+
     public final B secondsVisible(final boolean VISIBLE) {
         properties.put("secondsVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
@@ -197,6 +202,11 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
 
     public final B minuteTickMarkColor(final Color COLOR) {
         properties.put("minuteTickMarkColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
+    public final B tickLabelColor(final Color COLOR) {
+        properties.put("tickLabelColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
@@ -491,6 +501,8 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
             } else if ("discreteMinutes".equals(key)) {
                 CONTROL.setDiscreteMinutes(((BooleanProperty) properties.get(key)).get());
+            } else if ("discreteHours".equals(key)) {
+                CONTROL.setDiscreteHours(((BooleanProperty) properties.get(key)).get());
             } else if ("secondsVisible".equals(key)) {
                 CONTROL.setSecondsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("titleVisible".equals(key)) {
@@ -521,6 +533,8 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setHourTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("minuteTickMarkColor".equals(key)) {
                 CONTROL.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("tickLabelColor".equals(key)) {
+                CONTROL.setTickLabelColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("hourTickMarksVisible".equals(key)) {
                 CONTROL.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("minuteTickMarksVisible".equals(key)) {
