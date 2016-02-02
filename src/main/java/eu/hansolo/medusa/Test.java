@@ -54,6 +54,7 @@ public class Test extends Application {
     private              long           lastTimerCall;
     private              AnimationTimer timer;
 
+    
     @Override public void init() {
         gauge = GaugeBuilder.create()
                             .build();
