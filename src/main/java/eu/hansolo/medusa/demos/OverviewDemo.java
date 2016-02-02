@@ -92,6 +92,7 @@ public class OverviewDemo extends Application {
     private Clock          clock3;
     private Clock          clock4;
     private Clock          clock5;
+    private Clock          clock6;
     private long           lastTimerCall;
     private AnimationTimer timer;
 
@@ -435,6 +436,15 @@ public class OverviewDemo extends Application {
                              .running(true)
                              .build();
 
+        clock6 = ClockBuilder.create()
+                             .skinType(ClockSkinType.FAT)
+                             .backgroundPaint(Color.WHITE)
+                             .hourTickMarkColor(Color.rgb(200, 200, 200))
+                             .minuteTickMarkColor(Color.rgb(200, 200, 200))
+                             .tickLabelColor(Color.rgb(200, 200, 200))
+                             .running(true)
+                             .build();
+
         framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO, GaugeBackground.DARK_GRAY);
 
         framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
@@ -492,6 +502,7 @@ public class OverviewDemo extends Application {
         pane.add(gauge14, 3, 2);
         pane.add(gauge15, 4, 2);
         pane.add(clock3, 5, 2);
+        pane.add(clock6, 6, 2);
         pane.add(gauge16, 0, 3);
         pane.add(gauge17, 1, 3);
         pane.add(gauge18, 2, 3);
