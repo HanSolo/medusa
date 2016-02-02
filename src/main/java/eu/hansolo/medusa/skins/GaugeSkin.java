@@ -18,6 +18,7 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge.LedType;
+import eu.hansolo.medusa.Gauge.NeedleBehavior;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
@@ -131,23 +132,25 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double                   maxValue;
     private List<Section>            sections;
     private List<Section>            areas;
+    private NeedleBehavior           needleBehavior;
 
 
     // ******************** Constructors **************************************
     public GaugeSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        startAngle   = gauge.getStartAngle();
-        angleRange   = gauge.getAngleRange();
-        angleStep    = gauge.getAngleStep();
-        oldValue     = gauge.getValue();
-        minValue     = gauge.getMinValue();
-        maxValue     = gauge.getMaxValue();
-        limitString  = "";
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        sections     = gauge.getSections();
-        areas        = gauge.getAreas();
-        mouseHandler = event -> handleMouseEvent(event);
+        startAngle     = gauge.getStartAngle();
+        angleRange     = gauge.getAngleRange();
+        angleStep      = gauge.getAngleStep();
+        oldValue       = gauge.getValue();
+        minValue       = gauge.getMinValue();
+        maxValue       = gauge.getMaxValue();
+        limitString    = "";
+        formatString   = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        sections       = gauge.getSections();
+        areas          = gauge.getAreas();
+        needleBehavior = gauge.getNeedleBehavior();
+        mouseHandler   = event -> handleMouseEvent(event);
         updateMarkers();
 
         init();
@@ -383,18 +386,31 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Private Methods ***********************************
-    private void rotateNeedle(final double VALUE) {
+    private void rotateNeedle(double value) {
         double startOffsetAngle = 180 - startAngle;
         double targetAngle;
-        if (ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection()) {
-            targetAngle = startOffsetAngle + (VALUE - minValue) * angleStep;
-            targetAngle = Helper.clamp(startOffsetAngle, startOffsetAngle + angleRange, targetAngle);
+        if (NeedleBehavior.STANDARD == needleBehavior) {
+            if (ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection()) {
+                targetAngle = startOffsetAngle + (value - minValue) * angleStep;
+                targetAngle = Helper.clamp(startOffsetAngle, startOffsetAngle + angleRange, targetAngle);
+            } else {
+                targetAngle = startOffsetAngle - (value - minValue) * angleStep;
+                targetAngle = Helper.clamp(startOffsetAngle - angleRange, startOffsetAngle, targetAngle);
+            }
         } else {
-            targetAngle = startOffsetAngle - (VALUE - minValue) * angleStep;
-            targetAngle = Helper.clamp(startOffsetAngle - angleRange, startOffsetAngle, targetAngle);
+            if (value < minValue) value = maxValue - minValue + value;
+            if (value > maxValue) value = value - maxValue + minValue;
+            if (ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection()) {
+                targetAngle = startOffsetAngle + (value - minValue) * angleStep;
+                targetAngle = Helper.clamp(startOffsetAngle, startOffsetAngle + angleRange, targetAngle);
+            } else {
+                targetAngle = startOffsetAngle - (value - minValue) * angleStep;
+                targetAngle = Helper.clamp(startOffsetAngle - angleRange, startOffsetAngle, targetAngle);
+            }
         }
+
         needleRotate.setAngle(targetAngle);
-        valueText.setText(limitString + String.format(Locale.US, formatString, VALUE));
+        valueText.setText(limitString + String.format(Locale.US, formatString, value));
         if (getSkinnable().isLcdVisible()) {
             valueText.setTranslateX((0.691 * size - valueText.getLayoutBounds().getWidth()));
         } else {

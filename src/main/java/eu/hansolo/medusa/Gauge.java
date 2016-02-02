@@ -360,7 +360,28 @@ public class Gauge extends Control {
                 if (isAnimated() && withinSpeedLimit) {
                     long animationDuration = isReturnToZero() ? (long) (0.2 * getAnimationDuration()) : getAnimationDuration();
                     timeline.stop();
-                    final KeyValue KEY_VALUE = new KeyValue(currentValue, VALUE, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
+
+                    final KeyValue KEY_VALUE;
+                    if (NeedleBehavior.STANDARD == getNeedleBehavior()) {
+                        KEY_VALUE = new KeyValue(currentValue, VALUE, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
+                    } else {
+                        double ov  = getOldValue();
+                        double min = getMinValue();
+                        double max = getMaxValue();
+                        double cv  = getCurrentValue();
+                        double tmpValue;
+                        if (Math.abs(VALUE - ov) > getRange() * 0.5) {
+                            if (ov < VALUE) {
+                                tmpValue = min - max + VALUE;
+                            } else {
+                                tmpValue = ov + max - ov + min + VALUE - getRange();
+                            }
+                            KEY_VALUE = new KeyValue(currentValue, tmpValue, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
+                        } else {
+                            if (cv < min) currentValue.set(max + cv);
+                            KEY_VALUE = new KeyValue(currentValue, VALUE, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
+                        }
+                    }
                     final KeyFrame KEY_FRAME = new KeyFrame(Duration.millis(animationDuration), KEY_VALUE);
                     timeline.getKeyFrames().setAll(KEY_FRAME);
                     timeline.play();
