@@ -1072,6 +1072,7 @@ public class Clock extends Control {
                 setSecondNeedleColor(Color.rgb(255, 165, 24));
                 setHourTickMarkColor(Color.WHITE);
                 setMinuteTickMarkColor(Color.rgb(115, 115, 115));
+                setTickLabelColor(Color.WHITE);
                 setDateColor(Color.WHITE);
                 setDateVisible(true);
                 setSecondsVisible(true);

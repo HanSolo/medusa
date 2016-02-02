@@ -393,6 +393,7 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setSecondNeedleColor(Color.rgb(255, 165, 24));
                     CONTROL.setHourTickMarkColor(Color.WHITE);
                     CONTROL.setMinuteTickMarkColor(Color.rgb(115, 115, 115));
+                    CONTROL.setTickLabelColor(Color.WHITE);
                     CONTROL.setDateColor(Color.WHITE);
                     CONTROL.setDateVisible(true);
                     CONTROL.setSecondsVisible(true);

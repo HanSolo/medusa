@@ -324,7 +324,11 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             secondRotate.setAngle(TIME.getSecond() * 6 + TIME.get(ChronoField.MILLI_OF_SECOND) * 0.006);
         }
 
-        hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
+        if (getSkinnable().isDiscreteHours()) {
+            hourRotate.setAngle(TIME.getHour() * 30);
+        } else {
+            hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
+        }
 
         if (text.isVisible()) {
             text.setText(TIME_FORMATTER.format(TIME));

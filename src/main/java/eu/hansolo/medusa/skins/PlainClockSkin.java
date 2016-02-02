@@ -398,7 +398,11 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             }
         }
 
-        hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
+        if (getSkinnable().isDiscreteHours()) {
+            hourRotate.setAngle(TIME.getHour() * 30);
+        } else {
+            hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
+        }
 
         if (text.isVisible()) {
             text.setText(TIME_FORMATTER.format(TIME));

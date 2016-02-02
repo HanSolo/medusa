@@ -230,6 +230,7 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         Point2D center                 = new Point2D(size * 0.5, size * 0.5);
         Color   hourTickMarkColor      = getSkinnable().getHourTickMarkColor();
         Color   minuteTickMarkColor    = getSkinnable().getMinuteTickMarkColor();
+        Color   tickLabelColor         = getSkinnable().getTickLabelColor();
         boolean hourTickMarksVisible   = getSkinnable().isHourTickMarksVisible();
         boolean minuteTickMarksVisible = getSkinnable().isMinuteTickMarksVisible();
         boolean tickLabelsVisible      = getSkinnable().isTickLabelsVisible();
@@ -260,7 +261,7 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
                     Helper.rotateContextForText(ticksAndSections, startAngle, angle, TickLabelOrientation.HORIZONTAL);
                     ticksAndSections.setTextAlign(TextAlignment.CENTER);
                     ticksAndSections.setTextBaseline(VPos.CENTER);
-                    ticksAndSections.setFill(hourTickMarkColor);
+                    ticksAndSections.setFill(tickLabelColor);
                     if (counter == 0) {
                         ticksAndSections.fillText("12", 0, 0);
                     } else {
@@ -502,7 +503,11 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             }
         }
 
-        hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
+        if (getSkinnable().isDiscreteHours()) {
+            hourRotate.setAngle(TIME.getHour() * 30);
+        } else {
+            hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
+        }
 
         if (text.isVisible()) {
             text.setText(TIME_FORMATTER.format(TIME));
