@@ -74,6 +74,7 @@ public class Gauge extends Control {
             this.FACTOR = FACTOR;
         }
     }
+    public enum NeedleBehavior { STANDARD, OPTIMIZED }
     public enum KnobType { STANDARD, PLAIN, METAL, FLAT }
     public enum LedType { STANDARD, FLAT }
     public enum NumberFormat {
@@ -232,6 +233,8 @@ public class Gauge extends Control {
     private ObjectProperty<NeedleShape>          needleShape;
     private NeedleSize                           _needleSize;
     private ObjectProperty<NeedleSize>           needleSize;
+    private NeedleBehavior                       _needleBehavior;
+    private ObjectProperty<NeedleBehavior>       needleBehavior;
     private Color                                _needleColor;
     private ObjectProperty<Color>                needleColor;
     private Color                                _barColor;
@@ -357,7 +360,6 @@ public class Gauge extends Control {
                 if (isAnimated() && withinSpeedLimit) {
                     long animationDuration = isReturnToZero() ? (long) (0.2 * getAnimationDuration()) : getAnimationDuration();
                     timeline.stop();
-
                     final KeyValue KEY_VALUE = new KeyValue(currentValue, VALUE, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
                     final KeyFrame KEY_FRAME = new KeyFrame(Duration.millis(animationDuration), KEY_VALUE);
                     timeline.getKeyFrames().setAll(KEY_FRAME);
@@ -443,6 +445,7 @@ public class Gauge extends Control {
         _needleType                       = NeedleType.STANDARD;
         _needleShape                      = NeedleShape.ANGLED;
         _needleSize                       = NeedleSize.STANDARD;
+        _needleBehavior                   = NeedleBehavior.STANDARD;
         _needleColor                      = Color.rgb(200, 0, 0);
         _barColor                         = BRIGHT_COLOR;
         _barBackgroundColor               = DARK_COLOR;
@@ -1489,6 +1492,25 @@ public class Gauge extends Control {
             };
         }
         return needleSize;
+    }
+
+    public NeedleBehavior getNeedleBehavior() { return null == needleBehavior ? _needleBehavior : needleBehavior.get(); }
+    public void setNeedleBehavior(final NeedleBehavior BEHAVIOR) {
+        if (null == needleBehavior) {
+            _needleBehavior = BEHAVIOR;
+        } else {
+            needleBehavior.set(BEHAVIOR);
+        }
+    }
+    public ObjectProperty<NeedleBehavior> needleBehaviorProperty() {
+        if (null == needleBehavior) {
+            needleBehavior = new ObjectPropertyBase<NeedleBehavior>(_needleBehavior) {
+                @Override public void set(final NeedleBehavior BEHAVIOR) { super.set(null == BEHAVIOR ? NeedleBehavior.STANDARD : BEHAVIOR); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "needleBehavior"; }
+            };
+        }
+        return needleBehavior;
     }
 
     public Color getNeedleColor() { return null == needleColor ? _needleColor : needleColor.get(); }

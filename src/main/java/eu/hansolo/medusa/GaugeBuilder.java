@@ -18,6 +18,7 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Gauge.KnobType;
 import eu.hansolo.medusa.Gauge.LedType;
+import eu.hansolo.medusa.Gauge.NeedleBehavior;
 import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.NeedleType;
@@ -223,6 +224,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B needleSize(final NeedleSize SIZE) {
         properties.put("needleSize", new SimpleObjectProperty<>(SIZE));
+        return (B)this;
+    }
+
+    public final B needleBehavior(final NeedleBehavior BEHAVIOR) {
+        properties.put("needleBehavior", new SimpleObjectProperty<>(BEHAVIOR));
         return (B)this;
     }
 
@@ -985,6 +991,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setNeedleShape(((ObjectProperty<NeedleShape>) properties.get(key)).get());
             } else if("needleSize".equals(key)) {
                 CONTROL.setNeedleSize(((ObjectProperty<NeedleSize>) properties.get(key)).get());
+            } else if("needleBehavior".equals(key)) {
+                CONTROL.setNeedleBehavior(((ObjectProperty<NeedleBehavior>) properties.get(key)).get());
             } else if("needleColor".equals(key)) {
                 CONTROL.setNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("barColor".equals(key)) {
