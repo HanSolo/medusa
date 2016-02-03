@@ -545,7 +545,7 @@ public class Gauge extends Control {
             _minValue = Helper.clamp(-Double.MAX_VALUE, getMaxValue(), VALUE).doubleValue();
             setRange(getMaxValue() - _minValue);
             if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = _minValue;
-            setValue(isStartFromZero() && _minValue < 0 ? 0 : _minValue);
+            if (isStartFromZero() && _minValue < 0) setValue(0);
             if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(_minValue, getMaxValue(), originalThreshold)); }
         } else {
             minValue.set(VALUE);
@@ -560,7 +560,7 @@ public class Gauge extends Control {
                     super.set(Helper.clamp(-Double.MAX_VALUE, getMaxValue(), VALUE).doubleValue());
                     setRange(getMaxValue() - get());
                     if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = get();
-                    Gauge.this.setValue(isStartFromZero() && get() < 0 ? 0 : get());
+                    if (isStartFromZero() && _minValue < 0) Gauge.this.setValue(0);
                     if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(get(), getMaxValue(), originalThreshold)); }
                 }
                 @Override public Object getBean() { return Gauge.this; }
