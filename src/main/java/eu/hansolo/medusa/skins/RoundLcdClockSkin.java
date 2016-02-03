@@ -138,10 +138,9 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         secondsCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
         secondsCtx = secondsCanvas.getGraphicsContext2D();
 
-        pane = new Pane();
+        pane = new Pane(backgroundCanvas, foregroundCanvas, hoursCanvas, minutesCanvas, secondsCanvas);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.getChildren().setAll(backgroundCanvas, foregroundCanvas, hoursCanvas, minutesCanvas, secondsCanvas);
 
         getChildren().setAll(pane);
     }

@@ -245,11 +245,8 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                          upperRightText,
                                          lowerCenterText);
 
-        pane = new Pane();
+        pane = new Pane(crystalOverlay, backgroundText, shadowGroup);
         pane.setEffect(getSkinnable().isShadowsEnabled() ? mainInnerShadow1 : null);
-        pane.getChildren().setAll(crystalOverlay,
-                                  backgroundText,
-                                  shadowGroup);
         getChildren().setAll(pane);
     }
 
