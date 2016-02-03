@@ -36,15 +36,15 @@ import javafx.scene.paint.Color;
  */
 public class Marker implements Comparable<Marker>{
     public enum MarkerType { STANDARD, DOT, TRIANGLE }
-    private static final Color DEFAULT_MARKER_COLOR = Color.rgb(123, 30, 202);
-    public final MarkerEvent MARKER_PRESSED_EVENT  = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_PRESSED);
-    public final MarkerEvent MARKER_RELEASED_EVENT = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_RELEASED);
-    public final MarkerEvent VALUE_CHANGED_EVENT   = new MarkerEvent(Marker.this, null, MarkerEvent.VALUE_CHANGED);
-    public final MarkerEvent COLOR_CHANGED_EVENT   = new MarkerEvent(Marker.this, null, MarkerEvent.COLOR_CHANGED);
-    public final MarkerEvent TEXT_CHANGED_EVENT    = new MarkerEvent(Marker.this, null, MarkerEvent.TEXT_CHANGED);
-    public final MarkerEvent TYPE_CHANGED_EVENT    = new MarkerEvent(Marker.this, null, MarkerEvent.TYPE_CHANGED);
-    public final MarkerEvent EXCEEDED_EVENT        = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_EXCEEDED);
-    public final MarkerEvent UNDERRUN_EVENT        = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_UNDERRUN);
+    private static final Color DEFAULT_MARKER_COLOR  = Color.rgb(123, 30, 202);
+    public final MarkerEvent   MARKER_PRESSED_EVENT  = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_PRESSED);
+    public final MarkerEvent   MARKER_RELEASED_EVENT = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_RELEASED);
+    public final MarkerEvent   VALUE_CHANGED_EVENT   = new MarkerEvent(Marker.this, null, MarkerEvent.VALUE_CHANGED);
+    public final MarkerEvent   COLOR_CHANGED_EVENT   = new MarkerEvent(Marker.this, null, MarkerEvent.COLOR_CHANGED);
+    public final MarkerEvent   TEXT_CHANGED_EVENT    = new MarkerEvent(Marker.this, null, MarkerEvent.TEXT_CHANGED);
+    public final MarkerEvent   TYPE_CHANGED_EVENT    = new MarkerEvent(Marker.this, null, MarkerEvent.TYPE_CHANGED);
+    public final MarkerEvent   EXCEEDED_EVENT        = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_EXCEEDED);
+    public final MarkerEvent   UNDERRUN_EVENT        = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_UNDERRUN);
     private double                     _value;
     private DoubleProperty             value;
     private String                     _text;
@@ -176,12 +176,13 @@ public class Marker implements Comparable<Marker>{
     }
 
     @Override public String toString() {
-        return new StringBuilder("Marker : ").append("\n")
-                                             .append("value:").append(getValue())
-                                             .append("text : ").append(getText()).append("\n")
-                                             .append("color: ").append(getColor())
-                                             .append("type : ").append(getMarkerType())
-                                             .toString();
+        return new StringBuilder().append("{\n")
+                                  .append("\"value\":").append(getValue()).append(",\n")
+                                  .append("\"text\":\"").append(getText()).append("\",\n")
+                                  .append("\"color\":\n").append(getColor().toString().substring(0, 8).replace("0x", "#")).append("\",\n")
+                                  .append("\"type\":\"").append(getMarkerType().name()).append("\"\n")
+                                  .append("}")
+                                  .toString();
     }
 
 
