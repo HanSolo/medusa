@@ -210,6 +210,11 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B)this;
     }
 
+    public final B alarmColor(final Color COLOR) {
+        properties.put("alarmColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B hourTickMarksVisible(final boolean VISIBLE) {
         properties.put("hourTickMarksVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
@@ -225,18 +230,18 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B)this;
     }
 
-    public final B hourNeedleColor(final Color COLOR) {
-        properties.put("hourNeedleColor", new SimpleObjectProperty<>(COLOR));
+    public final B hourColor(final Color COLOR) {
+        properties.put("hourColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
-    public final B minuteNeedleColor(final Color COLOR) {
-        properties.put("minuteNeedleColor", new SimpleObjectProperty<>(COLOR));
+    public final B minuteColor(final Color COLOR) {
+        properties.put("minuteColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
-    public final B secondNeedleColor(final Color COLOR) {
-        properties.put("secondNeedleColor", new SimpleObjectProperty<>(COLOR));
+    public final B secondColor(final Color COLOR) {
+        properties.put("secondColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
@@ -378,8 +383,8 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setBackgroundPaint(Color.rgb(40, 42, 48));
                     CONTROL.setHourTickMarkColor(Color.rgb(255, 255, 255));
                     CONTROL.setMinuteTickMarkColor(Color.rgb(255, 255, 255, 0.5));
-                    CONTROL.setHourNeedleColor(Color.WHITE);
-                    CONTROL.setMinuteNeedleColor(Color.WHITE);
+                    CONTROL.setHourColor(Color.WHITE);
+                    CONTROL.setMinuteColor(Color.WHITE);
                     CONTROL.setKnobColor(Color.WHITE);
                     CONTROL.setTextColor(Color.rgb(255, 255, 255, 0.5));
                     CONTROL.setDateColor(Color.rgb(255, 255, 255));
@@ -388,9 +393,9 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     break;
                 case PEAR:
                     CONTROL.setBackgroundPaint(Color.BLACK);
-                    CONTROL.setHourNeedleColor(Color.WHITE);
-                    CONTROL.setMinuteNeedleColor(Color.WHITE);
-                    CONTROL.setSecondNeedleColor(Color.rgb(255, 165, 24));
+                    CONTROL.setHourColor(Color.WHITE);
+                    CONTROL.setMinuteColor(Color.WHITE);
+                    CONTROL.setSecondColor(Color.rgb(255, 165, 24));
                     CONTROL.setHourTickMarkColor(Color.WHITE);
                     CONTROL.setMinuteTickMarkColor(Color.rgb(115, 115, 115));
                     CONTROL.setTickLabelColor(Color.WHITE);
@@ -402,9 +407,9 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     break;
                 case PLAIN:
                     CONTROL.setBackgroundPaint(Color.rgb(29, 29, 29));
-                    CONTROL.setHourNeedleColor(Color.rgb(190, 190, 190));
-                    CONTROL.setMinuteNeedleColor(Color.rgb(190, 190, 190));
-                    CONTROL.setSecondNeedleColor(Color.rgb(0, 244, 0));
+                    CONTROL.setHourColor(Color.rgb(190, 190, 190));
+                    CONTROL.setMinuteColor(Color.rgb(190, 190, 190));
+                    CONTROL.setSecondColor(Color.rgb(0, 244, 0));
                     CONTROL.setDateColor(Color.rgb(190, 190, 190));
                     CONTROL.setSecondsVisible(true);
                     CONTROL.setHourTickMarkColor(Color.rgb(240, 240, 240));
@@ -413,8 +418,12 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 case DB:
                     CONTROL.setDiscreteSeconds(false);
                     CONTROL.setDiscreteMinutes(true);
-                    CONTROL.setSecondNeedleColor(Color.rgb(167, 0, 0));
+                    CONTROL.setSecondColor(Color.rgb(167, 0, 0));
                     CONTROL.setSecondsVisible(true);
+                    break;
+                case ROUND_LCD:
+                    CONTROL.setTextVisible(true);
+                    CONTROL.setDateVisible(true);
                     break;
                 case FAT:
                     CONTROL.setDiscreteMinutes(true);
@@ -536,18 +545,20 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("tickLabelColor".equals(key)) {
                 CONTROL.setTickLabelColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("alarmColor".equals(key)) {
+                CONTROL.setAlarmColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("hourTickMarksVisible".equals(key)) {
                 CONTROL.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("minuteTickMarksVisible".equals(key)) {
                 CONTROL.setMinuteTickMarksVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("tickLabelsVisible".equals(key)) {
                 CONTROL.setTickLabelsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("hourNeedleColor".equals(key)) {
-                CONTROL.setHourNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("minuteNeedleColor".equals(key)) {
-                CONTROL.setMinuteNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("secondNeedleColor".equals(key)) {
-                CONTROL.setSecondNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("hourColor".equals(key)) {
+                CONTROL.setHourColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("minuteColor".equals(key)) {
+                CONTROL.setMinuteColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("secondColor".equals(key)) {
+                CONTROL.setSecondColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("knobColor".equals(key)) {
                 CONTROL.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("lcdDesign".equals(key)) {

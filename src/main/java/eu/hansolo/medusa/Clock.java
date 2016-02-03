@@ -24,7 +24,6 @@ import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.TimeSectionComparator;
-import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -57,7 +56,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -133,19 +132,21 @@ public class Clock extends Control {
     private Color                             _minuteTickMarkColor;
     private ObjectProperty<Color>             minuteTickMarkColor;
     private Color                             _tickLabelColor;
-    private ObjectProperty<Color>            tickLabelColor;
+    private ObjectProperty<Color>             tickLabelColor;
+    private Color                             _alarmColor;
+    private ObjectProperty<Color>             alarmColor;
     private boolean                           _hourTickMarksVisible;
     private BooleanProperty                   hourTickMarksVisible;
     private boolean                           _minuteTickMarksVisible;
     private BooleanProperty                   minuteTickMarksVisible;
     private boolean                           _tickLabelsVisible;
     private BooleanProperty                   tickLabelsVisible;
-    private Color                             _hourNeedleColor;
-    private ObjectProperty<Color>             hourNeedleColor;
-    private Color                             _minuteNeedleColor;
-    private ObjectProperty<Color>             minuteNeedleColor;
-    private Color                             _secondNeedleColor;
-    private ObjectProperty<Color>             secondNeedleColor;
+    private Color                             _hourColor;
+    private ObjectProperty<Color>             hourColor;
+    private Color                             _minuteColor;
+    private ObjectProperty<Color>             minuteColor;
+    private Color                             _secondColor;
+    private ObjectProperty<Color>             secondColor;
     private Color                             _knobColor;
     private ObjectProperty<Color>             knobColor;
     private LcdDesign                         _lcdDesign;
@@ -237,12 +238,13 @@ public class Clock extends Control {
         _hourTickMarkColor      = DARK_COLOR;
         _minuteTickMarkColor    = DARK_COLOR;
         _tickLabelColor         = DARK_COLOR;
+        _alarmColor             = DARK_COLOR;
         _hourTickMarksVisible   = true;
         _minuteTickMarksVisible = true;
         _tickLabelsVisible      = true;
-        _hourNeedleColor        = DARK_COLOR;
-        _minuteNeedleColor      = DARK_COLOR;
-        _secondNeedleColor      = DARK_COLOR;
+        _hourColor              = DARK_COLOR;
+        _minuteColor            = DARK_COLOR;
+        _secondColor            = DARK_COLOR;
         _knobColor              = DARK_COLOR;
         _lcdDesign              = LcdDesign.STANDARD;
         _alarmsEnabled          = false;
@@ -693,6 +695,20 @@ public class Clock extends Control {
         return tickLabelColor;
     }
 
+    public Color getAlarmColor() { return null == alarmColor ? _alarmColor : alarmColor.get(); }
+    public void setAlarmColor(final Color COLOR) {
+        if (null == alarmColor) {
+            _alarmColor = COLOR;
+        } else {
+            alarmColor.set(COLOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public ObjectProperty<Color> alarmColorProperty() {
+        if (null == alarmColor) { alarmColor = new SimpleObjectProperty<>(Clock.this, "alarmColor", _alarmColor); }
+        return alarmColor;
+    }
+
     public boolean isHourTickMarksVisible() { return null == hourTickMarksVisible ? _hourTickMarksVisible : hourTickMarksVisible.get(); }
     public void setHourTickMarksVisible(final boolean VISIBLE) {
         if (null == hourTickMarksVisible) {
@@ -735,46 +751,46 @@ public class Clock extends Control {
         return tickLabelsVisible;
     }
 
-    public Color getHourNeedleColor() { return null == hourNeedleColor ? _hourNeedleColor : hourNeedleColor.get(); }
-    public void setHourNeedleColor(final Color COLOR) {
-        if (null == hourNeedleColor) {
-            _hourNeedleColor = COLOR;
+    public Color getHourColor() { return null == hourColor ? _hourColor : hourColor.get(); }
+    public void setHourColor(final Color COLOR) {
+        if (null == hourColor) {
+            _hourColor = COLOR;
         } else {
-            hourNeedleColor.set(COLOR);
+            hourColor.set(COLOR);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
-    public ObjectProperty<Color> hourNeedleColorProperty() {
-        if (null == hourNeedleColor) { hourNeedleColor = new SimpleObjectProperty<>(Clock.this, "hourNeedleColor", _hourNeedleColor); }
-        return hourNeedleColor;
+    public ObjectProperty<Color> hourColorProperty() {
+        if (null == hourColor) { hourColor = new SimpleObjectProperty<>(Clock.this, "hourColor", _hourColor); }
+        return hourColor;
     }
 
-    public Color getMinuteNeedleColor() { return null == minuteNeedleColor ? _minuteNeedleColor : minuteNeedleColor.get(); }
-    public void setMinuteNeedleColor(final Color COLOR) {
-        if (null == minuteNeedleColor) {
-            _minuteNeedleColor = COLOR;
+    public Color getMinuteColor() { return null == minuteColor ? _minuteColor : minuteColor.get(); }
+    public void setMinuteColor(final Color COLOR) {
+        if (null == minuteColor) {
+            _minuteColor = COLOR;
         } else {
-            minuteNeedleColor.set(COLOR);
+            minuteColor.set(COLOR);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
-    public ObjectProperty<Color> minuteNeedleColorProperty() {
-        if (null == minuteNeedleColor) { minuteNeedleColor = new SimpleObjectProperty<>(Clock.this, "minuteNeedleColor", _minuteNeedleColor); }
-        return minuteNeedleColor;
+    public ObjectProperty<Color> minuteColorProperty() {
+        if (null == minuteColor) { minuteColor = new SimpleObjectProperty<>(Clock.this, "minuteColor", _minuteColor); }
+        return minuteColor;
     }
 
-    public Color getSecondNeedleColor() { return null == secondNeedleColor ? _secondNeedleColor : secondNeedleColor.get(); }
-    public void setSecondNeedleColor(final Color COLOR) {
-        if (null == secondNeedleColor) {
-            _secondNeedleColor = COLOR;
+    public Color getSecondColor() { return null == secondColor ? _secondColor : secondColor.get(); }
+    public void setSecondColor(final Color COLOR) {
+        if (null == secondColor) {
+            _secondColor = COLOR;
         } else {
-            secondNeedleColor.set(COLOR);
+            secondColor.set(COLOR);
         }
         fireUpdateEvent(REDRAW_EVENT);
     }
-    public ObjectProperty<Color> secondNeedleColorProperty() {
-        if (null == secondNeedleColor) { secondNeedleColor = new SimpleObjectProperty<>(Clock.this, "secondNeedleColor", _secondNeedleColor); }
-        return secondNeedleColor;
+    public ObjectProperty<Color> secondColorProperty() {
+        if (null == secondColor) { secondColor = new SimpleObjectProperty<>(Clock.this, "secondColor", _secondColor); }
+        return secondColor;
     }
 
     public Color getKnobColor() { return null == knobColor ? _knobColor : knobColor.get(); }
@@ -1033,15 +1049,15 @@ public class Clock extends Control {
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {
         switch(skinType) {
-            case YOTA2: return new ClockSkin(Clock.this);
-            case LCD  : return new LcdClockSkin(Clock.this);
-            case PEAR : return new PearClockSkin(Clock.this);
-            case PLAIN: return new PlainClockSkin(Clock.this);
-            case DB   : return new DBClockSkin(Clock.this);
-            case FAT  : return new FatClockSkin(Clock.this);
-            case CLOCK:
-            default:
-                return new ClockSkin(Clock.this);
+            case YOTA2    : return new ClockSkin(Clock.this);
+            case LCD      : return new LcdClockSkin(Clock.this);
+            case PEAR     : return new PearClockSkin(Clock.this);
+            case PLAIN    : return new PlainClockSkin(Clock.this);
+            case DB       : return new DBClockSkin(Clock.this);
+            case FAT      : return new FatClockSkin(Clock.this);
+            case ROUND_LCD: return new RoundLcdClockSkin(Clock.this);
+            case CLOCK    :
+            default       : return new ClockSkin(Clock.this);
         }
     }
 
@@ -1057,8 +1073,8 @@ public class Clock extends Control {
                 setBackgroundPaint(Color.rgb(40, 42, 48));
                 setHourTickMarkColor(Color.rgb(255, 255, 255));
                 setMinuteTickMarkColor(Color.rgb(255, 255, 255, 0.5));
-                setHourNeedleColor(Color.WHITE);
-                setMinuteNeedleColor(Color.WHITE);
+                setHourColor(Color.WHITE);
+                setMinuteColor(Color.WHITE);
                 setKnobColor(Color.WHITE);
                 super.setSkin(new ClockSkin(Clock.this));
                 break;
@@ -1067,9 +1083,9 @@ public class Clock extends Control {
                 break;
             case PEAR:
                 setBackgroundPaint(Color.BLACK);
-                setHourNeedleColor(Color.WHITE);
-                setMinuteNeedleColor(Color.WHITE);
-                setSecondNeedleColor(Color.rgb(255, 165, 24));
+                setHourColor(Color.WHITE);
+                setMinuteColor(Color.WHITE);
+                setSecondColor(Color.rgb(255, 165, 24));
                 setHourTickMarkColor(Color.WHITE);
                 setMinuteTickMarkColor(Color.rgb(115, 115, 115));
                 setTickLabelColor(Color.WHITE);
@@ -1082,9 +1098,9 @@ public class Clock extends Control {
                 break;
             case PLAIN:
                 setBackgroundPaint(Color.rgb(29, 29, 29));
-                setHourNeedleColor(Color.rgb(190, 190, 190));
-                setMinuteNeedleColor(Color.rgb(190, 190, 190));
-                setSecondNeedleColor(Color.rgb(0, 244, 0));
+                setHourColor(Color.rgb(190, 190, 190));
+                setMinuteColor(Color.rgb(190, 190, 190));
+                setSecondColor(Color.rgb(0, 244, 0));
                 setDateColor(Color.rgb(190, 190, 190));
                 setSecondsVisible(true);
                 setHourTickMarkColor(Color.rgb(240, 240, 240));
@@ -1094,11 +1110,15 @@ public class Clock extends Control {
             case DB:
                 setDiscreteSeconds(false);
                 setDiscreteMinutes(true);
-                setSecondNeedleColor(Color.rgb(167, 0, 0));
+                setSecondColor(Color.rgb(167, 0, 0));
                 setSecondsVisible(true);
                 break;
             case FAT:
                 setDiscreteMinutes(true);
+                break;
+            case ROUND_LCD:
+                setTextVisible(true);
+                setDateVisible(true);
                 break;
             case CLOCK:
             default:
