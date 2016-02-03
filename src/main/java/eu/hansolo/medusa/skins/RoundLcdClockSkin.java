@@ -64,15 +64,15 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private              double            center;
     private              DateTimeFormatter dateFormat;
     private              Pane              pane;
-    private              Canvas            canvasBkg;
+    private              Canvas            backgroundCanvas;
     private              GraphicsContext   backgroundCtx;
-    private              Canvas            canvasFg;
+    private              Canvas            foregroundCanvas;
     private              GraphicsContext   foregroundCtx;
-    private              Canvas            canvasHours;
+    private              Canvas            hoursCanvas;
     private              GraphicsContext   hoursCtx;
-    private              Canvas            canvasMinutes;
+    private              Canvas            minutesCanvas;
     private              GraphicsContext   minutesCtx;
-    private              Canvas            canvasSeconds;
+    private              Canvas            secondsCanvas;
     private              GraphicsContext   secondsCtx;
     private              Color             hourColor;
     private              Color             minuteColor;
@@ -123,25 +123,25 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     }
 
     private void initGraphics() {
-        canvasBkg     = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-        backgroundCtx = canvasBkg.getGraphicsContext2D();
+        backgroundCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+        backgroundCtx = backgroundCanvas.getGraphicsContext2D();
 
-        canvasFg      = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-        foregroundCtx = canvasFg.getGraphicsContext2D();
+        foregroundCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+        foregroundCtx = foregroundCanvas.getGraphicsContext2D();
 
-        canvasHours   = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-        hoursCtx = canvasHours.getGraphicsContext2D();
+        hoursCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+        hoursCtx = hoursCanvas.getGraphicsContext2D();
 
-        canvasMinutes = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-        minutesCtx = canvasMinutes.getGraphicsContext2D();
+        minutesCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+        minutesCtx = minutesCanvas.getGraphicsContext2D();
 
-        canvasSeconds = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-        secondsCtx = canvasSeconds.getGraphicsContext2D();
+        secondsCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+        secondsCtx = secondsCanvas.getGraphicsContext2D();
 
         pane = new Pane();
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.getChildren().setAll(canvasBkg, canvasFg, canvasHours, canvasMinutes, canvasSeconds);
+        pane.getChildren().setAll(backgroundCanvas, foregroundCanvas, hoursCanvas, minutesCanvas, secondsCanvas);
 
         getChildren().setAll(pane);
     }
@@ -412,16 +412,16 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             pane.setMaxSize(size, size);
             pane.relocate((getSkinnable().getWidth() - size) * 0.5, (getSkinnable().getHeight() - size) * 0.5);
 
-            canvasBkg.setWidth(size);
-            canvasBkg.setHeight(size);
-            canvasFg.setWidth(size);
-            canvasFg.setHeight(size);
-            canvasHours.setWidth(size);
-            canvasHours.setHeight(size);
-            canvasMinutes.setWidth(size);
-            canvasMinutes.setHeight(size);
-            canvasSeconds.setWidth(size);
-            canvasSeconds.setHeight(size);
+            backgroundCanvas.setWidth(size);
+            backgroundCanvas.setHeight(size);
+            foregroundCanvas.setWidth(size);
+            foregroundCanvas.setHeight(size);
+            hoursCanvas.setWidth(size);
+            hoursCanvas.setHeight(size);
+            minutesCanvas.setWidth(size);
+            minutesCanvas.setHeight(size);
+            secondsCanvas.setWidth(size);
+            secondsCanvas.setHeight(size);
             drawBackground();
         }
     }
