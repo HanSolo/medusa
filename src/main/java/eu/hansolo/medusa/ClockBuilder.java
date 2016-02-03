@@ -255,8 +255,13 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B)this;
     }
 
-    public final B alarmsEnabled(final boolean CHECK) {
-        properties.put("alarmsEnabled", new SimpleBooleanProperty(CHECK));
+    public final B alarmsEnabled(final boolean ENABLED) {
+        properties.put("alarmsEnabled", new SimpleBooleanProperty(ENABLED));
+        return (B)this;
+    }
+
+    public final B alarmsVisible(final boolean VISIBLE) {
+        properties.put("alarmsVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
     }
 
@@ -455,7 +460,6 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
             CONTROL.setAreas(((ObjectProperty<List<TimeSection>>) properties.get("areasList")).get());
         }
 
-
         for (String key : properties.keySet()) {
             if ("prefSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
@@ -525,8 +529,6 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setNightMode(((BooleanProperty) properties.get(key)).get());
             } else if ("autoNightMode".equals(key)) {
                 CONTROL.setAutoNightMode(((BooleanProperty) properties.get(key)).get());
-            } else if ("running".equals(key)) {
-                CONTROL.setRunning(((BooleanProperty) properties.get(key)).get());
             } else if ("backgroundPaint".equals(key)) {
                 CONTROL.setBackgroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
             } else if ("borderPaint".equals(key)) {
@@ -567,6 +569,8 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setOnAlarm(((ObjectProperty<AlarmEventListener>) properties.get(key)).get());
             } else if ("alarmsEnabled".equals(key)) {
                 CONTROL.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
+            } else if ("alarmsVisible".equals(key)) {
+                CONTROL.setAlarmsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("lcdCrystalEnabled".equals(key)) {
                 CONTROL.setLcdCrystalEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("shadowsEnabled".equals(key)) {
@@ -579,6 +583,8 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setAnimated(((BooleanProperty) properties.get(key)).get());
             } else if("animationDuration".equals(key)) {
                 CONTROL.setAnimationDuration(((LongProperty) properties.get(key)).get());
+            } else if ("running".equals(key)) {
+                CONTROL.setRunning(((BooleanProperty) properties.get(key)).get());
             }
         }
         return CONTROL;
