@@ -153,6 +153,8 @@ public class Clock extends Control {
     private ObjectProperty<LcdDesign>         lcdDesign;
     private boolean                           _alarmsEnabled;
     private BooleanProperty                   alarmsEnabled;
+    private boolean                           _alarmsVisible;
+    private BooleanProperty                   alarmsVisible;
     private ObservableList<Alarm>             alarms;
     private List<Alarm>                       alarmsToRemove;
     private boolean                           _lcdCrystalEnabled;
@@ -248,6 +250,7 @@ public class Clock extends Control {
         _knobColor              = DARK_COLOR;
         _lcdDesign              = LcdDesign.STANDARD;
         _alarmsEnabled          = false;
+        _alarmsVisible          = false;
         alarms                  = FXCollections.observableArrayList();
         alarmsToRemove          = new ArrayList<>();
         _lcdCrystalEnabled      = false;
@@ -833,6 +836,20 @@ public class Clock extends Control {
     public BooleanProperty alarmsEnabledProperty() {
         if (null == alarmsEnabled) { alarmsEnabled = new SimpleBooleanProperty(Clock.this, "alarmsEnabled", _alarmsEnabled); }
         return alarmsEnabled;
+    }
+
+    public boolean isAlarmsVisible() { return null == alarmsVisible ? _alarmsVisible : alarmsVisible.get(); }
+    public void setAlarmsVisible(final boolean VISIBLE) {
+        if (null == alarmsVisible) {
+            _alarmsVisible = VISIBLE;
+        } else {
+            alarmsVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty alarmsVisibleProperty() {
+        if (null == alarmsVisible) { alarmsVisible = new SimpleBooleanProperty(Clock.this, "alarmsVisible", _alarmsVisible); }
+        return alarmsVisible;
     }
 
     public ObservableList<Alarm> getAlarms() { return alarms; }
