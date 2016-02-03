@@ -189,12 +189,14 @@ public class Section implements Comparable<Section> {
 
     @Override public String toString() {
         return new StringBuilder()
-            .append("Section   : ").append("\n")
-            .append("text      : ").append(getText()).append("\n")
-            .append("startValue: ").append(getStart()).append("\n")
-            .append("stopValue : ").append(getStop()).append("\n")
-            .append("color     : ").append(getColor().toString())
-            .append("textColor : ").append(getTextColor().toString()).toString();
+            .append("{\n")
+            .append("\"text\":\"").append(getText()).append("\",\n")
+            .append("\"startValue\":").append(getStart()).append(",\n")
+            .append("\"stopValue\":").append(getStop()).append(",\n")
+            .append("\"color\":\"").append(getColor().toString().substring(0,8).replace("0x", "#")).append("\",\n")
+            .append("\"textColor\":\"").append(getTextColor().toString().substring(0,8).replace("0x", "#")).append("\"\n")
+            .append("}")
+            .toString();
     }
 
 
