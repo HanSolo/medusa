@@ -17,6 +17,8 @@
 package eu.hansolo.medusa;
 
 
+import javafx.scene.paint.Color;
+
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -39,6 +41,7 @@ public class Alarm {
     private boolean       armed;
     private String        text;
     private Command       command;
+    private Color         color;
 
 
     // ******************** Constructors **************************************
@@ -55,11 +58,15 @@ public class Alarm {
         this(REPETITION, TIME, ARMED, TEXT, null);
     }
     public Alarm(final Repetition REPETITION, final ZonedDateTime TIME, final boolean ARMED, final String TEXT, final Command COMMAND) {
+        this(REPETITION, TIME, ARMED, TEXT, COMMAND, Clock.DARK_COLOR);
+    }
+    public Alarm(final Repetition REPETITION, final ZonedDateTime TIME, final boolean ARMED, final String TEXT, final Command COMMAND, final Color COLOR) {
         repetition = REPETITION;
         time       = TIME;
         armed      = ARMED;
         text       = TEXT;
         command    = COMMAND;
+        color      = COLOR;
     }
 
 
@@ -79,4 +86,7 @@ public class Alarm {
     public Command getCommand() { return command; }
     public void setCommand(final Command COMMAND) { command = COMMAND; }
     public void executeCommand() { if (null != command) command.execute(); }
+
+    public Color getColor() { return color; }
+    public void setColor(final Color COLOR) { color = COLOR; }
 }

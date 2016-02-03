@@ -24,6 +24,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.paint.Color;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -70,6 +71,11 @@ public class AlarmBuilder<B extends AlarmBuilder<B>> {
         return (B)this;
     }
 
+    public final B command(final Color COLOR) {
+        properties.put("color", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final Alarm build() {
         final Alarm ALARM = new Alarm();
         for (String key : properties.keySet()) {
@@ -83,6 +89,8 @@ public class AlarmBuilder<B extends AlarmBuilder<B>> {
                 ALARM.setArmed(((BooleanProperty) properties.get(key)).get());
             } else if ("command".equals(key)) {
                 ALARM.setCommand(((ObjectProperty<Command>) properties.get(key)).get());
+            } else if ("color".equals(key)) {
+                ALARM.setColor(((ObjectProperty<Color>) properties.get(key)).get());
             }
         }
         return ALARM;
