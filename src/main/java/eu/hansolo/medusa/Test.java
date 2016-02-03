@@ -16,6 +16,7 @@
 
 package eu.hansolo.medusa;
 
+import eu.hansolo.medusa.Alarm.Repetition;
 import eu.hansolo.medusa.Clock.ClockSkinType;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -31,6 +32,10 @@ import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Random;
 
@@ -56,7 +61,23 @@ public class Test extends Application {
                             .build();
 
         clock = ClockBuilder.create()
+                            .skinType(ClockSkinType.PEAR)
                             .prefSize(400, 400)
+                            .secondColor(Color.MAGENTA)
+                            .secondsVisible(true)
+                            .alarmsEnabled(true)
+                            .alarmsVisible(true)
+                            .alarms(AlarmBuilder.create()
+                                                .time(ZonedDateTime.of(LocalDate.of(2016, 02, 03),
+                                                                       LocalTime.of(18, 50, 00),
+                                                                       ZoneId.systemDefault()))
+                                                .text("Alarm Text")
+                                                .repetition(Repetition.ONCE)
+                                                .armed(true)
+                                                .color(Color.RED)
+                                                .onAlarmMarkerPressed(e -> System.out.println("Alarm pressed"))
+                                                .build())
+                            .running(true)
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -71,7 +92,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(gauge);
+        StackPane pane = new StackPane(clock);
         pane.setPadding(new Insets(10));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
