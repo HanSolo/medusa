@@ -16,15 +16,11 @@
 
 package eu.hansolo.medusa;
 
-import eu.hansolo.medusa.Alarm.Repetition;
 import eu.hansolo.medusa.Clock.ClockSkinType;
-import eu.hansolo.medusa.Gauge.LedType;
-import eu.hansolo.medusa.Gauge.SkinType;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.paint.Color;
@@ -35,8 +31,7 @@ import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.Locale;
 import java.util.Random;
 
 
@@ -98,7 +93,7 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        timer.start();
+        //timer.start();
     }
 
     @Override public void stop() {

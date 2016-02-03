@@ -18,9 +18,6 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
-import eu.hansolo.medusa.Gauge.ScaleDirection;
-import eu.hansolo.medusa.Section;
-import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.TimeSection;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
@@ -42,7 +39,6 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
@@ -51,10 +47,7 @@ import javafx.scene.transform.Rotate;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.List;
@@ -134,19 +127,19 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         hour  = new Rectangle(3, 60);
         hour.setArcHeight(3);
         hour.setArcWidth(3);
-        hour.setStroke(getSkinnable().getHourNeedleColor());
+        hour.setStroke(getSkinnable().getHourColor());
         hour.getTransforms().setAll(hourRotate);
 
         minute = new Rectangle(3, 96);
         minute.setArcHeight(3);
         minute.setArcWidth(3);
-        minute.setStroke(getSkinnable().getMinuteNeedleColor());
+        minute.setStroke(getSkinnable().getMinuteColor());
         minute.getTransforms().setAll(minuteRotate);
 
         second = new Rectangle(1, 96);
         second.setArcHeight(1);
         second.setArcWidth(1);
-        second.setStroke(getSkinnable().getSecondNeedleColor());
+        second.setStroke(getSkinnable().getSecondColor());
         second.getTransforms().setAll(secondRotate);
         second.setVisible(getSkinnable().isSecondsVisible());
         second.setManaged(getSkinnable().isSecondsVisible());
@@ -312,21 +305,21 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             ticksAndSectionsCanvas.setWidth(size);
             ticksAndSectionsCanvas.setHeight(size);
 
-            hour.setFill(getSkinnable().getHourNeedleColor());
+            hour.setFill(getSkinnable().getHourColor());
             hour.setWidth(size * 0.015);
             hour.setHeight(size * 0.29);
             hour.setArcWidth(size * 0.015);
             hour.setArcHeight(size * 0.015);
             hour.relocate((size - hour.getWidth()) * 0.5, size * 0.21);
 
-            minute.setFill(getSkinnable().getMinuteNeedleColor());
+            minute.setFill(getSkinnable().getMinuteColor());
             minute.setWidth(size * 0.015);
             minute.setHeight(size * 0.47);
             minute.setArcWidth(size * 0.015);
             minute.setArcHeight(size * 0.015);
             minute.relocate((size - minute.getWidth()) * 0.5, size * 0.03);
 
-            second.setFill(getSkinnable().getSecondNeedleColor());
+            second.setFill(getSkinnable().getSecondColor());
             second.setWidth(size * 0.005);
             second.setHeight(size * 0.47);
             second.setArcWidth(size * 0.015);

@@ -41,14 +41,12 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.FillRule;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -59,7 +57,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
 import java.util.List;
 
 
@@ -133,13 +130,13 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         hour  = new Path();
         hour.setFillRule(FillRule.EVEN_ODD);
         hour.setStroke(null);
-        hour.setFill(getSkinnable().getHourNeedleColor());
+        hour.setFill(getSkinnable().getHourColor());
         hour.getTransforms().setAll(hourRotate);
 
         minute = new Path();
         minute.setFillRule(FillRule.EVEN_ODD);
         minute.setStroke(null);
-        minute.setFill(getSkinnable().getMinuteNeedleColor());
+        minute.setFill(getSkinnable().getMinuteColor());
         minute.getTransforms().setAll(minuteRotate);
 
         dropShadow = new DropShadow();
@@ -341,11 +338,11 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             ticksAndSectionsCanvas.setHeight(size);
 
             createHourPointer();
-            hour.setFill(getSkinnable().getHourNeedleColor());
+            hour.setFill(getSkinnable().getHourColor());
             hour.relocate((size - hour.getLayoutBounds().getWidth()) * 0.5, size * 0.12733333);
 
             createMinutePointer();
-            minute.setFill(getSkinnable().getMinuteNeedleColor());
+            minute.setFill(getSkinnable().getMinuteColor());
             minute.relocate((size - minute.getLayoutBounds().getWidth()) * 0.5, 0);
 
             title.setFill(getSkinnable().getTextColor());

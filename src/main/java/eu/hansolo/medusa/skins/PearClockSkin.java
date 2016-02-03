@@ -56,7 +56,6 @@ import javafx.scene.transform.Rotate;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.List;
@@ -546,15 +545,15 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             ticksAndSectionsCanvas.setHeight(size);
 
             createHourPointer();
-            hour.setFill(getSkinnable().getHourNeedleColor());
+            hour.setFill(getSkinnable().getHourColor());
             hour.relocate((size - hour.getLayoutBounds().getWidth()) * 0.5, size * 0.23066667);
 
             createMinutePointer();
-            minute.setFill(getSkinnable().getMinuteNeedleColor());
+            minute.setFill(getSkinnable().getMinuteColor());
             minute.relocate((size - minute.getLayoutBounds().getWidth()) * 0.5, size * 0.03466667);
 
             createSecondPointer();
-            second.setFill(getSkinnable().getSecondNeedleColor());
+            second.setFill(getSkinnable().getSecondColor());
             second.relocate((size - second.getLayoutBounds().getWidth()) * 0.5, 0);
 
             title.setFill(getSkinnable().getTextColor());
@@ -565,7 +564,7 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             dateText.setFont(Fonts.latoLight(size * 0.06666667));
             dateText.relocate((center - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.4), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
 
-            dateNumber.setFill(getSkinnable().getSecondNeedleColor());
+            dateNumber.setFill(getSkinnable().getSecondColor());
             dateNumber.setFont(Fonts.latoLight(size * 0.06666667));
             dateNumber.relocate((center - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.51), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
 

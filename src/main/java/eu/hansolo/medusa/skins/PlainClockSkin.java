@@ -50,14 +50,12 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.List;
@@ -435,15 +433,15 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             ticksAndSectionsCanvas.setHeight(size);
 
             createHourPointer();
-            hour.setFill(getSkinnable().getHourNeedleColor());
+            hour.setFill(getSkinnable().getHourColor());
             hour.relocate((size - hour.getLayoutBounds().getWidth()) * 0.5, size * 0.16464238);
 
             createMinutePointer();
-            minute.setFill(getSkinnable().getMinuteNeedleColor());
+            minute.setFill(getSkinnable().getMinuteColor());
             minute.relocate((size - minute.getLayoutBounds().getWidth()) * 0.5, size * 0.048583);
 
             createSecondPointer();
-            second.setFill(getSkinnable().getSecondNeedleColor());
+            second.setFill(getSkinnable().getSecondColor());
             second.relocate((size - second.getLayoutBounds().getWidth()) * 0.5, size * 0.01956815);
 
             knob.setCenterX(center);

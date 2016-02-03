@@ -54,7 +54,6 @@ import javafx.scene.transform.Rotate;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.List;
@@ -354,18 +353,18 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             ticksAndSectionsCanvas.setWidth(size);
             ticksAndSectionsCanvas.setHeight(size);
 
-            hour.setFill(getSkinnable().getHourNeedleColor());
+            hour.setFill(getSkinnable().getHourColor());
             hour.setWidth(size * 0.05);
             hour.setHeight(size * 0.3125);
             hour.relocate((size - hour.getWidth()) * 0.5, center - size * 0.3125);
 
-            minute.setFill(getSkinnable().getMinuteNeedleColor());
+            minute.setFill(getSkinnable().getMinuteColor());
             minute.setWidth(size * 0.038);
             minute.setHeight(size * 0.4375);
             minute.relocate((size - minute.getWidth()) * 0.5, center - size * 0.4375);
 
             createSecondPointer();
-            second.setFill(getSkinnable().getSecondNeedleColor());
+            second.setFill(getSkinnable().getSecondColor());
             second.relocate((size - second.getLayoutBounds().getWidth()) * 0.5, center - second.getLayoutBounds().getHeight());
 
             knob.setFill(getSkinnable().getKnobColor());
