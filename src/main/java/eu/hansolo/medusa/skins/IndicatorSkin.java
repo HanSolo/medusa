@@ -265,7 +265,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Resizing ******************************************
     private void redraw() {
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         barColor             = getSkinnable().getBarColor();
 
