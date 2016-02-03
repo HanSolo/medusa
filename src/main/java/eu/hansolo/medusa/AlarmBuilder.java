@@ -16,6 +16,7 @@
 
 package eu.hansolo.medusa;
 
+import eu.hansolo.medusa.Alarm.AlarmMarkerEvent;
 import eu.hansolo.medusa.Alarm.Repetition;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -24,6 +25,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.event.EventHandler;
 import javafx.scene.paint.Color;
 
 import java.time.ZonedDateTime;
@@ -71,8 +73,18 @@ public class AlarmBuilder<B extends AlarmBuilder<B>> {
         return (B)this;
     }
 
-    public final B command(final Color COLOR) {
+    public final B color(final Color COLOR) {
         properties.put("color", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
+    public final B onAlarmMarkerPressed(final EventHandler<AlarmMarkerEvent> HANDLER) {
+        properties.put("onAlarmMarkerPressed", new SimpleObjectProperty<>(HANDLER));
+        return (B)this;
+    }
+
+    public final B onAlarmMarkerReleased(final EventHandler<AlarmMarkerEvent> HANDLER) {
+        properties.put("onAlarmMarkerReleased", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
     }
 
@@ -91,6 +103,10 @@ public class AlarmBuilder<B extends AlarmBuilder<B>> {
                 ALARM.setCommand(((ObjectProperty<Command>) properties.get(key)).get());
             } else if ("color".equals(key)) {
                 ALARM.setColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("onAlarmMarkerPressed".equals(key)) {
+                ALARM.setOnMarkerPressed(((ObjectProperty<EventHandler>) properties.get(key)).get());
+            } else if ("onAlarmMarkerReleased".equals(key)) {
+                ALARM.setOnMarkerReleased(((ObjectProperty<EventHandler>) properties.get(key)).get());
             }
         }
         return ALARM;
