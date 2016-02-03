@@ -16,10 +16,12 @@
 
 package eu.hansolo.medusa.skins;
 
+import eu.hansolo.medusa.Alarm;
 import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.TimeSection;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.CacheHint;
@@ -57,36 +59,41 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
  * Created by hansolo on 29.01.16.
  */
 public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
-    private static final double            PREFERRED_WIDTH  = 250;
-    private static final double            PREFERRED_HEIGHT = 250;
-    private static final double            MINIMUM_WIDTH    = 50;
-    private static final double            MINIMUM_HEIGHT   = 50;
-    private static final double            MAXIMUM_WIDTH    = 1024;
-    private static final double            MAXIMUM_HEIGHT   = 1024;
-    private static final DateTimeFormatter TIME_FORMATTER   = DateTimeFormatter.ofPattern("HH:mm");
-    private              double            size;
-    private              Canvas            ticksAndSectionsCanvas;
-    private              GraphicsContext   ticksAndSections;
-    private              Rectangle         hour;
-    private              Rectangle         minute;
-    private              Path              second;
-    private              Circle            knob;
-    private              Text              title;
-    private              Text              text;
-    private              Pane              pane;
-    private              Rotate            hourRotate;
-    private              Rotate            minuteRotate;
-    private              Rotate            secondRotate;
-    private              Group             shadowGroup;
-    private              DropShadow        dropShadow;
-    private              List<TimeSection> sections;
-    private              List<TimeSection> areas;
+    private static final double             PREFERRED_WIDTH     = 250;
+    private static final double             PREFERRED_HEIGHT    = 250;
+    private static final double             MINIMUM_WIDTH       = 50;
+    private static final double             MINIMUM_HEIGHT      = 50;
+    private static final double             MAXIMUM_WIDTH       = 1024;
+    private static final double             MAXIMUM_HEIGHT      = 1024;
+    private static final DateTimeFormatter  DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("EEEE\ndd.MM.YYYY\nHH:mm:ss");
+    private static final DateTimeFormatter  TIME_FORMATTER      = DateTimeFormatter.ofPattern("HH:mm");
+    private              Map<Alarm, Circle> alarmMap            = new ConcurrentHashMap<>();
+    private              double             size;
+    private              Canvas             ticksAndSectionsCanvas;
+    private              GraphicsContext    ticksAndSections;
+    private              Rectangle          hour;
+    private              Rectangle          minute;
+    private              Path               second;
+    private              Circle             knob;
+    private              Text               title;
+    private              Text               text;
+    private              Pane               pane;
+    private              Pane               alarmPane;
+    private              Rotate             hourRotate;
+    private              Rotate             minuteRotate;
+    private              Rotate             secondRotate;
+    private              Group              shadowGroup;
+    private              DropShadow         dropShadow;
+    private              List<TimeSection>  sections;
+    private              List<TimeSection>  areas;
 
 
     // ******************** Constructors **************************************
@@ -99,6 +106,8 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
         sections     = clock.getSections();
         areas        = clock.getAreas();
+
+        updateAlarms();
 
         init();
         initGraphics();
@@ -127,6 +136,8 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private void initGraphics() {
         ticksAndSectionsCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
         ticksAndSections = ticksAndSectionsCanvas.getGraphicsContext2D();
+
+        alarmPane = new Pane();
 
         hour  = new Rectangle(3, 60);
         hour.setArcHeight(3);
@@ -167,10 +178,9 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         text.setVisible(getSkinnable().isTextVisible());
         text.setManaged(getSkinnable().isTextVisible());
 
-        pane = new Pane();
+        pane = new Pane(ticksAndSectionsCanvas, alarmPane, title, text, shadowGroup);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.getChildren().addAll(ticksAndSectionsCanvas, title, text, shadowGroup);
 
         getChildren().setAll(pane);
     }
@@ -179,10 +189,13 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        //getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
         getSkinnable().currentTimeProperty().addListener(o ->
             updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())))
         );
+        getSkinnable().getAlarms().addListener((ListChangeListener<Alarm>) c -> {
+            updateAlarms();
+            redraw();
+        });
     }
 
 
@@ -260,6 +273,11 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Graphics ******************************************
+    private void updateAlarms() {
+        alarmMap.clear();
+        for (Alarm alarm : getSkinnable().getAlarms()) { alarmMap.put(alarm, new Circle()); }
+    }
+
     private void createSecondPointer() {
         double width  = size * 0.11866667;
         double height = size * 0.46266667;
@@ -308,8 +326,6 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         second.getElements().add(new ClosePath());
     }
 
-
-    // ******************** Resizing ******************************************
     public void updateTime(final ZonedDateTime TIME) {
         if (getSkinnable().isDiscreteMinutes()) {
             minuteRotate.setAngle(TIME.getMinute() * 6);
@@ -334,8 +350,13 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
             text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
         }
+
+        // Show all alarms within the next hour
+        if (TIME.getMinute() == 0 && TIME.getSecond() == 0) Helper.drawAlarms(getSkinnable(), size, 0.02, 0.445, alarmMap, DATE_TIME_FORMATTER, TIME);;
     }
 
+
+    // ******************** Resizing ******************************************
     private void resize() {
         double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
@@ -352,6 +373,8 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
             ticksAndSectionsCanvas.setWidth(size);
             ticksAndSectionsCanvas.setHeight(size);
+
+            alarmPane.setMaxSize(size, size);
 
             hour.setFill(getSkinnable().getHourColor());
             hour.setWidth(size * 0.05);
@@ -415,5 +438,8 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         text.setText(TIME_FORMATTER.format(time));
         Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
         text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
+
+        alarmPane.getChildren().setAll(alarmMap.values());
+        Helper.drawAlarms(getSkinnable(), size, 0.02, 0.445, alarmMap, DATE_TIME_FORMATTER, time);
     }
 }

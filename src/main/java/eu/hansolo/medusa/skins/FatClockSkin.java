@@ -16,11 +16,13 @@
 
 package eu.hansolo.medusa.skins;
 
+import eu.hansolo.medusa.Alarm;
 import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TimeSection;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
@@ -41,6 +43,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.FillRule;
@@ -58,20 +61,24 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
  * Created by hansolo on 02.02.16.
  */
 public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
-    private static final double            PREFERRED_WIDTH  = 250;
-    private static final double            PREFERRED_HEIGHT = 250;
-    private static final double            MINIMUM_WIDTH    = 50;
-    private static final double            MINIMUM_HEIGHT   = 50;
-    private static final double            MAXIMUM_WIDTH    = 1024;
-    private static final double            MAXIMUM_HEIGHT   = 1024;
-    private static final DateTimeFormatter DATE_FORMATER    = DateTimeFormatter.ofPattern("EE d");
-    private static final DateTimeFormatter TIME_FORMATTER   = DateTimeFormatter.ofPattern("HH:mm");
+    private static final double             PREFERRED_WIDTH     = 250;
+    private static final double             PREFERRED_HEIGHT    = 250;
+    private static final double             MINIMUM_WIDTH       = 50;
+    private static final double             MINIMUM_HEIGHT      = 50;
+    private static final double             MAXIMUM_WIDTH       = 1024;
+    private static final double             MAXIMUM_HEIGHT      = 1024;
+    private static final DateTimeFormatter  DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("EEEE\ndd.MM.YYYY\nHH:mm:ss");
+    private static final DateTimeFormatter  DATE_FORMATER       = DateTimeFormatter.ofPattern("EE d");
+    private static final DateTimeFormatter  TIME_FORMATTER      = DateTimeFormatter.ofPattern("HH:mm");
+    private              Map<Alarm, Circle> alarmMap            = new ConcurrentHashMap<>();
     private double            size;
     private Canvas            ticksAndSectionsCanvas;
     private GraphicsContext   ticksAndSections;
@@ -81,6 +88,7 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private Text              dateText;
     private Text              text;
     private Pane              pane;
+    private Pane              alarmPane;
     private Rotate            hourRotate;
     private Rotate            minuteRotate;
     private Group             shadowGroup;
@@ -98,6 +106,8 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
         sections     = clock.getSections();
         areas        = clock.getAreas();
+
+        updateAlarms();
 
         init();
         initGraphics();
@@ -126,6 +136,8 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private void initGraphics() {
         ticksAndSectionsCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
         ticksAndSections = ticksAndSectionsCanvas.getGraphicsContext2D();
+
+        alarmPane = new Pane();
 
         hour  = new Path();
         hour.setFillRule(FillRule.EVEN_ODD);
@@ -160,10 +172,9 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         text.setVisible(getSkinnable().isTextVisible());
         text.setManaged(getSkinnable().isTextVisible());
 
-        pane = new Pane();
+        pane = new Pane(ticksAndSectionsCanvas, alarmPane, title, dateText, text, shadowGroup);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.getChildren().addAll(ticksAndSectionsCanvas, title, dateText, text, shadowGroup);
 
         getChildren().setAll(pane);
     }
@@ -172,10 +183,13 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        //getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
         getSkinnable().currentTimeProperty().addListener(o ->
-                                                             updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())))
-                                                        );
+            updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())))
+        );
+        getSkinnable().getAlarms().addListener((ListChangeListener<Alarm>) c -> {
+            updateAlarms();
+            redraw();
+        });
     }
 
 
@@ -292,8 +306,11 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         minute.getElements().add(new ClosePath());
     }
 
+    private void updateAlarms() {
+        alarmMap.clear();
+        for (Alarm alarm : getSkinnable().getAlarms()) { alarmMap.put(alarm, new Circle()); }
+    }
 
-    // ******************** Resizing ******************************************
     public void updateTime(final ZonedDateTime TIME) {
         if (getSkinnable().isDiscreteMinutes()) {
             minuteRotate.setAngle(TIME.getMinute() * 6);
@@ -318,8 +335,13 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
             dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.45), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
         }
+
+        // Show all alarms within the next hour
+        if (TIME.getMinute() == 0 && TIME.getSecond() == 0) Helper.drawAlarms(getSkinnable(), size, 0.015, 0.485, alarmMap, DATE_TIME_FORMATTER, TIME);;
     }
 
+
+    // ******************** Resizing ******************************************
     private void resize() {
         double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
@@ -336,6 +358,8 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
             ticksAndSectionsCanvas.setWidth(size);
             ticksAndSectionsCanvas.setHeight(size);
+
+            alarmPane.setMaxSize(size, size);
 
             createHourPointer();
             hour.setFill(getSkinnable().getHourColor());
@@ -394,5 +418,8 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         dateText.setText(DATE_FORMATER.format(time).toUpperCase());
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.45), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
+
+        alarmPane.getChildren().setAll(alarmMap.values());
+        Helper.drawAlarms(getSkinnable(), size, 0.015, 0.485, alarmMap, DATE_TIME_FORMATTER, time);
     }
 }
