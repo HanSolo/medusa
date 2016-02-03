@@ -16,6 +16,7 @@
 
 package eu.hansolo.medusa.tools;
 
+import eu.hansolo.medusa.Alarm;
 import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
@@ -29,6 +30,7 @@ import javafx.geometry.VPos;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -38,6 +40,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -45,8 +48,11 @@ import javafx.scene.text.TextAlignment;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
@@ -820,6 +826,50 @@ public class Helper {
             CTX.setFill(area.getColor());
             CTX.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
             CTX.restore();
+        }
+    }
+
+    public static void drawAlarms(final Clock CLOCK, final double SIZE, final double ALARM_MARKER_SIZE, final double ALARM_MARKER_RADIUS, final Map<Alarm, Circle> ALARM_MAP, final DateTimeFormatter DATE_TIME_FORMATTER, final ZonedDateTime TIME) {
+        if (CLOCK.isAlarmsVisible()) {
+            double alarmSize = ALARM_MARKER_SIZE * SIZE;
+            double center    = SIZE * 0.5;
+            double angleStep = 360d / 60d;
+            for (Map.Entry<Alarm, Circle> entry : ALARM_MAP.entrySet()) {
+                Alarm         alarm      = entry.getKey();
+                ZonedDateTime alarmTime  = alarm.getTime();
+                double        alarmAngle = (alarmTime.getMinute() + alarmTime.getSecond() / 60d) * angleStep + 180;
+                double        sinValue   = Math.sin(Math.toRadians((-alarmAngle)));
+                double        cosValue   = Math.cos(Math.toRadians((-alarmAngle)));
+                Color         alarmColor = alarm.getColor();
+                Circle        dot        = entry.getValue();
+                dot.setRadius(alarmSize);
+                dot.setCenterX(center + SIZE * ALARM_MARKER_RADIUS * sinValue);
+                dot.setCenterY(center + SIZE * ALARM_MARKER_RADIUS * cosValue);
+                dot.setFill(alarmColor);
+                dot.setStroke(alarmColor.darker());
+                dot.setPickOnBounds(false);
+                dot.setOnMousePressed(e -> alarm.fireAlarmMarkerEvent(alarm.ALARM_MARKER_PRESSED_EVENT));
+                dot.setOnMouseReleased(e -> alarm.fireAlarmMarkerEvent(alarm.ALARM_MARKER_RELEASED_EVENT));
+                if (alarmTime.getDayOfMonth() == TIME.getDayOfMonth() &&
+                    alarmTime.getMonthValue() == TIME.getMonthValue() &&
+                    alarmTime.getYear() == TIME.getYear() &&
+                    alarmTime.getHour() == TIME.getHour() &&
+                    alarmTime.getMinute() >= TIME.getMinute()) {
+                    dot.setManaged(true);
+                    dot.setVisible(true);
+                } else {
+                    dot.setManaged(false);
+                    dot.setVisible(false);
+                }
+                Tooltip alarmTooltip;
+                if (alarm.getText().isEmpty()) {
+                    alarmTooltip = new Tooltip(DATE_TIME_FORMATTER.format(alarm.getTime()));
+                } else {
+                    alarmTooltip = new Tooltip(new StringBuilder(alarm.getText()).append("\n").append(DATE_TIME_FORMATTER.format(alarm.getTime())).toString());
+                }
+                alarmTooltip.setTextAlignment(TextAlignment.CENTER);
+                Tooltip.install(dot, alarmTooltip);
+            }
         }
     }
 }
