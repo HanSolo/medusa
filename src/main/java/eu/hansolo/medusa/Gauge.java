@@ -528,17 +528,49 @@ public class Gauge extends Control {
 
 
     // ******************** Data related methods ******************************
+
+    /**
+     * Returns the value of the Gauge. If animated == true this value represents
+     * the value at the end of the animation. Where currentValue represents the
+     * current value during the animation.
+     * @return the value of the gauge
+     */
     public double getValue() { return value.get(); }
+    /**
+     * Sets the value of the Gauge to the given double. If animated == true this
+     * value will be the end value after the animation is finished.
+     * @param VALUE
+     */
     public void setValue(final double VALUE) { value.set(VALUE); }
     public DoubleProperty valueProperty() { return value; }
 
+    /**
+     * Returns the current value of the Gauge. If animated == true this value
+     * represents the current value during the animation. Otherwise it's returns
+     * the same value as the getValue() method.
+     * @return the current value of the gauge
+     */
     public double getCurrentValue() { return currentValue.get(); }
     public ReadOnlyDoubleProperty currentValueProperty() { return currentValue; }
 
+    /**
+     * Returns the last value of the Gauge. This will not be the last value during
+     * an animation but the final last value after the animation was finished.
+     * @return the last value of the gauge
+     */
     public double getOldValue() { return oldValue.get(); }
     public ReadOnlyDoubleProperty oldValueProperty() { return oldValue; }
 
+    /**
+     * Returns the minimum value of the scale. This value represents the lower
+     * limit of the visible gauge values.
+     * @return the minimum value of the gauge scale
+     */
     public double getMinValue() { return null == minValue ? _minValue : minValue.get(); }
+    /**
+     * Sets the minimum value of the gauge scale to the given value
+     * @param VALUE
+     */
     public void setMinValue(final double VALUE) {
         if (null == minValue) {
             if (VALUE > getMaxValue()) { setMaxValue(VALUE); }
@@ -570,7 +602,16 @@ public class Gauge extends Control {
         return minValue;
     }
 
+    /**
+     * Returns the maximum value of the scale. This value represents the upper limit
+     * of the visible gauge values.
+     * @return the maximum value of the gauge scale
+     */
     public double getMaxValue() { return null == maxValue ? _maxValue : maxValue.get(); }
+    /**
+     * Sets the maximum value of the gauge scale to the given value
+     * @param VALUE
+     */
     public void setMaxValue(final double VALUE) {
         if (null == maxValue) {
             if (VALUE < getMinValue()) { setMinValue(VALUE); }
@@ -600,7 +641,18 @@ public class Gauge extends Control {
         return maxValue;
     }
 
+    /**
+     * Always returns the range of the gauge scale (maxValue - minValue).
+     * This value will be automatically calculated each time
+     * the min- or maxValue will change.
+     * @return the range of the gauge scale
+     */
     public double getRange() { return null == range ? _range : range.get(); }
+    /**
+     * This is a private method that sets the range to the given value
+     * which is always (maxValue - minValue).
+     * @param RANGE
+     */
     private void setRange(final double RANGE) {
         if (null == range) {
             _range = RANGE;
@@ -614,7 +666,19 @@ public class Gauge extends Control {
         return range;
     }
 
+    /**
+     * Returns the threshold value that can be used to visualize a
+     * threshold value on the scale. There are also events that will
+     * be fired if the threshold was exceeded or underrun.
+     * The value will be clamped to range of the gauge.
+     * @return the threshold value of the gauge
+     */
     public double getThreshold() { return null == threshold ? _threshold : threshold.get(); }
+    /**
+     * Sets the threshold of the gauge to the given value. The value
+     * will be clamped to the range of the gauge.
+     * @param THRESHOLD
+     */
     public void setThreshold(final double THRESHOLD) {
         originalThreshold = THRESHOLD;
         if (null == threshold) {
@@ -635,7 +699,17 @@ public class Gauge extends Control {
         return threshold;
     }
 
+    /**
+     * Returns the title of the gauge. This title will usually
+     * only be visible if it is not empty.
+     * @return the title of the gauge
+     */
     public String getTitle() { return null == title ? _title : title.get(); }
+    /**
+     * Sets the title of the gauge. This title will only be visible
+     * if it is not empty.
+     * @param TITLE
+     */
     public void setTitle(final String TITLE) {
         if (null == title) {
             _title = TITLE;
@@ -649,7 +723,17 @@ public class Gauge extends Control {
         return title;
     }
 
+    /**
+     * Returns the subtitle of the gauge. This subtitle will usually
+     * only be visible if it is not empty.
+     * @return the subtitle of the gauge
+     */
     public String getSubTitle() { return null == subTitle ? _subTitle : subTitle.get(); }
+    /**
+     * Sets the subtitle of the gauge. This subtitle will usually
+     * only be visible if it is not empty.
+     * @param SUBTITLE
+     */
     public void setSubTitle(final String SUBTITLE) {
         if (null == subTitle) {
             _subTitle = SUBTITLE;
@@ -663,7 +747,17 @@ public class Gauge extends Control {
         return subTitle;
     }
 
+    /**
+     * Returns the unit of the gauge. This unit will usually only
+     * be visible if it is not empty.
+     * @return the unit of the gauge
+     */
     public String getUnit() { return null == unit ? _unit : unit.get(); }
+    /**
+     * Sets the unit of the gauge. This unit will usually only be
+     * visible if it is not empty.
+     * @param UNIT
+     */
     public void setUnit(final String UNIT) {
         if (null == unit) {
             _unit = UNIT;
@@ -677,121 +771,276 @@ public class Gauge extends Control {
         return unit;
     }
 
+    /**
+     * Returns an observable list of Section objects. The sections
+     * will be used to colorize areas with a special meaning such
+     * as the red area in a rpm gauge. Sections in the Medusa library
+     * usually are less eye-catching than Areas.
+     * @return an observable list of Section objects
+     */
     public ObservableList<Section> getSections() { return sections; }
+    /**
+     * Sets the sections to the given list of Section objects. The
+     * sections will be used to colorize areas with a special
+     * meaning such as the red area in a rpm gauge.
+     * Sections in the Medusa library
+     * usually are less eye-catching than Areas.
+     * @param SECTIONS
+     */
     public void setSections(final List<Section> SECTIONS) {
         sections.setAll(SECTIONS);
         Collections.sort(sections, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Sets the sections to the given array of Section objects. The
+     * sections will be used to colorize areas with a special
+     * meaning such as the red area in a rpm gauge.
+     * @param SECTIONS
+     */
     public void setSections(final Section... SECTIONS) { setSections(Arrays.asList(SECTIONS)); }
+    /**
+     * Adds the given Section to the list of sections.
+     * Sections in the Medusa library
+     * usually are less eye-catching than Areas.
+     * @param SECTION
+     */
     public void addSection(final Section SECTION) {
         if (null == SECTION) return;
         sections.add(SECTION);
         Collections.sort(sections, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Removes the given Section from the list of sections.
+     * Sections in the Medusa library
+     * usually are less eye-catching than Areas.
+     * @param SECTION
+     */
     public void removeSection(final Section SECTION) {
         if (null == SECTION) return;
         sections.remove(SECTION);
         Collections.sort(sections, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Clears the list of sections.
+     */
     public void clearSections() {
         sections.clear();
         fireUpdateEvent(SECTION_EVENT);
     }
 
+    /**
+     * Returns an observable list of Section objects. The sections
+     * will be used to colorize areas with a special meaning such
+     * as the red area in a rpm gauge. Areas in the Medusa library
+     * usually are more eye-catching than Sections.
+     * @return an observable list of Section objects
+     */
     public ObservableList<Section> getAreas() { return areas; }
+    /**
+     * Sets the sections to the given list of Section objects. The
+     * sections will be used to colorize areas with a special
+     * meaning such as the red area in a rpm gauge.
+     * Areas in the Medusa library usually are more
+     * eye-catching than Sections.
+     * @param AREAS
+     */
     public void setAreas(final List<Section> AREAS) {
         areas.setAll(AREAS);
         Collections.sort(areas, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Sets the sections to the given array of Section objects. The
+     * sections will be used to colorize areas with a special
+     * meaning such as the red area in a rpm gauge.
+     * Areas in the Medusa library usually are more
+     * eye-catching than Sections.
+     * @param AREAS
+     */
     public void setAreas(final Section... AREAS) { setAreas(Arrays.asList(AREAS)); }
+    /**
+     * Adds the given Section to the list of areas.
+     * Areas in the Medusa library usually are more
+     * eye-catching than Sections.
+     * @param AREA
+     */
     public void addArea(final Section AREA) {
         if (null == AREA) return;
         areas.add(AREA);
         Collections.sort(areas, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Removes the given Section from the list of areas.
+     * Areas in the Medusa library usually are more
+     * eye-catching than Sections.
+     * @param AREA
+     */
     public void removeArea(final Section AREA) {
         if (null == AREA) return;
         areas.remove(AREA);
         Collections.sort(areas, new SectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Clears the list of areas.
+     */
     public void clearAreas() {
         areas.clear();
         fireUpdateEvent(SECTION_EVENT);
     }
 
+    /**
+     * Returns an observable list of Section objects.
+     * The sections will be used to colorize tickmarks with a
+     * special meaning such as the red area in a rpm gauge.
+     * @return an observable list of Section objects
+     */
     public ObservableList<Section> getTickMarkSections() { return tickMarkSections; }
+    /**
+     * Sets the tickmark sections to the given list of Section objects.
+     * @param SECTIONS
+     */
     public void setTickMarkSections(final List<Section> SECTIONS) {
         tickMarkSections.setAll(SECTIONS);
         Collections.sort(tickMarkSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Sets the tickmark sections to the given array of Section objects.
+     * @param SECTIONS
+     */
     public void setTickMarkSections(final Section... SECTIONS) { setTickMarkSections(Arrays.asList(SECTIONS)); }
+    /**
+     * Adds the given Section to the list of tickmark sections.
+     * @param SECTION
+     */
     public void addTickMarkSection(final Section SECTION) {
         if (null == SECTION) return;
         tickMarkSections.add(SECTION);
         Collections.sort(tickMarkSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Removes the given Section from the list of tickmark sections.
+     * @param SECTION
+     */
     public void removeTickMarkSection(final Section SECTION) {
         if (null == SECTION) return;
         tickMarkSections.remove(SECTION);
         Collections.sort(tickMarkSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Clears the list of tickmark sections.
+     */
     public void clearTickMarkSections() {
         tickMarkSections.clear();
         fireUpdateEvent(REDRAW_EVENT);
     }
 
+    /**
+     * Returns an observable list of Section objects.
+     * The sections will be used to colorize ticklabels with
+     * a special meaning such as the red area in a rpm gauge.
+     * @return an observable list of Section objects
+     */
     public ObservableList<Section> getTickLabelSections() { return tickLabelSections; }
+    /**
+     * Sets the ticklabel sections to the given list of Section objects.
+     * @param SECTIONS
+     */
     public void setTickLabelSections(final List<Section> SECTIONS) {
         tickLabelSections.setAll(SECTIONS);
         Collections.sort(tickLabelSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Sets the ticklabel sections to the given array of Section objects.
+     * @param SECTIONS
+     */
     public void setTickLabelSections(final Section... SECTIONS) { setTickLabelSections(Arrays.asList(SECTIONS)); }
+    /**
+     * Adds the given Section to the list of ticklabel sections.
+     * @param SECTION
+     */
     public void addTickLabelSection(final Section SECTION) {
         if (null == SECTION) return;
         tickLabelSections.add(SECTION);
         Collections.sort(tickLabelSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Removes the given Section from the list of ticklabel sections.
+     * @param SECTION
+     */
     public void removeTickLabelSection(final Section SECTION) {
         if (null == SECTION) return;
         tickLabelSections.remove(SECTION);
         Collections.sort(tickLabelSections, new SectionComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Clears the list of ticklabel sections.
+     */
     public void clearTickLabelSections() {
         tickLabelSections.clear();
         fireUpdateEvent(REDRAW_EVENT);
     }
 
+    /**
+     * Returns an observable list of Marker objects.
+     * Like the threshold the markers are used to visualize
+     * specific values. The markers will be visualized using
+     * nodes with mouse event support (pressed, released) and
+     * tooltip.
+     * @return an observable list of Marker objects
+     */
     public ObservableList<Marker> getMarkers() { return markers; }
+    /**
+     * Sets the list of markers to the given list of Marker objects.
+     * The markers will be visualized using nodes with mouse event
+     * support (pressed, released) and tooltip.
+     * @param MARKERS
+     */
     public void setMarkers(final List<Marker> MARKERS) {
         markers.setAll(MARKERS);
         Collections.sort(markers, new MarkerComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Sets the list of markers to the given array of Marker objects.
+     * The markers will be visualuzed using nodes with mouse event
+     * support (pressed, released) and tooltip.
+     * @param MARKERS
+     */
     public void setMarkers(final Marker... MARKERS) { setMarkers(Arrays.asList(MARKERS)); }
+    /**
+     * Adds the given Marker to the list of markers.
+     * @param MARKER
+     */
     public void addMarker(final Marker MARKER) {
         if (null == MARKER) return;
         markers.add(MARKER);
         Collections.sort(markers, new MarkerComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Removes the given Marker from the list of markers.
+     * @param MARKER
+     */
     public void removeMarker(final Marker MARKER) {
         if (null == MARKER) return;
         markers.remove(MARKER);
         Collections.sort(markers, new MarkerComparator());
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Clears the list of markers.
+     */
     public void clearMarkers() {
         markers.clear();
         fireUpdateEvent(REDRAW_EVENT);
