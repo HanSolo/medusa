@@ -505,7 +505,7 @@ public class Gauge extends Control {
         _gradientBarEnabled               = false;
         _customTickLabelsEnabled          = false;
         customTickLabels                  = FXCollections.observableArrayList();
-        _customTickLabelFontSize          = 10;
+        _customTickLabelFontSize          = 18;
         _interactive                      = false;
         _buttonTooltipText                = "";
         _keepAspect                       = true;
@@ -1874,7 +1874,19 @@ public class Gauge extends Control {
         return tickMarkColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the major
+     * tickmarks. This color will only be used if no tickmark
+     * section is defined at the position of the tickmark.
+     * @return the color that will be used to colorize the major tickmarks
+     */
     public Color getMajorTickMarkColor() { return null == majorTickMarkColor ? _majorTickMarkColor : majorTickMarkColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the major
+     * tickmarks. This color will only be used if no tickmark
+     * section is defined at the position of the tickmark.
+     * @param COLOR
+     */
     public void setMajorTickMarkColor(final Color COLOR) {
         if (null == majorTickMarkColor) {
             _majorTickMarkColor = COLOR;
@@ -1888,7 +1900,19 @@ public class Gauge extends Control {
         return majorTickMarkColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the medium
+     * tickmarks. This color will only be used if no tickmark
+     * section is defined at the position of the tickmark.
+     * @return the color that will be used to colorize the medium tickmark
+     */
     public Color getMediumTickMarkColor() { return null == mediumTickMarkColor ? _mediumTickMarkColor : mediumTickMarkColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the medium
+     * tickmarks. This color will only be used if no tickmark
+     * section is defined at the position of the tickmark.
+     * @param COLOR
+     */
     public void setMediumTickMarkColor(final Color COLOR) {
         if (null == mediumTickMarkColor) {
             _mediumTickMarkColor = COLOR;
@@ -1901,8 +1925,20 @@ public class Gauge extends Control {
         if (null == mediumTickMarkColor) { mediumTickMarkColor = new SimpleObjectProperty<>(Gauge.this, "mediumTickMarkColor", _mediumTickMarkColor); }
         return mediumTickMarkColor;
     }
-    
+
+    /**
+     * Returns the color that will be used to colorize the minor
+     * tickmarks. This color will only be used if no tickmark
+     * section is defined at the position of the tickmark.
+     * @return the color that will be used to colorize the minor tickmark
+     */
     public Color getMinorTickMarkColor() { return null == minorTickMarkColor ? _minorTickMarkColor : minorTickMarkColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the minor
+     * tickmarks. This color will only be used if no tickmark
+     * section is defined at the position of the tickmark.
+     * @param COLOR
+     */
     public void setMinorTickMarkColor(final Color COLOR) {
         if (null == minorTickMarkColor) {
             _minorTickMarkColor = COLOR;
@@ -1916,7 +1952,17 @@ public class Gauge extends Control {
         return minorTickMarkColor;
     }
 
+    /**
+     * Returns the shape that will be used to visualize the major tickmark.
+     * Values are LINE, DOT, TRIANGLE, BOX, TICK_LABEL and PILL
+     * @return the shape that will be used to visualize the major tickmark
+     */
     public TickMarkType getMajorTickMarkType() { return null == majorTickMarkType ? _majorTickMarkType : majorTickMarkType.get(); }
+    /**
+     * Defines the shape that will be used to visualize the major tickmark.
+     * Values are LINE, DOT, TRIANGLE, BOX, TICK_LABEL and PILL
+     * @param TYPE
+     */
     public void setMajorTickMarkType(final TickMarkType TYPE) {
         if (null == majorTickMarkType) {
             _majorTickMarkType = null == TYPE ? TickMarkType.LINE : TYPE;
@@ -1936,7 +1982,17 @@ public class Gauge extends Control {
         return majorTickMarkType;
     }
 
+    /**
+     * Returns the shape that will be used to visualize the medium tickmark.
+     * Values are LINE, DOT, TRIANGLE, BOX and PILL
+     * @return the shape that will be used to visualize the medium tickmark
+     */
     public TickMarkType getMediumTickMarkType() { return null == mediumTickMarkType ? _mediumTickMarkType : mediumTickMarkType.get(); }
+    /**
+     * Defines the shape that will be used to visualize the medium tickmark.
+     * Values are LINE, DOT, TRIANGLE, BOX and PILL
+     * @param TYPE
+     */
     public void setMediumTickMarkType(final TickMarkType TYPE) {
         if (null == mediumTickMarkType) {
             _mediumTickMarkType = null == TYPE ? TickMarkType.LINE : TYPE;
@@ -1955,8 +2011,18 @@ public class Gauge extends Control {
         }
         return mediumTickMarkType;
     }
-    
+
+    /**
+     * Returns the shape that will be used to visualize the minor tickmark.
+     * Values are LINE, DOT, TRIANGLE, BOX and PILL
+     * @return the shape that will be used to visualize the minor tickmark
+     */
     public TickMarkType getMinorTickMarkType() { return null == minorTickMarkType ? _minorTickMarkType : minorTickMarkType.get(); }
+    /**
+     * Defines the shape that will be used to visualize the minor tickmark.
+     * Values are LINE, DOT, TRIANGLE, BOX and PILL
+     * @param TYPE
+     */
     public void setMinorTickMarkType(final TickMarkType TYPE) {
         if (null == minorTickMarkType) {
             _minorTickMarkType = null == TYPE ? TickMarkType.LINE : TYPE;
@@ -1978,7 +2044,17 @@ public class Gauge extends Control {
         return minorTickMarkType;
     }
 
+    /**
+     * Returns the number format that will be used to format the value
+     * in the gauge (NOT USED AT THE MOMENT)
+     * @return the number format that will bused to format the value
+     */
     public NumberFormat getNumberFormat() { return null == numberFormat ? _numberFormat : numberFormat.get(); }
+    /**
+     * Defines the number format that will be used to format the value
+     * in the gauge (NOT USED AT THE MOMENT)
+     * @param FORMAT
+     */
     public void setNumberFormat(final NumberFormat FORMAT) {
         if (null == numberFormat) {
             _numberFormat = null == FORMAT ? NumberFormat.STANDARD : FORMAT;
@@ -1998,7 +2074,19 @@ public class Gauge extends Control {
         return numberFormat;
     }
 
+    /**
+     * Returns the number of decimals that will be used to format the
+     * value of the gauge. The number of decimals will be clamped to
+     * a value between 0-3.
+     * @return the number of decimals that will be used to format the value
+     */
     public int getDecimals() { return null == decimals ? _decimals : decimals.get(); }
+    /**
+     * Defines the number of decimals that will be used to format the
+     * value of the gauge. The number of decimals will be clamped to
+     * a value between 0-3.
+     * @param DECIMALS
+     */
     public void setDecimals(final int DECIMALS) {
         if (null == decimals) {
             _decimals = Helper.clamp(0, MAX_NO_OF_DECIMALS, DECIMALS);
@@ -2018,7 +2106,19 @@ public class Gauge extends Control {
         return decimals;
     }
 
+    /**
+     * Returns the number of decimals that will be used to format the
+     * value of the ticklabels. The number of decimals will be clamped to
+     * a value between 0-3.
+     * @return
+     */
     public int getTickLabelDecimals() { return null == tickLabelDecimals ? _tickLabelDecimals : tickLabelDecimals.get(); }
+    /**
+     * Defines the number of decimals that will be used to format the
+     * value of the gauge. The number of decimals will be clamped to
+     * a value between 0-3.
+     * @param DECIMALS
+     */
     public void setTickLabelDecimals(final int DECIMALS) {
         if (null == tickLabelDecimals) {
             _tickLabelDecimals = Helper.clamp(0, MAX_NO_OF_DECIMALS, DECIMALS);
@@ -2038,7 +2138,25 @@ public class Gauge extends Control {
         return tickLabelDecimals;
     }
 
+    /**
+     * Returns the shape of the needle that will be used. This is
+     * dependent on the used SkinType. Values are
+     * GaugeSkin  : STANDARD, FAT
+     * HSkin      : STANDARD
+     * VSkin      : STANDARD
+     * QuarterSkin: STANDARD
+     * @return the shape of the needle that will be used
+     */
     public NeedleType getNeedleType() { return null == needleType ? _needleType : needleType.get(); }
+    /**
+     * Defines the shape of the needle that will be used. This is
+     * dependent on the used SkinType. Values are
+     * GaugeSkin  : STANDARD, FAT
+     * HSkin      : STANDARD
+     * VSkin      : STANDARD
+     * QuarterSkin: STANDARD
+     * @param TYPE
+     */
     public void setNeedleType(final NeedleType TYPE) {
         if (null == needleType) {
             _needleType = TYPE == null ? NeedleType.STANDARD : TYPE;
@@ -2058,7 +2176,19 @@ public class Gauge extends Control {
         return needleType;
     }
 
+    /**
+     * Returns the graphical representation of the needle that will be used.
+     * Values are ANGLED, ROUND and FLAT
+     * In principle it defines how the needle will be filled (gradient, color)
+     * @return the graphical representation of the needle
+     */
     public NeedleShape getNeedleShape() { return null == needleShape ? _needleShape : needleShape.get(); }
+    /**
+     * Defines the graphical representation of the needle that will be used.
+     * Values are ANGLED, ROUND and FLAT
+     * In principle it defines how the needle will be filled (gradient, color)
+     * @param SHAPE
+     */
     public void setNeedleShape(final NeedleShape SHAPE) {
         if (null == needleShape) {
             _needleShape = null == SHAPE ? NeedleShape.ANGLED : SHAPE;
@@ -2077,8 +2207,18 @@ public class Gauge extends Control {
         }
         return needleShape;
     }
-    
+
+    /**
+     * Returns the thickness of the needle.
+     * The values are THIN, STANDARD and THICK
+     * @return the thickness of the needle
+     */
     public NeedleSize getNeedleSize() { return null == needleSize ? _needleSize : needleSize.get(); }
+    /**
+     * Defines the thickness of the needle.
+     * The values are THIN, STANDARD and THICK
+     * @param SIZE
+     */
     public void setNeedleSize(final NeedleSize SIZE) {
         if (null == needleSize) {
             _needleSize = null == SIZE ? NeedleSize.STANDARD : SIZE;
@@ -2098,7 +2238,31 @@ public class Gauge extends Control {
         return needleSize;
     }
 
+    /**
+     * Returns the behavior of the needle movement.
+     * The values are STANDARD and OPTIMIZED
+     * This is an experimental feature that only makes sense in
+     * gauges that use an angleRange of 360 degrees and where the
+     * needle should be able to use the shortest way to the target
+     * value. As an example one can think of a compass. If the value
+     * in a compass changes from 20 degrees to 290 degrees the needle
+     * will take the shortest way to the value, in this case this
+     * means it will rotate counter-clockwise.
+     * @return the behavior of the needle movement (EXPERIMENTAL)
+     */
     public NeedleBehavior getNeedleBehavior() { return null == needleBehavior ? _needleBehavior : needleBehavior.get(); }
+    /**
+     * Defines the behavior of the needle movement.
+     * The values are STANDARD and OPTIMIZED
+     * This is an experimental feature that only makes sense in
+     * gauges that use an angleRange of 360 degrees and where the
+     * needle should be able to use the shortest way to the target
+     * value. As an example one can think of a compass. If the value
+     * in a compass changes from 20 degrees to 290 degrees the needle
+     * will take the shortest way to the value, in this case this
+     * means it will rotate counter-clockwise.
+     * @param BEHAVIOR
+     */
     public void setNeedleBehavior(final NeedleBehavior BEHAVIOR) {
         if (null == needleBehavior) {
             _needleBehavior = BEHAVIOR;
@@ -2117,7 +2281,17 @@ public class Gauge extends Control {
         return needleBehavior;
     }
 
+    /**
+     * Returns the color that will be used to colorize the needle of
+     * the radial gauges.
+     * @return the color that wil be used to colorize the needle
+     */
     public Color getNeedleColor() { return null == needleColor ? _needleColor : needleColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the needle of
+     * the radial gauges.
+     * @param COLOR
+     */
     public void setNeedleColor(final Color COLOR) {
         if (null == needleColor) {
             _needleColor = COLOR;
@@ -2131,7 +2305,17 @@ public class Gauge extends Control {
         return needleColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the bar of
+     * the gauge (if it has a bar).
+     * @return the color that will be used to colorized the bar (if available)
+     */
     public Color getBarColor() { return null == barColor ? _barColor : barColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the bar of
+     * the gauge (if it has a bar).
+     * @param COLOR
+     */
     public void setBarColor(final Color COLOR) {
         if (null == barColor) {
             _barColor = COLOR;
@@ -2145,7 +2329,17 @@ public class Gauge extends Control {
         return barColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the bar background of
+     * the gauge (if it has a bar).
+     * @return the color that will be used to colorize the bar background
+     */
     public Color getBarBackgroundColor() { return null == barBackgroundColor ? _barBackgroundColor : barBackgroundColor.get(); }
+    /**
+     * Returns the color that will be used to colorize the bar background of
+     * the gauge (if it has a bar).
+     * @param COLOR
+     */
     public void setBarBackgroundColor(final Color COLOR) {
         if (null == barBackgroundColor) {
             _barBackgroundColor = COLOR;
@@ -2159,7 +2353,33 @@ public class Gauge extends Control {
         return barBackgroundColor;
     }
 
+    /**
+     * Returns the design that will be used to visualize the LCD display
+     * of the gauge (if it has one). The values are
+     * BEIGE, BLACK, BLUE, ORANGE, RED, YELLOW, WHITE, GRAY,
+     * BLACK, GREEN, GREEN_DARKGREEN, BLUE2, BLUE_BLACK,
+     * BLUE_DARKBLUE, BLUE_LIGHTBLUE, BLUE_GRAY, STANDARD,
+     * LIGHTGREEN, STANDARD_GREEN, BLUE_BLUE, RED_DARKRED,
+     * DARKBLUE, PURPLE, BLACK_RED, DARKGREEN, AMBER,
+     * LIGHTBLUE, GREEN_BLACK, YELLOW_BLACK, BLACK_YELLOW,
+     * LIGHTGREEN_BLACK, DARKPURPLE, DARKAMBER, BLUE_LIGHTBLUE2,
+     * GRAY_PURPLE, YOCTOPUCE, SECTIONS, FLAT_CUSTOM
+     * @return the design that will be used to visualize the LCD display (if available)
+     */
     public LcdDesign getLcdDesign() { return null == lcdDesign ? _lcdDesign : lcdDesign.get(); }
+    /**
+     * Defines the design that will be used to visualize the LCD display
+     * of the gauge (if it has one). The values are
+     * BEIGE, BLACK, BLUE, ORANGE, RED, YELLOW, WHITE, GRAY,
+     * BLACK, GREEN, GREEN_DARKGREEN, BLUE2, BLUE_BLACK,
+     * BLUE_DARKBLUE, BLUE_LIGHTBLUE, BLUE_GRAY, STANDARD,
+     * LIGHTGREEN, STANDARD_GREEN, BLUE_BLUE, RED_DARKRED,
+     * DARKBLUE, PURPLE, BLACK_RED, DARKGREEN, AMBER,
+     * LIGHTBLUE, GREEN_BLACK, YELLOW_BLACK, BLACK_YELLOW,
+     * LIGHTGREEN_BLACK, DARKPURPLE, DARKAMBER, BLUE_LIGHTBLUE2,
+     * GRAY_PURPLE, YOCTOPUCE, SECTIONS, FLAT_CUSTOM
+     * @param DESIGN
+     */
     public void setLcdDesign(final LcdDesign DESIGN) {
         if (null == lcdDesign) {
             _lcdDesign = null == DESIGN ? LcdDesign.STANDARD : DESIGN;
@@ -2179,7 +2399,19 @@ public class Gauge extends Control {
         return lcdDesign;
     }
 
+    /**
+     * Returns the font that will be used to visualize the LCD value
+     * if the gauge has a LCD display.
+     * The values are STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA
+     * @return the font that will be used to visualize the LCD value
+     */
     public LcdFont getLcdFont() { return null == lcdFont ? _lcdFont : lcdFont.get(); }
+    /**
+     * Defines the font that will be used to visualize the LCD value
+     * if the gauge has a LCD display.
+     * The values are STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA
+     * @param FONT
+     */
     public void setLcdFont(final LcdFont FONT) {
         if (null == lcdFont) {
             _lcdFont = null == FONT ? LcdFont.DIGITAL_BOLD : FONT;
@@ -2200,7 +2432,17 @@ public class Gauge extends Control {
         return lcdFont;
     }
 
+    /**
+     * Returns the color that will be used to visualize the LED of the
+     * gauge if it has one.
+     * @return the color that will be used to visualize the LED
+     */
     public Color getLedColor() { return null == ledColor ? _ledColor : ledColor.get(); }
+    /**
+     * Defines the color that will be used to visualize the LED of the
+     * gauge if it has one.
+     * @param COLOR
+     */
     public void setLedColor(final Color COLOR) {
         if (null == ledColor) {
             _ledColor = COLOR;
@@ -2214,7 +2456,19 @@ public class Gauge extends Control {
         return ledColor;
     }
 
+    /**
+     * Returns the graphical representation of the LED.
+     * The values are STANDARD and FLAT
+     * In principle this represents how the LED will be filled (gradient or color).
+     * @return the graphical representation of the LED
+     */
     public LedType getLedType() { return null == ledType ? _ledType : ledType.get(); }
+    /**
+     * Defines the graphical representation of the LED.
+     * The values are STANDARD and FLAT
+     * In principle this represents how the LED will be filled (gradient or color).
+     * @param TYPE
+     */
     public void setLedType(final LedType TYPE) {
         if (null == ledType) {
             _ledType = null == TYPE ? LedType.STANDARD : TYPE;
@@ -2233,8 +2487,18 @@ public class Gauge extends Control {
         }
         return ledType;
     }
-    
+
+    /**
+     * Returns the color that will be used to colorize the title
+     * of the gauge.
+     * @return the color that will be used to colorize the title
+     */
     public Color getTitleColor() { return null == titleColor ? _titleColor : titleColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the title
+     * of the gauge.
+     * @param COLOR
+     */
     public void setTitleColor(final Color COLOR) {
         if (null == titleColor) {
             _titleColor = COLOR;
@@ -2248,7 +2512,17 @@ public class Gauge extends Control {
         return titleColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the subTitle
+     * of the gauge.
+     * @return the color that will be used to colorize the subTitle
+     */
     public Color getSubTitleColor() { return null == subTitleColor ? _subTitleColor : subTitleColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the subTitle
+     * of the gauge.
+     * @param COLOR
+     */
     public void setSubTitleColor(final Color COLOR) {
         if (null == subTitleColor) {
             _subTitleColor = COLOR;
@@ -2262,7 +2536,17 @@ public class Gauge extends Control {
         return subTitleColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the unit
+     * of the gauge.
+     * @return the color that will be used to colorize the unit
+     */
     public Color getUnitColor() { return null == unitColor ? _unitColor : unitColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the unit
+     * of the gauge.
+     * @param COLOR
+     */
     public void setUnitColor(final Color COLOR) {
         if (null == unitColor) {
             _unitColor = COLOR;
@@ -2276,7 +2560,17 @@ public class Gauge extends Control {
         return unitColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the value
+     * of the gauge.
+     * @return the color that will be used to colorize the value
+     */
     public Color getValueColor() { return null == valueColor ? _valueColor : valueColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the value
+     * of the gauge.
+     * @param COLOR
+     */
     public void setValueColor(final Color COLOR) {
         if (null == valueColor) {
             _valueColor = COLOR;
@@ -2290,7 +2584,17 @@ public class Gauge extends Control {
         return valueColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the threshold
+     * indicator of the gauge.
+     * @return the color that will be used to colorize the threshold indicator
+     */
     public Color getThresholdColor() { return null == thresholdColor ? _thresholdColor : thresholdColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the threshold
+     * indicator of the gauge.
+     * @param COLOR
+     */
     public void setThresholdColor(final Color COLOR) {
         if (null == thresholdColor) {
             _thresholdColor = COLOR;
@@ -2304,7 +2608,21 @@ public class Gauge extends Control {
         return thresholdColor;
     }
 
+    /**
+     * Returns true if the value of the gauge should be checked against
+     * all sections (if sections not empty). If a value enters a section
+     * or leaves a section it will fire an event. The check will be performed
+     * after the animation is finished (if animated == true).
+     * @return true if the value of the gauge should be checked against all sections
+     */
     public boolean getCheckSectionsForValue() { return null == checkSectionsForValue ? _checkSectionsForValue : checkSectionsForValue.get(); }
+    /**
+     * Defines if the value of the gauge should be checked against
+     * all sections (if sections not empty). If a value enters a section
+     * or leaves a section it will fire an event. The check will be performed
+     * after the animation is finished (if animated == true).
+     * @param CHECK
+     */
     public void setCheckSectionsForValue(final boolean CHECK) {
         if (null == checkSectionsForValue) { _checkSectionsForValue = CHECK; } else { checkSectionsForValue.set(CHECK); }
     }
@@ -2313,7 +2631,21 @@ public class Gauge extends Control {
         return checkSectionsForValue;
     }
 
+    /**
+     * Returns true if the value of the gauge should be checked against
+     * all areas (if areas not empty). If a value enters an area
+     * or leaves an area it will fire an event. The check will be performed
+     * after the animation is finished (if animated == true).
+     * @return true if the the value of the gauge should be checked against all areas
+     */
     public boolean getCheckAreasForValue() { return null == checkAreasForValue ? _checkAreasForValue : checkAreasForValue.get(); }
+    /**
+     * Defines if the value of the gauge should be checked against
+     * all areas (if areas not empty). If a value enters an area
+     * or leaves an area it will fire an event. The check will be performed
+     * after the animation is finished (if animated == true).
+     * @param CHECK
+     */
     public void setCheckAreasForValue(final boolean CHECK) {
         if (null == checkAreasForValue) { _checkAreasForValue = CHECK; } else { checkAreasForValue.set(CHECK); }
     }
@@ -2322,7 +2654,21 @@ public class Gauge extends Control {
         return checkAreasForValue;
     }
 
+    /**
+     * Returns true if the value of the gauge should be checked against
+     * the threshold. If a value crosses the threshold it will fire an
+     * event (EXCEEDED and UNDERRUN. The check will be performed
+     * after the animation is finished (if animated == true).
+     * @return true if the value of the gauge should be checked against the threshold
+     */
     public boolean isCheckThreshold() { return null == checkThreshold ? _checkThreshold : checkThreshold.get(); }
+    /**
+     * Defines if the value of the gauge should be checked against
+     * the threshold. If a value crosses the threshold it will fire an
+     * event (EXCEEDED and UNDERRUN. The check will be performed
+     * after the animation is finished (if animated == true).
+     * @param CHECK
+     */
     public void setCheckThreshold(final boolean CHECK) {
         if (null == checkThreshold) {
             _checkThreshold = CHECK;
@@ -2335,7 +2681,17 @@ public class Gauge extends Control {
         return checkThreshold;
     }
 
+    /**
+     * Returns true if an inner shadow should be drawn on the gauge
+     * background.
+     * @return true if an inner shadow should be drawn on the gauge background
+     */
     public boolean isInnerShadowEnabled() { return null == innerShadowEnabled ? _innerShadowEnabled : innerShadowEnabled.get(); }
+    /**
+     * Defines if an inner shadow should be drawn on the gauge
+     * background.
+     * @param ENABLED
+     */
     public void setInnerShadowEnabled(final boolean ENABLED) {
         if (null == innerShadowEnabled) {
             _innerShadowEnabled = ENABLED;
@@ -2349,7 +2705,15 @@ public class Gauge extends Control {
         return innerShadowEnabled;
     }
 
+    /**
+     * Returns true if the threshold indicator should be drawn.
+     * @return true if the threshold indicator should be drawn
+     */
     public boolean isThresholdVisible() { return null == thresholdVisible ? _thresholdVisible : thresholdVisible.get(); }
+    /**
+     * Defines if the threshold indicator should be drawn
+     * @param VISIBLE
+     */
     public void setThresholdVisible(final boolean VISIBLE) {
         if (null == thresholdVisible) {
             _thresholdVisible = VISIBLE;
@@ -2363,7 +2727,15 @@ public class Gauge extends Control {
         return thresholdVisible;
     }
 
+    /**
+     * Returns true if the sections will be drawn
+     * @return true if the sections will be drawn
+     */
     public boolean getSectionsVisible() { return null == sectionsVisible ? _sectionsVisible : sectionsVisible.get(); }
+    /**
+     * Defines if the sections will be drawn
+     * @param VISIBLE
+     */
     public void setSectionsVisible(final boolean VISIBLE) {
         if (null == sectionsVisible) {
             _sectionsVisible = VISIBLE;
@@ -2377,7 +2749,17 @@ public class Gauge extends Control {
         return sectionsVisible;
     }
 
+    /**
+     * Returns true if the text of the sections should be drawn inside
+     * the sections. This is currently only used in the SimpleSkin.
+     * @return true if the text of the sections should be drawn
+     */
     public boolean isSectionTextVisible() { return null == sectionTextVisible ? _sectionTextVisible : sectionTextVisible.get(); }
+    /**
+     * Defines if the text of the sections should be drawn inside
+     * the sections. This is currently only used in the SimpleSkin.
+     * @param VISIBLE
+     */
     public void setSectionTextVisible(final boolean VISIBLE) {
         if (null == sectionTextVisible) {
             _sectionTextVisible = VISIBLE;
@@ -2391,7 +2773,17 @@ public class Gauge extends Control {
         return sectionTextVisible;
     }
 
+    /**
+     * Returns true if the icon of the sections should be drawn inside
+     * the sections. This is currently only used in the SimpleSkin.
+     * @return true if the icon of the sections should be drawn
+     */
     public boolean getSectionIconsVisible() { return null == sectionIconsVisible ? _sectionIconsVisible : sectionIconsVisible.get(); }
+    /**
+     * Defines if the icon of the sections should be drawn inside
+     * the sections. This is currently only used in the SimpleSkin.
+     * @param VISIBLE
+     */
     public void setSectionIconsVisible(final boolean VISIBLE) {
         if (null == sectionIconsVisible) {
             _sectionIconsVisible = VISIBLE;
@@ -2405,7 +2797,15 @@ public class Gauge extends Control {
         return sectionIconsVisible;
     }
 
+    /**
+     * Returns true if the areas should be drawn
+     * @return true if the areas should be drawn
+     */
     public boolean getAreasVisible() { return null == areasVisible ? _areasVisible : areasVisible.get(); }
+    /**
+     * Defines if the areas should be drawn
+     * @param VISIBLE
+     */
     public void setAreasVisible(final boolean VISIBLE) {
         if (null == areasVisible) {
             _areasVisible = VISIBLE;
@@ -2419,7 +2819,17 @@ public class Gauge extends Control {
         return areasVisible;
     }
 
+    /**
+     * Returns true if the tickmark sections should be used to
+     * colorize the tickmarks.
+     * @return true if the tickmark sections should be used
+     */
     public boolean getTickMarkSectionsVisible() { return null == tickMarkSectionsVisible ? _tickMarkSectionsVisible : tickMarkSectionsVisible.get(); }
+    /**
+     * Defines if the tickmark sections should be used to
+     * colorize the tickmarks.
+     * @param VISIBLE
+     */
     public void setTickMarkSectionsVisible(final boolean VISIBLE) {
         if (null == tickMarkSectionsVisible) {
             _tickMarkSectionsVisible = VISIBLE;
@@ -2433,7 +2843,17 @@ public class Gauge extends Control {
         return tickMarkSectionsVisible;
     }
 
+    /**
+     * Returns true if the ticklabel sections should be used
+     * to colorize the ticklabels.
+     * @return true if the ticklabel sections should be used
+     */
     public boolean getTickLabelSectionsVisible() { return null == tickLabelSectionsVisible ? _tickLabelSectionsVisible : tickLabelSectionsVisible.get(); }
+    /**
+     * Defines if the ticklabel sections should be used to
+     * colorize the ticklabels.
+     * @param VISIBLE
+     */
     public void setTickLabelSectionsVisible(final boolean VISIBLE) {
         if (null == tickLabelSectionsVisible) {
             _tickLabelSectionsVisible = VISIBLE;
@@ -2447,7 +2867,15 @@ public class Gauge extends Control {
         return tickLabelSectionsVisible;
     }
 
+    /**
+     * Returns true if the markers should be drawn
+     * @return true if the markser should be drawn
+     */
     public boolean getMarkersVisible() { return null == markersVisible ? _markersVisible : markersVisible.get() ; }
+    /**
+     * Defines if the markers should be drawn
+     * @param VISIBLE
+     */
     public void setMarkersVisible(final boolean VISIBLE) {
         if (null == markersVisible) {
             _markersVisible = VISIBLE;
@@ -2461,7 +2889,15 @@ public class Gauge extends Control {
         return markersVisible;
     }
 
+    /**
+     * Returns true if the ticklabels should be drawn
+     * @return true if the ticklabels should be drawn
+     */
     public boolean getTickLabelsVisible() { return null == tickLabelsVisible ? _tickLabelsVisible : tickLabelsVisible.get(); }
+    /**
+     * Defines if the ticklabels should be drawn
+     * @param VISIBLE
+     */
     public void setTickLabelsVisible(final boolean VISIBLE) {
         if (null == tickLabelsVisible) {
             _tickLabelsVisible = VISIBLE;
@@ -2475,7 +2911,19 @@ public class Gauge extends Control {
         return tickLabelsVisible;
     }
 
+    /**
+     * Returns true if only the first and the last ticklabel
+     * will be drawn. Sometimes this could be useful if a gauge
+     * should for example only should show 0 and 1000.
+     * @return true if only the first and last ticklabel will be drawn
+     */
     public boolean isOnlyFirstAndLastTickLabelVisible() { return null == onlyFirstAndLastTickLabelVisible ? _onlyFirstAndLastTickLabelVisible : onlyFirstAndLastTickLabelVisible.get(); }
+    /**
+     * Defines if only the first and the last ticklabel
+     * will be drawn. Sometimes this could be useful if a gauge
+     * should for example only should show 0 and 1000.
+     * @param VISIBLE
+     */
     public void setOnlyFirstAndLastTickLabelVisible(final boolean VISIBLE) {
         if (null == onlyFirstAndLastTickLabelVisible) {
             _onlyFirstAndLastTickLabelVisible = VISIBLE;
@@ -2489,7 +2937,19 @@ public class Gauge extends Control {
         return onlyFirstAndLastTickLabelVisible;
     }
 
+    /**
+     * Returns true if the major tickmarks should be drawn
+     * If set to false and minorTickmarks == true, a minor tickmark
+     * will be drawn instead of the major tickmark.
+     * @return true if the major tickmarks should be drawn
+     */
     public boolean getMajorTickMarksVisible() { return null == majorTickMarksVisible ? _majorTickMarksVisible : majorTickMarksVisible.get(); }
+    /**
+     * Defines if the major tickmarks should be drawn
+     * If set to false and minorTickmarks == true, a minor tickmark
+     * will be drawn instead of the major tickmark.
+     * @param VISIBLE
+     */
     public void setMajorTickMarksVisible(final boolean VISIBLE) {
         if (null == majorTickMarksVisible) {
             _majorTickMarksVisible = VISIBLE;
@@ -2503,6 +2963,12 @@ public class Gauge extends Control {
         return majorTickMarksVisible;
     }
 
+    /**
+     * Returns true if the medium tickmarks should be drawn
+     * If set to false and minorTickmarks == true, a minor tickmark
+     * will be drawn instead of the medium tickmark.
+     * @return true if the medium tickmarks should be drawn
+     */
     public boolean getMediumTickMarksVisible() { return null == mediumTickMarksVisible ? _mediumTickMarksVisible : mediumTickMarksVisible.get(); }
     public void setMediumTickMarksVisible(final boolean VISIBLE) {
         if (null == mediumTickMarksVisible) {
@@ -2516,8 +2982,16 @@ public class Gauge extends Control {
         if (null == mediumTickMarksVisible) { mediumTickMarksVisible = new SimpleBooleanProperty(Gauge.this, "mediumTickMarksVisible", _mediumTickMarksVisible); }
         return mediumTickMarksVisible;
     }
-    
+
+    /**
+     * Returns true if the minor tickmarks should be drawn
+     * @return true if the minor tickmarks should be drawn
+     */
     public boolean getMinorTickMarksVisible() { return null == minorTickMarksVisible ? _minorTickMarksVisible : minorTickMarksVisible.get(); }
+    /**
+     * Defines if the minor tickmarks should be drawn
+     * @param VISIBLE
+     */
     public void setMinorTickMarksVisible(final boolean VISIBLE) {
         if (null == minorTickMarksVisible) {
             _minorTickMarksVisible = VISIBLE;
@@ -2531,7 +3005,19 @@ public class Gauge extends Control {
         return minorTickMarksVisible;
     }
 
+    /**
+     * Returns the value that represents the space between major
+     * tickmarks. This value will be automatically set by the
+     * autoscale property. Be careful when changing it manually.
+     * @return the value that represents the space between major tickmarks
+     */
     public double getMajorTickSpace() { return null == majorTickSpace ? _majorTickSpace : majorTickSpace.get(); }
+    /**
+     * Defines the value that represents the space between major
+     * tickmarks. This value will be automatically set by the
+     * autoscale property. Be careful when changing it manually.
+     * @param SPACE
+     */
     public void setMajorTickSpace(final double SPACE) {
         if (null == majorTickSpace) {
             _majorTickSpace = SPACE;
@@ -2545,7 +3031,19 @@ public class Gauge extends Control {
         return majorTickSpace;
     }
 
+    /**
+     * Returns the value that represents the space between minor
+     * tickmarks. This value will be automatically set by the
+     * autoscale property. Be careful when changing it manually.
+     * @return the value that represents the space between minor tickmarks
+     */
     public double getMinorTickSpace() { return null == minorTickSpace ? _minorTickSpace : minorTickSpace.get(); }
+    /**
+     * Defines the value that represents the space between major
+     * tickmarks. This value will be automatically set by the
+     * autoscale property. Be careful when changing it manually.
+     * @param SPACE
+     */
     public void setMinorTickSpace(final double SPACE) {
         if (null == minorTickSpace) {
             _minorTickSpace = SPACE;
@@ -2559,7 +3057,17 @@ public class Gauge extends Control {
         return minorTickSpace;
     }
 
+    /**
+     * Returns true if the LCD display is visible (if available)
+     * The LCD display won't be visible if valueVisible == false.
+     * @return true if the LCD display is visible
+     */
     public boolean isLcdVisible() { return null == lcdVisible ? _lcdVisible : lcdVisible.get(); }
+    /**
+     * Defines if the LCD display is visible (if available)
+     * The LCD display won't be visible if valueVisible == false.
+     * @param VISIBLE
+     */
     public void setLcdVisible(final boolean VISIBLE) {
         if (null == lcdVisible) {
             _lcdVisible = VISIBLE;
@@ -2573,7 +3081,21 @@ public class Gauge extends Control {
         return lcdVisible;
     }
 
+    /**
+     * Returns true if the crystal effect of the LCD display will be drawn.
+     * This feature could decrease the performance if you run it on
+     * embedded devices because it will calculate a bitmap image where
+     * each pixel will be calculated.
+     * @return true if the crystal effect of the LCD display will be drawn
+     */
     public boolean isLcdCrystalEnabled() { return null == lcdCrystalEnabled ? _lcdCrystalEnabled : lcdCrystalEnabled.get(); }
+    /**
+     * Defines if the crystal effect of the LCD display will be drawn.
+     * This feature could decrease the performance if you run it on
+     * embedded devices because it will calculate a bitmap image where
+     * each pixel will be calculated.
+     * @param ENABLED
+     */
     public void setLcdCrystalEnabled(final boolean ENABLED) {
         if (null == lcdCrystalEnabled) {
             _lcdCrystalEnabled = ENABLED;
@@ -2587,7 +3109,15 @@ public class Gauge extends Control {
         return lcdCrystalEnabled;
     }
 
+    /**
+     * Returns true if the LED will be drawn (if available)
+     * @return true if the LED will be drawn
+     */
     public boolean isLedVisible() { return null == ledVisible ? _ledVisible : ledVisible.get(); }
+    /**
+     * Defines if the LED will be drawn (if available)
+     * @param VISIBLE
+     */
     public void setLedVisible(final boolean VISIBLE) {
         if (null == ledVisible) {
             _ledVisible = VISIBLE;
@@ -2601,7 +3131,15 @@ public class Gauge extends Control {
         return ledVisible;
     }
 
+    /**
+     * Returns true if the LED is on (if available)
+     * @return true if the LED is on
+     */
     public boolean isLedOn() { return null == ledOn ? _ledOn : ledOn.get(); }
+    /**
+     * Defines if the LED is on (if available)
+     * @param ON
+     */
     public void setLedOn(final boolean ON) {
         if (null == ledOn) {
             _ledOn = ON;
@@ -2615,7 +3153,15 @@ public class Gauge extends Control {
         return ledOn;
     }
 
+    /**
+     * Returns true if the LED is blinking (if available)
+     * @return true if the LED is blinking
+     */
     public boolean isLedBlinking() { return null == ledBlinking ? _ledBlinking : ledBlinking.get(); }
+    /**
+     * Defines if the LED is blinking (if available)
+     * @param BLINKING
+     */
     public void setLedBlinking(final boolean BLINKING) {
         if (null == ledBlinking) {
             _ledBlinking = BLINKING;
@@ -2634,7 +3180,19 @@ public class Gauge extends Control {
         return ledBlinking;
     }
 
+    /**
+     * Returns the orientation of the control. This feature
+     * will only be used in the BulletChartSkin and LinearSkin.
+     * Values are HORIZONTAL and VERTICAL
+     * @return the orientation of the control
+     */
     public Orientation getOrientation() { return null == orientation ? _orientation : orientation.get(); }
+    /**
+     * Defines the orientation of the control. This feature
+     * will only be used in the BulletChartSkin and LinearSkin.
+     * Values are HORIZONTAL and VERTICAL
+     * @param ORIENTATION
+     */
     public void setOrientation(final Orientation ORIENTATION) {
         if (null == orientation) {
             _orientation = ORIENTATION;
@@ -2648,7 +3206,17 @@ public class Gauge extends Control {
         return orientation;
     }
 
+    /**
+     * Returns true if the gradient defined by the gradient lookup
+     * will be used to visualize the bar (if available).
+     * @return true if the gradient defined by the gradient lookup will be used to visualize the bar
+     */
     public boolean isGradientBarEnabled() { return null == gradientBarEnabled ? _gradientBarEnabled : gradientBarEnabled.get(); }
+    /**
+     * Defines if the gradient defined by the gradient lookup
+     * will be used to visualize the bar (if available).
+     * @param ENABLED
+     */
     public void setGradientBarEnabled(final boolean ENABLED) {
         if (null == gradientBarEnabled) {
             _gradientBarEnabled = ENABLED;
@@ -2662,22 +3230,61 @@ public class Gauge extends Control {
         return gradientBarEnabled;
     }
 
+    /**
+     * Returns the GradientLookup that is used to colorize the bar
+     * of the gauge (if avaiable)
+     * @return the GradientLookup that is used to colorize the bar
+     */
     public GradientLookup getGradientLookup() {
         if (null == gradientLookup) { gradientLookup = new GradientLookup(); }
         return gradientLookup;
     }
+    /**
+     * Defines the GradientLookup that is used to colorize the bar
+     * of the gauge (if avaiable)
+     * @param GRADIENT_LOOKUP
+     */
     public void setGradientLookup(final GradientLookup GRADIENT_LOOKUP) {
         gradientLookup = GRADIENT_LOOKUP;
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Returns a list of Stops that will be used to calculate the gradient
+     * in the GradientLookup.
+     * @return a list of Stops that will be used to calculate the gradient in the GradientLookup
+     */
     public List<Stop> getGradientBarStops() { return getGradientLookup().getStops(); }
+    /**
+     * Defines a list of Stops that will be used to calculate the gradient
+     * in the GradientLookup.
+     * @param STOPS
+     */
     public void setGradientBarStops(final Stop... STOPS) { setGradientBarStops(Arrays.asList(STOPS)); }
+    /**
+     * Defines a list of Stops that will be used to calculate the gradient
+     * in the GradientLookup.
+     * @param STOPS
+     */
     public void setGradientBarStops(final List<Stop> STOPS) {
         getGradientLookup().setStops(STOPS);
         fireUpdateEvent(REDRAW_EVENT);
     }
 
+    /**
+     * Returns true if custom ticklabels should be used instead of the
+     * automatically calculated ones. This could be useful for gauges
+     * like a compass where you need "N", "E", "S" and "W" instead of
+     * numbers.
+     * @return true if custom ticklabels should be used
+     */
     public boolean getCustomTickLabelsEnabled() { return null == customTickLabelsEnabled ? _customTickLabelsEnabled : customTickLabelsEnabled.get(); }
+    /**
+     * Defines if custom ticklabels should be used instead of the
+     * automatically calculated ones. This could be useful for gauges
+     * like a compass where you need "N", "E", "S" and "W" instead of
+     * numbers.
+     * @param ENABLED
+     */
     public void setCustomTickLabelsEnabled(final boolean ENABLED) {
         if (null == customTickLabelsEnabled) {
             _customTickLabelsEnabled = ENABLED;
@@ -2691,28 +3298,66 @@ public class Gauge extends Control {
         return customTickLabelsEnabled;
     }
 
+    /**
+     * Returns a list of Strings that represent the ticklabels that
+     * will be used for the scale.
+     * @return a list of Strings that represent the ticklabels
+     */
     public List<String> getCustomTickLabels() { return customTickLabels; }
+    /**
+     * Defines a list of Strings that represent the ticklabels that
+     * will be used for the scale.
+     * @param TICK_LABELS
+     */
     public void setCustomTickLabels(final List<String> TICK_LABELS) {
         customTickLabels.setAll(TICK_LABELS);
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Defines a list of Strings that represent the ticklabels that
+     * will be used for the scale.
+     * @param TICK_LABELS
+     */
     public void setCustomTickLabels(final String... TICK_LABELS) { setCustomTickLabels(Arrays.asList(TICK_LABELS)); }
+    /**
+     * Adds the given String to the list of custom ticklabels
+     * @param TICK_LABEL
+     */
     public void addCustomTickLabel(final String TICK_LABEL) {
         if (null == TICK_LABEL) return;
         if (!customTickLabels.contains(TICK_LABEL)) customTickLabels.add(TICK_LABEL);
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Removes the given String from the list of custom ticklabels
+     * @param TICK_LABEL
+     */
     public void removeCustomTickLabel(final String TICK_LABEL) {
         if (null == TICK_LABEL) return;
         if (customTickLabels.contains(TICK_LABEL)) customTickLabels.remove(TICK_LABEL);
         fireUpdateEvent(REDRAW_EVENT);
     }
+    /**
+     * Clears the list of custom ticklabels
+     */
     public void clearCustomTickLabels() {
         customTickLabels.clear();
         fireUpdateEvent(REDRAW_EVENT);
     }
 
+    /**
+     * Returns the custom font size. The default font size is 18px at
+     * a size of 250px. This value will be used to calculate the current
+     * font size for the ticklabels when scaling.
+     * @return the custom font size
+     */
     public double getCustomTickLabelFontSize() { return null == customTickLabelFontSize ? _customTickLabelFontSize : customTickLabelFontSize.get(); }
+    /**
+     * Defines the custom font size. The default font size is 18px at
+     * a size of 250px. This value will be used to calculate the current
+     * font size for the ticklabels when scaling.
+     * @param SIZE
+     */
     public void setCustomTickLabelFontSize(final double SIZE) {
         if (null == customTickLabelFontSize) {
             _customTickLabelFontSize = Helper.clamp(0d, 72d, SIZE);
@@ -2732,7 +3377,19 @@ public class Gauge extends Control {
         return customTickLabelFontSize;
     }
 
+    /**
+     * Returns true if the gauge is in interactive mode. This is currently
+     * implemented in the radial gauges that have a knob. If interactive == true
+     * the knob can be pressed to trigger something.
+     * @return true if the gauge is in interactive mode
+     */
     public boolean isInteractive() { return null == interactive ? _interactive : interactive.get(); }
+    /**
+     * Defines if the gauge is in interactive mode. This is currently
+     * implemented in the radial gauges that have a knob. If interactive == true
+     * the knob can be pressed to trigger something.
+     * @param INTERACTIVE
+     */
     public void setInteractive(final boolean INTERACTIVE) {
         if (null == interactive) {
             _interactive = INTERACTIVE;
@@ -2746,7 +3403,17 @@ public class Gauge extends Control {
         return interactive;
     }
 
+    /**
+     * Returns the text that will be shown in the button tooltip. The
+     * knob in the radial gauges acts as button if interactive == true.
+     * @return the text that will be shown in the button tooltip
+     */
     public String getButtonTooltipText() { return null == buttonTooltipText ? _buttonTooltipText : buttonTooltipText.get(); }
+    /**
+     * Defines the text that will be shown in the button tooltip. The
+     * knob in the radial gauges acts as button if interactive == true.
+     * @param TEXT
+     */
     public void setButtonTooltipText(final String TEXT) {
         if (null == buttonTooltipText) {
             _buttonTooltipText = TEXT;
@@ -2760,7 +3427,19 @@ public class Gauge extends Control {
         return buttonTooltipText;
     }
 
+    /**
+     * Returns true if the control should keep it's aspect. This is
+     * in principle only needed if the control has different width and
+     * height.
+     * @return true if the control should keep it's aspect
+     */
     public boolean isKeepAspect() { return null == keepAspect ? _keepAspect : keepAspect.get(); }
+    /**
+     * Defines if the control should keep it's aspect. This is
+     * in principle only needed if the control has different width and
+     * height.
+     * @param KEEP
+     */
     public void setKeepAspect(final boolean KEEP) {
         if (null == keepAspect) {
             _keepAspect = KEEP;
@@ -2773,6 +3452,9 @@ public class Gauge extends Control {
         return keepAspect;
     }
 
+    /**
+     * Calling this method will lead to a recalculation of the scale
+     */
     public void calcAutoScale() {
         double maxNoOfMajorTicks = 10;
         double maxNoOfMinorTicks = 10;
@@ -2808,6 +3490,10 @@ public class Gauge extends Control {
         blinkFuture = blinkService.schedule(blinkTask, LED_BLINK_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Calling this method will stop all threads. This is needed when using
+     * JavaFX on mobile devices when the device goes to sleep mode.
+     */
     public void stop() {
         setLedOn(false);
         if (null != blinkFuture) { blinkFuture.cancel(true); }
