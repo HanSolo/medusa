@@ -1048,6 +1048,12 @@ public class Gauge extends Control {
 
 
     // ******************** UI related methods ********************************
+    /**
+     * A convenient method to set the color of foreground elements like
+     * title, subTitle, unit, value, tickLabel and tickMark to the given
+     * Color.
+     * @param COLOR
+     */
     public void setForegroundBaseColor(final Color COLOR) {
         if (null == titleColor)          { _titleColor          = COLOR; } else { titleColor.set(COLOR); }
         if (null == subTitleColor)       { _subTitleColor       = COLOR; } else { subTitleColor.set(COLOR); }
@@ -1062,7 +1068,19 @@ public class Gauge extends Control {
         fireUpdateEvent(REDRAW_EVENT);
     }
 
+    /**
+     * Returns true if the visualization of the value should start from 0. This
+     * is especially useful when you work for example with a gauge that has a
+     * range with a negative minValue
+     * @return true if the visualization of the value should start from 0
+     */
     public boolean isStartFromZero() { return null == startFromZero ? _startFromZero : startFromZero.get(); }
+    /**
+     * Defines the behavior of the visualization where the needle/bar should
+     * start from 0 instead of the minValue. This is especially useful when
+     * working with a gauge that has a range with a negative minValue
+     * @param IS_TRUE
+     */
     public void setStartFromZero(final boolean IS_TRUE) {
         if (null == startFromZero) {
             _startFromZero = IS_TRUE;
@@ -1086,7 +1104,20 @@ public class Gauge extends Control {
         return startFromZero;
     }
 
+    /**
+     * Returns true if the needle/bar should always return to zero. This setting
+     * only makes sense if animated == true and the data rate is not too high.
+     * Set to false when using real measured live data.
+     * @return true if the needle/bar should always return to zero.
+     */
     public boolean isReturnToZero() { return null == returnToZero ? _returnToZero : returnToZero.get(); }
+    /**
+     * Defines the behavior of the visualization where the needle/bar should
+     * always return to 0 after it reached the final value. This setting only makes
+     * sense if animated == true and the data rate is not too high.
+     * Set to false when using real measured live data.
+     * @param IS_TRUE
+     */
     public void setReturnToZero(final boolean IS_TRUE) {
         if (null == returnToZero) {
             _returnToZero = Double.compare(getMinValue(), 0d) <= 0 ? IS_TRUE : false;
@@ -1107,7 +1138,17 @@ public class Gauge extends Control {
         return returnToZero;
     }
 
+    /**
+     * Returns the color that will be used to colorize the 0 tickmark and ticklabel
+     * when the gauge range has a negative min- and positive maxValue.
+     * @return the color that will used to visualize the 0 tickmark and ticklabel
+     */
     public Color getZeroColor() { return null == zeroColor ? _zeroColor : zeroColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the 0 tickmark and ticklabel
+     * when the gauge range has a negative min- and positive maxValue.
+     * @param COLOR
+     */
     public void setZeroColor(final Color COLOR) {
         if (null == zeroColor) {
             _zeroColor = COLOR;
@@ -1121,7 +1162,16 @@ public class Gauge extends Control {
         return zeroColor;
     }
 
+    /**
+     * Returns the smallest value that was measured after the last reset.
+     * The default value is the maxValue of the gauge.
+     * @return the smallest value that was measured after the last reset
+     */
     public double getMinMeasuredValue() { return null == minMeasuredValue ? _minMeasuredValue : minMeasuredValue.get(); }
+    /**
+     * Sets the minMeasuredValue to the given value.
+     * @param MIN_MEASURED_VALUE
+     */
     public void setMinMeasuredValue(final double MIN_MEASURED_VALUE) {
         if (null == minMeasuredValue) {
             _minMeasuredValue = MIN_MEASURED_VALUE;
@@ -1134,9 +1184,18 @@ public class Gauge extends Control {
         return minMeasuredValue;
     }
 
+    /**
+     * Returns the biggest value that was measured after the last reset.
+     * The default value is the minValue of the gauge.
+     * @return the biggest value that was measured after the last reset
+     */
     public double getMaxMeasuredValue() {
         return null == maxMeasuredValue ? _maxMeasuredValue : maxMeasuredValue.get();
     }
+    /**
+     * Sets the maxMeasuredVAlue to the given value.
+     * @param MAX_MEASURED_VALUE
+     */
     public void setMaxMeasuredValue(final double MAX_MEASURED_VALUE) {
         if (null == maxMeasuredValue) {
             _maxMeasuredValue = MAX_MEASURED_VALUE;
@@ -1149,12 +1208,23 @@ public class Gauge extends Control {
         return maxMeasuredValue;
     }
 
+    /**
+     * Resets the min- and maxMeasuredValue to the value of the gauge.
+     */
     public void resetMeasuredValues() {
         setMinMeasuredValue(getValue());
         setMaxMeasuredValue(getValue());
     }
 
+    /**
+     * Returns true if the indicator of the minMeasuredValue is visible.
+     * @return true if the indicator of the minMeasuredValue is visible
+     */
     public boolean isMinMeasuredValueVisible() { return null == minMeasuredValueVisible ? _minMeasuredValueVisible : minMeasuredValueVisible.get(); }
+    /**
+     * Defines if the indicator of the minMeasuredValue should be visible.
+     * @param VISIBLE
+     */
     public void setMinMeasuredValueVisible(final boolean VISIBLE) {
         if (null == minMeasuredValueVisible) {
             _minMeasuredValueVisible = VISIBLE;
@@ -1168,7 +1238,15 @@ public class Gauge extends Control {
         return minMeasuredValueVisible;
     }
 
+    /**
+     * Returns true if the indicator of the maxMeasuredValue is visible.
+     * @return true if the indicator of the maxMeasuredValue is visible
+     */
     public boolean isMaxMeasuredValueVisible() { return null == maxMeasuredValueVisible ? _maxMeasuredValueVisible : maxMeasuredValueVisible.get(); }
+    /**
+     * Defines if the indicator of the maxMeasuredValue should be visible.
+     * @param VISIBLE
+     */
     public void setMaxMeasuredValueVisible(final boolean VISIBLE) {
         if (null == maxMeasuredValueVisible) {
             _maxMeasuredValueVisible = VISIBLE;
@@ -1182,7 +1260,15 @@ public class Gauge extends Control {
         return maxMeasuredValueVisible;
     }
 
+    /**
+     * Returns true if the old value of the gauge is visible (not implemented)
+     * @return true if the old value of the gauge is visible (not implemented)
+     */
     public boolean isOldValueVisible() { return null == oldValueVisible ? _oldValueVisible : oldValueVisible.get(); }
+    /**
+     * Defines if the old value of the gauge should be visible (not implemented)
+     * @param VISIBLE
+     */
     public void setOldValueVisible(final boolean VISIBLE) {
         if (null == oldValueVisible) {
             _oldValueVisible = VISIBLE;
@@ -1196,7 +1282,16 @@ public class Gauge extends Control {
         return oldValueVisible;
     }
 
+    /**
+     * Returns true if the visualization of the gauge value is visible.
+     * Usually this is a Label or Text node.
+     * @return true if the visualization of the gauge value is visible
+     */
     public boolean isValueVisible() { return null == valueVisible ? _valueVisible : valueVisible.get(); }
+    /**
+     * Defines if the visualization of the gauge value should be visible.
+     * @param VISIBLE
+     */
     public void setValueVisible(final boolean VISIBLE) {
         if (null == valueVisible) {
             _valueVisible = VISIBLE;
@@ -1210,7 +1305,16 @@ public class Gauge extends Control {
         return valueVisible;
     }
 
+    /**
+     * Returns the Paint object that will be used to fill the gauge background.
+     * This is usally a Color object.
+     * @return the Paint object that will be used to fill the gauge background
+     */
     public Paint getBackgroundPaint() { return null == backgroundPaint ? _backgroundPaint : backgroundPaint.get(); }
+    /**
+     * Defines the Paint object that will be used to fill the gauge background.
+     * @param PAINT
+     */
     public void setBackgroundPaint(final Paint PAINT) {
         if (null == backgroundPaint) {
             _backgroundPaint = PAINT;
@@ -1224,6 +1328,11 @@ public class Gauge extends Control {
         return backgroundPaint;
     }
 
+    /**
+     * Returns the Paint object that will be used to draw the border of the gauge.
+     * Usually this is a Color object.
+     * @return the Paint object that will be used to draw the border of the gauge
+     */
     public Paint getBorderPaint() { return null == borderPaint ? _borderPaint : borderPaint.get(); }
     public void setBorderPaint(final Paint PAINT) {
         if (null == borderPaint) {
@@ -1238,7 +1347,17 @@ public class Gauge extends Control {
         return borderPaint;
     }
 
+    /**
+     * Returns the Paint object that will be used to fill the foreground of the gauge.
+     * This could be used to visualize glass effects etc. and is only rarely used.
+     * @return the Paint object that will be used to fill the foreground of the gauge
+     */
     public Paint getForegroundPaint() { return null == foregroundPaint ? _foregroundPaint : foregroundPaint.get(); }
+    /**
+     * Defines the Paint object that will be used to fill the foreground of the gauge.
+     * This could be used to visualize glass effects etc. and is only rarely used.
+     * @param PAINT
+     */
     public void setForegroundPaint(final Paint PAINT) {
         if (null == foregroundPaint) {
             _foregroundPaint = PAINT;
@@ -1252,7 +1371,17 @@ public class Gauge extends Control {
         return foregroundPaint;
     }
 
+    /**
+     * Returns the color that will be used to colorize the knob of
+     * the radial gauges.
+     * @return the color that will be used to colorize the knob of the radial gauges
+     */
     public Color getKnobColor() { return null == knobColor ? _knobColor : knobColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the knob of
+     * the radial gauges.
+     * @param COLOR
+     */
     public void setKnobColor(final Color COLOR) {
         if (null == knobColor) {
             _knobColor = COLOR;
@@ -1266,7 +1395,17 @@ public class Gauge extends Control {
         return knobColor;
     }
 
+    /**
+     * Returns the type of knob that will be used in the radial
+     * gauges. The values are STANDARD, PLAIN, METAL and FLAT.
+     * @return the type of knob that will be used in the radial gauges
+     */
     public KnobType getKnobType() { return null == knobType ? _knobType : knobType.get(); }
+    /**
+     * Defines the type of knob that will be used in the radial
+     * gauges. The values are STANDARD, PLAIN, METAL and FLAT.
+     * @param TYPE
+     */
     public void setKnobType(final KnobType TYPE) {
         if (null == knobType) {
             _knobType = null == TYPE ? KnobType.STANDARD : TYPE;
@@ -1286,7 +1425,27 @@ public class Gauge extends Control {
         return knobType;
     }
 
+    /**
+     * Returns the position of the knob in radial gauges. This
+     * position also defines where the needle will be placed.
+     * Dependent on the SkinType you can use the following values
+     * GaugeSkin  : CENTER
+     * HSkin      : TOP_CENTER, BOTTOM_CENTER
+     * VSkin      : CENTER_LEFT, CENTER_RIGHT
+     * QuarterSkin: TOP_RIGHT, BOTTOM_RIGHT, BOTTOM_LEFT, TOP_LEFT
+     * @return the position of the knob in the radial gauges
+     */
     public Pos getKnobPosition() { return null == knobPosition ? _knobPosition : knobPosition.get(); }
+    /**
+     * Defines the position of the knob in radial gauges. This
+     * position also defines where the needle will be placed.
+     * Dependent on the SkinType you can use the following values
+     * GaugeSkin  : CENTER
+     * HSkin      : TOP_CENTER, BOTTOM_CENTER
+     * VSkin      : CENTER_LEFT, CENTER_RIGHT
+     * QuarterSkin: TOP_RIGHT, BOTTOM_RIGHT, BOTTOM_LEFT, TOP_LEFT
+     * @param POSITION
+     */
     public void setKnobPosition(final Pos POSITION) {
         if (null == knobPosition) {
             _knobPosition = POSITION;
@@ -1317,7 +1476,23 @@ public class Gauge extends Control {
         return knobPosition;
     }
 
+    /**
+     * Returns true if setting the value of the gauge will be animated
+     * using the duration defined in animationDuration [ms].
+     * Keep in mind that it only makes sense to animate the setting if
+     * the data rate is low (> 1 value per second). If you use real
+     * live measured data you should set animated to false.
+     * @return true if setting the value of the gauge will be animated
+     */
     public boolean isAnimated() { return null == animated ? _animated : animated.get(); }
+    /**
+     * Defines if setting the value of the gauge should be animated using
+     * the duration defined in animationDuration [ms].
+     * Keep in mind that it only makes sense to animate the setting if
+     * the data rate is low (> 1 value per second). If you use real
+     * live measured data you should set animated to false.
+     * @param ANIMATED
+     */
     public void setAnimated(final boolean ANIMATED) {
         if (null == animated) {
             _animated = ANIMATED;
@@ -1330,10 +1505,42 @@ public class Gauge extends Control {
         return animated;
     }
 
+    /**
+     * Returns the duration in milliseconds that will be used to animate
+     * the needle/bar of the gauge from the last value to the next value.
+     * This will only be used if animated == true. This value will be
+     * clamped in the range of 10ms - 10s.
+     * @return the duration in ms that will be used to animate the needle/bar
+     */
     public long getAnimationDuration() { return animationDuration; }
+    /**
+     * Defines the duration ín milliseconds that will be used to animate
+     * the needle/bar of the gauge from the last value to the next value.
+     * This will only be used if animated == true. This value will be
+     * clamped in the range of 10ms - 10s.
+     * @param ANIMATION_DURATION
+     */
     public void setAnimationDuration(final long ANIMATION_DURATION) { animationDuration = Helper.clamp(10l, 10000l, ANIMATION_DURATION); }
 
+    /**
+     * Returns the angle in degree that defines the start of the scale with
+     * it's minValue in a radial gauge. If set to 0 the scale will start at
+     * the bottom center and the direction of counting is mathematical correct
+     * counter-clockwise.
+     * Means if you would like to start the scale on the left side in the
+     * middle of the gauge height the startAngle should be set to 270 degrees.
+     * @return the angle in degree that defines the start of the scale
+     */
     public double getStartAngle() { return null == startAngle ? _startAngle : startAngle.get(); }
+    /**
+     * Defines the angle in degree that defines the start of the scale with
+     * it's minValue in a radial gauge. If set to 0 the scale will start at
+     * the bottom center and the direction of counting is mathematical correct
+     * counter-clockwise.
+     * Means if you would like to start the scale on the left side in the
+     * middle of the gauge height the startAngle should be set to 270 degrees.
+     * @param ANGLE
+     */
     public void setStartAngle(final double ANGLE) {
         if (null == startAngle) {
             _startAngle = Helper.clamp(0d, 360d, ANGLE);
@@ -1353,7 +1560,21 @@ public class Gauge extends Control {
         return startAngle;
     }
 
+    /**
+     * Returns the angle range in degree that will be used to draw the scale
+     * of the radial gauge. The given range will be clamped in the range of
+     * 0 - 360 degrees and will be drawn in the direction dependent on the
+     * scaleDirection.
+     * @return the angle range in degree that will be used to draw the scale
+     */
     public double getAngleRange() { return null == angleRange ? _angleRange : angleRange.get(); }
+    /**
+     * Defines the angle range in degree that will be used to draw the scale
+     * of the radial gauge. The given range will be clamped in the range of
+     * 0 - 360 degrees. The range will start at the startAngle and will be
+     * drawn in the direction dependent on the scaleDirection.
+     * @param RANGE
+     */
     public void setAngleRange(final double RANGE) {
         double tmpAngleRange = Helper.clamp(0d, 360d, RANGE);
         if (null == angleRange) {
@@ -1375,7 +1596,18 @@ public class Gauge extends Control {
         return angleRange;
     }
 
+    /**
+     * Returns the value that is calculated by dividing the angleRange
+     * by the range. The angleStep will always be recalculated when changing
+     * the min-, maxValue or angleRange.
+     * E.g. angleRange = 180 degrees, range = 0 - 100 -> angleStep = 180/100 = 1.8
+     * @return the value that is calculated by dividing the angleRange by the range
+     */
     public double getAngleStep() { return null == angleStep ? _angleStep : angleStep.get(); }
+    /**
+     * Private method that will be used to set the angleStep
+     * @param STEP
+     */
     private void setAngleStep(final double STEP) {
         if (null == angleStep) {
             _angleStep = STEP;
@@ -1388,7 +1620,23 @@ public class Gauge extends Control {
         return angleStep;
     }
 
+    /**
+     * Returns true if the scale will be calculated automatically based
+     * on the defined values for min- and maxValue.
+     * The autoscaling is on per default because otherwise you will
+     * run into problems when having very large or very small scales like
+     * 0 - 10000 or 0 - 1.
+     * @return true if the scale will be calculated automatically
+     */
     public boolean isAutoScale() { return null == autoScale ? _autoScale : autoScale.get(); }
+    /**
+     * Defines if the scale should be calculated automatically based on
+     * the defined values for min- and maxValue.
+     * The autoscaling is on per default because otherwise you will
+     * run into problems when having very large or very small scales like
+     * 0 - 10000 or 0 - 1.
+     * @param AUTO_SCALE
+     */
     public void setAutoScale(final boolean AUTO_SCALE) {
         if (null == autoScale) {
             _autoScale = AUTO_SCALE;
@@ -1422,7 +1670,19 @@ public class Gauge extends Control {
         return autoScale;
     }
 
+    /**
+     * Returns true if effects like shadows will be drawn.
+     * In some gauges inner- and dropshadows will be used which will be
+     * switched on/off by setting the shadowsEnabled property.
+     * @return true if effects like shadows will be drawn
+     */
     public boolean isShadowsEnabled() { return null == shadowsEnabled ? _shadowsEnabled : shadowsEnabled.get(); }
+    /**
+     * Defines if effects like shadows should be drawn.
+     * In some gauges inner- and dropshadows will be used which will be
+     * switched on/off by setting the shadowsEnabled property.
+     * @param ENABLED
+     */
     public void setShadowsEnabled(final boolean ENABLED) {
         if (null == shadowsEnabled) {
             _shadowsEnabled = ENABLED;
@@ -1436,7 +1696,19 @@ public class Gauge extends Control {
         return shadowsEnabled;
     }
 
+    /**
+     * Returns true if the highlight effect on the gauges like the
+     * LinearSkin bar will be drawn. If you would like to have a
+     * more flat style you should set this to false.
+     * @return true if the highlight effect on a bar will be drawn
+     */
     public boolean isBarEffectEnabled() { return null == barEffectEnabled ? _barEffectEnabled : barEffectEnabled.get(); }
+    /**
+     * Defines if the the highlight effect on the gauges like the
+     * LinearSkin bar will be drawn. If you would like to have a
+     * more flat style you should set this to false.
+     * @param ENABLED
+     */
     public void setBarEffectEnabled(final boolean ENABLED) {
         if (null == barEffectEnabled) {
             _barEffectEnabled = ENABLED;
@@ -1450,7 +1722,25 @@ public class Gauge extends Control {
         return barEffectEnabled;
     }
 
+    /**
+     * Returns the direction of the scale. The values are
+     * CLOCKWISE and COUNTER_CLOCKWISE. This property is needed
+     * to realize gauges like in QuarterSkin where the needle
+     * and knob should be placed on the upper right corner and
+     * the scale should start at the bottom. Here you need a
+     * counter-clockwise direction of the scale.
+     * @return the direction of the scale
+     */
     public ScaleDirection getScaleDirection() { return null == scaleDirection ? _scaleDirection : scaleDirection.get(); }
+    /**
+     * Defines the direction of the scale. The values are
+     * CLOCKWISE and COUNTER_CLOCKWISE. This property is needed
+     * to realize gauges like in QuarterSkin where the needle
+     * and knob should be placed on the upper right corner and
+     * the scale should start at the bottom. Here you need a
+     * counter-clockwise direction of the scale.
+     * @param DIRECTION
+     */
     public void setScaleDirection(final ScaleDirection DIRECTION) {
         if (null == scaleDirection) {
             _scaleDirection = null == DIRECTION ? ScaleDirection.CLOCKWISE : DIRECTION;
@@ -1470,7 +1760,19 @@ public class Gauge extends Control {
         return scaleDirection;
     }
 
+    /**
+     * Returns the location of the ticklabels. The values are
+     * INSIDE and OUTSIDE. The location of the ticklabels has an
+     * influence on the size of the tickmarks and length of the needle.
+     * @return the location of the ticklabels
+     */
     public TickLabelLocation getTickLabelLocation() { return null == tickLabelLocation ? _tickLabelLocation : tickLabelLocation.get(); }
+    /**
+     * Defines the location of the ticklabels. The values are
+     * INSIDE and OUTSIDE. The location of the ticklabels has an
+     * influence on the size of the tickmarks and length of the needle.
+     * @param LOCATION
+     */
     public void setTickLabelLocation(final TickLabelLocation LOCATION) {
         if (null == tickLabelLocation) {
             _tickLabelLocation = null == LOCATION ? TickLabelLocation.INSIDE : LOCATION;
@@ -1490,7 +1792,19 @@ public class Gauge extends Control {
         return tickLabelLocation;
     }
 
+    /**
+     * Returns the orientation of the ticklabels. The values are
+     * HORIZONTAL, ORTHOGONAL and TANGENT. Especially the ORTHOGONAL
+     * setting can be useful when using scales with big numbers.
+     * @return the orientation of the ticklabels
+     */
     public TickLabelOrientation getTickLabelOrientation() { return null == tickLabelOrientation ? _tickLabelOrientation : tickLabelOrientation.get(); }
+    /**
+     * Defines the orientation of the ticklabels. The values are
+     * HORIZONTAL, ORTHOGONAL and TANGENT. Especially the ORTHOGONAL
+     * setting can be useful when using scales with big numbers.
+     * @param ORIENTATION
+     */
     public void setTickLabelOrientation(final TickLabelOrientation ORIENTATION) {
         if (null == tickLabelOrientation) {
             _tickLabelOrientation = null == ORIENTATION ? TickLabelOrientation.HORIZONTAL : ORIENTATION;
@@ -1510,7 +1824,17 @@ public class Gauge extends Control {
         return tickLabelOrientation;
     }
 
+    /**
+     * Returns the color that will be used to colorize the ticklabels. This color
+     * will only be used if no ticklabel section defines a different color.
+     * @return the color that will be used to colorize the ticklabels
+     */
     public Color getTickLabelColor() { return null == tickLabelColor ? _tickLabelColor : tickLabelColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the ticklabels. This color
+     * will only be used if no ticklabel section defines a different color.
+     * @param COLOR
+     */
     public void setTickLabelColor(final Color COLOR) {
         if (null == tickLabelColor) {
             _tickLabelColor = COLOR;
@@ -1524,7 +1848,19 @@ public class Gauge extends Control {
         return tickLabelColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the tickmarks. This color
+     * will only be used if no tickmark section or major-, medium- and minorTickMarkColor
+     * is defined at the position of the tickmark.
+     * @return the color that will be used to colorize the tickmarks
+     */
     public Color getTickMarkColor() { return null == tickMarkColor ? _tickMarkColor : tickMarkColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the tickmarks. This color
+     * will only be used if no tickmark section or major-, medium- and minorTickMarkColor
+     * is defined at the position of the tickmark.
+     * @param COLOR
+     */
     public void setTickMarkColor(final Color COLOR) {
         if (null == tickMarkColor) {
             _tickMarkColor = COLOR;
