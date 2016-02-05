@@ -77,6 +77,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private LineTo        dataBarLineToInnerArc;
     private ArcTo         dataBarInnerArc;
     private Line          threshold;
+    private Text         thresholdText;
     private InnerShadow   innerShadow;
     private Font          smallFont;
     private Font          bigFont;
@@ -191,6 +192,10 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         threshold.setStrokeLineCap(StrokeLineCap.BUTT);
         threshold.setVisible(getSkinnable().isThresholdVisible());
         threshold.setManaged(getSkinnable().isThresholdVisible());
+        
+        thresholdText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
+        thresholdText.setFill(getSkinnable().getTitleColor());
+        thresholdText.setVisible(Double.compare(getSkinnable().getThreshold(), getSkinnable().getMinValue()) != 0 && Double.compare(getSkinnable().getThreshold(), getSkinnable().getMaxValue()) != 0);
 
         pane = new Pane();
         pane.getChildren().setAll(unitText,
@@ -200,7 +205,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                   maxText,
                                   barBackground,
                                   dataBar,
-                                  threshold);
+                                  threshold, 
+                                  thresholdText);
 
         getChildren().setAll(pane);
     }
@@ -229,6 +235,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("VISBILITY".equals(EVENT_TYPE)) {
             threshold.setVisible(getSkinnable().isThresholdVisible());
             threshold.setManaged(getSkinnable().isThresholdVisible());
+            thresholdText.setVisible(getSkinnable().isThresholdVisible());
+            thresholdText.setManaged(getSkinnable().isThresholdVisible());
             redraw();
         }
     }
@@ -288,6 +296,9 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxText.setFill(getSkinnable().getValueColor());
         maxText.setText(String.format(Locale.US, otherFormatString, getSkinnable().getMaxValue()));
         maxText.relocate(((0.27778 * width) - maxText.getLayoutBounds().getWidth()) * 0.5 + 0.72222 * width, 0.7 * height);
+        
+        thresholdText.setFill(getSkinnable().getTitleColor());
+        thresholdText.setVisible(Double.compare(getSkinnable().getThreshold(), getSkinnable().getMinValue()) != 0 && Double.compare(getSkinnable().getThreshold(), getSkinnable().getMaxValue()) != 0);
 
         unitText.setFill(getSkinnable().getUnitColor());
         unitText.setText(getSkinnable().getUnit());
@@ -299,6 +310,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void resize() {
+        
         width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
         size   = width < height ? width : height;
@@ -369,16 +381,31 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             dataBarInnerArc.setRadiusY(0.3 * height);
             dataBarInnerArc.setX(0.27778 * width);
             dataBarInnerArc.setY(0.675 * height);
-
-            threshold.setStroke(getSkinnable().getThresholdColor());
-            threshold.setStrokeWidth(Helper.clamp(1d, 2d, 0.00675676 * height));
+            
             double thresholdInnerRadius = 0.3 * height;
             double thresholdOuterRadius = 0.675 * height;
-            double thresholdAngle = Helper.clamp(90d, 270d, (getSkinnable().getThreshold() - minValue) * angleStep + 90d);
-            threshold.setStartX(centerX + thresholdInnerRadius * Math.sin(-Math.toRadians(thresholdAngle)));
-            threshold.setStartY(centerX + thresholdInnerRadius * Math.cos(-Math.toRadians(thresholdAngle)));
-            threshold.setEndX(centerX + thresholdOuterRadius * Math.sin(-Math.toRadians(thresholdAngle)));
-            threshold.setEndY(centerX + thresholdOuterRadius * Math.cos(-Math.toRadians(thresholdAngle)));
+            double thresholdTextRadius = 0.76 * height;
+            double thresholdAngle = Helper.clamp(90d, 270d, (getSkinnable().getThreshold() - minValue) * angleStep + 90d);            
+            double sinValue   = Math.sin(-Math.toRadians(thresholdAngle));
+            double cosValue   = Math.cos(-Math.toRadians(thresholdAngle));
+            double fontSize   = height * 0.1;
+            maxWidth = height * 0.15;
+            
+            thresholdText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));       
+            thresholdText.setFont(Fonts.latoRegular(fontSize));
+            if (thresholdText.getLayoutBounds().getWidth() > maxWidth) {
+                Helper.adjustTextSize(thresholdText, maxWidth, fontSize);
+            }
+            thresholdText.setTranslateX(-thresholdText.getLayoutBounds().getWidth() * 0.5);
+            thresholdText.setTranslateY(-thresholdText.getLayoutBounds().getHeight() * 0.5);
+            thresholdText.relocate(centerX + thresholdTextRadius * sinValue, centerX + thresholdTextRadius * cosValue);
+            
+            threshold.setStroke(getSkinnable().getThresholdColor());
+            threshold.setStrokeWidth(Helper.clamp(1d, 2d, 0.00675676 * height));
+            threshold.setStartX(centerX + thresholdInnerRadius * sinValue);
+            threshold.setStartY(centerX + thresholdInnerRadius * cosValue );
+            threshold.setEndX(centerX + thresholdOuterRadius * sinValue);
+            threshold.setEndY(centerX + thresholdOuterRadius * cosValue);
         }
     }
 }
