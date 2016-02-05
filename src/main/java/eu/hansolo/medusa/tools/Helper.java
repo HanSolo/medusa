@@ -62,6 +62,8 @@ import java.util.concurrent.ThreadFactory;
  * Created by hansolo on 11.12.15.
  */
 public class Helper {
+    public static final Color INACTIVE_ALARM_COLOR = Color.rgb(90, 90, 90, 0.5);
+
 
     public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
         if (VALUE.doubleValue() < MIN.doubleValue()) return MIN;
@@ -840,7 +842,7 @@ public class Helper {
                 double        alarmAngle = (alarmTime.getMinute() + alarmTime.getSecond() / 60d) * angleStep + 180;
                 double        sinValue   = Math.sin(Math.toRadians((-alarmAngle)));
                 double        cosValue   = Math.cos(Math.toRadians((-alarmAngle)));
-                Color         alarmColor = alarm.getColor();
+                Color         alarmColor = alarm.isArmed() ? alarm.getColor() : INACTIVE_ALARM_COLOR;
                 Circle        dot        = entry.getValue();
                 dot.setRadius(alarmSize);
                 dot.setCenterX(center + SIZE * ALARM_MARKER_RADIUS * sinValue);
