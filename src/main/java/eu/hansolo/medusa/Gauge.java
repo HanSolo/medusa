@@ -1480,7 +1480,7 @@ public class Gauge extends Control {
      * Returns true if setting the value of the gauge will be animated
      * using the duration defined in animationDuration [ms].
      * Keep in mind that it only makes sense to animate the setting if
-     * the data rate is low (> 1 value per second). If you use real
+     * the data rate is low (more than 1 value per second). If you use real
      * live measured data you should set animated to false.
      * @return true if setting the value of the gauge will be animated
      */
@@ -1489,7 +1489,7 @@ public class Gauge extends Control {
      * Defines if setting the value of the gauge should be animated using
      * the duration defined in animationDuration [ms].
      * Keep in mind that it only makes sense to animate the setting if
-     * the data rate is low (> 1 value per second). If you use real
+     * the data rate is low (more than 1 value per second). If you use real
      * live measured data you should set animated to false.
      * @param ANIMATED
      */
@@ -1600,7 +1600,7 @@ public class Gauge extends Control {
      * Returns the value that is calculated by dividing the angleRange
      * by the range. The angleStep will always be recalculated when changing
      * the min-, maxValue or angleRange.
-     * E.g. angleRange = 180 degrees, range = 0 - 100 -> angleStep = 180/100 = 1.8
+     * E.g. angleRange = 180 degrees, range = 0 - 100 will lead to angleStep = 180/100 = 1.8
      * @return the value that is calculated by dividing the angleRange by the range
      */
     public double getAngleStep() { return null == angleStep ? _angleStep : angleStep.get(); }
