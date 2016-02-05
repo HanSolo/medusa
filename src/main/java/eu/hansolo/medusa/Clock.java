@@ -264,14 +264,38 @@ public class Clock extends Control {
 
 
     // ******************** Methods *******************************************
+    /**
+     * Returns the current time of the clock.
+     * @return the current time of the clock
+     */
     public ZonedDateTime getTime() { return time.get(); }
+    /**
+     * Defines the current time of the clock.
+     * @param TIME
+     */
     public void setTime(ZonedDateTime TIME) { time.set(TIME); }
     public ObjectProperty<ZonedDateTime> timeProperty() { return time; }
 
+    /**
+     * Returns the current time in epoch seconds
+     * @return the current time in epoch seconds
+     */
     public long getCurrentTime() { return currentTime.get(); }
     public ReadOnlyLongProperty currentTimeProperty() { return currentTime; }
 
+    /**
+     * Returns the title of the clock. The title
+     * could be used to show for example the current
+     * city or timezone.
+     * @return the title of the clock
+     */
     public String getTitle() { return null == title ? _title : title.get(); }
+    /**
+     * Defines the title of the clock. The title
+     * could be used to show for example the current
+     * city or timezone
+     * @param TITLE
+     */
     public void setTitle(String TITLE) {
         if (null == title) {
             _title = TITLE;
@@ -284,8 +308,18 @@ public class Clock extends Control {
         if (null == title) { title = new SimpleStringProperty(Clock.this, "title", _title); }
         return title;
     }
-    
+
+    /**
+     * Returns the text that was defined for the clock.
+     * This text could be used for additional information.
+     * @return the text that was defined for the clock
+     */
     public String getText() { return null == text ? _text : text.get(); }
+    /**
+     * Define the text for the clock.
+     * This text could be used for additional information.
+     * @param TEXT
+     */
     public void setText(String TEXT) { 
         if (null == text) {
             _text = TEXT;
@@ -299,7 +333,23 @@ public class Clock extends Control {
         return text; 
     }
 
+    /**
+     * Returns true if the clock will check each section for
+     * the current time and the section will fire events in
+     * case the current time enters or leaves a section.
+     * This section events can be used to control something like
+     * switching on/off lights etc.
+     * @return true if the clock will check each section for the current time
+     */
     public boolean getCheckSectionsForValue() { return null == checkSectionsForValue ? _checkSectionsForValue : checkSectionsForValue.get(); }
+    /**
+     * Defines if the clock will check each section for
+     * the current time and the section will fire events
+     * in case the current time enters or leaves a section.
+     * This section events can be used to control something like
+     * switching on/off lights etc.
+     * @param CHECK
+     */
     public void setCheckSectionsForValue(final boolean CHECK) {
         if (null == checkSectionsForValue) {
             _checkSectionsForValue = CHECK;
@@ -312,7 +362,23 @@ public class Clock extends Control {
         return checkSectionsForValue;
     }
 
+    /**
+     * Returns true if the clock will check each area for
+     * the current time and the area will fire events in
+     * case the current time enters or leaves a section.
+     * This area events can be used to control something like
+     * switching on/off lights etc.
+     * @return true if the clock will check each are for the current time
+     */
     public boolean getCheckAreasForValue() { return null == checkAreasForValue ? _checkAreasForValue : checkAreasForValue.get(); }
+    /**
+     * Defines if the clock will check each area for
+     * the current time and the area will fire events in
+     * case the current time enters or leaves a section.
+     * This area events can be used to control something like
+     * switching on/off lights etc.
+     * @param CHECK
+     */
     public void setCheckAreasForValue(final boolean CHECK) {
         if (null == checkAreasForValue) {
             _checkAreasForValue = CHECK;
@@ -324,32 +390,76 @@ public class Clock extends Control {
         if (null == checkAreasForValue) { checkAreasForValue = new SimpleBooleanProperty(Clock.this, "checkAreasForValue", _checkAreasForValue); }
         return checkAreasForValue;
     }
-    
+
+    /**
+     * Returns an observable list of TimeSection objects. The sections
+     * will be used to colorize areas with a special meaning.
+     * TimeSections in the Medusa library usually are less eye-catching than
+     * Areas.
+     * @return an observable list of TimeSection objects
+     */
     public ObservableList<TimeSection> getSections() { return sections; }
+    /**
+     * Sets the sections to the given list of TimeSection objects. The
+     * sections will be used to colorize areas with a special
+     * meaning. Sections in the Medusa library usually are less eye-catching
+     * than Areas.
+     * @param SECTIONS
+     */
     public void setSections(final List<TimeSection> SECTIONS) {
         sections.setAll(SECTIONS);
         Collections.sort(sections, new TimeSectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Sets the sections to the given array of TimeSection objects. The
+     * sections will be used to colorize areas with a special
+     * meaning. Sections in the Medusa library usually are less eye-catching
+     * than Areas.
+     * @param SECTIONS
+     */
     public void setSections(final TimeSection... SECTIONS) { setSections(Arrays.asList(SECTIONS)); }
+    /**
+     * Adds the given TimeSection to the list of sections.
+     * Sections in the Medusa library usually are less eye-catching
+     * than Areas.
+     * @param SECTION
+     */
     public void addSection(final TimeSection SECTION) {
         if (null == SECTION) return;
         sections.add(SECTION);
         Collections.sort(sections, new TimeSectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Removes the given TimeSection from the list of sections.
+     * Sections in the Medusa library usually are less eye-catching
+     * than Areas.
+     * @param SECTION
+     */
     public void removeSection(final TimeSection SECTION) {
         if (null == SECTION) return;
         sections.remove(SECTION);
         Collections.sort(sections, new TimeSectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Clears the list of sections.
+     */
     public void clearSections() {
         sections.clear();
         fireUpdateEvent(SECTION_EVENT);
     }
 
+    /**
+     * Returns true if the sections should be drawn in the clock.
+     * @return true if the sections should be drawn in the clock.
+     */
     public boolean getSectionsVisible() { return null == sectionsVisible ? _sectionsVisible : sectionsVisible.get(); }
+    /**
+     * Defines if the sections should be drawn in the clock.
+     * @param VISIBLE
+     */
     public void setSectionsVisible(final boolean VISIBLE) {
         if (null == sectionsVisible) {
             _sectionsVisible = VISIBLE;
@@ -363,31 +473,75 @@ public class Clock extends Control {
         return sectionsVisible;
     }
 
+    /**
+     * Returns an observable list of TimeSection objects. The sections
+     * will be used to colorize areas with a special meaning.
+     * Areas in the Medusa library usually are more eye-catching
+     * than Sections.
+     * @return an observable list of TimeSection objects
+     */
     public ObservableList<TimeSection> getAreas() { return areas; }
+    /**
+     * Sets the areas to the given list of TimeSection objects. The
+     * sections will be used to colorize areas with a special
+     * meaning. Areas in the Medusa library usually are more eye-catching
+     * than Sections.
+     * @param AREAS
+     */
     public void setAreas(final List<TimeSection> AREAS) {
         areas.setAll(AREAS);
         Collections.sort(areas, new TimeSectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Sets the areas to the given array of TimeSection objects. The
+     * sections will be used to colorize areas with a special
+     * meaning. Areas in the Medusa library usually are more eye-catching
+     * than Sections.
+     * @param AREAS
+     */
     public void setAreas(final TimeSection... AREAS) { setAreas(Arrays.asList(AREAS)); }
+    /**
+     * Adds the given TimeSection to the list of areas.
+     * Areas in the Medusa library usually are more eye-catching
+     * than Sections.
+     * @param AREA
+     */
     public void addArea(final TimeSection AREA) {
         if (null == AREA) return;
         areas.add(AREA);
         Collections.sort(areas, new TimeSectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Removes the given TimeSection from the list of areas.
+     * Areas in the Medusa library usually are more eye-catching
+     * than Sections.
+     * @param AREA
+     */
     public void removeArea(final TimeSection AREA) {
         if (null == AREA) return;
         areas.remove(AREA);
         Collections.sort(areas, new TimeSectionComparator());
         fireUpdateEvent(SECTION_EVENT);
     }
+    /**
+     * Clears the list of areas
+     */
     public void clearAreas() {
         areas.clear();
         fireUpdateEvent(SECTION_EVENT);
     }
 
+    /**
+     * Returns true if the areas should be drawn in the clock.
+     * @return true if the areas should be drawn in the clock
+     */
     public boolean getAreasVisible() { return null == areasVisible ? _areasVisible : areasVisible.get(); }
+    /**
+     * Defines if the areas should be drawn in the clock.
+     * @param VISIBLE
+     */
     public void setAreasVisible(final boolean VISIBLE) {
         if (null == areasVisible) {
             _areasVisible = VISIBLE;
@@ -401,7 +555,19 @@ public class Clock extends Control {
         return areasVisible;
     }
 
+    /**
+     * Returns true if the second hand of the clock should move
+     * in discrete steps of 1 second. Otherwise it will move continuously like
+     * in an automatic clock.
+     * @return true if the second hand of the clock should move in discrete steps of 1 second
+     */
     public boolean isDiscreteSeconds() { return null == discreteSeconds ? _discreteSeconds : discreteSeconds.get(); }
+    /**
+     * Defines if the second hand of the clock should move in
+     * discrete steps of 1 second. Otherwise it will move continuously like
+     * in an automatic clock.
+     * @param DISCRETE
+     */
     public void setDiscreteSeconds(boolean DISCRETE) {
         if (null == discreteSeconds) {
             _discreteSeconds = DISCRETE;
@@ -428,7 +594,19 @@ public class Clock extends Control {
         return discreteSeconds;
     }
 
+    /**
+     * Returns true if the minute hand of the clock should move in
+     * discrete steps of 1 minute. Otherwise it will move continuously like
+     * in an automatic clock.
+     * @return true if the minute hand of the clock should move in discrete steps of 1 minute
+     */
     public boolean isDiscreteMinutes() { return null == discreteMinutes ? _discreteMinutes : discreteMinutes.get(); }
+    /**
+     * Defines if the minute hand of the clock should move in
+     * discrete steps of 1 minute. Otherwise it will move continuously like
+     * in an automatic clock.
+     * @param DISCRETE
+     */
     public void setDiscreteMinutes(boolean DISCRETE) {
         if (null == discreteMinutes) {
             _discreteMinutes = DISCRETE;
@@ -455,7 +633,21 @@ public class Clock extends Control {
         return discreteMinutes;
     }
 
+    /**
+     * Returns true if the hour hand of the clock should move in
+     * discrete steps of 1 hour. This behavior was more or less
+     * implemented to realize the clock of clocks and should usually
+     * be false.
+     * @return true if the hour hand of the clock should move in discrete steps of 1 hour
+     */
     public boolean isDiscreteHours() { return null == discreteHours ? _discreteHours : discreteHours.get(); }
+    /**
+     * Defines if the hour hand of the clock should move in
+     * discrete steps of 1 hour. This behavior was more or less
+     * implemented to realize the clock of clocks and should usually
+     * be false.
+     * @param DISCRETE
+     */
     public void setDiscreteHours(final boolean DISCRETE) {
         if (null == discreteHours) {
             _discreteHours = DISCRETE;
@@ -468,7 +660,15 @@ public class Clock extends Control {
         return discreteHours;
     }
 
+    /**
+     * Returns true if the second hand of the clock will be drawn.
+     * @return true if the second hand of the clock will be drawn.
+     */
     public boolean isSecondsVisible() { return null == secondsVisible ? _secondsVisible : secondsVisible.get(); }
+    /**
+     * Defines if the second hand of the clock will be drawn.
+     * @param VISIBLE
+     */
     public void setSecondsVisible(boolean VISIBLE) { 
         if (null == secondsVisible) {
             _secondsVisible = VISIBLE;
@@ -482,7 +682,15 @@ public class Clock extends Control {
         return secondsVisible; 
     }
 
+    /**
+     * Returns true if the title of the clock will be drawn.
+     * @return true if the title of the clock will be drawn
+     */
     public boolean isTitleVisible() { return null == titleVisible ? _titleVisible : titleVisible.get(); }
+    /**
+     * Defines if the title of the clock will be drawn.
+     * @param VISIBLE
+     */
     public void setTitleVisible(final boolean VISIBLE) {
         if (null == titleVisible) {
             _titleVisible = VISIBLE;
@@ -496,7 +704,15 @@ public class Clock extends Control {
         return titleVisible;
     }
 
+    /**
+     * Returns true if the text of the clock will be drawn.
+     * @return true if the text of the clock will be drawn
+     */
     public boolean isTextVisible() { return null == textVisible ? _textVisible : textVisible.get(); }
+    /**
+     * Defines if the text of the clock will be drawn.
+     * @param VISIBLE
+     */
     public void setTextVisible(final boolean VISIBLE) {
         if (null == textVisible) {
             _textVisible = VISIBLE;
@@ -510,7 +726,15 @@ public class Clock extends Control {
         return textVisible;
     }
 
+    /**
+     * Returns true if the date of the clock will be drawn.
+     * @return true if the date of the clock will be drawn
+     */
     public boolean isDateVisible() { return null == dateVisible ? _dateVisible : dateVisible.get(); }
+    /**
+     * Defines if the date of the clock will be drawn.
+     * @param VISIBLE
+     */
     public void setDateVisible(final boolean VISIBLE) {
         if (null == dateVisible) {
             _dateVisible = VISIBLE;
@@ -524,7 +748,15 @@ public class Clock extends Control {
         return dateVisible;
     }
 
+    /**
+     * Returns true if the clock is in night mode (NOT USED AT THE MOMENT)
+     * @return true if the clock is in night mode (NOT USED AT THE MOMENT)
+     */
     public boolean isNightMode() { return null == nightMode ? _nightMode : nightMode.get(); }
+    /**
+     * Defines if the clock is in night mode (NOT USED AT THE MOMENT)
+     * @param MODE
+     */
     public void setNightMode(boolean MODE) { 
         if (null == nightMode) {
             _nightMode = MODE;
@@ -538,7 +770,17 @@ public class Clock extends Control {
         return nightMode; 
     }
 
+    /**
+     * Returns true if the clock is running and shows the current time.
+     * The clock will only start running if animated == false.
+     * @return true if the clock is running
+     */
     public boolean isRunning() { return null == running ? _running : running.get(); }
+    /**
+     * Defines if the clock is running.
+     * The clock will only start running if animated == false;
+     * @param RUNNING
+     */
     public void setRunning(boolean RUNNING) { 
         if (null == running) {
             _running = RUNNING;
@@ -559,7 +801,17 @@ public class Clock extends Control {
         return running; 
     }
 
+    /**
+     * Returns true if the clock is in auto night mode (NOT USED AT THE MOMENT).
+     * The idea is that the clock can switch the colors from bright to dark
+     * automatically in dependence on the time of day.
+     * @return true if the clock is in auto night mode (NOT USED AT THE MOMENT)
+     */
     public boolean isAutoNightMode() { return null == autoNightMode ? _autoNightMode : autoNightMode.get(); }
+    /**
+     * Defines if the clock is in auto night mode (NOT USED AT THE MOMENT)
+     * @param MODE
+     */
     public void setAutoNightMode(boolean MODE) { 
         if (null == autoNightMode) {
             _autoNightMode = MODE;
@@ -572,7 +824,17 @@ public class Clock extends Control {
         return autoNightMode;
     }
 
+    /**
+     * Returns the Paint object that will be used to fill the clock background.
+     * This is usally a Color object.
+     * @return the Paint object that will be used to fill the clock background
+     */
     public Paint getBackgroundPaint() { return null == backgroundPaint ? _backgroundPaint : backgroundPaint.get(); }
+    /**
+     * Defines the Paint object that will be used to fill the clock background.
+     * This is usally a Color object.
+     * @param PAINT
+     */
     public void setBackgroundPaint(final Paint PAINT) {
         if (null == backgroundPaint) {
             _backgroundPaint = PAINT;
@@ -586,7 +848,17 @@ public class Clock extends Control {
         return backgroundPaint;
     }
 
+    /**
+     * Returns the Paint object that will be used to draw the border of the clock.
+     * Usually this is a Color object.
+     * @return the Paint object that will be used to draw the border of the clock
+     */
     public Paint getBorderPaint() { return null == borderPaint ? _borderPaint : borderPaint.get(); }
+    /**
+     * Defines the Paint object that will be used to draw the border of the clock.
+     * Usually this is a Color object.
+     * @param PAINT
+     */
     public void setBorderPaint(final Paint PAINT) {
         if (null == borderPaint) {
             _borderPaint = PAINT;
@@ -600,7 +872,17 @@ public class Clock extends Control {
         return borderPaint;
     }
 
+    /**
+     * Returns the Paint object that will be used to fill the foreground of the clock.
+     * This could be used to visualize glass effects etc. and is only rarely used.
+     * @return the Paint object that will be used to fill the foreground of the clock
+     */
     public Paint getForegroundPaint() { return null == foregroundPaint ? _foregroundPaint : foregroundPaint.get(); }
+    /**
+     * Defines the Paint object that will be used to fill the foreground of the clock.
+     * This could be used to visualize glass effects etc. and is only rarely used.
+     * @param PAINT
+     */
     public void setForegroundPaint(final Paint PAINT) {
         if (null == foregroundPaint) {
             _foregroundPaint = PAINT;
@@ -614,7 +896,15 @@ public class Clock extends Control {
         return foregroundPaint;
     }
 
+    /**
+     * Returns the color that will be used to colorize the title of the clock.
+     * @return the color that will be used to colorize the title of the clock
+     */
     public Color getTitleColor() { return null == titleColor ? _titleColor : titleColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the title of the clock
+     * @param COLOR
+     */
     public void setTitleColor(final Color COLOR) {
         if (null == titleColor) {
             _titleColor = COLOR;
@@ -628,7 +918,15 @@ public class Clock extends Control {
         return titleColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the text of the clock.
+     * @return the color that will be used to colorize the text of the clock
+     */
     public Color getTextColor() { return null == textColor ? _textColor : textColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the text of the clock.
+     * @param COLOR
+     */
     public void setTextColor(final Color COLOR) {
         if (null == textColor) {
             _textColor = COLOR;
@@ -642,7 +940,15 @@ public class Clock extends Control {
         return textColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the date of the clock.
+     * @return the color that will be used to colorize the date of the clock
+     */
     public Color getDateColor() { return null == dateColor ? _dateColor : dateColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the date of the clock
+     * @param COLOR
+     */
     public void setDateColor(final Color COLOR) {
         if (null == dateColor) {
             _dateColor = COLOR;
@@ -656,7 +962,15 @@ public class Clock extends Control {
         return dateColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the hour tickmarks of the clock.
+     * @return the color that will be used to colorize the hour tickmarks of the clock
+     */
     public Color getHourTickMarkColor() { return null == hourTickMarkColor ? _hourTickMarkColor : hourTickMarkColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the hour tickmarks of the clock.
+     * @param COLOR
+     */
     public void setHourTickMarkColor(final Color COLOR) {
         if (null == hourTickMarkColor) {
             _hourTickMarkColor = COLOR;
@@ -670,7 +984,15 @@ public class Clock extends Control {
         return hourTickMarkColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the minute tickmarks of the clock.
+     * @return the color that will be used to colorize the minute tickmarks of the clock
+     */
     public Color getMinuteTickMarkColor() { return null == minuteTickMarkColor ? _minuteTickMarkColor : minuteTickMarkColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the minute tickmarks of the clock.
+     * @param COLOR
+     */
     public void setMinuteTickMarkColor(final Color COLOR) {
         if (null == minuteTickMarkColor) {
             _minuteTickMarkColor = COLOR;
@@ -684,7 +1006,15 @@ public class Clock extends Control {
         return minuteTickMarkColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the ticklabels of the clock.
+     * @return the color that will be used to colorize the ticklabels of the clock
+     */
     public Color getTickLabelColor() { return null == tickLabelColor ? _tickLabelColor : tickLabelColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the ticklabels of the clock.
+     * @param COLOR
+     */
     public void setTickLabelColor(final Color COLOR) {
         if (null == tickLabelColor) {
             _tickLabelColor = COLOR;
@@ -698,7 +1028,15 @@ public class Clock extends Control {
         return tickLabelColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the alarm icon.
+     * @return the color that will be used to colorize the alarm icon
+     */
     public Color getAlarmColor() { return null == alarmColor ? _alarmColor : alarmColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the alarm icon
+     * @param COLOR
+     */
     public void setAlarmColor(final Color COLOR) {
         if (null == alarmColor) {
             _alarmColor = COLOR;
@@ -712,7 +1050,15 @@ public class Clock extends Control {
         return alarmColor;
     }
 
+    /**
+     * Returns true if the hour tickmarks will be drawn.
+     * @return true if the hour tickmarks will be drawn
+     */
     public boolean isHourTickMarksVisible() { return null == hourTickMarksVisible ? _hourTickMarksVisible : hourTickMarksVisible.get(); }
+    /**
+     * Defines if the hour tickmarks will be drawn.
+     * @param VISIBLE
+     */
     public void setHourTickMarksVisible(final boolean VISIBLE) {
         if (null == hourTickMarksVisible) {
             _hourTickMarksVisible = VISIBLE;
@@ -726,7 +1072,15 @@ public class Clock extends Control {
         return hourTickMarksVisible;
     }
 
+    /**
+     * Returns true if the minute tickmarks will be drawn.
+     * @return true if the minute tickmarks will be drawn
+     */
     public boolean isMinuteTickMarksVisible() { return null == minuteTickMarksVisible ? _minuteTickMarksVisible : minuteTickMarksVisible.get(); }
+    /**
+     * Defines if the minute tickmarks will be drawn.
+     * @param VISIBLE
+     */
     public void setMinuteTickMarksVisible(final boolean VISIBLE) {
         if (null == minuteTickMarksVisible) {
             _minuteTickMarksVisible = VISIBLE;
@@ -740,7 +1094,15 @@ public class Clock extends Control {
         return minuteTickMarksVisible;
     }
 
+    /**
+     * Returns true if the ticklabels will be drawn.
+     * @return true if the ticklabels will be drawn
+     */
     public boolean isTickLabelsVisible() { return null == tickLabelsVisible ? _tickLabelsVisible : tickLabelsVisible.get(); }
+    /**
+     * Defines if the ticklabels will be drawn.
+     * @param VISIBLE
+     */
     public void setTickLabelsVisible(final boolean VISIBLE) {
         if (null == tickLabelsVisible) {
             _tickLabelsVisible = VISIBLE;
@@ -754,7 +1116,15 @@ public class Clock extends Control {
         return tickLabelsVisible;
     }
 
+    /**
+     * Returns the color that will be used to colorize the hour hand of the clock.
+     * @return the color that will be used to colorize the hour hand of the clock
+     */
     public Color getHourColor() { return null == hourColor ? _hourColor : hourColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the hour hand of the clock
+     * @param COLOR
+     */
     public void setHourColor(final Color COLOR) {
         if (null == hourColor) {
             _hourColor = COLOR;
@@ -768,7 +1138,15 @@ public class Clock extends Control {
         return hourColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the minute hand of the clock.
+     * @return the color that will be used to colorize the minute hand of the clock
+     */
     public Color getMinuteColor() { return null == minuteColor ? _minuteColor : minuteColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the minute hand of the clock.
+     * @param COLOR
+     */
     public void setMinuteColor(final Color COLOR) {
         if (null == minuteColor) {
             _minuteColor = COLOR;
@@ -782,7 +1160,15 @@ public class Clock extends Control {
         return minuteColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the second hand of the clock.
+     * @return the color that will be used to colorize the second hand of the clock
+     */
     public Color getSecondColor() { return null == secondColor ? _secondColor : secondColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the second hand of the clock
+     * @param COLOR
+     */
     public void setSecondColor(final Color COLOR) {
         if (null == secondColor) {
             _secondColor = COLOR;
@@ -796,7 +1182,15 @@ public class Clock extends Control {
         return secondColor;
     }
 
+    /**
+     * Returns the color that will be used to colorize the knob of the clock (if available)
+     * @return the color that will be used to colorize the knob of the clock (if available)
+     */
     public Color getKnobColor() { return null == knobColor ? _knobColor : knobColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the knob of the clock (if available)
+     * @param COLOR
+     */
     public void setKnobColor(final Color COLOR) {
         if (null == knobColor) {
             _knobColor = COLOR;
@@ -810,7 +1204,17 @@ public class Clock extends Control {
         return knobColor;
     }
 
+    /**
+     * Returns the LcdDesign that will be used to visualize the LCD display.
+     * This is currently only used in the LcdSkin.
+     * @return the LcdDesign that will be used to visualize th LCD display
+     */
     public LcdDesign getLcdDesign() { return null == lcdDesign ? _lcdDesign : lcdDesign.get(); }
+    /**
+     * Defines the LcdDesign that will be used to visualize the LCD display.
+     * This is currently only used in the LcdSkin.
+     * @param DESIGN
+     */
     public void setLcdDesign(final LcdDesign DESIGN) {
         if (null == lcdDesign) {
             _lcdDesign = DESIGN;
@@ -824,7 +1228,17 @@ public class Clock extends Control {
         return lcdDesign;
     }
 
+    /**
+     * Returns true if alarms are enabled.
+     * If false then no alarms will be triggered
+     * @return true if alarms are enabled
+     */
     public boolean isAlarmsEnabled() { return null == alarmsEnabled ? _alarmsEnabled : alarmsEnabled.get(); }
+    /**
+     * Defines if alarms are enabled.
+     * If false then no alarms will be triggered.
+     * @param CHECK
+     */
     public void setAlarmsEnabled(final boolean CHECK) {
         if (null == alarmsEnabled) {
             _alarmsEnabled = CHECK;
@@ -838,7 +1252,15 @@ public class Clock extends Control {
         return alarmsEnabled;
     }
 
+    /**
+     * Returns true if alarm markers should be drawn.
+     * @return true if alarm markers should be drawn
+     */
     public boolean isAlarmsVisible() { return null == alarmsVisible ? _alarmsVisible : alarmsVisible.get(); }
+    /**
+     * Defines if alarm markers should be drawn.
+     * @param VISIBLE
+     */
     public void setAlarmsVisible(final boolean VISIBLE) {
         if (null == alarmsVisible) {
             _alarmsVisible = VISIBLE;
@@ -852,14 +1274,51 @@ public class Clock extends Control {
         return alarmsVisible;
     }
 
+    /**
+     * Returns an observable list of Alarm objects.
+     * @return an observable list of Alarm objects
+     */
     public ObservableList<Alarm> getAlarms() { return alarms; }
+    /**
+     * Sets the alarms to the given list of Alarm objects.
+     * @param ALARMS
+     */
     public void setAlarms(final List<Alarm> ALARMS) { alarms.setAll(ALARMS); }
+    /**
+     * Sets the alarms to the given array of Alarm objects.
+     * @param ALARMS
+     */
     public void setAlarms(final Alarm... ALARMS) { setAlarms(Arrays.asList(ALARMS)); }
+    /**
+     * Adds the given Alarm object from the list of alarms.
+     * @param ALARM
+     */
     public void addAlarm(final Alarm ALARM) { if (!alarms.contains(ALARM)) alarms.add(ALARM); }
+    /**
+     * Removes the given Alarm object from the list of alarms.
+     * @param ALARM
+     */
     public void removeAlarm(final Alarm ALARM) { if (alarms.contains(ALARM)) alarms.remove(ALARM); }
+    /**
+     * Clears the list of alarms.
+     */
     public void clearAlarms() { alarms.clear(); }
 
+    /**
+     * Returns true if the crystal effect of the LCD display will be drawn.
+     * This feature could decrease the performance if you run it on
+     * embedded devices because it will calculate a bitmap image where
+     * each pixel will be calculated.
+     * @return true if the crystal effect of the LCD display will be drawn
+     */
     public boolean isLcdCrystalEnabled() { return null == lcdCrystalEnabled ? _lcdCrystalEnabled : lcdCrystalEnabled.get(); }
+    /**
+     * Defines if the crystal effect of the LCD display will be drawn.
+     * This feature could decrease the performance if you run it on
+     * embedded devices because it will calculate a bitmap image where
+     * each pixel will be calculated.
+     * @param ENABLED
+     */
     public void setLcdCrystalEnabled(final boolean ENABLED) {
         if (null == lcdCrystalEnabled) {
             _lcdCrystalEnabled = ENABLED;
@@ -873,7 +1332,15 @@ public class Clock extends Control {
         return lcdCrystalEnabled;
     }
 
+    /**
+     * Returns true if effects like shadows will be drawn.
+     * @return true if effects like shadows will be drawn
+     */
     public boolean getShadowsEnabled() { return null == shadowsEnabled ? _shadowsEnabled : shadowsEnabled.get(); }
+    /**
+     * Defines if effects like shadows will be drawn.
+     * @param ENABLED
+     */
     public void setShadowsEnabled(final boolean ENABLED) {
         if (null == shadowsEnabled) {
             _shadowsEnabled = ENABLED;
@@ -887,7 +1354,19 @@ public class Clock extends Control {
         return shadowsEnabled;
     }
 
+    /**
+     * Returns the font that will be used to visualize the LCD
+     * if the clock has a LCD display or for the LcdClockSkin.
+     * The values are STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA
+     * @return the font that will be used to visualize the LCD
+     */
     public LcdFont getLcdFont() { return null == lcdFont ? _lcdFont : lcdFont.get(); }
+    /**
+     * Defines the font that will be used to visualize the LCD value
+     * if the clock has a LCD display or for the LcdClockSkin.
+     * The values are STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA
+     * @param FONT
+     */
     public void setLcdFont(final LcdFont FONT) {
         if (null == lcdFont) {
             _lcdFont = FONT;
@@ -901,7 +1380,17 @@ public class Clock extends Control {
         return lcdFont;
     }
 
+    /**
+     * Returns the Locale that will be used to format the date in
+     * some ClockSkins.
+     * @return the Locale that will be used to format the date
+     */
     public Locale getLocale() { return null == locale ? _locale : locale.get(); }
+    /**
+     * Defines the Locale that will be used to format the date in
+     * some ClockSkins.
+     * @param LOCALE
+     */
     public void setLocale(final Locale LOCALE) {
         if (null == locale) {
             _locale = LOCALE;
@@ -915,7 +1404,21 @@ public class Clock extends Control {
         return locale;
     }
 
+    /**
+     * Returns the location of the ticklabels. The values are
+     * INSIDE and OUTSIDE. The location of the ticklabels has an
+     * influence on the size of the tickmarks and length of the hands.
+     * (NOT USED AT THE MOMENT)
+     * @return the location of the ticklabels
+     */
     public TickLabelLocation getTickLabelLocation() { return null == tickLabelLocation ? _tickLabelLocation : tickLabelLocation.get(); }
+    /**
+     * Defines the location of the ticklabels. The values are
+     * INSIDE and OUTSIDE. The location of the ticklabels has an
+     * influence on the size of the tickmarks and length of the hands.
+     * (NOT USED AT THE MOMENT)
+     * @param LOCATION
+     */
     public void setTickLabelLocation(final TickLabelLocation LOCATION) {
         if (null == tickLabelLocation) {
             _tickLabelLocation = LOCATION;
@@ -929,7 +1432,21 @@ public class Clock extends Control {
         return tickLabelLocation;
     }
 
+    /**
+     * Returns true if the clock hands should be animated when set to
+     * another time. This could be used to visualize the movement of the
+     * clock hands when the time changes.
+     * If set to true the clock can not be started with setRunning(true).
+     * @return true if the clock hands should be animated when set to another time
+     */
     public boolean isAnimated() { return null == animated ? _animated : animated.get(); }
+    /**
+     * Defines if the clock hands should be animated when set to
+     * another time. This could be used to visualize the movement of the
+     * clock hands when the time changes.
+     * If set to true the clock can not be started with setRunning(true).
+     * @param ANIMATED
+     */
     public void setAnimated(final boolean ANIMATED) {
         if (null == animated) {
             _animated = ANIMATED;
@@ -942,10 +1459,29 @@ public class Clock extends Control {
         return animated;
     }
 
+    /**
+     * Returns the duration in milliseconds that will be used to animate
+     * the hands of the clock from the current time to the given time.
+     * This will only be used if animated == true. This value will be
+     * clamped in the range of 10ms - 10s.
+     * @return the duration in milliseconds that will be used to animate the clock hands
+     */
     public long getAnimationDuration() { return animationDuration; }
+    /**
+     * Defines the duration in milliseconds that will be used to animate
+     * the hands of the clock from the current time to the given time.
+     * This will only be used if animated == true. This value will be
+     * clamped in the range of 10ms - 10s.
+     * @param ANIMATION_DURATION
+     */
     public void setAnimationDuration(final long ANIMATION_DURATION) { animationDuration = Helper.clamp(10l, 20000l, ANIMATION_DURATION); }
 
-
+    /**
+     * Calling this method will check the current time against all Alarm
+     * objects in alarms. The Alarm object will fire events in case the
+     * time is after the alarm time.
+     * @param TIME
+     */
     private void checkAlarms(final ZonedDateTime TIME) {
         alarmsToRemove.clear();
         for (Alarm alarm : alarms) {
@@ -1007,6 +1543,11 @@ public class Clock extends Control {
         }
     }
 
+    /**
+     * Calling this method will check for the current time of the day and
+     * switches on/off the night mode.
+     * @param TIME
+     */
     private void checkForNight(final ZonedDateTime TIME) {
         int hour   = TIME.getHour();
         int minute = TIME.getMinute();
