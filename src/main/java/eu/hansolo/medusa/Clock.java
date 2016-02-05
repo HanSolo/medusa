@@ -960,9 +960,19 @@ public class Clock extends Control {
                         alarmsToRemove.add(alarm);
                     }
                     break;
+                case HALF_HOURLY:
+                    if ((ALARM_TIME.getMinute() == TIME.getMinute() ||
+                        ALARM_TIME.plusMinutes(30).getMinute() == TIME.getMinute()) &&
+                        ALARM_TIME.getSecond() == TIME.getSecond()) {
+                        if (alarm.isArmed()) {
+                            fireAlarmEvent(new AlarmEvent(Clock.this, alarm));
+                            alarm.executeCommand();
+                        }
+                    }
+                    break;
                 case HOURLY:
-                    if (ALARM_TIME.getHour()   == TIME.getMinute() &&
-                        ALARM_TIME.getMinute() == TIME.getSecond()) {
+                    if (ALARM_TIME.getMinute() == TIME.getMinute() &&
+                        ALARM_TIME.getSecond() == TIME.getSecond()) {
                         if (alarm.isArmed()) {
                             fireAlarmEvent(new AlarmEvent(Clock.this, alarm));
                             alarm.executeCommand();
