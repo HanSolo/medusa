@@ -49,26 +49,16 @@ allprojects {
 }
 
 // create one jar for the javadoc
-task docs(type: Javadoc) {
-    source subprojects.collect { project -> project.sourceSets.main.allJava }
-    classpath = files(subprojects.collect { project -> project.sourceSets.main.compileClasspath })
-    destinationDir = new File('build/docs/javadoc')
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
 }
-task javadocJar(type: Jar, dependsOn: docs) {
-    classifier ='javadoc'
-    from 'build/docs/javadoc'
-}
-
 
 // create one jar for the source files
-task sourcesJar(type: Jar, dependsOn: javadocJar) {
-    classifier  = 'sources'
-    subprojects.each {
-        subproject ->
-            from subproject.configurations.archives.allArtifacts.files.filter { it.name.endsWith("sources.jar") }.collect { zipTree(it) }
-    }
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
-
 
 artifacts {
     archives jar
