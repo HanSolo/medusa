@@ -303,8 +303,6 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        otherFormatString    = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
         sectionsVisible      = getSkinnable().getSectionsVisible();
@@ -313,6 +311,23 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         barBackground.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
 
         setBarColor(getSkinnable().getCurrentValue());
+
+        dataBar.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
+
+        threshold.setStroke(getSkinnable().getThresholdColor());
+        double thresholdInnerRadius = 0.3 * height;
+        double thresholdOuterRadius = 0.675 * height;
+        double thresholdAngle       = Helper.clamp(90d, 270d, (getSkinnable().getThreshold() - minValue) * angleStep + 90d);
+        threshold.setStartX(centerX + thresholdInnerRadius * Math.sin(-Math.toRadians(thresholdAngle)));
+        threshold.setStartY(centerX + thresholdInnerRadius * Math.cos(-Math.toRadians(thresholdAngle)));
+        threshold.setEndX(centerX + thresholdOuterRadius * Math.sin(-Math.toRadians(thresholdAngle)));
+        threshold.setEndY(centerX + thresholdOuterRadius * Math.cos(-Math.toRadians(thresholdAngle)));
+
+        redrawText();
+    }
+    private void redrawText() {
+        formatString      = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        otherFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
 
         titleText.setFill(getSkinnable().getTitleColor());
         titleText.setText(getSkinnable().getTitle());
@@ -334,17 +349,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setText(getSkinnable().getUnit());
         unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.5 * height);
 
-        dataBar.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
-
-        threshold.setStroke(getSkinnable().getThresholdColor());
-        double thresholdInnerRadius = 0.3 * height;
-        double thresholdOuterRadius = 0.675 * height;
-        double thresholdAngle       = Helper.clamp(90d, 270d, (getSkinnable().getThreshold() - minValue) * angleStep + 90d);
-        threshold.setStartX(centerX + thresholdInnerRadius * Math.sin(-Math.toRadians(thresholdAngle)));
-        threshold.setStartY(centerX + thresholdInnerRadius * Math.cos(-Math.toRadians(thresholdAngle)));
-        threshold.setEndX(centerX + thresholdOuterRadius * Math.sin(-Math.toRadians(thresholdAngle)));
-        threshold.setEndY(centerX + thresholdOuterRadius * Math.cos(-Math.toRadians(thresholdAngle)));
-
+        double thresholdAngle      = Helper.clamp(90d, 270d, (getSkinnable().getThreshold() - minValue) * angleStep + 90d);
         double thresholdTextRadius = 0.26 * height;
         thresholdText.setFill(getSkinnable().getValueColor());
         thresholdText.setText(String.format(Locale.US, formatString, getSkinnable().getThreshold()));
