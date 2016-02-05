@@ -225,7 +225,8 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Resizing ******************************************
     private void redraw() {
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
 
@@ -295,7 +296,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdText.setFont(Fonts.latoRegular(fontSize));
         if (thresholdText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(thresholdText, maxWidth, fontSize); }
         textRadius = size * 0.5;
-        textAngle  = getSkinnable().getThreshold() * angleStep;
+        textAngle  = (getSkinnable().getThreshold() - minValue) * angleStep;
         sinValue   = Math.sin(Math.toRadians(180 + angleRange * 0.5 - textAngle));
         cosValue   = Math.cos(Math.toRadians(180 + angleRange * 0.5 - textAngle));
         textX      = size * 0.5 + textRadius * sinValue;
