@@ -52,6 +52,12 @@ public class TimeSection implements Comparable<TimeSection> {
 
 
     // ******************** Constructors **************************************
+    /**
+     * Represents an area of a given range, defined by a start and stop time.
+     * This class is used for regions and areas in many clocks. It is possible
+     * to check a time against the defined range and fire events in case the
+     * value enters or leaves the defined region.
+     */
     public TimeSection() {
         this(LocalTime.now(), LocalTime.now(), "", null, Color.TRANSPARENT, Color.TRANSPARENT);
     }
@@ -82,7 +88,15 @@ public class TimeSection implements Comparable<TimeSection> {
 
 
     // ******************** Methods *******************************************
+    /**
+     * Returns the time when the section begins.
+     * @return the time when the section begins
+     */
     public LocalTime getStart() { return null == start ? _start : start.get(); }
+    /**
+     * Defines the time when the section starts.
+     * @param START
+     */
     public void setStart(final LocalTime START) {
         if (null == start) {
             _start = START;
@@ -95,7 +109,15 @@ public class TimeSection implements Comparable<TimeSection> {
         return start;
     }
 
+    /**
+     * Returns the time when the section ends.
+     * @return the time when the section ends
+     */
     public LocalTime getStop() { return null == stop ? _stop : stop.get(); }
+    /**
+     * Defines the time when the section ends
+     * @param STOP
+     */
     public void setStop(final LocalTime STOP) {
         if (null == stop) {
             _stop = STOP;
@@ -108,7 +130,15 @@ public class TimeSection implements Comparable<TimeSection> {
         return stop;
     }
 
+    /**
+     * Returns the text that was set for the section.
+     * @return the text that was set for the section
+     */
     public String getText() { return null == text ? _text : text.get(); }
+    /**
+     * Defines the text for the section
+     * @param TEXT
+     */
     public void setText(final String TEXT) {
         if (null == text) {
             _text = TEXT;
@@ -121,7 +151,15 @@ public class TimeSection implements Comparable<TimeSection> {
         return text;
     }
 
+    /**
+     * Returns the image that was defined for the section.
+     * @return the image that was defined for the section
+     */
     public Image getImage() { return null == icon ? _icon : icon.get(); }
+    /**
+     * Defines an image for the section.
+     * @param IMAGE
+     */
     public void setIcon(final Image IMAGE) {
         if (null == icon) {
             _icon = IMAGE;
@@ -134,7 +172,17 @@ public class TimeSection implements Comparable<TimeSection> {
         return icon;
     }
 
+    /**
+     * Returns the color that will be used to colorize the section
+     * in a clock.
+     * @return the color that will be used to colorize the section
+     */
     public Color getColor() { return null == color ? _color : color.get(); }
+    /**
+     * Defines the color that will be used to colorize the section
+     * in a clock.
+     * @param COLOR
+     */
     public void setColor(final Color COLOR) {
         if (null == color) {
             _color = COLOR;
@@ -147,7 +195,15 @@ public class TimeSection implements Comparable<TimeSection> {
         return color;
     }
 
+    /**
+     * Returns the color that will be used to colorize the section text.
+     * @return the color that will bused to colorize the section text
+     */
     public Color getTextColor() { return null == textColor ? _textColor : textColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the section text
+     * @param COLOR
+     */
     public void setTextColor(final Color COLOR) {
         if (null == textColor) {
             _textColor = COLOR;
@@ -160,10 +216,25 @@ public class TimeSection implements Comparable<TimeSection> {
         return textColor;
     }
 
+    /**
+     * Returns true if the given time is within the range between
+     * section.getStart() and section.getStop()
+     * @param VALUE
+     * @return true if the given time is within the range of the section
+     */
     public boolean contains(final LocalTime VALUE) {
         return VALUE.isAfter(getStart()) && VALUE.isBefore(getStop());
     }
 
+    /**
+     * Checks if the section contains the given time and fires an event
+     * in case the value "entered" or "left" the section. With this one
+     * can react if a time "enters"/"leaves" a specific region in a gauge.
+     * This can be useful to control things like switching lights on if
+     * the time enters the region and switching it of again when the time
+     * left the region.
+     * @param VALUE
+     */
     public void checkForValue(final LocalTime VALUE) {
         boolean wasInSection = contains(checkedValue);
         boolean isInSection  = contains(VALUE);

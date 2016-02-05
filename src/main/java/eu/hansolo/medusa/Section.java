@@ -52,6 +52,12 @@ public class Section implements Comparable<Section> {
 
 
     // ******************** Constructors **************************************
+    /**
+     * Represents an area of a given range, defined by a start and stop value.
+     * This class is used for regions and areas in many gauges. It is possible
+     * to check a value against the defined range and fire events in case the
+     * value enters or leaves the defined region.
+     */
     public Section() {
         this(-1, -1, "", null, Color.TRANSPARENT, Color.TRANSPARENT);
     }
@@ -82,7 +88,15 @@ public class Section implements Comparable<Section> {
 
 
     // ******************** Methods *******************************************
+    /**
+     * Returns the value where the section begins.
+     * @return the value where the section begins
+     */
     public double getStart() { return null == start ? _start : start.get(); }
+    /**
+     * Defines the value where the section begins.
+     * @param START
+     */
     public void setStart(final double START) {
         if (null == start) {
             _start = START;
@@ -95,7 +109,15 @@ public class Section implements Comparable<Section> {
         return start;
     }
 
+    /**
+     * Returns the value where the section ends.
+     * @return the value where the section ends
+     */
     public double getStop() { return null == stop ? _stop : stop.get(); }
+    /**
+     * Defines the value where the section ends.
+     * @param STOP
+     */
     public void setStop(final double STOP) {
         if (null == stop) {
             _stop = STOP;
@@ -108,7 +130,15 @@ public class Section implements Comparable<Section> {
         return stop;
     }
 
+    /**
+     * Returns the text that was set for the section.
+     * @return the text that was set for the section
+     */
     public String getText() { return null == text ? _text : text.get(); }
+    /**
+     * Defines a text for the section.
+     * @param TEXT
+     */
     public void setText(final String TEXT) {
         if (null == text) {
             _text = TEXT;
@@ -121,7 +151,17 @@ public class Section implements Comparable<Section> {
         return text;
     }
 
+    /**
+     * Returns the image that was defined for the section.
+     * In some skins the image will be drawn (e.g. SimpleSkin).
+     * @return the image that was defined for the section
+     */
     public Image getImage() { return null == icon ? _icon : icon.get(); }
+    /**
+     * Defines an image for the section.
+     * In some skins the image will be drawn (e.g. SimpleSkin)
+     * @param IMAGE
+     */
     public void setIcon(final Image IMAGE) {
         if (null == icon) {
             _icon = IMAGE;
@@ -134,7 +174,17 @@ public class Section implements Comparable<Section> {
         return icon;
     }
 
+    /**
+     * Returns the color that will be used to colorize the section in
+     * a gauge.
+     * @return the color that will be used to colorize the section
+     */
     public Color getColor() { return null == color ? _color : color.get(); }
+    /**
+     * Defines the color that will be used to colorize the section in
+     * a gauge.
+     * @param COLOR
+     */
     public void setColor(final Color COLOR) {
         if (null == color) {
             _color = COLOR;
@@ -147,7 +197,15 @@ public class Section implements Comparable<Section> {
         return color;
     }
 
+    /**
+     * Returns the color that will be used to colorize the section text.
+     * @return the color that will be used to colorize the section text
+     */
     public Color getTextColor() { return null == textColor ? _textColor : textColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the section text.
+     * @param COLOR
+     */
     public void setTextColor(final Color COLOR) {
         if (null == textColor) {
             _textColor = COLOR;
@@ -160,10 +218,22 @@ public class Section implements Comparable<Section> {
         return textColor;
     }
 
+    /**
+     * Returns true if the given value is within the range between
+     * section.getStart() and section.getStop()
+     * @param VALUE
+     * @return true if the given value is within the range of the section
+     */
     public boolean contains(final double VALUE) {
         return (Double.compare(VALUE, getStart()) >= 0 && Double.compare(VALUE, getStop()) <= 0);
     }
 
+    /**
+     * Checks if the section contains the given value and fires an event
+     * in case the value "entered" or "left" the section. With this one
+     * can react if a value enters/leaves a specific region in a gauge.
+     * @param VALUE
+     */
     public void checkForValue(final double VALUE) {
         boolean wasInSection = contains(checkedValue);
         boolean isInSection  = contains(VALUE);

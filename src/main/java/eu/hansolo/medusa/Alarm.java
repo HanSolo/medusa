@@ -34,12 +34,7 @@ import java.time.temporal.ChronoUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Alarm {
-    public enum Repetition {
-        ONCE,
-        HOURLY,
-        DAILY,
-        WEEKLY
-    }
+    public enum Repetition { ONCE, HALF_HOURLY, HOURLY, DAILY, WEEKLY }
     public static final boolean          ARMED   = true;
     public static final boolean          UNARMED = false;
 
@@ -55,6 +50,9 @@ public class Alarm {
 
 
     // ******************** Constructors **************************************
+    /**
+     * Represents a point in time where something should be triggered.
+     */
     public Alarm() {
         this(Repetition.ONCE, ZonedDateTime.now().plus(5, ChronoUnit.MINUTES), true, "", null, Clock.DARK_COLOR);
     }
@@ -90,23 +88,81 @@ public class Alarm {
 
 
     // ******************** Methods *******************************************
+    /**
+     * Returns the repetition rate of the alarm.
+     * The values are ONCE, HALF_HOURLY, HOURLY, DAILY, WEEKLY
+     * @return the repetition rate of the alarm
+     */
     public Repetition getRepetition() { return repetition; }
+    /**
+     * Defines the repetition rate of the alarm.
+     * The values are ONCE, HALF_HOURLY, HOURLY, DAILY, WEEKLY
+     * @param REPETITION
+     */
     public void setRepetition(final Repetition REPETITION) { repetition = REPETITION; }
 
+    /**
+     * Returns the time of the alarm.
+     * @return the time of the alarm
+     */
     public ZonedDateTime getTime() { return time; }
+    /**
+     * Defines the time of the alarm.
+     * @param TIME
+     */
     public void setTime(final ZonedDateTime TIME) { time = TIME; }
 
+    /**
+     * Returns true if the alarm is activated.
+     * If an alarm is not armed it will be drawn gray translucent.
+     * @return true if the alarm is activated
+     */
     public boolean isArmed() { return armed; }
+    /**
+     * Defines if the alarm is activated.
+     * If an alarm is not armed it will be drawn gray translucent.
+     * @param ARMED
+     */
     public void setArmed(final boolean ARMED) { armed = ARMED; }
 
+    /**
+     * Returns the text that was defined for the alarm.
+     * The text will be shown in tooltips.
+     * @return the text that was defined for the alarm
+     */
     public String getText() { return text; }
+    /**
+     * Defines a text for the alarm.
+     * The text will be shown in tooltips.
+     * @param TEXT
+     */
     public void setText(final String TEXT) { text = TEXT; }
 
+    /**
+     * Returns an instance of a class that implements the Command interface.
+     * This interface only contains one method execute() which will be called
+     * when the alarm is triggered. With this one could execute specific tasks
+     * defined in separate classes.
+     * @return an instance of a class that implements the Command interface
+     */
     public Command getCommand() { return command; }
+    /**
+     * Defines a class that implements the Command interface and which execute()
+     * method will be called when the alarm is triggered.
+     * @param COMMAND
+     */
     public void setCommand(final Command COMMAND) { command = COMMAND; }
     public void executeCommand() { if (null != command) command.execute(); }
 
+    /**
+     * Returns the color that will be used to colorize the alarm in a clock.
+     * @return the color that will be used to colorize the alarm
+     */
     public Color getColor() { return color; }
+    /**
+     * Defines the color that will be used to colorize the alarm
+     * @param COLOR
+     */
     public void setColor(final Color COLOR) { color = COLOR; }
 
     @Override public String toString() {
