@@ -48,8 +48,10 @@ import javafx.scene.text.TextAlignment;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -787,24 +789,31 @@ public class Helper {
                                         final double LINE_WIDTH) {
         if (SECTIONS.isEmpty()) return;
         TickLabelLocation tickLabelLocation = CLOCK.getTickLabelLocation();
+        ZonedDateTime     time              = CLOCK.getTime();
+        boolean           isAM              = time.get(ChronoField.AMPM_OF_DAY) == 0;
         double            xy                = TickLabelLocation.INSIDE == tickLabelLocation ? XY_INSIDE * SIZE : XY_OUTSIDE * SIZE;
         double            wh                = TickLabelLocation.INSIDE == tickLabelLocation ? WH_INSIDE * SIZE : WH_OUTSIDE * SIZE;
         double            offset            = 90;
         int               listSize          = SECTIONS.size();
         double            angleStep         = 360d / 60d;
         for (int i = 0 ; i < listSize ; i++) {
-            TimeSection section           = SECTIONS.get(i);
-            LocalTime   start             = section.getStart();
-            LocalTime   stop              = section.getStop();
-            double      sectionStartAngle = (start.getHour() % 12 * 5d + start.getMinute() / 12d + start.getSecond() / 300d) * angleStep + 180;
-            double      sectionAngleExtend;
-            sectionAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5d + (stop.getMinute() - start.getMinute()) / 12d + (stop.getSecond() - start.getSecond()) / 300d) * angleStep;
-            CTX.save();
-            CTX.setStroke(section.getColor());
-            CTX.setLineWidth(SIZE * LINE_WIDTH);
-            CTX.setLineCap(StrokeLineCap.BUTT);
-            CTX.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
-            CTX.restore();
+            TimeSection section   = SECTIONS.get(i);
+            LocalTime   start     = section.getStart();
+            LocalTime   stop      = section.getStop();
+            boolean     isStartAM = start.get(ChronoField.AMPM_OF_DAY) == 0;
+            boolean     isStopAM  = stop.get(ChronoField.AMPM_OF_DAY) == 0;
+            boolean     draw      = isAM ? (isStartAM || isStopAM) :(!isStartAM || !isStopAM);
+            if (draw) {
+                double sectionStartAngle = (start.getHour() % 12 * 5d + start.getMinute() / 12d + start.getSecond() / 300d) * angleStep + 180;
+                double sectionAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5d + (stop.getMinute() - start.getMinute()) / 12d + (stop.getSecond() - start.getSecond()) / 300d) * angleStep;
+                if (start.getHour() > stop.getHour()) { sectionAngleExtend = (360d - Math.abs(sectionAngleExtend)); }
+                CTX.save();
+                CTX.setStroke(section.getColor());
+                CTX.setLineWidth(SIZE * LINE_WIDTH);
+                CTX.setLineCap(StrokeLineCap.BUTT);
+                CTX.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
+                CTX.restore();
+            }
         }
     }
 
@@ -812,22 +821,29 @@ public class Helper {
                                      final double XY_INSIDE, final double XY_OUTSIDE, final double WH_INSIDE, final double WH_OUTSIDE) {
         if (AREAS.isEmpty()) return;
         TickLabelLocation tickLabelLocation = CLOCK.getTickLabelLocation();
-        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? XY_OUTSIDE * SIZE : XY_INSIDE * SIZE;
-        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? WH_OUTSIDE * SIZE : WH_INSIDE * SIZE;
-        double            offset            = 90;
-        double            angleStep         = 360d / 60d;
-        int listSize = AREAS.size();
+        ZonedDateTime time      = CLOCK.getTime();
+        boolean       isAM      = time.get(ChronoField.AMPM_OF_DAY) == 0;
+        double        xy        = TickLabelLocation.OUTSIDE == tickLabelLocation ? XY_OUTSIDE * SIZE : XY_INSIDE * SIZE;
+        double        wh        = TickLabelLocation.OUTSIDE == tickLabelLocation ? WH_OUTSIDE * SIZE : WH_INSIDE * SIZE;
+        double        offset    = 90;
+        double        angleStep = 360d / 60d;
+        int           listSize  = AREAS.size();
         for (int i = 0; i < listSize ; i++) {
-            TimeSection area           = AREAS.get(i);
-            LocalTime   start          = area.getStart();
-            LocalTime   stop           = area.getStop();
-            double      areaStartAngle = (start.getHour() % 12 * 5d + start.getMinute() / 12d + start.getSecond() / 300d) * angleStep + 180;
-            double      areaAngleExtend;
-            areaAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5d + (stop.getMinute() - start.getMinute()) / 12d + (stop.getSecond() - start.getSecond()) / 300d) * angleStep;
-            CTX.save();
-            CTX.setFill(area.getColor());
-            CTX.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
-            CTX.restore();
+            TimeSection area      = AREAS.get(i);
+            LocalTime   start     = area.getStart();
+            LocalTime   stop      = area.getStop();
+            boolean     isStartAM = start.get(ChronoField.AMPM_OF_DAY) == 0;
+            boolean     isStopAM  = stop.get(ChronoField.AMPM_OF_DAY) == 0;
+            boolean     draw      = isAM ? (isStartAM || isStopAM) :(!isStartAM || !isStopAM);
+            if (draw) {
+                double areaStartAngle  = (start.getHour() % 12 * 5d + start.getMinute() / 12d + start.getSecond() / 300d) * angleStep + 180;;
+                double areaAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5d + (stop.getMinute() - start.getMinute()) / 12d + (stop.getSecond() - start.getSecond()) / 300d) * angleStep;
+                if (start.getHour() > stop.getHour()) { areaAngleExtend = (360d - Math.abs(areaAngleExtend)); }
+                CTX.save();
+                CTX.setFill(area.getColor());
+                CTX.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), -areaAngleExtend, ArcType.ROUND);
+                CTX.restore();
+            }
         }
     }
 
