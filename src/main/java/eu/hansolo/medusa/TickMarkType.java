@@ -20,5 +20,5 @@ package eu.hansolo.medusa;
  * Created by hansolo on 28.01.16.
  */
 public enum TickMarkType {
-    LINE, DOT, TRIANGLE, BOX, TICK_LABEL, PILL
+    LINE, DOT, TRAPEZOID, TRIANGLE, BOX, TICK_LABEL, PILL
 }

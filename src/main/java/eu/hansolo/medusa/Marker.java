@@ -163,13 +163,13 @@ public class Marker implements Comparable<Marker>{
 
     /**
      * Returns the shape that will be used to visualize the marker.
-     * The values are STANDARD, DOT, TRIANGLE.
+     * The values are STANDARD, DOT, TRAPEZOID.
      * @return the shape that will be used to visualize the marker
      */
     public MarkerType getMarkerType() { return null == markerType ? _markerType : markerType.get(); }
     /**
      * Defines the shape that will be used to visualize the marker.
-     * The values are STANDARD, DOT, TRIANGLE.
+     * The values are STANDARD, DOT, TRAPEZOID.
      * @param TYPE
      */
     public void setMarkerType(final MarkerType TYPE) {

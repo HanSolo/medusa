@@ -529,44 +529,44 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double tickLabelTickMarkX;
         double tickLabelTickMarkY;
 
-        double triangleMajorInnerAngle1;
-        double triangleMajorInnerAngle2;
-        double triangleMajorOuterAngle1;
-        double triangleMajorOuterAngle2;
-        double triangleMajorInnerPoint1X;
-        double triangleMajorInnerPoint1Y;
-        double triangleMajorInnerPoint2X;
-        double triangleMajorInnerPoint2Y;
-        double triangleMajorOuterPoint1X;
-        double triangleMajorOuterPoint1Y;
-        double triangleMajorOuterPoint2X;
-        double triangleMajorOuterPoint2Y;
+        double trapezoidMajorInnerAngle1;
+        double trapezoidMajorInnerAngle2;
+        double trapezoidMajorOuterAngle1;
+        double trapezoidMajorOuterAngle2;
+        double trapezoidMajorInnerPoint1X;
+        double trapezoidMajorInnerPoint1Y;
+        double trapezoidMajorInnerPoint2X;
+        double trapezoidMajorInnerPoint2Y;
+        double trapezoidMajorOuterPoint1X;
+        double trapezoidMajorOuterPoint1Y;
+        double trapezoidMajorOuterPoint2X;
+        double trapezoidMajorOuterPoint2Y;
 
-        double triangleMediumInnerAngle1;
-        double triangleMediumInnerAngle2;
-        double triangleMediumOuterAngle1;
-        double triangleMediumOuterAngle2;
-        double triangleMediumInnerPoint1X;
-        double triangleMediumInnerPoint1Y;
-        double triangleMediumInnerPoint2X;
-        double triangleMediumInnerPoint2Y;
-        double triangleMediumOuterPoint1X;
-        double triangleMediumOuterPoint1Y;
-        double triangleMediumOuterPoint2X;
-        double triangleMediumOuterPoint2Y;
+        double trapezoidMediumInnerAngle1;
+        double trapezoidMediumInnerAngle2;
+        double trapezoidMediumOuterAngle1;
+        double trapezoidMediumOuterAngle2;
+        double trapezoidMediumInnerPoint1X;
+        double trapezoidMediumInnerPoint1Y;
+        double trapezoidMediumInnerPoint2X;
+        double trapezoidMediumInnerPoint2Y;
+        double trapezoidMediumOuterPoint1X;
+        double trapezoidMediumOuterPoint1Y;
+        double trapezoidMediumOuterPoint2X;
+        double trapezoidMediumOuterPoint2Y;
 
-        double triangleMinorInnerAngle1;
-        double triangleMinorInnerAngle2;
-        double triangleMinorOuterAngle1;
-        double triangleMinorOuterAngle2;
-        double triangleMinorInnerPoint1X;
-        double triangleMinorInnerPoint1Y;
-        double triangleMinorInnerPoint2X;
-        double triangleMinorInnerPoint2Y;
-        double triangleMinorOuterPoint1X;
-        double triangleMinorOuterPoint1Y;
-        double triangleMinorOuterPoint2X;
-        double triangleMinorOuterPoint2Y;
+        double trapezoidMinorInnerAngle1;
+        double trapezoidMinorInnerAngle2;
+        double trapezoidMinorOuterAngle1;
+        double trapezoidMinorOuterAngle2;
+        double trapezoidMinorInnerPoint1X;
+        double trapezoidMinorInnerPoint1Y;
+        double trapezoidMinorInnerPoint2X;
+        double trapezoidMinorInnerPoint2Y;
+        double trapezoidMinorOuterPoint1X;
+        double trapezoidMinorOuterPoint1Y;
+        double trapezoidMinorOuterPoint2X;
+        double trapezoidMinorOuterPoint2Y;
 
 
         // Main loop
@@ -605,44 +605,44 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     tickLabelTickMarkX         = centerX + scaledSize * 0.3805 * sinValue;
                     tickLabelTickMarkY         = centerY + scaledSize * 0.3805 * cosValue;
 
-                    triangleMajorInnerAngle1   = Math.toRadians(angle - 1.2 + startAngle);
-                    triangleMajorInnerAngle2   = Math.toRadians(angle + 1.2 + startAngle);
-                    triangleMajorOuterAngle1   = Math.toRadians(angle - 0.8 + startAngle);
-                    triangleMajorOuterAngle2   = Math.toRadians(angle + 0.8 + startAngle);
-                    triangleMajorInnerPoint1X  = centerX + scaledSize * 0.3585 * Math.sin(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint1Y  = centerY + scaledSize * 0.3585 * Math.cos(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint2X  = centerX + scaledSize * 0.3585 * Math.sin(triangleMajorInnerAngle2);
-                    triangleMajorInnerPoint2Y  = centerY + scaledSize * 0.3585 * Math.cos(triangleMajorInnerAngle2);
-                    triangleMajorOuterPoint1X  = centerX + scaledSize * 0.4105 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint1Y  = centerY + scaledSize * 0.4105 * Math.cos(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint2X  = centerX + scaledSize * 0.4105 * Math.sin(triangleMajorOuterAngle2);
-                    triangleMajorOuterPoint2Y  = centerY + scaledSize * 0.4105 * Math.cos(triangleMajorOuterAngle2);
+                    trapezoidMajorInnerAngle1   = Math.toRadians(angle - 1.2 + startAngle);
+                    trapezoidMajorInnerAngle2   = Math.toRadians(angle + 1.2 + startAngle);
+                    trapezoidMajorOuterAngle1   = Math.toRadians(angle - 0.8 + startAngle);
+                    trapezoidMajorOuterAngle2   = Math.toRadians(angle + 0.8 + startAngle);
+                    trapezoidMajorInnerPoint1X  = centerX + scaledSize * 0.3585 * Math.sin(trapezoidMajorInnerAngle1);
+                    trapezoidMajorInnerPoint1Y  = centerY + scaledSize * 0.3585 * Math.cos(trapezoidMajorInnerAngle1);
+                    trapezoidMajorInnerPoint2X  = centerX + scaledSize * 0.3585 * Math.sin(trapezoidMajorInnerAngle2);
+                    trapezoidMajorInnerPoint2Y  = centerY + scaledSize * 0.3585 * Math.cos(trapezoidMajorInnerAngle2);
+                    trapezoidMajorOuterPoint1X  = centerX + scaledSize * 0.4105 * Math.sin(trapezoidMajorOuterAngle1);
+                    trapezoidMajorOuterPoint1Y  = centerY + scaledSize * 0.4105 * Math.cos(trapezoidMajorOuterAngle1);
+                    trapezoidMajorOuterPoint2X  = centerX + scaledSize * 0.4105 * Math.sin(trapezoidMajorOuterAngle2);
+                    trapezoidMajorOuterPoint2Y  = centerY + scaledSize * 0.4105 * Math.cos(trapezoidMajorOuterAngle2);
 
-                    triangleMediumInnerAngle1  = Math.toRadians(angle - 1.0 + startAngle);
-                    triangleMediumInnerAngle2  = Math.toRadians(angle + 1.0 + startAngle);
-                    triangleMediumOuterAngle1  = Math.toRadians(angle - 0.7 + startAngle);
-                    triangleMediumOuterAngle2  = Math.toRadians(angle + 0.7 + startAngle);
-                    triangleMediumInnerPoint1X = centerX + scaledSize * 0.3585 * Math.sin(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint1Y = centerY + scaledSize * 0.3585 * Math.cos(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint2X = centerX + scaledSize * 0.3585 * Math.sin(triangleMediumInnerAngle2);
-                    triangleMediumInnerPoint2Y = centerY + scaledSize * 0.3585 * Math.cos(triangleMediumInnerAngle2);
-                    triangleMediumOuterPoint1X = centerX + scaledSize * 0.3985 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMediumOuterPoint1Y = centerY + scaledSize * 0.3985 * Math.cos(triangleMediumOuterAngle1);
-                    triangleMediumOuterPoint2X = centerX + scaledSize * 0.3985 * Math.sin(triangleMediumOuterAngle2);
-                    triangleMediumOuterPoint2Y = centerY + scaledSize * 0.3985 * Math.cos(triangleMediumOuterAngle2);
+                    trapezoidMediumInnerAngle1  = Math.toRadians(angle - 1.0 + startAngle);
+                    trapezoidMediumInnerAngle2  = Math.toRadians(angle + 1.0 + startAngle);
+                    trapezoidMediumOuterAngle1  = Math.toRadians(angle - 0.7 + startAngle);
+                    trapezoidMediumOuterAngle2  = Math.toRadians(angle + 0.7 + startAngle);
+                    trapezoidMediumInnerPoint1X = centerX + scaledSize * 0.3585 * Math.sin(trapezoidMediumInnerAngle1);
+                    trapezoidMediumInnerPoint1Y = centerY + scaledSize * 0.3585 * Math.cos(trapezoidMediumInnerAngle1);
+                    trapezoidMediumInnerPoint2X = centerX + scaledSize * 0.3585 * Math.sin(trapezoidMediumInnerAngle2);
+                    trapezoidMediumInnerPoint2Y = centerY + scaledSize * 0.3585 * Math.cos(trapezoidMediumInnerAngle2);
+                    trapezoidMediumOuterPoint1X = centerX + scaledSize * 0.3985 * Math.sin(trapezoidMajorOuterAngle1);
+                    trapezoidMediumOuterPoint1Y = centerY + scaledSize * 0.3985 * Math.cos(trapezoidMediumOuterAngle1);
+                    trapezoidMediumOuterPoint2X = centerX + scaledSize * 0.3985 * Math.sin(trapezoidMediumOuterAngle2);
+                    trapezoidMediumOuterPoint2Y = centerY + scaledSize * 0.3985 * Math.cos(trapezoidMediumOuterAngle2);
 
-                    triangleMinorInnerAngle1   = Math.toRadians(angle - 0.8 + startAngle);
-                    triangleMinorInnerAngle2   = Math.toRadians(angle + 0.8 + startAngle);
-                    triangleMinorOuterAngle1   = Math.toRadians(angle - 0.6 + startAngle);
-                    triangleMinorOuterAngle2   = Math.toRadians(angle + 0.6 + startAngle);
-                    triangleMinorInnerPoint1X  = centerX + scaledSize * 0.3585 * Math.sin(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint1Y  = centerY + scaledSize * 0.3585 * Math.cos(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint2X  = centerX + scaledSize * 0.3585 * Math.sin(triangleMinorInnerAngle2);
-                    triangleMinorInnerPoint2Y  = centerY + scaledSize * 0.3585 * Math.cos(triangleMinorInnerAngle2);
-                    triangleMinorOuterPoint1X  = centerX + scaledSize * 0.3975 * Math.sin(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint1Y  = centerY + scaledSize * 0.3975 * Math.cos(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint2X  = centerX + scaledSize * 0.3975 * Math.sin(triangleMinorOuterAngle2);
-                    triangleMinorOuterPoint2Y  = centerY + scaledSize * 0.3975 * Math.cos(triangleMinorOuterAngle2);
+                    trapezoidMinorInnerAngle1   = Math.toRadians(angle - 0.8 + startAngle);
+                    trapezoidMinorInnerAngle2   = Math.toRadians(angle + 0.8 + startAngle);
+                    trapezoidMinorOuterAngle1   = Math.toRadians(angle - 0.6 + startAngle);
+                    trapezoidMinorOuterAngle2   = Math.toRadians(angle + 0.6 + startAngle);
+                    trapezoidMinorInnerPoint1X  = centerX + scaledSize * 0.3585 * Math.sin(trapezoidMinorInnerAngle1);
+                    trapezoidMinorInnerPoint1Y  = centerY + scaledSize * 0.3585 * Math.cos(trapezoidMinorInnerAngle1);
+                    trapezoidMinorInnerPoint2X  = centerX + scaledSize * 0.3585 * Math.sin(trapezoidMinorInnerAngle2);
+                    trapezoidMinorInnerPoint2Y  = centerY + scaledSize * 0.3585 * Math.cos(trapezoidMinorInnerAngle2);
+                    trapezoidMinorOuterPoint1X  = centerX + scaledSize * 0.3975 * Math.sin(trapezoidMinorOuterAngle1);
+                    trapezoidMinorOuterPoint1Y  = centerY + scaledSize * 0.3975 * Math.cos(trapezoidMinorOuterAngle1);
+                    trapezoidMinorOuterPoint2X  = centerX + scaledSize * 0.3975 * Math.sin(trapezoidMinorOuterAngle2);
+                    trapezoidMinorOuterPoint2Y  = centerY + scaledSize * 0.3975 * Math.cos(trapezoidMinorOuterAngle2);
                     break;
                 case INSIDE:
                 default:
@@ -669,44 +669,44 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     tickLabelTickMarkX         = centerX + scaledSize * 0.445 * sinValue;
                     tickLabelTickMarkY         = centerY + scaledSize * 0.445 * cosValue;
 
-                    triangleMajorInnerAngle1   = Math.toRadians(angle - 0.8 + startAngle);
-                    triangleMajorInnerAngle2   = Math.toRadians(angle + 0.8 + startAngle);
-                    triangleMajorOuterAngle1   = Math.toRadians(angle - 1.2 + startAngle);
-                    triangleMajorOuterAngle2   = Math.toRadians(angle + 1.2 + startAngle);
-                    triangleMajorInnerPoint1X  = centerX + scaledSize * 0.423 * Math.sin(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint1Y  = centerY + scaledSize * 0.423 * Math.cos(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint2X  = centerX + scaledSize * 0.423 * Math.sin(triangleMajorInnerAngle2);
-                    triangleMajorInnerPoint2Y  = centerY + scaledSize * 0.423 * Math.cos(triangleMajorInnerAngle2);
-                    triangleMajorOuterPoint1X  = centerX + scaledSize * 0.475 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint1Y  = centerY + scaledSize * 0.475 * Math.cos(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint2X  = centerX + scaledSize * 0.475 * Math.sin(triangleMajorOuterAngle2);
-                    triangleMajorOuterPoint2Y  = centerY + scaledSize * 0.475 * Math.cos(triangleMajorOuterAngle2);
+                    trapezoidMajorInnerAngle1   = Math.toRadians(angle - 0.8 + startAngle);
+                    trapezoidMajorInnerAngle2   = Math.toRadians(angle + 0.8 + startAngle);
+                    trapezoidMajorOuterAngle1   = Math.toRadians(angle - 1.2 + startAngle);
+                    trapezoidMajorOuterAngle2   = Math.toRadians(angle + 1.2 + startAngle);
+                    trapezoidMajorInnerPoint1X  = centerX + scaledSize * 0.423 * Math.sin(trapezoidMajorInnerAngle1);
+                    trapezoidMajorInnerPoint1Y  = centerY + scaledSize * 0.423 * Math.cos(trapezoidMajorInnerAngle1);
+                    trapezoidMajorInnerPoint2X  = centerX + scaledSize * 0.423 * Math.sin(trapezoidMajorInnerAngle2);
+                    trapezoidMajorInnerPoint2Y  = centerY + scaledSize * 0.423 * Math.cos(trapezoidMajorInnerAngle2);
+                    trapezoidMajorOuterPoint1X  = centerX + scaledSize * 0.475 * Math.sin(trapezoidMajorOuterAngle1);
+                    trapezoidMajorOuterPoint1Y  = centerY + scaledSize * 0.475 * Math.cos(trapezoidMajorOuterAngle1);
+                    trapezoidMajorOuterPoint2X  = centerX + scaledSize * 0.475 * Math.sin(trapezoidMajorOuterAngle2);
+                    trapezoidMajorOuterPoint2Y  = centerY + scaledSize * 0.475 * Math.cos(trapezoidMajorOuterAngle2);
 
-                    triangleMediumInnerAngle1  = Math.toRadians(angle - 0.7 + startAngle);
-                    triangleMediumInnerAngle2  = Math.toRadians(angle + 0.7 + startAngle);
-                    triangleMediumOuterAngle1  = Math.toRadians(angle - 1.0 + startAngle);
-                    triangleMediumOuterAngle2  = Math.toRadians(angle + 1.0 + startAngle);
-                    triangleMediumInnerPoint1X = centerX + scaledSize * 0.435 * Math.sin(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint1Y = centerY + scaledSize * 0.435 * Math.cos(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint2X = centerX + scaledSize * 0.435 * Math.sin(triangleMediumInnerAngle2);
-                    triangleMediumInnerPoint2Y = centerY + scaledSize * 0.435 * Math.cos(triangleMediumInnerAngle2);
-                    triangleMediumOuterPoint1X = centerX + scaledSize * 0.475 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMediumOuterPoint1Y = centerY + scaledSize * 0.475 * Math.cos(triangleMediumOuterAngle1);
-                    triangleMediumOuterPoint2X = centerX + scaledSize * 0.475 * Math.sin(triangleMediumOuterAngle2);
-                    triangleMediumOuterPoint2Y = centerY + scaledSize * 0.475 * Math.cos(triangleMediumOuterAngle2);
+                    trapezoidMediumInnerAngle1  = Math.toRadians(angle - 0.7 + startAngle);
+                    trapezoidMediumInnerAngle2  = Math.toRadians(angle + 0.7 + startAngle);
+                    trapezoidMediumOuterAngle1  = Math.toRadians(angle - 1.0 + startAngle);
+                    trapezoidMediumOuterAngle2  = Math.toRadians(angle + 1.0 + startAngle);
+                    trapezoidMediumInnerPoint1X = centerX + scaledSize * 0.435 * Math.sin(trapezoidMediumInnerAngle1);
+                    trapezoidMediumInnerPoint1Y = centerY + scaledSize * 0.435 * Math.cos(trapezoidMediumInnerAngle1);
+                    trapezoidMediumInnerPoint2X = centerX + scaledSize * 0.435 * Math.sin(trapezoidMediumInnerAngle2);
+                    trapezoidMediumInnerPoint2Y = centerY + scaledSize * 0.435 * Math.cos(trapezoidMediumInnerAngle2);
+                    trapezoidMediumOuterPoint1X = centerX + scaledSize * 0.475 * Math.sin(trapezoidMajorOuterAngle1);
+                    trapezoidMediumOuterPoint1Y = centerY + scaledSize * 0.475 * Math.cos(trapezoidMediumOuterAngle1);
+                    trapezoidMediumOuterPoint2X = centerX + scaledSize * 0.475 * Math.sin(trapezoidMediumOuterAngle2);
+                    trapezoidMediumOuterPoint2Y = centerY + scaledSize * 0.475 * Math.cos(trapezoidMediumOuterAngle2);
 
-                    triangleMinorInnerAngle1   = Math.toRadians(angle - 0.6 + startAngle);
-                    triangleMinorInnerAngle2   = Math.toRadians(angle + 0.6 + startAngle);
-                    triangleMinorOuterAngle1   = Math.toRadians(angle - 0.8 + startAngle);
-                    triangleMinorOuterAngle2   = Math.toRadians(angle + 0.8 + startAngle);
-                    triangleMinorInnerPoint1X  = centerX + scaledSize * 0.440 * Math.sin(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint1Y  = centerY + scaledSize * 0.440 * Math.cos(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint2X  = centerX + scaledSize * 0.440 * Math.sin(triangleMinorInnerAngle2);
-                    triangleMinorInnerPoint2Y  = centerY + scaledSize * 0.440 * Math.cos(triangleMinorInnerAngle2);
-                    triangleMinorOuterPoint1X  = centerX + scaledSize * 0.475 * Math.sin(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint1Y  = centerY + scaledSize * 0.475 * Math.cos(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint2X  = centerX + scaledSize * 0.475 * Math.sin(triangleMinorOuterAngle2);
-                    triangleMinorOuterPoint2Y  = centerY + scaledSize * 0.475 * Math.cos(triangleMinorOuterAngle2);
+                    trapezoidMinorInnerAngle1   = Math.toRadians(angle - 0.6 + startAngle);
+                    trapezoidMinorInnerAngle2   = Math.toRadians(angle + 0.6 + startAngle);
+                    trapezoidMinorOuterAngle1   = Math.toRadians(angle - 0.8 + startAngle);
+                    trapezoidMinorOuterAngle2   = Math.toRadians(angle + 0.8 + startAngle);
+                    trapezoidMinorInnerPoint1X  = centerX + scaledSize * 0.440 * Math.sin(trapezoidMinorInnerAngle1);
+                    trapezoidMinorInnerPoint1Y  = centerY + scaledSize * 0.440 * Math.cos(trapezoidMinorInnerAngle1);
+                    trapezoidMinorInnerPoint2X  = centerX + scaledSize * 0.440 * Math.sin(trapezoidMinorInnerAngle2);
+                    trapezoidMinorInnerPoint2Y  = centerY + scaledSize * 0.440 * Math.cos(trapezoidMinorInnerAngle2);
+                    trapezoidMinorOuterPoint1X  = centerX + scaledSize * 0.475 * Math.sin(trapezoidMinorOuterAngle1);
+                    trapezoidMinorOuterPoint1Y  = centerY + scaledSize * 0.475 * Math.cos(trapezoidMinorOuterAngle1);
+                    trapezoidMinorOuterPoint2X  = centerX + scaledSize * 0.475 * Math.sin(trapezoidMinorOuterAngle2);
+                    trapezoidMinorOuterPoint2Y  = centerY + scaledSize * 0.475 * Math.cos(trapezoidMinorOuterAngle2);
                     break;
             }
 
@@ -735,13 +735,28 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 }
 
                 switch (tickMarkType) {
+                    case TRAPEZOID:
+                        if (majorTickMarksVisible) {
+                            Helper.drawTrapezoid(ticksAndSections, trapezoidMajorInnerPoint1X, trapezoidMajorInnerPoint1Y, trapezoidMajorInnerPoint2X, trapezoidMajorInnerPoint2Y,
+                                                 trapezoidMajorOuterPoint1X, trapezoidMajorOuterPoint1Y, trapezoidMajorOuterPoint2X, trapezoidMajorOuterPoint2Y);
+                        } else if (minorTickMarksVisible) {
+                            Helper.drawTrapezoid(ticksAndSections, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y,
+                                                 trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
+                        }
+                        break;
                     case TRIANGLE:
                         if (majorTickMarksVisible) {
-                            Helper.drawTriangle(ticksAndSections, triangleMajorInnerPoint1X, triangleMajorInnerPoint1Y, triangleMajorInnerPoint2X, triangleMajorInnerPoint2Y,
-                                         triangleMajorOuterPoint1X, triangleMajorOuterPoint1Y, triangleMajorOuterPoint2X, triangleMajorOuterPoint2Y);
+                            if (TickLabelLocation.INSIDE == tickLabelLocation) {
+                                Helper.drawTriangle(ticksAndSections, innerPointX, innerPointY, trapezoidMajorOuterPoint1X, trapezoidMajorOuterPoint1Y, trapezoidMajorOuterPoint2X, trapezoidMajorOuterPoint2Y);
+                            } else {
+                                Helper.drawTriangle(ticksAndSections, outerPointX, outerPointY, trapezoidMajorInnerPoint1X, trapezoidMajorInnerPoint1Y, trapezoidMajorInnerPoint2X, trapezoidMajorInnerPoint2Y);
+                            }
                         } else if (minorTickMarksVisible) {
-                            Helper.drawTriangle(ticksAndSections, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
-                                         triangleMinorOuterPoint1X, triangleMinorOuterPoint1Y, triangleMinorOuterPoint2X, triangleMinorOuterPoint2Y);
+                            if (TickLabelLocation.INSIDE == tickLabelLocation) {
+                                Helper.drawTriangle(ticksAndSections, innerMinorPointX, innerMinorPointY, trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
+                            } else {
+                                Helper.drawTriangle(ticksAndSections, outerMinorPointX, outerMinorPointY, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y);
+                            }
                         }
                         break;
                     case DOT:
@@ -825,9 +840,16 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 ticksAndSections.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, mediumTickMarkColor) : mediumTickMarkColor);
                 ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, mediumTickMarkColor) : mediumTickMarkColor);
                 switch(mediumTickMarkType) {
+                    case TRAPEZOID:
+                        Helper.drawTrapezoid(ticksAndSections, trapezoidMediumInnerPoint1X, trapezoidMediumInnerPoint1Y, trapezoidMediumInnerPoint2X, trapezoidMediumInnerPoint2Y,
+                                             trapezoidMediumOuterPoint1X, trapezoidMediumOuterPoint1Y, trapezoidMediumOuterPoint2X, trapezoidMediumOuterPoint2Y);
+                        break;
                     case TRIANGLE:
-                        Helper.drawTriangle(ticksAndSections, triangleMediumInnerPoint1X, triangleMediumInnerPoint1Y, triangleMediumInnerPoint2X, triangleMediumInnerPoint2Y,
-                                     triangleMediumOuterPoint1X, triangleMediumOuterPoint1Y, triangleMediumOuterPoint2X, triangleMediumOuterPoint2Y);
+                        if (TickLabelLocation.INSIDE == tickLabelLocation) {
+                            Helper.drawTriangle(ticksAndSections, innerMediumPointX, innerMediumPointY, trapezoidMediumOuterPoint1X, trapezoidMediumOuterPoint1Y, trapezoidMediumOuterPoint2X, trapezoidMediumOuterPoint2Y);
+                        } else {
+                            Helper.drawTriangle(ticksAndSections, outerMediumPointX, outerMediumPointY, trapezoidMediumInnerPoint1X, trapezoidMediumInnerPoint1Y, trapezoidMediumInnerPoint2X, trapezoidMediumInnerPoint2Y);
+                        }
                         break;
                     case DOT:
                         Helper.drawDot(ticksAndSections, dotMediumCenterX - mediumHalfDotSize, dotMediumCenterY - mediumHalfDotSize, mediumDotSize);
@@ -856,9 +878,16 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     ticksAndSections.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     ticksAndSections.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     switch (minorTickMarkType) {
+                        case TRAPEZOID:
+                            Helper.drawTrapezoid(ticksAndSections, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y,
+                                                 trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
+                            break;
                         case TRIANGLE:
-                            Helper.drawTriangle(ticksAndSections, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
-                                         triangleMinorOuterPoint1X, triangleMinorOuterPoint1Y, triangleMinorOuterPoint2X, triangleMinorOuterPoint2Y);
+                            if (TickLabelLocation.INSIDE == tickLabelLocation) {
+                                Helper.drawTriangle(ticksAndSections, innerMinorPointX, innerMinorPointY, trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
+                            } else {
+                                Helper.drawTriangle(ticksAndSections, outerMinorPointX, outerMinorPointY, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y);
+                            }
                             break;
                         case DOT:
                             Helper.drawDot(ticksAndSections, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
@@ -1044,29 +1073,29 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 double cosValue = Math.cos(Math.toRadians(valueAngle));
                 switch (marker.getMarkerType()) {
                     case TRIANGLE:
-                        Path triangle = (Path) shape;
-                        triangle.getElements().clear();
+                        Path trapezoid = (Path) shape;
+                        trapezoid.getElements().clear();
                         switch (tickLabelLocation) {
                             case OUTSIDE:
-                                triangle.getElements().add(new MoveTo(centerX + scaledSize * 0.38 * sinValue, centerY + scaledSize * 0.38 * cosValue));
+                                trapezoid.getElements().add(new MoveTo(centerX + scaledSize * 0.38 * sinValue, centerY + scaledSize * 0.38 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + scaledSize * 0.4075 * sinValue, centerY + scaledSize * 0.4075 * cosValue));
+                                trapezoid.getElements().add(new LineTo(centerX + scaledSize * 0.4075 * sinValue, centerY + scaledSize * 0.4075 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + scaledSize * 0.4075 * sinValue, centerY + scaledSize * 0.4075 * cosValue));
-                                triangle.getElements().add(new ClosePath());
+                                trapezoid.getElements().add(new LineTo(centerX + scaledSize * 0.4075 * sinValue, centerY + scaledSize * 0.4075 * cosValue));
+                                trapezoid.getElements().add(new ClosePath());
                                 break;
                             case INSIDE:
                             default:
-                                triangle.getElements().add(new MoveTo(centerX + scaledSize * 0.465 * sinValue, centerY + scaledSize * 0.465 * cosValue));
+                                trapezoid.getElements().add(new MoveTo(centerX + scaledSize * 0.465 * sinValue, centerY + scaledSize * 0.465 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + scaledSize * 0.436 * sinValue, centerY + scaledSize * 0.436 * cosValue));
+                                trapezoid.getElements().add(new LineTo(centerX + scaledSize * 0.436 * sinValue, centerY + scaledSize * 0.436 * cosValue));
                                 sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
                                 cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
-                                triangle.getElements().add(new LineTo(centerX + scaledSize * 0.436 * sinValue, centerY + scaledSize * 0.436 * cosValue));
-                                triangle.getElements().add(new ClosePath());
+                                trapezoid.getElements().add(new LineTo(centerX + scaledSize * 0.436 * sinValue, centerY + scaledSize * 0.436 * cosValue));
+                                trapezoid.getElements().add(new ClosePath());
                                 break;
                         }
                         break;

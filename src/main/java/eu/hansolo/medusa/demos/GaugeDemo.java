@@ -153,15 +153,15 @@ public class GaugeDemo extends Application {
                         .tickMarkSections(section1, section2)                                            // Sections to color tick marks
                         // Related to Major Tick Marks
                         .majorTickMarksVisible(true)                                                     // Should major tick marks be visible
-                        .majorTickMarkType(TickMarkType.LINE)                                            // Tick mark type for major tick marks (LINE, DOT, TRIANGLE, TICK_LABEL)
+                        .majorTickMarkType(TickMarkType.LINE)                                            // Tick mark type for major tick marks (LINE, DOT, TRAPEZOID, TICK_LABEL)
                         .majorTickMarkColor(Color.BLACK)                                                 // Color for major tick marks (overriden by tick mark sections)
                         // Related to Medium Tick Marks
                         .mediumTickMarksVisible(true)                                                    // Should medium tick marks be visible
-                        .mediumTickMarkType(TickMarkType.LINE)                                           // Tick mark type for medium tick marks (LINE, DOT, TRIANGLE)
+                        .mediumTickMarkType(TickMarkType.LINE)                                           // Tick mark type for medium tick marks (LINE, DOT, TRAPEZOID)
                         .mediumTickMarkColor(Color.BLACK)                                                // Color for medium tick marks (overriden by tick mark sections)
                         // Related to Minor Tick Marks
                         .minorTickMarksVisible(true)                                                     // Should minor tick marks be visible
-                        .minorTickMarkType(TickMarkType.LINE)                                            // Tick mark type for minor tick marks (LINE, DOT, TRIANGLE)
+                        .minorTickMarkType(TickMarkType.LINE)                                            // Tick mark type for minor tick marks (LINE, DOT, TRAPEZOID)
                         .minorTickMarkColor(Color.BLACK)                                                 // Color for minor tick marks (override by tick mark sections)
                         // Related to LED
                         .ledVisible(false)                                                               // Should LED be visible

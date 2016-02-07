@@ -38,7 +38,6 @@ import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TickMarkType;
 import javafx.application.Application;
-import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -153,13 +152,13 @@ public class FGaugeDemo extends Application {
                             .tickMarkSections(section1, section2)                                               // Define sections to color tick marks
                             // Related to Major Tick Marks
                             .majorTickMarksVisible(true)                                                        // Define if major tick marks should be visible
-                            .majorTickMarkType(TickMarkType.TRIANGLE)                                           // Define the tick mark type for major tick marks (LINE, DOT, TRIANGLE, TICK_LABEL)
+                            .majorTickMarkType(TickMarkType.TRAPEZOID)                                           // Define the tick mark type for major tick marks (LINE, DOT, TRAPEZOID, TICK_LABEL)
                             // Related to Medium Tick Marks
                             .mediumTickMarksVisible(false)                                                      // Define if medium tick marks should be visible
-                            .mediumTickMarkType(TickMarkType.LINE)                                              // Define the tick mark type for medium tick marks (LINE, DOT, TRIANGLE)
+                            .mediumTickMarkType(TickMarkType.LINE)                                              // Define the tick mark type for medium tick marks (LINE, DOT, TRAPEZOID)
                             // Related to Minor Tick Marks
                             .minorTickMarksVisible(true)                                                        // Define if minor tick marks should be visible
-                            .minorTickMarkType(TickMarkType.LINE)                                               // Define the tick mark type for minor tick marks (LINE, DOT, TRIANGLE)
+                            .minorTickMarkType(TickMarkType.LINE)                                               // Define the tick mark type for minor tick marks (LINE, DOT, TRAPEZOID)
                             // Related to LED
                             .ledVisible(false)                                                                  // Defines if the LED should be visible
                             .ledType(LedType.STANDARD)                                                          // Defines the type of the LED (STANDARD, FLAT)

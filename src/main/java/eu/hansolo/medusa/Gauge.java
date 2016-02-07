@@ -1954,13 +1954,13 @@ public class Gauge extends Control {
 
     /**
      * Returns the shape that will be used to visualize the major tickmark.
-     * Values are LINE, DOT, TRIANGLE, BOX, TICK_LABEL and PILL
+     * Values are LINE, DOT, TRAPEZOID, BOX, TICK_LABEL and PILL
      * @return the shape that will be used to visualize the major tickmark
      */
     public TickMarkType getMajorTickMarkType() { return null == majorTickMarkType ? _majorTickMarkType : majorTickMarkType.get(); }
     /**
      * Defines the shape that will be used to visualize the major tickmark.
-     * Values are LINE, DOT, TRIANGLE, BOX, TICK_LABEL and PILL
+     * Values are LINE, DOT, TRAPEZOID, BOX, TICK_LABEL and PILL
      * @param TYPE
      */
     public void setMajorTickMarkType(final TickMarkType TYPE) {
@@ -1984,13 +1984,13 @@ public class Gauge extends Control {
 
     /**
      * Returns the shape that will be used to visualize the medium tickmark.
-     * Values are LINE, DOT, TRIANGLE, BOX and PILL
+     * Values are LINE, DOT, TRAPEZOID, BOX and PILL
      * @return the shape that will be used to visualize the medium tickmark
      */
     public TickMarkType getMediumTickMarkType() { return null == mediumTickMarkType ? _mediumTickMarkType : mediumTickMarkType.get(); }
     /**
      * Defines the shape that will be used to visualize the medium tickmark.
-     * Values are LINE, DOT, TRIANGLE, BOX and PILL
+     * Values are LINE, DOT, TRAPEZOID, BOX and PILL
      * @param TYPE
      */
     public void setMediumTickMarkType(final TickMarkType TYPE) {
@@ -2014,13 +2014,13 @@ public class Gauge extends Control {
 
     /**
      * Returns the shape that will be used to visualize the minor tickmark.
-     * Values are LINE, DOT, TRIANGLE, BOX and PILL
+     * Values are LINE, DOT, TRAPEZOID, BOX and PILL
      * @return the shape that will be used to visualize the minor tickmark
      */
     public TickMarkType getMinorTickMarkType() { return null == minorTickMarkType ? _minorTickMarkType : minorTickMarkType.get(); }
     /**
      * Defines the shape that will be used to visualize the minor tickmark.
-     * Values are LINE, DOT, TRIANGLE, BOX and PILL
+     * Values are LINE, DOT, TRAPEZOID, BOX and PILL
      * @param TYPE
      */
     public void setMinorTickMarkType(final TickMarkType TYPE) {
