@@ -163,6 +163,16 @@ public class Helper {
         }
     }
 
+    public static DateTimeFormatter getDateFormat(final Locale LOCALE) {
+        if (Locale.US == LOCALE) {
+            return DateTimeFormatter.ofPattern("MM/dd/YYYY");
+        } else if (Locale.CHINA == LOCALE) {
+            return DateTimeFormatter.ofPattern("YYYY.MM.dd");
+        } else {
+            return DateTimeFormatter.ofPattern("dd.MM.YYYY");
+        }
+    }
+
     public static final String colorToCss(final Color COLOR) {
         return COLOR.toString().replace("0x", "#");
     }
@@ -284,6 +294,10 @@ public class Helper {
         final double DISTANCE_TO_WHITE = colorDistance(COLOR, Color.WHITE);
         final double DISTANCE_TO_BLACK = colorDistance(COLOR, Color.BLACK);
         return DISTANCE_TO_BLACK < DISTANCE_TO_WHITE;
+    }
+
+    public static Color getTranslucentColorFrom(final Color COLOR, final double FACTOR) {
+        return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), Helper.clamp(0d, 1d, FACTOR));
     }
 
     public static void drawRadialTickMarks(final Gauge GAUGE, final GraphicsContext CTX, final double MIN_VALUE, final double MAX_VALUE,
