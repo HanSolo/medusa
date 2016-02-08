@@ -79,8 +79,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text         maxValueText;
     private Text         thresholdText;
     private Pane         pane;
-    private double       startAngle       = 26;
-    private double       angleRange       = 128;
+    private double       angleRange;
     private double       minValue;
     private double       range;
     private double       angleStep;
@@ -92,7 +91,6 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleRange   = Helper.clamp(90d, 180d, gauge.getAngleRange());
-        startAngle   = getStartAngle();
         oldValue     = gauge.getValue();
         minValue     = gauge.getMinValue();
         range        = gauge.getRange();
@@ -197,20 +195,10 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             angleRange = Helper.clamp(90d, 180d, getSkinnable().getAngleRange());
-            startAngle = getStartAngle();
             minValue   = getSkinnable().getMinValue();
             range      = getSkinnable().getRange();
             angleStep  = angleRange / range;
             redraw();
-        }
-    }
-
-    private double getStartAngle() {
-        ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
-        switch(scaleDirection) {
-            //case COUNTER_CLOCKWISE: return 180 - angleRange * 0.5;
-            case CLOCKWISE        :
-            default               : return 180 + angleRange * 0.5;
         }
     }
 
