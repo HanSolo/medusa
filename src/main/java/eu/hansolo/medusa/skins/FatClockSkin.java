@@ -283,6 +283,7 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private void createHourPointer() {
         double width  = size * 0.09733333;
         double height = size * 0.42066667;
+        hour.setCache(false);
         hour.getElements().clear();
         hour.getElements().add(new MoveTo(0.0, 0.0));
         hour.getElements().add(new CubicCurveTo(0.0, 0.0, 0.0, 0.884310618066561 * height, 0.0, 0.884310618066561 * height));
@@ -291,11 +292,14 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         hour.getElements().add(new CubicCurveTo(width, 0.884310618066561 * height, width, 0.0, width, 0.0));
         hour.getElements().add(new LineTo(0.0, 0.0));
         hour.getElements().add(new ClosePath());
+        hour.setCache(true);
+        hour.setCacheHint(CacheHint.ROTATE);
     }
 
     private void createMinutePointer() {
         double width  = size * 0.09733333;
         double height = size * 0.548;
+        minute.setCache(false);
         minute.getElements().clear();
         minute.getElements().add(new MoveTo(0.0, 0.0));
         minute.getElements().add(new CubicCurveTo(0.0, 0.0, 0.0, 0.9111922141119222 * height, 0.0, 0.9111922141119222 * height));
@@ -304,6 +308,8 @@ public class FatClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         minute.getElements().add(new CubicCurveTo(width, 0.9111922141119222 * height, width, 0.0, width, 0.0));
         minute.getElements().add(new LineTo(0.0, 0.0));
         minute.getElements().add(new ClosePath());
+        minute.setCache(true);
+        minute.setCacheHint(CacheHint.ROTATE);
     }
 
     private void updateAlarms() {

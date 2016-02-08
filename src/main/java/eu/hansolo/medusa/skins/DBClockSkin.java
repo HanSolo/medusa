@@ -281,6 +281,7 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private void createSecondPointer() {
         double width  = size * 0.11866667;
         double height = size * 0.46266667;
+        second.setCache(false);
         second.getElements().clear();
         second.getElements().add(new MoveTo(0.1348314606741573 * width, 0.4365994236311239 * height));
         second.getElements().add(new CubicCurveTo(0.1348314606741573 * width, 0.38328530259365995 * height,
@@ -324,6 +325,8 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
                                                   0.0, 0.3703170028818444 * height,
                                                   0.0, 0.4365994236311239 * height));
         second.getElements().add(new ClosePath());
+        second.setCache(true);
+        second.setCacheHint(CacheHint.ROTATE);
     }
 
     public void updateTime(final ZonedDateTime TIME) {
@@ -377,13 +380,19 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             alarmPane.setMaxSize(size, size);
 
             hour.setFill(getSkinnable().getHourColor());
+            hour.setCache(false);
             hour.setWidth(size * 0.05);
             hour.setHeight(size * 0.3125);
+            hour.setCache(true);
+            hour.setCacheHint(CacheHint.ROTATE);
             hour.relocate((size - hour.getWidth()) * 0.5, center - size * 0.3125);
 
             minute.setFill(getSkinnable().getMinuteColor());
+            minute.setCache(false);
             minute.setWidth(size * 0.038);
             minute.setHeight(size * 0.4375);
+            minute.setCache(true);
+            minute.setCacheHint(CacheHint.ROTATE);
             minute.relocate((size - minute.getWidth()) * 0.5, center - size * 0.4375);
 
             createSecondPointer();

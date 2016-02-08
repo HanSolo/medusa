@@ -298,6 +298,8 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sectionsCanvas.setCache(true);
             sectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
+            needle.setCache(false);
+
             needleMoveTo1.setX(0.275 * size); needleMoveTo1.setY(0.5 * size);
 
             needleCubicCurveTo2.setControlX1(0.275 * size); needleCubicCurveTo2.setControlY1(0.62426575 * size);
@@ -319,6 +321,9 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleCubicCurveTo7.setControlX1(0.3551895 * size); needleCubicCurveTo7.setControlY1(0.296985 * size);
             needleCubicCurveTo7.setControlX2(0.275 * size); needleCubicCurveTo7.setControlY2(0.3891265 * size);
             needleCubicCurveTo7.setX(0.275 * size); needleCubicCurveTo7.setY(0.5 * size);
+
+            needle.setCache(true);
+            needle.setCacheHint(CacheHint.ROTATE);
 
             needle.setStrokeWidth(size * 0.025);
 

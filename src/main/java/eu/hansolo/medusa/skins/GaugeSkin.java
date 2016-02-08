@@ -709,6 +709,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double center = size * 0.5;
         double needleWidth;
         double needleHeight;
+        needle.setCache(false);
         needle.getElements().clear();
         switch(getSkinnable().getNeedleType()) {
             case FAT:
@@ -747,7 +748,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 needleRotate.setPivotY(needle.getLayoutBounds().getHeight());
                 break;
         }
-
+        needle.setCache(true);
+        needle.setCacheHint(CacheHint.ROTATE);
     }
 
     private void drawKnob(final boolean PRESSED) {

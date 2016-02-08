@@ -340,24 +340,33 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             alarmPane.setMaxSize(size, size);
 
             hour.setFill(getSkinnable().getHourColor());
+            hour.setCache(false);
             hour.setWidth(size * 0.015);
             hour.setHeight(size * 0.29);
             hour.setArcWidth(size * 0.015);
             hour.setArcHeight(size * 0.015);
+            hour.setCache(true);
+            hour.setCacheHint(CacheHint.ROTATE);
             hour.relocate((size - hour.getWidth()) * 0.5, size * 0.21);
 
             minute.setFill(getSkinnable().getMinuteColor());
+            minute.setCache(false);
             minute.setWidth(size * 0.015);
             minute.setHeight(size * 0.47);
             minute.setArcWidth(size * 0.015);
             minute.setArcHeight(size * 0.015);
+            minute.setCache(true);
+            minute.setCacheHint(CacheHint.ROTATE);
             minute.relocate((size - minute.getWidth()) * 0.5, size * 0.03);
 
             second.setFill(getSkinnable().getSecondColor());
+            second.setCache(false);
             second.setWidth(size * 0.005);
             second.setHeight(size * 0.47);
             second.setArcWidth(size * 0.015);
             second.setArcHeight(size * 0.015);
+            second.setCache(true);
+            second.setCacheHint(CacheHint.ROTATE);
             second.relocate((size - second.getWidth()) * 0.5, size * 0.03);
 
             knob.setFill(getSkinnable().getKnobColor());

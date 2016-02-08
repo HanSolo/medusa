@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
+import javafx.scene.CacheHint;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Background;
@@ -339,6 +340,8 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             double needleWidth  = size * 0.064;
             double needleHeight = size * 0.42;
 
+            needle.setCache(false);
+
             needleMoveTo1.setX(0.0625 * needleWidth); needleMoveTo1.setY(0.923809523809524 * needleHeight);
 
             needleCubicCurveTo2.setControlX1(0.0625  *needleWidth); needleCubicCurveTo2.setControlY1(0.961904761904762 * needleHeight);
@@ -366,6 +369,9 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleCubicCurveTo8.setControlX1(0.125 * needleWidth); needleCubicCurveTo8.setControlY1(0.885714285714286 * needleHeight);
             needleCubicCurveTo8.setControlX2(0.0625 * needleWidth); needleCubicCurveTo8.setControlY2(0.904761904761905 * needleHeight);
             needleCubicCurveTo8.setX(0.0625 * needleWidth); needleCubicCurveTo8.setY(0.923809523809524 * needleHeight);
+
+            needle.setCache(true);
+            needle.setCacheHint(CacheHint.ROTATE);
 
             needle.relocate((size - needle.getLayoutBounds().getWidth()) * 0.5, centerY - needle.getLayoutBounds().getHeight());
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);

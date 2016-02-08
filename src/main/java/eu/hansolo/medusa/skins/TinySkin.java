@@ -386,6 +386,8 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             double needleWidth  = size * 0.26470588;
             double needleHeight = size * 0.47426471;
 
+            needle.setCache(false);
+
             needleMoveTo1.setX(0.277777777777778 * needleWidth); needleMoveTo1.setY(0.720930232558139 * needleHeight);
 
             needleCubicCurveTo2.setControlX1(0.277777777777778 * needleWidth); needleCubicCurveTo2.setControlY1(0.652428682170543 * needleHeight);
@@ -421,6 +423,9 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleCubicCurveTo11.setControlX1(0.5 * needleWidth); needleCubicCurveTo11.setControlY1(0);
             needleCubicCurveTo11.setControlX2(0); needleCubicCurveTo11.setControlY2(0.566860465116279 * needleHeight);
             needleCubicCurveTo11.setX(0); needleCubicCurveTo11.setY(0.720930232558139 * needleHeight);
+
+            needle.setCache(true);
+            needle.setCacheHint(CacheHint.ROTATE);
 
             needle.relocate((size - needle.getLayoutBounds().getWidth()) * 0.5, centerY - needle.getLayoutBounds().getHeight() + needle.getLayoutBounds().getWidth() * 0.5);
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);

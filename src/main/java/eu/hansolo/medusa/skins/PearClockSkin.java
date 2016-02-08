@@ -298,6 +298,7 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private void createHourPointer() {
         double width  = size * 0.04533333;
         double height = size * 0.292;
+        hour.setCache(false);
         hour.getElements().clear();
         hour.getElements().add(new MoveTo(0.3235294117647059 * width, 0.9223744292237442 * height));
         hour.getElements().add(new CubicCurveTo(0.3235294117647059 * width, 0.906392694063927 * height,
@@ -371,11 +372,14 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
                                                 0.0, 0.8881278538812786 * height,
                                                 0.0, 0.9223744292237442 * height));
         hour.getElements().add(new ClosePath());
+        hour.setCache(true);
+        hour.setCacheHint(CacheHint.ROTATE);
     }
 
     private void createMinutePointer() {
         double width  = size * 0.04533333;
         double height = size * 0.488;
+        minute.setCache(false);
         minute.getElements().clear();
         minute.getElements().add(new MoveTo(0.3235294117647059 * width, 0.953551912568306 * height));
         minute.getElements().add(new CubicCurveTo(0.3235294117647059 * width, 0.9439890710382514 * height,
@@ -449,11 +453,14 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
                                                   0.0, 0.9330601092896175 * height,
                                                   0.0, 0.953551912568306 * height));
         minute.getElements().add(new ClosePath());
+        minute.setCache(true);
+        minute.setCacheHint(CacheHint.ROTATE);
     }
 
     private void createSecondPointer() {
         double width  = size * 0.02933333;
         double height = size * 0.58133333;
+        second.setCache(false);
         second.getElements().clear();
         second.getElements().add(new MoveTo(0.22727272727272727 * width, 0.8600917431192661 * height));
         second.getElements().add(new CubicCurveTo(0.22727272727272727 * width, 0.8520642201834863 * height,
@@ -497,6 +504,8 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
                                                   0.0, 0.8486238532110092 * height,
                                                   0.0, 0.8600917431192661 * height));
         second.getElements().add(new ClosePath());
+        second.setCache(true);
+        second.setCacheHint(CacheHint.ROTATE);
     }
 
     private void updateAlarms() {

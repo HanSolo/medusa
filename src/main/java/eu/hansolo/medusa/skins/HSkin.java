@@ -957,6 +957,8 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             double needleWidth  = scaledWidth * getSkinnable().getNeedleSize().FACTOR;
             double needleHeight = TickLabelLocation.OUTSIDE == getSkinnable().getTickLabelLocation() ? scaledWidth * 0.3965 : scaledWidth * 0.455;
 
+            needle.setCache(false);
+
             needleMoveTo1.setX(0.25 * needleWidth); needleMoveTo1.setY(0.025423728813559324 * needleHeight);
 
             needleCubicCurveTo2.setControlX1(0.25 * needleWidth); needleCubicCurveTo2.setControlY1(0.00847457627118644 * needleHeight);
@@ -976,6 +978,9 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleCubicCurveTo6.setControlX1(0); needleCubicCurveTo6.setControlY1(needleHeight);
             needleCubicCurveTo6.setControlX2(0.25 * needleWidth); needleCubicCurveTo6.setControlY2(0.025423728813559324 * needleHeight);
             needleCubicCurveTo6.setX(0.25 * needleWidth); needleCubicCurveTo6.setY(0.025423728813559324 * needleHeight);
+
+            needle.setCache(true);
+            needle.setCacheHint(CacheHint.ROTATE);
 
             needle.relocate(centerX - needle.getLayoutBounds().getWidth() * 0.5, centerY - needle.getLayoutBounds().getHeight());
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);

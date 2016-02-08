@@ -269,6 +269,7 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private void createHourPointer() {
         double width  = size * 0.04723347;
         double height = size * 0.35897436;
+        hour.setCache(false);
         hour.getElements().clear();
         hour.getElements().add(new MoveTo(0.18571428571428572 * width, 0.9342105263157895 * height));
         hour.getElements().add(new CubicCurveTo(0.18571428571428572 * width, 0.9116541353383458 * height,
@@ -306,11 +307,14 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
                                                 0.0, 0.9116541353383458 * height,
                                                 0.0, 0.9342105263157895 * height));
         hour.getElements().add(new ClosePath());
+        hour.setCache(true);
+        hour.setCacheHint(CacheHint.ROTATE);
     }
 
     private void createMinutePointer() {
         double width  = size * 0.04723347;
         double height = size * 0.47503374;
+        minute.setCache(false);
         minute.getElements().clear();
         minute.getElements().add(new MoveTo(0.18571428571428572 * width, 0.9502840909090909 * height));
         minute.getElements().add(new CubicCurveTo(0.18571428571428572 * width, 0.9332386363636364 * height,
@@ -348,11 +352,14 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
                                                   0.0, 0.9318181818181818 * height,
                                                   0.0, 0.9502840909090909 * height));
         minute.getElements().add(new ClosePath());
+        minute.setCache(true);
+        minute.setCacheHint(CacheHint.ROTATE);
     }
 
     private void createSecondPointer() {
         double width  = size * 0.04723347;
         double height = size * 0.50404858;
+        second.setCache(false);
         second.getElements().clear();
         second.getElements().add(new MoveTo(0.18571428571428572 * width, 0.9531459170013387 * height));
         second.getElements().add(new CubicCurveTo(0.18571428571428572 * width, 0.9370816599732262 * height,
@@ -390,6 +397,8 @@ public class PlainClockSkin extends SkinBase<Clock> implements Skin<Clock> {
                                                   0.0, 0.9330655957161981 * height,
                                                   0.0, 0.9531459170013387 * height));
         second.getElements().add(new ClosePath());
+        second.setCache(true);
+        second.setCacheHint(CacheHint.ROTATE);
     }
 
     private void updateAlarms() {
