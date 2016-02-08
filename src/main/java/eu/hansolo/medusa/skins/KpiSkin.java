@@ -18,7 +18,6 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
 import javafx.scene.CacheHint;
@@ -63,15 +62,6 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Arc          barBackground;
     private Arc          thresholdBar;
     private Path         needle;
-    private MoveTo       needleMoveTo1;
-    private CubicCurveTo needleCubicCurveTo2;
-    private CubicCurveTo needleCubicCurveTo3;
-    private CubicCurveTo needleCubicCurveTo4;
-    private CubicCurveTo needleCubicCurveTo5;
-    private LineTo       needleLineTo6;
-    private CubicCurveTo needleCubicCurveTo7;
-    private CubicCurveTo needleCubicCurveTo8;
-    private ClosePath    needleClosePath9;
     private Rotate       needleRotate;
     private Text         titleText;
     private Text         valueText;
@@ -140,16 +130,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         needleRotate = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
 
-        needleMoveTo1       = new MoveTo();
-        needleCubicCurveTo2 = new CubicCurveTo();
-        needleCubicCurveTo3 = new CubicCurveTo();
-        needleCubicCurveTo4 = new CubicCurveTo();
-        needleCubicCurveTo5 = new CubicCurveTo();
-        needleLineTo6       = new LineTo();
-        needleCubicCurveTo7 = new CubicCurveTo();
-        needleCubicCurveTo8 = new CubicCurveTo();
-        needleClosePath9    = new ClosePath();
-        needle = new Path(needleMoveTo1, needleCubicCurveTo2, needleCubicCurveTo3, needleCubicCurveTo4, needleCubicCurveTo5, needleLineTo6,needleCubicCurveTo7, needleCubicCurveTo8, needleClosePath9);
+        needle = new Path();
         needle.setFillRule(FillRule.EVEN_ODD);
         needle.getTransforms().setAll(needleRotate);
         needle.setFill(getSkinnable().getNeedleColor());
@@ -209,6 +190,36 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needleRotate.setAngle(targetAngle);
         valueText.setText(String.format(Locale.US, formatString, VALUE));
         resizeValueText();
+    }
+
+    private void drawNeedle() {
+        double needleWidth  = size * 0.064;
+        double needleHeight = size * 0.44;
+        needle.setCache(false);
+        needle.getElements().clear();
+        needle.getElements().add(new MoveTo(0.1875 * needleWidth, 0.0));
+        needle.getElements().add(new CubicCurveTo(0.1875 * needleWidth, 0.0,
+                                                0.1875 * needleWidth, 0.8727272727272727 * needleHeight,
+                                                0.1875 * needleWidth, 0.8727272727272727 * needleHeight));
+        needle.getElements().add(new CubicCurveTo(0.0625 * needleWidth, 0.8818181818181818 * needleHeight,
+                                                0.0, 0.9 * needleHeight,
+                                                0.0, 0.9272727272727272 * needleHeight));
+        needle.getElements().add(new CubicCurveTo(0.0, 0.9636363636363636 * needleHeight,
+                                                0.25 * needleWidth, needleHeight,
+                                                0.5 * needleWidth, needleHeight));
+        needle.getElements().add(new CubicCurveTo(0.75 * needleWidth, needleHeight,
+                                                needleWidth, 0.9636363636363636 * needleHeight,
+                                                needleWidth, 0.9272727272727272 * needleHeight));
+        needle.getElements().add(new CubicCurveTo(needleWidth, 0.9 * needleHeight,
+                                                0.9375 * needleWidth, 0.8818181818181818 * needleHeight,
+                                                0.8125 * needleWidth, 0.8727272727272727 * needleHeight));
+        needle.getElements().add(new CubicCurveTo(0.8125 * needleWidth, 0.8727272727272727 * needleHeight,
+                                                0.8125 * needleWidth, 0.0,
+                                                0.8125 * needleWidth, 0.0));
+        needle.getElements().add(new LineTo(0.1875 * needleWidth, 0.0));
+        needle.getElements().add(new ClosePath());
+        needle.setCache(true);
+        needle.setCacheHint(CacheHint.ROTATE);
     }
 
 
@@ -325,45 +336,11 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             thresholdBar.setStartAngle(90 - angleRange * 0.5);
             thresholdBar.setLength((getSkinnable().getMaxValue() - getSkinnable().getThreshold()) * angleStep);
 
-            double needleWidth  = size * 0.064;
-            double needleHeight = size * 0.42;
+            drawNeedle();
 
-            needle.setCache(false);
-
-            needleMoveTo1.setX(0.0625 * needleWidth); needleMoveTo1.setY(0.923809523809524 * needleHeight);
-
-            needleCubicCurveTo2.setControlX1(0.0625  *needleWidth); needleCubicCurveTo2.setControlY1(0.961904761904762 * needleHeight);
-            needleCubicCurveTo2.setControlX2(0.25 * needleWidth); needleCubicCurveTo2.setControlY2(0.990476190476191 * needleHeight);
-            needleCubicCurveTo2.setX(0.5 * needleWidth); needleCubicCurveTo2.setY(0.990476190476191 * needleHeight);
-
-            needleCubicCurveTo3.setControlX1(0.75 * needleWidth); needleCubicCurveTo3.setControlY1(0.990476190476191 * needleHeight);
-            needleCubicCurveTo3.setControlX2(0.9375 * needleWidth); needleCubicCurveTo3.setControlY2(0.961904761904762 * needleHeight);
-            needleCubicCurveTo3.setX(0.9375 * needleWidth); needleCubicCurveTo3.setY(0.923809523809524 * needleHeight);
-
-            needleCubicCurveTo4.setControlX1(0.9375 * needleWidth); needleCubicCurveTo4.setControlY1(0.904761904761905 * needleHeight);
-            needleCubicCurveTo4.setControlX2(0.875 * needleWidth); needleCubicCurveTo4.setControlY2(0.885714285714286 * needleHeight);
-            needleCubicCurveTo4.setX(0.8125 * needleWidth); needleCubicCurveTo4.setY(0.876190476190476 * needleHeight);
-
-            needleCubicCurveTo5.setControlX1(0.8125 * needleWidth); needleCubicCurveTo5.setControlY1(0.876190476190476 * needleHeight);
-            needleCubicCurveTo5.setControlX2(0.8125 * needleWidth); needleCubicCurveTo5.setControlY2(0);
-            needleCubicCurveTo5.setX(0.8125 * needleWidth); needleCubicCurveTo5.setY(0);
-
-            needleLineTo6.setX(0.1875 * needleWidth); needleLineTo6.setY(0);
-
-            needleCubicCurveTo7.setControlX1(0.1875 * needleWidth); needleCubicCurveTo7.setControlY1(0);
-            needleCubicCurveTo7.setControlX2(0.1875 * needleWidth); needleCubicCurveTo7.setControlY2(0.876190476190476 * needleHeight);
-            needleCubicCurveTo7.setX(0.1875 * needleWidth); needleCubicCurveTo7.setY(0.876190476190476 * needleHeight);
-
-            needleCubicCurveTo8.setControlX1(0.125 * needleWidth); needleCubicCurveTo8.setControlY1(0.885714285714286 * needleHeight);
-            needleCubicCurveTo8.setControlX2(0.0625 * needleWidth); needleCubicCurveTo8.setControlY2(0.904761904761905 * needleHeight);
-            needleCubicCurveTo8.setX(0.0625 * needleWidth); needleCubicCurveTo8.setY(0.923809523809524 * needleHeight);
-
-            needle.setCache(true);
-            needle.setCacheHint(CacheHint.ROTATE);
-
-            needle.relocate((size - needle.getLayoutBounds().getWidth()) * 0.5, centerY - needle.getLayoutBounds().getHeight());
+            needle.relocate((size - needle.getLayoutBounds().getWidth()) * 0.5, centerY - needle.getLayoutBounds().getHeight() + needle.getLayoutBounds().getWidth() * 0.5);
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
-            needleRotate.setPivotY(needle.getLayoutBounds().getHeight() - needle.getLayoutBounds().getHeight() * 0.07619048);
+            needleRotate.setPivotY(needle.getLayoutBounds().getHeight() - needle.getLayoutBounds().getWidth() * 0.5);
 
             resizeStaticText();
             resizeValueText();
