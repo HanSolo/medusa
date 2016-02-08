@@ -87,6 +87,7 @@ public class OverviewDemo extends Application {
     private Gauge          gauge19;
     private Gauge          gauge20;
     private Gauge          gauge21;
+    private Gauge          gauge22;
     private Clock          clock1;
     private Clock          clock2;
     private Clock          clock3;
@@ -204,7 +205,6 @@ public class OverviewDemo extends Application {
 
         gauge5 = GaugeBuilder.create()
                              .skinType(SkinType.DASHBOARD)
-                             .backgroundPaint(Color.web("#eff3f3"))
                              .animated(true)
                              .title("Dashboard")
                              .unit("°C")
@@ -400,6 +400,15 @@ public class OverviewDemo extends Application {
                                         new Section(80, 100, Color.RED))
                               .build();
 
+        gauge22 = GaugeBuilder.create()
+                              .skinType(SkinType.DIGITAL)
+                              .foregroundBaseColor(Color.rgb(0,222,249))
+                              .barColor(Color.rgb(0,222,249))
+                              .title("DIGITAL")
+                              .unit("UNIT")
+                              .animated(true)
+                              .build();
+
         clock1 = ClockBuilder.create()
                              .skinType(ClockSkinType.YOTA2)
                              .sectionsVisible(true)
@@ -485,6 +494,7 @@ public class OverviewDemo extends Application {
                     gauge19.setValue(RND.nextDouble() * gauge19.getRange() + gauge19.getMinValue());
                     gauge20.setValue(RND.nextDouble() * gauge20.getRange() + gauge20.getMinValue());
                     gauge21.setValue(RND.nextDouble() * gauge21.getRange() + gauge21.getMinValue());
+                    gauge22.setValue(RND.nextDouble() * gauge22.getRange() + gauge22.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -500,6 +510,7 @@ public class OverviewDemo extends Application {
         pane.add(gauge5, 4, 0);
         pane.add(clock1, 5, 0);
         pane.add(clock5, 6, 0);
+        pane.add(gauge22, 7, 0);
         pane.add(gauge6, 0, 1);
         pane.add(gauge7, 1, 1);
         pane.add(gauge8, 2, 1);
@@ -524,19 +535,18 @@ public class OverviewDemo extends Application {
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));
-        pane.getColumnConstraints().add(new ColumnConstraints(180));
-        pane.getColumnConstraints().add(new ColumnConstraints(180));
-        pane.getColumnConstraints().add(new ColumnConstraints(180));
-        pane.getColumnConstraints().add(new ColumnConstraints(180));
-        pane.getColumnConstraints().add(new ColumnConstraints(180));
-        pane.getColumnConstraints().add(new ColumnConstraints(180));
-        pane.getColumnConstraints().add(new ColumnConstraints(180));
-        pane.getRowConstraints().add(new RowConstraints(180));
-        pane.getRowConstraints().add(new RowConstraints(180));
-        pane.getRowConstraints().add(new RowConstraints(180));
-        pane.getRowConstraints().add(new RowConstraints(180));
-        pane.getRowConstraints().add(new RowConstraints(180));
-        pane.getRowConstraints().add(new RowConstraints(180));
+        pane.getColumnConstraints().add(new ColumnConstraints(150));
+        pane.getColumnConstraints().add(new ColumnConstraints(150));
+        pane.getColumnConstraints().add(new ColumnConstraints(150));
+        pane.getColumnConstraints().add(new ColumnConstraints(150));
+        pane.getColumnConstraints().add(new ColumnConstraints(150));
+        pane.getColumnConstraints().add(new ColumnConstraints(150));
+        pane.getColumnConstraints().add(new ColumnConstraints(150));
+        pane.getColumnConstraints().add(new ColumnConstraints(150));
+        pane.getRowConstraints().add(new RowConstraints(150));
+        pane.getRowConstraints().add(new RowConstraints(150));
+        pane.getRowConstraints().add(new RowConstraints(150));
+        pane.getRowConstraints().add(new RowConstraints(150));
         pane.setBackground(new Background(new BackgroundFill(Color.rgb(90, 90, 90), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
