@@ -95,8 +95,7 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         textColor       = clock.getTextColor();
         dateColor       = clock.getDateColor();
         alarmColor      = clock.getAlarmColor();
-
-        adjustDateFormat();
+        dateFormat      = Helper.getDateFormat(clock.getLocale());
 
         init();
         initGraphics();
@@ -271,9 +270,9 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         backgroundCtx.clearRect(0, 0, size, size);
         // draw translucent background
         backgroundCtx.setStroke(Color.rgb(0, 12, 6, 0.1));
-        Color hColor = getTranslucentColorFrom(hourColor, 0.1);
-        Color mColor = getTranslucentColorFrom(minuteColor, 0.1);
-        Color sColor = getTranslucentColorFrom(secondColor, 0.1);
+        Color hColor = Helper.getTranslucentColorFrom(hourColor, 0.1);
+        Color mColor = Helper.getTranslucentColorFrom(minuteColor, 0.1);
+        Color sColor = Helper.getTranslucentColorFrom(secondColor, 0.1);
         for (int i = 0 ; i < 360 ; i++) {
             backgroundCtx.save();
             if (i % 6 == 0) {
@@ -302,7 +301,7 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             int    l     = title.length();
             char[] bkgChrs = new char[l];
             Arrays.fill(bkgChrs, '8');
-            backgroundCtx.setFill(getTranslucentColorFrom(titleColor, 0.1));
+            backgroundCtx.setFill(Helper.getTranslucentColorFrom(titleColor, 0.1));
             backgroundCtx.setFont(Fonts.digitalReadoutBold(0.09 * size));
             backgroundCtx.setTextBaseline(VPos.CENTER);
             backgroundCtx.setTextAlign(TextAlignment.CENTER);
@@ -314,7 +313,7 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         Locale locale = getSkinnable().getLocale();
         // draw the text
         if (getSkinnable().isTextVisible()) {
-            backgroundCtx.setFill(getTranslucentColorFrom(textColor, 0.1));
+            backgroundCtx.setFill(Helper.getTranslucentColorFrom(textColor, 0.1));
             backgroundCtx.setTextBaseline(VPos.CENTER);
             backgroundCtx.setTextAlign(TextAlignment.CENTER);
             if (Locale.US == locale) {
@@ -328,7 +327,7 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
         // draw the date
         if (getSkinnable().isDateVisible()) {
-            backgroundCtx.setFill(getTranslucentColorFrom(dateColor, 0.1));
+            backgroundCtx.setFill(Helper.getTranslucentColorFrom(dateColor, 0.1));
             backgroundCtx.setFont(Fonts.digital(0.09 * size));
             if (Locale.US == locale) {
                 backgroundCtx.fillText("88/88/8888", center, size * 0.65);
@@ -341,7 +340,7 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
         // draw the alarmOn icon
         if (getSkinnable().isAlarmsEnabled() && getSkinnable().getAlarms().size() > 0) {
-            backgroundCtx.setFill(getTranslucentColorFrom(alarmColor, 0.1));
+            backgroundCtx.setFill(Helper.getTranslucentColorFrom(alarmColor, 0.1));
             drawAlarmIcon(backgroundCtx, backgroundCtx.getFill());
         }
     }
@@ -380,23 +379,6 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         drawHours(TIME);
         drawMinutes(TIME);
         drawSeconds(TIME);
-    }
-
-
-    // ******************** Methods *******************************************
-    private Color getTranslucentColorFrom(final Color COLOR, final double FACTOR) {
-        return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), Helper.clamp(0d, 1d, FACTOR));
-    }
-
-    private void adjustDateFormat() {
-        Locale locale = getSkinnable().getLocale();
-        if (Locale.US == locale) {
-            dateFormat = DateTimeFormatter.ofPattern("MM/dd/YYYY");
-        } else if (Locale.CHINA == locale) {
-            dateFormat = DateTimeFormatter.ofPattern("YYYY.MM.dd");
-        } else {
-            dateFormat = DateTimeFormatter.ofPattern("dd.MM.YYYY");
-        }
     }
 
 
@@ -446,4 +428,3 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         drawSeconds(time);
     }
 }
-
