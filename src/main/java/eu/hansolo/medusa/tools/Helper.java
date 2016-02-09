@@ -50,6 +50,7 @@ import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.Locale;
@@ -171,6 +172,9 @@ public class Helper {
         } else {
             return DateTimeFormatter.ofPattern("dd.MM.YYYY");
         }
+    }
+    public static DateTimeFormatter getLocalizedDateFormat(final Locale LOCALE) {
+        return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(LOCALE);
     }
 
     public static final String colorToCss(final Color COLOR) {
@@ -442,6 +446,21 @@ public class Helper {
         double trapezoidMinorOuterPoint2X;
         double trapezoidMinorOuterPoint2Y;
 
+        double triangleMajorInnerPointX;
+        double triangleMajorInnerPointY;
+        double triangleMajorOuterPointX;
+        double triangleMajorOuterPointY;
+
+        double triangleMediumInnerPointX;
+        double triangleMediumInnerPointY;
+        double triangleMediumOuterPointX;
+        double triangleMediumOuterPointY;
+
+        double triangleMinorInnerPointX;
+        double triangleMinorInnerPointY;
+        double triangleMinorOuterPointX;
+        double triangleMinorOuterPointY;
+
 
         // Main loop
         ScaleDirection scaleDirection = GAUGE.getScaleDirection();
@@ -456,28 +475,28 @@ public class Helper {
 
             switch(tickLabelLocation) {
                 case OUTSIDE:
-                    innerPointX                = centerX + SIZE * 0.3585 * sinValue;
-                    innerPointY                = centerY + SIZE * 0.3585 * cosValue;
-                    innerMediumPointX          = centerX + SIZE * 0.3585 * sinValue;
-                    innerMediumPointY          = centerY + SIZE * 0.3585 * cosValue;
-                    innerMinorPointX           = centerX + SIZE * 0.3585 * sinValue;
-                    innerMinorPointY           = centerY + SIZE * 0.3585 * cosValue;
-                    outerPointX                = centerX + SIZE * 0.4105 * sinValue;
-                    outerPointY                = centerY + SIZE * 0.4105 * cosValue;
-                    outerMediumPointX          = centerX + SIZE * 0.4045 * sinValue;
-                    outerMediumPointY          = centerY + SIZE * 0.4045 * cosValue;
-                    outerMinorPointX           = centerX + SIZE * 0.3975 * sinValue;
-                    outerMinorPointY           = centerY + SIZE * 0.3975 * cosValue;
-                    textPointX                 = centerX + SIZE * orthTextFactor * sinValue;
-                    textPointY                 = centerY + SIZE * orthTextFactor * cosValue;
-                    dotCenterX                 = centerX + SIZE * 0.3685 * sinValue;
-                    dotCenterY                 = centerY + SIZE * 0.3685 * cosValue;
-                    dotMediumCenterX           = centerX + SIZE * 0.365375 * sinValue;
-                    dotMediumCenterY           = centerY + SIZE * 0.365375 * cosValue;
-                    dotMinorCenterX            = centerX + SIZE * 0.36225 * sinValue;
-                    dotMinorCenterY            = centerY + SIZE * 0.36225 * cosValue;
-                    tickLabelTickMarkX         = centerX + SIZE * 0.3805 * sinValue;
-                    tickLabelTickMarkY         = centerY + SIZE * 0.3805 * cosValue;
+                    innerPointX                 = centerX + SIZE * 0.3585 * sinValue;
+                    innerPointY                 = centerY + SIZE * 0.3585 * cosValue;
+                    innerMediumPointX           = innerPointX;
+                    innerMediumPointY           = innerPointY;
+                    innerMinorPointX            = innerPointX;
+                    innerMinorPointY            = innerPointY;
+                    outerPointX                 = centerX + SIZE * 0.4105 * sinValue;
+                    outerPointY                 = centerY + SIZE * 0.4105 * cosValue;
+                    outerMediumPointX           = centerX + SIZE * 0.4045 * sinValue;
+                    outerMediumPointY           = centerY + SIZE * 0.4045 * cosValue;
+                    outerMinorPointX            = centerX + SIZE * 0.3975 * sinValue;
+                    outerMinorPointY            = centerY + SIZE * 0.3975 * cosValue;
+                    textPointX                  = centerX + SIZE * orthTextFactor * sinValue;
+                    textPointY                  = centerY + SIZE * orthTextFactor * cosValue;
+                    dotCenterX                  = centerX + SIZE * 0.3685 * sinValue;
+                    dotCenterY                  = centerY + SIZE * 0.3685 * cosValue;
+                    dotMediumCenterX            = centerX + SIZE * 0.365375 * sinValue;
+                    dotMediumCenterY            = centerY + SIZE * 0.365375 * cosValue;
+                    dotMinorCenterX             = centerX + SIZE * 0.36225 * sinValue;
+                    dotMinorCenterY             = centerY + SIZE * 0.36225 * cosValue;
+                    tickLabelTickMarkX          = centerX + SIZE * 0.3805 * sinValue;
+                    tickLabelTickMarkY          = centerY + SIZE * 0.3805 * cosValue;
 
                     trapezoidMajorInnerAngle1   = Math.toRadians(angle - 1.2 + START_ANGLE);
                     trapezoidMajorInnerAngle2   = Math.toRadians(angle + 1.2 + START_ANGLE);
@@ -517,31 +536,46 @@ public class Helper {
                     trapezoidMinorOuterPoint1Y  = centerY + SIZE * 0.3975 * Math.cos(trapezoidMinorOuterAngle1);
                     trapezoidMinorOuterPoint2X  = centerX + SIZE * 0.3975 * Math.sin(trapezoidMinorOuterAngle2);
                     trapezoidMinorOuterPoint2Y  = centerY + SIZE * 0.3975 * Math.cos(trapezoidMinorOuterAngle2);
+
+                    triangleMajorInnerPointX    = centerX + SIZE * 0.3585 * sinValue;
+                    triangleMajorInnerPointY    = centerY + SIZE * 0.3585 * cosValue;
+                    triangleMajorOuterPointX    = centerX + SIZE * 0.4105 * sinValue;
+                    triangleMajorOuterPointY    = centerX + SIZE * 0.4105 * cosValue;
+
+                    triangleMediumInnerPointX   = triangleMajorInnerPointX;
+                    triangleMediumInnerPointY   = triangleMajorInnerPointY;
+                    triangleMediumOuterPointX   = centerX + SIZE * 0.4045 * sinValue;
+                    triangleMediumOuterPointY   = centerX + SIZE * 0.4045 * cosValue;
+
+                    triangleMinorInnerPointX    = triangleMajorInnerPointX;
+                    triangleMinorInnerPointY    = triangleMajorInnerPointY;
+                    triangleMinorOuterPointX    = centerX + SIZE * 0.3975 * sinValue;
+                    triangleMinorOuterPointY    = centerX + SIZE * 0.3975 * cosValue;
                     break;
                 case INSIDE:
                 default:
-                    innerPointX                = centerX + SIZE * 0.423 * sinValue;
-                    innerPointY                = centerY + SIZE * 0.423 * cosValue;
-                    innerMediumPointX          = centerX + SIZE * 0.43 * sinValue;
-                    innerMediumPointY          = centerY + SIZE * 0.43 * cosValue;
-                    innerMinorPointX           = centerX + SIZE * 0.436 * sinValue;
-                    innerMinorPointY           = centerY + SIZE * 0.436 * cosValue;
-                    outerPointX                = centerX + SIZE * 0.475 * sinValue;
-                    outerPointY                = centerY + SIZE * 0.475 * cosValue;
-                    outerMediumPointX          = centerX + SIZE * 0.475 * sinValue;
-                    outerMediumPointY          = centerY + SIZE * 0.475 * cosValue;
-                    outerMinorPointX           = centerX + SIZE * 0.475 * sinValue;
-                    outerMinorPointY           = centerY + SIZE * 0.475 * cosValue;
-                    textPointX                 = centerX + SIZE * orthTextFactor * sinValue;
-                    textPointY                 = centerY + SIZE * orthTextFactor * cosValue;
-                    dotCenterX                 = centerX + SIZE * 0.4625 * sinValue;
-                    dotCenterY                 = centerY + SIZE * 0.4625 * cosValue;
-                    dotMediumCenterX           = centerX + SIZE * 0.465625 * sinValue;
-                    dotMediumCenterY           = centerY + SIZE * 0.465625 * cosValue;
-                    dotMinorCenterX            = centerX + SIZE * 0.46875 * sinValue;
-                    dotMinorCenterY            = centerY + SIZE * 0.46875 * cosValue;
-                    tickLabelTickMarkX         = centerX + SIZE * 0.445 * sinValue;
-                    tickLabelTickMarkY         = centerY + SIZE * 0.445 * cosValue;
+                    innerPointX                 = centerX + SIZE * 0.423 * sinValue;
+                    innerPointY                 = centerY + SIZE * 0.423 * cosValue;
+                    innerMediumPointX           = centerX + SIZE * 0.43 * sinValue;
+                    innerMediumPointY           = centerY + SIZE * 0.43 * cosValue;
+                    innerMinorPointX            = centerX + SIZE * 0.436 * sinValue;
+                    innerMinorPointY            = centerY + SIZE * 0.436 * cosValue;
+                    outerPointX                 = centerX + SIZE * 0.475 * sinValue;
+                    outerPointY                 = centerY + SIZE * 0.475 * cosValue;
+                    outerMediumPointX           = outerPointX;
+                    outerMediumPointY           = outerPointY;
+                    outerMinorPointX            = outerPointX;
+                    outerMinorPointY            = outerPointY;
+                    textPointX                  = centerX + SIZE * orthTextFactor * sinValue;
+                    textPointY                  = centerY + SIZE * orthTextFactor * cosValue;
+                    dotCenterX                  = centerX + SIZE * 0.4625 * sinValue;
+                    dotCenterY                  = centerY + SIZE * 0.4625 * cosValue;
+                    dotMediumCenterX            = centerX + SIZE * 0.465625 * sinValue;
+                    dotMediumCenterY            = centerY + SIZE * 0.465625 * cosValue;
+                    dotMinorCenterX             = centerX + SIZE * 0.46875 * sinValue;
+                    dotMinorCenterY             = centerY + SIZE * 0.46875 * cosValue;
+                    tickLabelTickMarkX          = centerX + SIZE * 0.445 * sinValue;
+                    tickLabelTickMarkY          = centerY + SIZE * 0.445 * cosValue;
 
                     trapezoidMajorInnerAngle1   = Math.toRadians(angle - 0.8 + START_ANGLE);
                     trapezoidMajorInnerAngle2   = Math.toRadians(angle + 0.8 + START_ANGLE);
@@ -581,6 +615,21 @@ public class Helper {
                     trapezoidMinorOuterPoint1Y  = centerY + SIZE * 0.475 * Math.cos(trapezoidMinorOuterAngle1);
                     trapezoidMinorOuterPoint2X  = centerX + SIZE * 0.475 * Math.sin(trapezoidMinorOuterAngle2);
                     trapezoidMinorOuterPoint2Y  = centerY + SIZE * 0.475 * Math.cos(trapezoidMinorOuterAngle2);
+
+                    triangleMajorInnerPointX    = centerX + SIZE * 0.423 * sinValue;
+                    triangleMajorInnerPointY    = centerX + SIZE * 0.423 * cosValue;
+                    triangleMajorOuterPointX    = centerX + SIZE * 0.475 * sinValue;
+                    triangleMajorOuterPointY    = centerX + SIZE * 0.475 * cosValue;
+
+                    triangleMediumInnerPointX   = centerX + SIZE * 0.43 * sinValue;
+                    triangleMediumInnerPointY   = centerX + SIZE * 0.43 * cosValue;
+                    triangleMediumOuterPointX   = triangleMajorOuterPointX;
+                    triangleMediumOuterPointY   = triangleMajorOuterPointY;
+
+                    triangleMinorInnerPointX    = centerX + SIZE * 0.436 * sinValue;
+                    triangleMinorInnerPointY    = centerX + SIZE * 0.436 * cosValue;
+                    triangleMinorOuterPointX    = triangleMajorOuterPointX;
+                    triangleMinorOuterPointY    = triangleMajorOuterPointY;
                     break;
             }
 
@@ -624,15 +673,15 @@ public class Helper {
                         case TRIANGLE:
                             if (majorTickMarksVisible) {
                                 if (TickLabelLocation.INSIDE == tickLabelLocation) {
-                                    Helper.drawTriangle(CTX, innerPointX, innerPointY, trapezoidMajorOuterPoint1X, trapezoidMajorOuterPoint1Y, trapezoidMajorOuterPoint2X, trapezoidMajorOuterPoint2Y);
+                                    Helper.drawTriangle(CTX, triangleMajorInnerPointX, triangleMajorInnerPointY, trapezoidMajorOuterPoint1X, trapezoidMajorOuterPoint1Y, trapezoidMajorOuterPoint2X, trapezoidMajorOuterPoint2Y);
                                 } else {
-                                    Helper.drawTriangle(CTX, outerPointX, outerPointY, trapezoidMajorInnerPoint1X, trapezoidMajorInnerPoint1Y, trapezoidMajorInnerPoint2X, trapezoidMajorInnerPoint2Y);
+                                    Helper.drawTriangle(CTX, triangleMajorOuterPointX, triangleMajorOuterPointY, trapezoidMajorInnerPoint1X, trapezoidMajorInnerPoint1Y, trapezoidMajorInnerPoint2X, trapezoidMajorInnerPoint2Y);
                                 }
                             } else if (minorTickMarksVisible) {
                                 if (TickLabelLocation.INSIDE == tickLabelLocation) {
-                                    Helper.drawTriangle(CTX, innerMinorPointX, innerMinorPointY, trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
+                                    Helper.drawTriangle(CTX, triangleMinorInnerPointX, triangleMinorInnerPointY, trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
                                 } else {
-                                    Helper.drawTriangle(CTX, outerMinorPointX, outerMinorPointY, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y);
+                                    Helper.drawTriangle(CTX, triangleMinorOuterPointX, triangleMinorOuterPointY, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y);
                                 }
                             }
                             break;
@@ -724,9 +773,9 @@ public class Helper {
                         break;
                     case TRIANGLE:
                         if (TickLabelLocation.INSIDE == tickLabelLocation) {
-                            Helper.drawTriangle(CTX, innerMediumPointX, innerMediumPointY, trapezoidMediumOuterPoint1X, trapezoidMediumOuterPoint1Y, trapezoidMediumOuterPoint2X, trapezoidMediumOuterPoint2Y);
+                            Helper.drawTriangle(CTX, triangleMediumInnerPointX, triangleMediumInnerPointY, trapezoidMediumOuterPoint1X, trapezoidMediumOuterPoint1Y, trapezoidMediumOuterPoint2X, trapezoidMediumOuterPoint2Y);
                         } else {
-                            Helper.drawTriangle(CTX, outerMediumPointX, outerMediumPointY, trapezoidMediumInnerPoint1X, trapezoidMediumInnerPoint1Y, trapezoidMediumInnerPoint2X, trapezoidMediumInnerPoint2Y);
+                            Helper.drawTriangle(CTX, triangleMediumOuterPointX, triangleMediumOuterPointY, trapezoidMediumInnerPoint1X, trapezoidMediumInnerPoint1Y, trapezoidMediumInnerPoint2X, trapezoidMediumInnerPoint2Y);
                         }
                         break;
                     case DOT:
@@ -771,9 +820,9 @@ public class Helper {
                             break;
                         case TRIANGLE:
                             if (TickLabelLocation.INSIDE == tickLabelLocation) {
-                                Helper.drawTriangle(CTX, innerMinorPointX, innerMinorPointY, trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
+                                Helper.drawTriangle(CTX, triangleMinorInnerPointX, triangleMinorInnerPointY, trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
                             } else {
-                                Helper.drawTriangle(CTX, outerMinorPointX, outerMinorPointY, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y);
+                                Helper.drawTriangle(CTX, triangleMinorOuterPointX, triangleMinorOuterPointY, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y);
                             }
                             break;
                         case DOT:
