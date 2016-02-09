@@ -28,6 +28,10 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -136,6 +140,7 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setFill(valueColor);
 
         pane = new Pane(backgroundCanvas, barCanvas, valueBkgText, valueText);
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         getChildren().setAll(pane);
@@ -269,21 +274,6 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Resizing ******************************************
-    private void redraw() {
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        formatString    = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        barColor        = getSkinnable().getBarColor();
-        valueColor      = getSkinnable().getValueColor();
-        unitColor       = getSkinnable().getUnitColor();
-        drawBackground();
-
-        setBar(getSkinnable().getCurrentValue());
-
-        valueBkgText.setFill(Helper.getTranslucentColorFrom(valueColor, 0.1));
-
-        valueText.setFill(valueColor);
-    }
-
     private void resize() {
         double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
@@ -311,5 +301,21 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             drawBackground();
             setBar(getSkinnable().getCurrentValue());
         }
+    }
+
+    private void redraw() {
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        formatString    = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        barColor        = getSkinnable().getBarColor();
+        valueColor      = getSkinnable().getValueColor();
+        unitColor       = getSkinnable().getUnitColor();
+        drawBackground();
+
+        setBar(getSkinnable().getCurrentValue());
+
+        valueBkgText.setFill(Helper.getTranslucentColorFrom(valueColor, 0.1));
+
+        valueText.setFill(valueColor);
     }
 }

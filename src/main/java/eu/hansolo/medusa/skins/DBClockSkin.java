@@ -142,24 +142,28 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         hour  = new Rectangle(3, 60);
         hour.setArcHeight(3);
         hour.setArcWidth(3);
-        hour.setStroke(Color.web("#282a3280"));
+        hour.setStroke(null);
+        hour.setFill(getSkinnable().getHourColor());
         hour.getTransforms().setAll(hourRotate);
 
         minute = new Rectangle(3, 96);
         minute.setArcHeight(3);
         minute.setArcWidth(3);
-        minute.setStroke(Color.web("#282a3280"));
+        minute.setStroke(null);
+        minute.setFill(getSkinnable().getMinuteColor());
         minute.getTransforms().setAll(minuteRotate);
 
         second = new Path();
         second.setFillRule(FillRule.EVEN_ODD);
         second.setStroke(null);
+        second.setFill(getSkinnable().getSecondColor());
         second.getTransforms().setAll(secondRotate);
         second.setVisible(getSkinnable().isSecondsVisible());
         second.setManaged(getSkinnable().isSecondsVisible());
 
         knob = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, 4.5);
-        knob.setStroke(Color.web("#282a3280"));
+        knob.setStroke(null);
+        knob.setFill(getSkinnable().getKnobColor());
 
         dropShadow = new DropShadow();
         dropShadow.setColor(Color.rgb(0, 0, 0, 0.25));
@@ -179,7 +183,7 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         text.setManaged(getSkinnable().isTextVisible());
 
         pane = new Pane(ticksAndSectionsCanvas, alarmPane, title, text, shadowGroup);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         getChildren().setAll(pane);
@@ -422,7 +426,7 @@ public class DBClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     }
 
     private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);

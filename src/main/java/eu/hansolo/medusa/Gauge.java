@@ -176,6 +176,8 @@ public class Gauge extends Control {
     private ObjectProperty<Paint>                backgroundPaint;
     private Paint                                _borderPaint;
     private ObjectProperty<Paint>                borderPaint;
+    private double                               _borderWidth;
+    private DoubleProperty                       borderWidth;
     private Paint                                _foregroundPaint;
     private ObjectProperty<Paint>                foregroundPaint;
     private Color                                _knobColor;
@@ -435,6 +437,7 @@ public class Gauge extends Control {
         _valueVisible                     = true;
         _backgroundPaint                  = Color.TRANSPARENT;
         _borderPaint                      = Color.TRANSPARENT;
+        _borderWidth                      = 1;
         _foregroundPaint                  = Color.TRANSPARENT;
         _knobColor                        = Color.rgb(204, 204, 204);
         _knobType                         = KnobType.STANDARD;
@@ -1334,6 +1337,10 @@ public class Gauge extends Control {
      * @return the Paint object that will be used to draw the border of the gauge
      */
     public Paint getBorderPaint() { return null == borderPaint ? _borderPaint : borderPaint.get(); }
+    /**
+     * Defines the Paint object that will be used to draw the border of the gauge.
+     * @param PAINT
+     */
     public void setBorderPaint(final Paint PAINT) {
         if (null == borderPaint) {
             _borderPaint = PAINT;
@@ -1345,6 +1352,36 @@ public class Gauge extends Control {
     public ObjectProperty<Paint> borderPaintProperty() {
         if (null == borderPaint) { borderPaint = new SimpleObjectProperty<>(Gauge.this, "borderPaint", _borderPaint); }
         return borderPaint;
+    }
+
+    /**
+     * Returns the width in pixels that will be used to draw the border of the gauge.
+     * The value will be clamped between 0 and 50 pixels.
+     * @return the width in pixels that will be used to draw the border of the gauge
+     */
+    public double getBorderWidth() { return null == borderWidth ? _borderWidth : borderWidth.get(); }
+    /**
+     * Defines the width in pixels that will be used to draw the border of the gauge.
+     * The value will be clamped between 0 and 50 pixels.
+     * @param WIDTH
+     */
+    public void setBorderWidth(final double WIDTH) {
+        if (null == borderWidth) {
+            _borderWidth = Helper.clamp(0d, 50d, WIDTH);
+        } else {
+            borderWidth.set(WIDTH);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public DoubleProperty borderWidthProperty() {
+        if (null == borderWidth) {
+            borderWidth = new DoublePropertyBase(_borderWidth) {
+                @Override public void set(final double WIDTH) { super.set(Helper.clamp(0d, 50d, WIDTH)); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "borderWidth"; }
+            };
+        }
+        return borderWidth;
     }
 
     /**
@@ -3681,6 +3718,7 @@ public class Gauge extends Control {
                 super.setSkin(new LcdSkin(Gauge.this));
                 break;
             case TINY:
+                setBorderWidth(26);
                 setBackgroundPaint(Color.rgb(216,216,216));
                 setBorderPaint(Color.rgb(76,76,76));
                 setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));

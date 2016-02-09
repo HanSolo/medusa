@@ -185,7 +185,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxValueText.setVisible(getSkinnable().getTickLabelsVisible());
 
         pane = new Pane(barBackground, bar, needle, minValueText, maxValueText);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         getChildren().setAll(pane);
@@ -265,31 +265,6 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Resizing ******************************************
-    private void redraw() {
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
-
-        barColor             = getSkinnable().getBarColor();
-
-        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
-        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
-        sectionsVisible      = getSkinnable().getSectionsVisible();
-
-        minValueText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
-        maxValueText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
-        resizeStaticText();
-
-        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
-        bar.setStroke(getSkinnable().getBarColor());
-        needle.setFill(getSkinnable().getNeedleColor());
-
-        minValueText.setVisible(getSkinnable().getTickLabelsVisible());
-        maxValueText.setVisible(getSkinnable().getTickLabelsVisible());
-
-        minValueText.setFill(getSkinnable().getTitleColor());
-        maxValueText.setFill(getSkinnable().getTitleColor());
-    }
-
     private void resizeStaticText() {
         double maxWidth = width * 0.28472222;
         double fontSize = height * 0.12631579;
@@ -378,5 +353,31 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             resizeStaticText();
         }
+    }
+
+    private void redraw() {
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_HEIGHT * height))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+
+        barColor             = getSkinnable().getBarColor();
+
+        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
+        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
+        sectionsVisible      = getSkinnable().getSectionsVisible();
+
+        minValueText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
+        maxValueText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
+        resizeStaticText();
+
+        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
+        bar.setStroke(getSkinnable().getBarColor());
+        needle.setFill(getSkinnable().getNeedleColor());
+
+        minValueText.setVisible(getSkinnable().getTickLabelsVisible());
+        maxValueText.setVisible(getSkinnable().getTickLabelsVisible());
+
+        minValueText.setFill(getSkinnable().getTitleColor());
+        maxValueText.setFill(getSkinnable().getTitleColor());
     }
 }

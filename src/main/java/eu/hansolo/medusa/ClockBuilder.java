@@ -175,6 +175,11 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B)this;
     }
 
+    public final B borderWidth(final double WIDTH) {
+        properties.put("borderWidth", new SimpleDoubleProperty(WIDTH));
+        return (B)this;
+    }
+
     public final B foregroundPaint(final Paint PAINT) {
         properties.put("foregroundPaint", new SimpleObjectProperty<>(PAINT));
         return (B)this;
@@ -533,6 +538,8 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setBackgroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
             } else if ("borderPaint".equals(key)) {
                 CONTROL.setBorderPaint(((ObjectProperty<Paint>) properties.get(key)).get());
+            } else if ("borderWidth".equals(key)) {
+                CONTROL.setBorderWidth(((DoubleProperty) properties.get(key)).get());
             } else if ("foregroundPaint".equals(key)) {
                 CONTROL.setForegroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
             } else if ("titleColor".equals(key)) {

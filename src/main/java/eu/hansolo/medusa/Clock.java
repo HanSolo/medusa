@@ -119,6 +119,8 @@ public class Clock extends Control {
     private ObjectProperty<Paint>             backgroundPaint;
     private Paint                             _borderPaint;
     private ObjectProperty<Paint>             borderPaint;
+    private double                            _borderWidth;
+    private DoubleProperty                    borderWidth;
     private Paint                             _foregroundPaint;
     private ObjectProperty<Paint>             foregroundPaint;
     private Color                             _titleColor;
@@ -233,6 +235,7 @@ public class Clock extends Control {
         _autoNightMode          = false;
         _backgroundPaint        = Color.TRANSPARENT;
         _borderPaint            = Color.TRANSPARENT;
+        _borderWidth            = 1;
         _foregroundPaint        = Color.TRANSPARENT;
         _titleColor             = DARK_COLOR;
         _textColor              = DARK_COLOR;
@@ -870,6 +873,36 @@ public class Clock extends Control {
     public ObjectProperty<Paint> borderPaintProperty() {
         if (null == borderPaint) { borderPaint = new SimpleObjectProperty<>(Clock.this, "borderPaint", _borderPaint); }
         return borderPaint;
+    }
+
+    /**
+     * Returns the width in pixels that will be used to draw the border of the clock.
+     * The value will be clamped between 0 and 50 pixels.
+     * @return the width in pixels that will be used to draw the border of the clock
+     */
+    public double getBorderWidth() { return null == borderWidth ? _borderWidth : borderWidth.get(); }
+    /**
+     * Defines the width in pixels that will be used to draw the border of the clock.
+     * The value will be clamped between 0 and 50 pixels.
+     * @param WIDTH
+     */
+    public void setBorderWidth(final double WIDTH) {
+        if (null == borderWidth) {
+            _borderWidth = Helper.clamp(0d, 50d, WIDTH);
+        } else {
+            borderWidth.set(WIDTH);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public DoubleProperty borderWidthProperty() {
+        if (null == borderWidth) {
+            borderWidth = new DoublePropertyBase(_borderWidth) {
+                @Override public void set(final double WIDTH) { super.set(Helper.clamp(0d, 50d, WIDTH)); }
+                @Override public Object getBean() { return Clock.this; }
+                @Override public String getName() { return "borderWidth"; }
+            };
+        }
+        return borderWidth;
     }
 
     /**

@@ -237,17 +237,16 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setEffect(bigGlow);
 
         // Add all nodes
-        pane = new Pane();
-        pane.getChildren().setAll(background,
-                                  mainCanvas,
-                                  tickMarkCanvas,
-                                  mask,
-                                  needle,
-                                  centerKnob,
-                                  titleText,
-                                  subTitleText,
-                                  unitText,
-                                  valueText);
+        pane = new Pane(background,
+                        mainCanvas,
+                        tickMarkCanvas,
+                        mask,
+                        needle,
+                        centerKnob,
+                        titleText,
+                        subTitleText,
+                        unitText,
+                        valueText);
 
         getChildren().setAll(pane);
     }

@@ -167,6 +167,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B borderWidth(final double WIDTH) {
+        properties.put("borderWidth", new SimpleDoubleProperty(WIDTH));
+        return (B)this;
+    }
+
     public final B foregroundPaint(final Paint PAINT) {
         properties.put("foregroundPaint", new SimpleObjectProperty<>(PAINT));
         return (B)this;
@@ -815,6 +820,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setOldValueVisible(true);
                     break;
                 case TINY:
+                    CONTROL.setBorderWidth(26);
                     CONTROL.setBackgroundPaint(Color.rgb(216,216,216));
                     CONTROL.setBorderPaint(Color.rgb(76,76,76));
                     CONTROL.setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));
@@ -975,6 +981,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setBackgroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
             } else if ("borderPaint".equals(key)) {
                 CONTROL.setBorderPaint(((ObjectProperty<Paint>) properties.get(key)).get());
+            } else if ("borderWidth".equals(key)) {
+                CONTROL.setBorderWidth(((DoubleProperty) properties.get(key)).get());
             } else if ("foregroundPaint".equals(key)) {
                 CONTROL.setForegroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
             } else if ("knobColor".equals(key)) {

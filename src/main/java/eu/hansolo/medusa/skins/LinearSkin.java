@@ -179,18 +179,19 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
 
-        pane = new Pane();
-        pane.getChildren().setAll(barBorder1,
-                                  barBorder2,
-                                  barBackground,
-                                  ticksAndSectionsCanvas,
-                                  titleText,
-                                  unitText,
-                                  ledCanvas,
-                                  lcd,
-                                  valueText,
-                                  bar,
-                                  barHighlight);
+        pane = new Pane(barBorder1,
+                        barBorder2,
+                        barBackground,
+                        ticksAndSectionsCanvas,
+                        titleText,
+                        unitText,
+                        ledCanvas,
+                        lcd,
+                        valueText,
+                        bar,
+                        barHighlight);
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
@@ -705,7 +706,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
 
         // Background stroke and fill
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(Orientation.HORIZONTAL == orientation ? getSkinnable().getBorderWidth() / preferredHeight * height : getSkinnable().getBorderWidth() / preferredWidth * width))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Color barColor = getSkinnable().getBarColor();

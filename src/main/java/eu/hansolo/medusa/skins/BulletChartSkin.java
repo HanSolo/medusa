@@ -22,6 +22,7 @@ import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
@@ -30,6 +31,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -141,13 +149,15 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdRect     = new Rectangle();
         Tooltip.install(thresholdRect, thresholdTooltip);
 
-        pane = new Pane();
-        pane.getChildren().setAll(titleText,
-                                  unitText,
-                                  tickMarkCanvas,
-                                  sectionsCanvas,
-                                  barRect,
-                                  thresholdRect);
+        pane = new Pane(titleText,
+                        unitText,
+                        tickMarkCanvas,
+                        sectionsCanvas,
+                        barRect,
+                        thresholdRect);
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+
         getChildren().setAll(pane);
     }
 
@@ -423,6 +433,8 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
         drawTickMarks(tickMarksCtx);
         drawSections(sectionsCtx);
         thresholdRect.setFill(getSkinnable().getThresholdColor());
