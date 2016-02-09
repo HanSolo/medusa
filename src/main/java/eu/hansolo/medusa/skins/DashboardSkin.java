@@ -220,6 +220,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         threshold.setManaged(getSkinnable().isThresholdVisible());
 
         thresholdText = new Text(String.format(Locale.US, formatString, getSkinnable().getThreshold()));
+        thresholdText.setVisible(getSkinnable().isThresholdVisible());
+        thresholdText.setManaged(getSkinnable().isThresholdVisible());
 
         pane = new Pane(unitText, titleText, valueText, minText, maxText, barBackground, dataBar, threshold, thresholdText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
