@@ -3718,7 +3718,7 @@ public class Gauge extends Control {
                 super.setSkin(new LcdSkin(Gauge.this));
                 break;
             case TINY:
-                setBorderWidth(26);
+                setBorderWidth(24);
                 setBackgroundPaint(Color.rgb(216,216,216));
                 setBorderPaint(Color.rgb(76,76,76));
                 setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));

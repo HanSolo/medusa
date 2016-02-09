@@ -335,6 +335,9 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             pane.setMaxSize(size, size);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
 
+            pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
+            pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+
             barBackground.setCenterX(centerX);
             barBackground.setCenterY(centerY);
             barBackground.setRadiusX(barRadius);
@@ -410,8 +413,8 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();

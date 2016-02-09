@@ -820,7 +820,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setOldValueVisible(true);
                     break;
                 case TINY:
-                    CONTROL.setBorderWidth(26);
+                    CONTROL.setBorderWidth(24);
                     CONTROL.setBackgroundPaint(Color.rgb(216,216,216));
                     CONTROL.setBorderPaint(Color.rgb(76,76,76));
                     CONTROL.setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));

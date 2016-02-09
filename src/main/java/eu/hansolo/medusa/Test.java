@@ -18,6 +18,7 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Alarm.Repetition;
 import eu.hansolo.medusa.Clock.ClockSkinType;
+import eu.hansolo.medusa.Gauge.SkinType;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;

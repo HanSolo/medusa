@@ -214,6 +214,8 @@ public class OverviewDemo extends Application {
                              .valueColor(Color.WHITE)
                              .titleColor(Color.WHITE)
                              .unitColor(Color.WHITE)
+                             .thresholdVisible(true)
+                             .threshold(35)
                              .shadowsEnabled(true)
                              .gradientBarEnabled(true)
                              .gradientBarStops(new Stop(0.00, Color.BLUE),
