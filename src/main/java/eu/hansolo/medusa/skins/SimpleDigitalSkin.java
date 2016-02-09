@@ -195,9 +195,9 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double v             = (VALUE - minValue) * angleStep;
         int    minValueAngle = (int) (-minValue * angleStep);
         if (!isStartFromZero) {
-            for (int i = 0; i < 300; i++) {
+            for (int i = 0; i < 280; i++) {
                 if (i % 10 == 0 && i < v) {
-                    barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.3, barWidth * 0.5 + barWidth * 0.3, size - barWidth - barWidth * 0.6, size - barWidth - barWidth * 0.6, (-i - 129), 9, ArcType.OPEN);
+                    barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, (-i - 139), 9.2, ArcType.OPEN);
                 }
             }
         } else {
@@ -205,13 +205,13 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 if (VALUE < 0) {
                     for (int i = (minValueAngle - 1); i >= 0; i--) {
                         if (i % 10 == 0 && i > v - 6) {
-                            barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.3, barWidth * 0.5 + barWidth * 0.3, size - barWidth - barWidth * 0.6, size - barWidth - barWidth * 0.6, (-i - 129), 9, ArcType.OPEN);
+                            barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, (-i - 139), 9.2, ArcType.OPEN);
                         }
                     }
                 } else {
                     for (int i = minValueAngle; i <= 300; i++) {
                         if (i % 10 == 0 && i < v) {
-                            barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.3, barWidth * 0.5 + barWidth * 0.3, size - barWidth - barWidth * 0.6, size - barWidth - barWidth * 0.6, (-i - 129), 9, ArcType.OPEN);
+                            barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, (-i - 139), 9.2, ArcType.OPEN);
                         }
                     }
                 }
@@ -229,13 +229,13 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // draw translucent background
         backgroundCtx.setStroke(Color.rgb(0, 12, 6, 0.1));
         Color bColor = Helper.getTranslucentColorFrom(barColor, 0.1);
-        for (int i = -60 ; i < 240 ; i++) {
+        for (int i = -50 ; i < 230 ; i++) {
             backgroundCtx.save();
             if (i % 10 == 0) {
                 // draw value bar
                 backgroundCtx.setStroke(bColor);
                 backgroundCtx.setLineWidth(barWidth);
-                backgroundCtx.strokeArc(barWidth * 0.5 + barWidth * 0.3, barWidth * 0.5 + barWidth * 0.3, size - barWidth - barWidth * 0.6, size - barWidth - barWidth * 0.6, i + 1, 9, ArcType.OPEN);
+                backgroundCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, i + 1, 9.2, ArcType.OPEN);
             }
             backgroundCtx.restore();
         }
@@ -245,7 +245,7 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             backgroundCtx.setTextAlign(TextAlignment.CENTER);
             backgroundCtx.setFont(Fonts.robotoBold(0.09 * size));
             backgroundCtx.setFill(unitColor);
-            backgroundCtx.fillText(getSkinnable().getUnit(), center, size * 0.7);
+            backgroundCtx.fillText(getSkinnable().getUnit(), center, size * 0.75, size * 0.4);
         }
 
         backgroundCanvas.setCache(true);
@@ -302,11 +302,11 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barCanvas.setWidth(size);
             barCanvas.setHeight(size);
 
-            valueBkgText.setFont(Fonts.digitalReadoutBold(0.2 * size));
-            valueBkgText.setY(center + (valueBkgText.getLayoutBounds().getHeight() * 0.35));
+            valueBkgText.setFont(Fonts.digitalReadoutBold(0.25 * size));
+            valueBkgText.setY(center + (valueBkgText.getLayoutBounds().getHeight() * 0.325));
 
-            valueText.setFont(Fonts.digitalReadoutBold(0.2 * size));
-            valueText.setY(center + (valueText.getLayoutBounds().getHeight() * 0.35));
+            valueText.setFont(Fonts.digitalReadoutBold(0.25 * size));
+            valueText.setY(center + (valueText.getLayoutBounds().getHeight() * 0.325));
 
             drawBackground();
             setBar(getSkinnable().getCurrentValue());
