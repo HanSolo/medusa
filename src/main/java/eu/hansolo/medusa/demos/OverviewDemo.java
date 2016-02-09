@@ -186,7 +186,6 @@ public class OverviewDemo extends Application {
 
         gauge4 = GaugeBuilder.create()
                              .skinType(SkinType.BULLET_CHART)
-                             .backgroundPaint(Color.rgb(204, 204, 204))
                              .sections(new Section(0, 16.66666, "0", Color.web("#11632f")),
                                        new Section(16.66666, 33.33333, "1", Color.web("#36843d")),
                                        new Section(33.33333, 50.0, "2", Color.web("#67a328")),

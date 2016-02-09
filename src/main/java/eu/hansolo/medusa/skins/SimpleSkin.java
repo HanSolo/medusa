@@ -160,8 +160,6 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         // Add all nodes
         pane = new Pane(sectionsCanvas, needle, valueText, titleText);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
@@ -180,11 +178,9 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     protected void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
+            redraw();
         } else if ("REDRAW".equals(EVENT_TYPE)) {
-            needle.setFill(getSkinnable().getNeedleColor());
-            needle.setStroke(getSkinnable().getBorderPaint());
-            titleText.setFill(getSkinnable().getTitleColor());
-            valueText.setFill(getSkinnable().getValueColor());
+            redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             if (getSkinnable().getCheckSectionsForValue()) {
                 double currentValue = getSkinnable().getCurrentValue();
@@ -348,12 +344,12 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        titleText.setText(getSkinnable().getTitle());
+        needle.setFill(getSkinnable().getNeedleColor());
+        needle.setStroke(getSkinnable().getBorderPaint());
         titleText.setFill(getSkinnable().getTitleColor());
         valueText.setFill(getSkinnable().getValueColor());
+        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        titleText.setText(getSkinnable().getTitle());
         resizeText();
     }
 }
