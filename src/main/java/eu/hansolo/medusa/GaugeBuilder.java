@@ -840,6 +840,9 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 case DIGITAL:
                     CONTROL.setBarColor(Gauge.DARK_COLOR);
                     break;
+                case SIMPLE_DIGITAL:
+                    CONTROL.setBarColor(Gauge.DARK_COLOR);
+                    break;
             }
         } else {
             CONTROL = new Gauge();

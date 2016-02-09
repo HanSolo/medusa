@@ -97,7 +97,7 @@ public class Gauge extends Control {
     public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE, LEFT_TO_RIGHT, RIGHT_TO_LEFT, BOTTOM_TO_TOP, TOP_TO_BOTTOM }
     public enum SkinType { AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
                            MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL,
-                           LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL }
+                           LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL, SIMPLE_DIGITAL }
 
     public  static final Color                   DARK_COLOR           = Color.rgb(36, 36, 36);
     public  static final Color                   BRIGHT_COLOR         = Color.rgb(223, 223, 223);
@@ -3521,27 +3521,28 @@ public class Gauge extends Control {
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {
         switch(skinType) {
-            case AMP         : return new AmpSkin(Gauge.this);
-            case BULLET_CHART: return new BulletChartSkin(Gauge.this);
-            case DASHBOARD   : return new DashboardSkin(Gauge.this);
-            case FLAT        : return new FlatSkin(Gauge.this);
-            case INDICATOR   : return new IndicatorSkin(Gauge.this);
-            case KPI         : return new KpiSkin(Gauge.this);
-            case MODERN      : return new ModernSkin(Gauge.this);
-            case SIMPLE      : return new SimpleSkin(Gauge.this);
-            case SLIM        : return new SlimSkin(Gauge.this);
-            case SPACE_X     : return new SpaceXSkin(Gauge.this);
-            case QUARTER     : return new QuarterSkin(Gauge.this);
-            case HORIZONTAL  : return new HSkin(Gauge.this);
-            case VERTICAL    : return new VSkin(Gauge.this);
-            case LCD         : return new LcdSkin(Gauge.this);
-            case TINY        : return new TinySkin(Gauge.this);
-            case BATTERY     : return new BatterySkin(Gauge.this);
-            case LEVEL       : return new LevelSkin(Gauge.this);
-            case LINEAR      : return new LinearSkin(Gauge.this);
-            case DIGITAL     : return new DigitalSkin(Gauge.this);
-            case GAUGE       :
-            default          : return new GaugeSkin(Gauge.this);
+            case AMP           : return new AmpSkin(Gauge.this);
+            case BULLET_CHART  : return new BulletChartSkin(Gauge.this);
+            case DASHBOARD     : return new DashboardSkin(Gauge.this);
+            case FLAT          : return new FlatSkin(Gauge.this);
+            case INDICATOR     : return new IndicatorSkin(Gauge.this);
+            case KPI           : return new KpiSkin(Gauge.this);
+            case MODERN        : return new ModernSkin(Gauge.this);
+            case SIMPLE        : return new SimpleSkin(Gauge.this);
+            case SLIM          : return new SlimSkin(Gauge.this);
+            case SPACE_X       : return new SpaceXSkin(Gauge.this);
+            case QUARTER       : return new QuarterSkin(Gauge.this);
+            case HORIZONTAL    : return new HSkin(Gauge.this);
+            case VERTICAL      : return new VSkin(Gauge.this);
+            case LCD           : return new LcdSkin(Gauge.this);
+            case TINY          : return new TinySkin(Gauge.this);
+            case BATTERY       : return new BatterySkin(Gauge.this);
+            case LEVEL         : return new LevelSkin(Gauge.this);
+            case LINEAR        : return new LinearSkin(Gauge.this);
+            case DIGITAL       : return new DigitalSkin(Gauge.this);
+            case SIMPLE_DIGITAL: return new SimpleDigitalSkin(Gauge.this);
+            case GAUGE         :
+            default            : return new GaugeSkin(Gauge.this);
         }
     }
 
@@ -3706,6 +3707,9 @@ public class Gauge extends Control {
                 setBarEffectEnabled(true);
                 super.setSkin(new LinearSkin(Gauge.this));
             case DIGITAL:
+                setBarColor(DARK_COLOR);
+                break;
+            case SIMPLE_DIGITAL:
                 setBarColor(DARK_COLOR);
                 break;
             case GAUGE:

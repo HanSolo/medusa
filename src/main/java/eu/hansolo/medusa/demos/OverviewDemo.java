@@ -88,6 +88,7 @@ public class OverviewDemo extends Application {
     private Gauge          gauge20;
     private Gauge          gauge21;
     private Gauge          gauge22;
+    private Gauge          gauge23;
     private Clock          clock1;
     private Clock          clock2;
     private Clock          clock3;
@@ -409,6 +410,14 @@ public class OverviewDemo extends Application {
                               .animated(true)
                               .build();
 
+        gauge23 = GaugeBuilder.create()
+                              .skinType(SkinType.SIMPLE_DIGITAL)
+                              .foregroundBaseColor(Color.rgb(0,249,222))
+                              .barColor(Color.rgb(0,249,222))
+                              .unit("KPH")
+                              .animated(true)
+                              .build();
+
         clock1 = ClockBuilder.create()
                              .skinType(ClockSkinType.YOTA2)
                              .sectionsVisible(true)
@@ -495,6 +504,7 @@ public class OverviewDemo extends Application {
                     gauge20.setValue(RND.nextDouble() * gauge20.getRange() + gauge20.getMinValue());
                     gauge21.setValue(RND.nextDouble() * gauge21.getRange() + gauge21.getMinValue());
                     gauge22.setValue(RND.nextDouble() * gauge22.getRange() + gauge22.getMinValue());
+                    gauge23.setValue(RND.nextDouble() * gauge23.getRange() + gauge23.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -518,6 +528,7 @@ public class OverviewDemo extends Application {
         pane.add(gauge10, 4, 1);
         pane.add(clock2, 5, 1);
         pane.add(gauge21, 6, 1);
+        pane.add(gauge23, 7, 1);
         pane.add(gauge11, 0, 2);
         pane.add(gauge12, 1, 2);
         pane.add(gauge13, 2, 2);
