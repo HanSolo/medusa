@@ -82,23 +82,31 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private boolean         isStartFromZero;
     private double          barWidth;
     private String          formatString;
+    private boolean         sectionsVisible;
+    private List<Section>   sections;
+    private boolean         thresholdVisible;
+    private Color           thresholdColor;
 
 
     // ******************** Constructors **************************************
     public DigitalSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        minValue        = gauge.getMinValue();
-        maxValue        = gauge.getMaxValue();
-        range           = gauge.getRange();
-        angleStep       = ANGLE_RANGE / range;
-        formatString    = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        barColor        = gauge.getBarColor();
-        valueColor      = gauge.getValueColor();
-        titleColor      = gauge.getTitleColor();
-        subTitleColor   = gauge.getSubTitleColor();
-        unitColor       = gauge.getUnitColor();
-        isStartFromZero = gauge.isStartFromZero();
+        minValue         = gauge.getMinValue();
+        maxValue         = gauge.getMaxValue();
+        range            = gauge.getRange();
+        angleStep        = ANGLE_RANGE / range;
+        formatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        barColor         = gauge.getBarColor();
+        valueColor       = gauge.getValueColor();
+        titleColor       = gauge.getTitleColor();
+        subTitleColor    = gauge.getSubTitleColor();
+        unitColor        = gauge.getUnitColor();
+        isStartFromZero  = gauge.isStartFromZero();
+        sectionsVisible  = gauge.getSectionsVisible();
+        sections         = gauge.getSections();
+        thresholdVisible = gauge.isThresholdVisible();
+        thresholdColor   = gauge.getThresholdColor();
 
         init();
         initGraphics();
@@ -169,6 +177,12 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             range     = getSkinnable().getRange();
             angleStep = ANGLE_RANGE / range;
             redraw();
+        } else if ("SECTIONS".equals(EVENT_TYPE)) {
+            sections         = getSkinnable().getSections();
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            sectionsVisible  = getSkinnable().getSectionsVisible();
+            thresholdVisible = getSkinnable().isThresholdVisible();
+            thresholdVisible = getSkinnable().isThresholdVisible();
         }
     }
 
@@ -179,6 +193,22 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         barCtx.setLineCap(StrokeLineCap.BUTT);
         barCtx.setStroke(barColor);
         barCtx.setLineWidth(barWidth);
+
+        if (sectionsVisible) {
+            int listSize = sections.size();
+            for (int i = 0 ; i < listSize ;i++) {
+                Section section = sections.get(i);
+                if (section.contains(VALUE)) {
+                    barCtx.setStroke(section.getColor());
+                    break;
+                }
+            }
+        }
+
+        if (thresholdVisible && VALUE > getSkinnable().getThreshold()) {
+            barCtx.setStroke(thresholdColor);
+        }
+
         double v             = (VALUE - minValue) * angleStep;
         int    minValueAngle = (int) (-minValue * angleStep);
         if (!isStartFromZero) {
