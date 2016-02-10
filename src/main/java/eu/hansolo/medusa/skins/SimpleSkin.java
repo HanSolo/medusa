@@ -250,7 +250,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 sectionsCtx.setTextAlign(TextAlignment.CENTER);
                 sectionsCtx.setTextBaseline(VPos.CENTER);
                 sectionsCtx.setFill(section.getTextColor());
-                sectionsCtx.fillText(section.getText(), textPoint.getX(), textPoint.getY());
+                sectionsCtx.fillText(section.getText(), textPoint.getX(), textPoint.getY(), 0.2 * size);
             } else if (size > 0 && getSkinnable().getSectionIconsVisible()) {
                 // Draw Section Icon
                 Image icon = section.getImage();
