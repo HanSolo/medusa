@@ -25,6 +25,9 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -58,7 +61,23 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
+                            .skinType(SkinType.MODERN)
                             .prefSize(400, 400)
+                            .animated(true)
+                            .thresholdVisible(true)
+                            .threshold(75)
+                            .sectionsVisible(true)
+                            .sectionTextVisible(true)
+                            .sections(
+                                new Section(70, 75, Color.rgb(252, 0, 0, 0.15)),
+                                new Section(75, 80, Color.rgb(252, 0, 0, 0.30)),
+                                new Section(80, 85, Color.rgb(252, 0, 0, 0.45)),
+                                new Section(85, 90, Color.rgb(252, 0, 0, 0.50)),
+                                new Section(90, 95, Color.rgb(252, 0, 0, 0.65)),
+                                new Section(95, 100, Color.rgb(252, 0, 0, 0.80)))
+                            .interactive(true)
+                            .onButtonPressed(e -> gauge.setSubTitle("PRESSED"))
+                            .onButtonReleased(e -> gauge.setSubTitle(""))
                             .build();
 
         clock = ClockBuilder.create()
@@ -94,7 +113,7 @@ public class Test extends Application {
 
     @Override public void start(Stage stage) {
         StackPane pane = new StackPane(gauge);
-        pane.setPadding(new Insets(10));
+        pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
                                                      new Stop(0.0, Color.rgb(38, 38, 38)),
@@ -102,6 +121,7 @@ public class Test extends Application {
         //pane.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
         //pane.setBackground(new Background(new BackgroundFill(Color.rgb(39,44,50), CornerRadii.EMPTY, Insets.EMPTY)));
         //pane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBackground(new Background(new BackgroundFill(Gauge.DARK_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
 
@@ -115,7 +135,7 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        //timer.start();
+        timer.start();
     }
 
     @Override public void stop() {
