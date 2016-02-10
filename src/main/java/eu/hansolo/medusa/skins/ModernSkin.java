@@ -57,6 +57,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -109,16 +110,24 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private EventHandler<MouseEvent> mouseHandler;
     private Tooltip                  buttonTooltip;
     private String                   formatString;
+    private boolean                  sectionsVisible;
+    private List<Section>            sections;
+    private Color                    barColor;
+    private Color                    thresholdColor;
 
 
     // ******************** Constructors **************************************
     public ModernSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleStep     = ANGLE_RANGE / (gauge.getRange());
-        mouseHandler  = event -> handleMouseEvent(event);
-        buttonTooltip = new Tooltip();
-        formatString  = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        angleStep       = ANGLE_RANGE / (gauge.getRange());
+        mouseHandler    = event -> handleMouseEvent(event);
+        buttonTooltip   = new Tooltip();
+        formatString    = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        sectionsVisible = gauge.getSectionsVisible();
+        sections        = gauge.getSections();
+        barColor        = gauge.getBarColor();
+        thresholdColor  = gauge.getThresholdColor();
 
         init();
         initGraphics();
@@ -179,9 +188,9 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double targetAngle = 180 - START_ANGLE + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
 
-        glow1   = new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getBarColor(), 0.085 * PREFERRED_WIDTH, 0, 0, 0);
-        glow2   = new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getBarColor(), 0.085 * PREFERRED_WIDTH, 0, 0, 0);
-        bigGlow = new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getBarColor(), 0.25 * PREFERRED_WIDTH, 0, 0, 0);
+        glow1   = new DropShadow(BlurType.TWO_PASS_BOX, barColor, 0.085 * PREFERRED_WIDTH, 0, 0, 0);
+        glow2   = new DropShadow(BlurType.TWO_PASS_BOX, barColor, 0.085 * PREFERRED_WIDTH, 0, 0, 0);
+        bigGlow = new DropShadow(BlurType.TWO_PASS_BOX, barColor, 0.25 * PREFERRED_WIDTH, 0, 0, 0);
 
         needleMoveTo1       = new MoveTo();
         needleCubicCurveTo2 = new CubicCurveTo();
@@ -302,6 +311,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 valueText.setVisible(false);
                 valueText.setManaged(false);
             }
+            sectionsVisible = getSkinnable().getSectionsVisible();
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             angleStep = ANGLE_RANGE / getSkinnable().getRange();
@@ -318,6 +328,9 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 centerKnob.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseHandler);
                 Tooltip.uninstall(centerKnob, buttonTooltip);
             }
+        } else if ("SECTIONS".equals(EVENT_TYPE)) {
+            sectionsVisible = getSkinnable().getSectionsVisible();
+            sections        = getSkinnable().getSections();
         }
     }
 
@@ -365,12 +378,13 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resizeText();
             placeTextVerticaly();
         }
+
         if (VALUE > getSkinnable().getThreshold()) {
-            glow2.setColor(getSkinnable().getThresholdColor());
-            bigGlow.setColor(getSkinnable().getThresholdColor());
+            glow2.setColor(thresholdColor);
+            bigGlow.setColor(thresholdColor);
         } else {
-            glow2.setColor(getSkinnable().getBarColor());
-            bigGlow.setColor(getSkinnable().getBarColor());
+            glow2.setColor(barColor);
+            bigGlow.setColor(barColor);
         }
         highlightValue(tickMarkCtx, VALUE);
     }
@@ -396,9 +410,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         boolean    mediumTickMarksVisible = getSkinnable().getMediumTickMarksVisible();
         double     threshold              = getSkinnable().getThreshold();
         Color      tickMarkColor          = Color.TRANSPARENT;
-        Color      highlightColor         = CURRENT_VALUE < getSkinnable().getThreshold() ? getSkinnable().getBarColor() : getSkinnable().getThresholdColor();
-        Color      barColor               = getSkinnable().getBarColor();
-        Color      thresholdColor         = getSkinnable().getThresholdColor();
+        Color      highlightColor         = CURRENT_VALUE < getSkinnable().getThreshold() ? barColor : thresholdColor;
 
         double innerPointX;
         double innerPointY;
@@ -475,28 +487,30 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double maxValue         = getSkinnable().getMaxValue();
         double offset           = 90 - START_ANGLE;
         double sectionWidth     = size * 0.05;
-        int    listSize         = getSkinnable().getSections().size();
-        for (int i = 0 ; i < listSize ; i++) {
-            final Section SECTION = getSkinnable().getSections().get(i);
-            final double SECTION_START_ANGLE;
-            if (Double.compare(SECTION.getStart(), maxValue) <= 0 && Double.compare(SECTION.getStop(), minValue) >= 0) {
-                if (Double.compare(SECTION.getStart(), minValue) < 0 && Double.compare(SECTION.getStop(), maxValue) < 0) {
-                    SECTION_START_ANGLE = 0;
-                } else {
-                    SECTION_START_ANGLE = (SECTION.getStart() - minValue) * angleStep;
+        if (sectionsVisible) {
+            int listSize = sections.size();
+            for (int i = 0; i < listSize; i++) {
+                final Section SECTION = sections.get(i);
+                final double  SECTION_START_ANGLE;
+                if (Double.compare(SECTION.getStart(), maxValue) <= 0 && Double.compare(SECTION.getStop(), minValue) >= 0) {
+                    if (Double.compare(SECTION.getStart(), minValue) < 0 && Double.compare(SECTION.getStop(), maxValue) < 0) {
+                        SECTION_START_ANGLE = 0;
+                    } else {
+                        SECTION_START_ANGLE = (SECTION.getStart() - minValue) * angleStep;
+                    }
+                    final double SECTION_ANGLE_EXTEND;
+                    if (Double.compare(SECTION.getStop(), maxValue) > 0) {
+                        SECTION_ANGLE_EXTEND = (maxValue - SECTION.getStart()) * angleStep;
+                    } else {
+                        SECTION_ANGLE_EXTEND = (SECTION.getStop() - SECTION.getStart()) * angleStep;
+                    }
+                    mainCtx.save();
+                    mainCtx.setStroke(SECTION.getColor());
+                    mainCtx.setLineWidth(sectionWidth);
+                    mainCtx.setLineCap(StrokeLineCap.BUTT);
+                    mainCtx.strokeArc(sectionsXY, sectionsXY, sectionsWH, sectionsWH, -(offset + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
+                    mainCtx.restore();
                 }
-                final double SECTION_ANGLE_EXTEND;
-                if (Double.compare(SECTION.getStop(), maxValue) > 0) {
-                    SECTION_ANGLE_EXTEND = (maxValue - SECTION.getStart()) * angleStep;
-                } else {
-                    SECTION_ANGLE_EXTEND = (SECTION.getStop() - SECTION.getStart()) * angleStep;
-                }
-                mainCtx.save();
-                mainCtx.setStroke(SECTION.getColor());
-                mainCtx.setLineWidth(sectionWidth);
-                mainCtx.setLineCap(StrokeLineCap.BUTT);
-                mainCtx.strokeArc(sectionsXY, sectionsXY, sectionsWH, sectionsWH, -(offset + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
-                mainCtx.restore();
             }
         }
 
@@ -796,6 +810,8 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setFill(getSkinnable().getUnitColor());
         valueText.setFill(getSkinnable().getValueColor());
         buttonTooltip.setText(getSkinnable().getButtonTooltipText());
+        barColor       = getSkinnable().getBarColor();
+        thresholdColor = getSkinnable().getThresholdColor();
         resizeText();
     }
 }
