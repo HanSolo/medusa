@@ -16,7 +16,6 @@
 
 package eu.hansolo.medusa;
 
-import eu.hansolo.medusa.Alarm.Repetition;
 import eu.hansolo.medusa.Clock.ClockSkinType;
 import eu.hansolo.medusa.Gauge.SkinType;
 import javafx.animation.AnimationTimer;
@@ -25,9 +24,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -36,11 +32,7 @@ import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Locale;
 import java.util.Random;
 
 
@@ -81,7 +73,7 @@ public class Test extends Application {
                             .build();
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.DIGITAL)
+                            .skinType(ClockSkinType.SLIM)
                             .prefSize(400, 400)
                             .backgroundPaint(Clock.DARK_COLOR)
                             .running(true)

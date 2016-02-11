@@ -2439,14 +2439,14 @@ public class Gauge extends Control {
     /**
      * Returns the font that will be used to visualize the LCD value
      * if the gauge has a LCD display.
-     * The values are STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA
+     * The values are STANDARD, LCD, SLIM, DIGITAL_BOLD, ELEKTRA
      * @return the font that will be used to visualize the LCD value
      */
     public LcdFont getLcdFont() { return null == lcdFont ? _lcdFont : lcdFont.get(); }
     /**
      * Defines the font that will be used to visualize the LCD value
      * if the gauge has a LCD display.
-     * The values are STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA
+     * The values are STANDARD, LCD, SLIM, DIGITAL_BOLD, ELEKTRA
      * @param FONT
      */
     public void setLcdFont(final LcdFont FONT) {

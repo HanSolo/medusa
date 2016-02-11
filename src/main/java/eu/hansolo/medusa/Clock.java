@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, DIGITAL }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM}
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -1390,14 +1390,14 @@ public class Clock extends Control {
     /**
      * Returns the font that will be used to visualize the LCD
      * if the clock has a LCD display or for the LcdClockSkin.
-     * The values are STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA
+     * The values are STANDARD, LCD, SLIM, DIGITAL_BOLD, ELEKTRA
      * @return the font that will be used to visualize the LCD
      */
     public LcdFont getLcdFont() { return null == lcdFont ? _lcdFont : lcdFont.get(); }
     /**
      * Defines the font that will be used to visualize the LCD value
      * if the clock has a LCD display or for the LcdClockSkin.
-     * The values are STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA
+     * The values are STANDARD, LCD, SLIM, DIGITAL_BOLD, ELEKTRA
      * @param FONT
      */
     public void setLcdFont(final LcdFont FONT) {
@@ -1661,7 +1661,7 @@ public class Clock extends Control {
             case DB       : return new DBClockSkin(Clock.this);
             case FAT      : return new FatClockSkin(Clock.this);
             case ROUND_LCD: return new RoundLcdClockSkin(Clock.this);
-            case DIGITAL  : return new DigitalClockSkin(Clock.this);
+            case SLIM     : return new SlimClockSkin(Clock.this);
             case CLOCK    :
             default       : return new ClockSkin(Clock.this);
         }
@@ -1726,7 +1726,7 @@ public class Clock extends Control {
                 setTextVisible(true);
                 setDateVisible(true);
                 break;
-            case DIGITAL:
+            case SLIM:
                 setSecondsVisible(true);
                 setDateVisible(true);
                 setHourColor(Color.WHITE);

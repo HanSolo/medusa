@@ -46,7 +46,7 @@ import java.time.temporal.ChronoField;
 /**
  * Created by hansolo on 11.02.16.
  */
-public class DigitalClockSkin extends SkinBase<Clock> implements Skin<Clock> {
+public class SlimClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private static final double             PREFERRED_WIDTH     = 250;
     private static final double             PREFERRED_HEIGHT    = 250;
     private static final double             MINIMUM_WIDTH       = 50;
@@ -68,7 +68,7 @@ public class DigitalClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Constructors **************************************
-    public DigitalClockSkin(Clock clock) {
+    public SlimClockSkin(Clock clock) {
         super(clock);
 
         dateNumberFormatter = Helper.getLocalizedDateFormat(clock.getLocale());
@@ -180,11 +180,11 @@ public class DigitalClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         if (dateText.isVisible()) {
             dateText.setText(DATE_TEXT_FORMATTER.format(TIME));
             Helper.adjustTextSize(dateText, 0.6 * size, size * 0.08);
-            dateText.relocate((size - dateText.getLayoutBounds().getWidth()) * 0.5, size * 0.164);
+            dateText.relocate((size - dateText.getLayoutBounds().getWidth()) * 0.5, size * 0.22180451);
 
             dateNumbers.setText(dateNumberFormatter.format(TIME));
             Helper.adjustTextSize(dateNumbers, 0.6 * size, size * 0.08);
-            dateNumbers.relocate((size - dateNumbers.getLayoutBounds().getWidth()) * 0.5, size * 0.76);
+            dateNumbers.relocate((size -dateNumbers.getLayoutBounds().getWidth()) * 0.5, size * 0.68984962);
         }
 
         hour.setText(HOUR_FORMATTER.format(TIME));
@@ -220,17 +220,17 @@ public class DigitalClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
             secondBackgroundCircle.setCenterX(center);
             secondBackgroundCircle.setCenterY(center);
-            secondBackgroundCircle.setRadius(size * 0.48);
-            secondBackgroundCircle.setStrokeWidth(size * 0.008);
+            secondBackgroundCircle.setRadius(size * 0.48590226);
+            secondBackgroundCircle.setStrokeWidth(size * 0.02819549);
 
             secondArc.setCenterX(center);
             secondArc.setCenterY(center);
-            secondArc.setRadiusX(size * 0.48);
-            secondArc.setRadiusY(size * 0.48);
-            secondArc.setStrokeWidth(size * 0.008);
+            secondArc.setRadiusX(size * 0.48590226);
+            secondArc.setRadiusY(size * 0.48590226);
+            secondArc.setStrokeWidth(size * 0.02819549);
 
-            dateText.setFont(Fonts.robotoLight(size * 0.08));
-            dateNumbers.setFont(Fonts.robotoLight(size * 0.08));
+            dateText.setFont(Fonts.robotoLight(size * 0.08082707));
+            dateNumbers.setFont(Fonts.robotoLight(size * 0.08082707));
 
             hour.setFont(Fonts.robotoMedium(size * 0.328));
             minute.setFont(Fonts.robotoThin(size * 0.328));

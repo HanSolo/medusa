@@ -407,7 +407,7 @@ public class OverviewDemo extends Application {
                               .skinType(SkinType.DIGITAL)
                               .foregroundBaseColor(Color.rgb(0,222,249))
                               .barColor(Color.rgb(0,222,249))
-                              .title("DIGITAL")
+                              .title("SLIM")
                               .unit("UNIT")
                               .animated(true)
                               .build();
@@ -477,7 +477,7 @@ public class OverviewDemo extends Application {
                              .build();
 
         clock8 = ClockBuilder.create()
-                            .skinType(ClockSkinType.DIGITAL)
+                            .skinType(ClockSkinType.SLIM)
                             .running(true)
                             .build();
 

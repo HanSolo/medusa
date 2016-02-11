@@ -133,7 +133,7 @@ public class GaugeDemo extends Application {
                         // Related to LCD
                         .lcdVisible(false)                                                               // LCD instead of the plain value text
                         .lcdDesign(LcdDesign.STANDARD)                                                   // Design for LCD
-                        .lcdFont(LcdFont.DIGITAL_BOLD)                                                   // Font for LCD (STANDARD, LCD, DIGITAL, DIGITAL_BOLD, ELEKTRA)
+                        .lcdFont(LcdFont.DIGITAL_BOLD)                                                   // Font for LCD (STANDARD, LCD, SLIM, DIGITAL_BOLD, ELEKTRA)
                         // Related to scale
                         .scaleDirection(ScaleDirection.CLOCKWISE)                                        // Direction of Scale (CLOCKWISE, COUNTER_CLOCKWISE)
                         .minValue(0)                                                                     // Start value of Scale

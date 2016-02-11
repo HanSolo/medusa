@@ -438,7 +438,7 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 case FAT:
                     CONTROL.setDiscreteMinutes(true);
                     break;
-                case DIGITAL:
+                case SLIM:
                     CONTROL.setSecondsVisible(true);
                     CONTROL.setDateVisible(true);
                     CONTROL.setHourColor(Color.WHITE);
