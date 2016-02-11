@@ -81,23 +81,13 @@ public class Test extends Application {
                             .build();
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.PEAR)
+                            //.skinType(ClockSkinType.DB)
                             .prefSize(400, 400)
-                            .secondColor(Color.MAGENTA)
+                            .discreteSeconds(false)
                             .secondsVisible(true)
-                            .alarmsEnabled(true)
-                            .alarmsVisible(true)
-                            .alarms(AlarmBuilder.create()
-                                                .time(ZonedDateTime.of(LocalDate.of(2016, 02, 03),
-                                                                       LocalTime.of(18, 50, 00),
-                                                                       ZoneId.systemDefault()))
-                                                .text("Alarm Text")
-                                                .repetition(Repetition.ONCE)
-                                                .armed(true)
-                                                .color(Color.RED)
-                                                .onAlarmMarkerPressed(e -> System.out.println("Alarm pressed"))
-                                                .build())
                             .running(true)
+                            //.animated(true)
+                            .animationDuration(5000)
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -112,7 +102,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(gauge);
+        StackPane pane = new StackPane(clock);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
@@ -121,7 +111,7 @@ public class Test extends Application {
         //pane.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
         //pane.setBackground(new Background(new BackgroundFill(Color.rgb(39,44,50), CornerRadii.EMPTY, Insets.EMPTY)));
         //pane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-        pane.setBackground(new Background(new BackgroundFill(Gauge.DARK_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
+        //pane.setBackground(new Background(new BackgroundFill(Gauge.DARK_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
 
@@ -130,6 +120,7 @@ public class Test extends Application {
         stage.show();
 
         //gauge.setValue(0.35);
+        clock.setTime(ZonedDateTime.now().plusHours(2));
 
         // Calculate number of nodes
         calcNoOfNodes(pane);
