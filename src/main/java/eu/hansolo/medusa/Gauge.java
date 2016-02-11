@@ -3534,11 +3534,10 @@ public class Gauge extends Control {
     public void stop() {
         setLedOn(false);
         if (null != blinkFuture) { blinkFuture.cancel(true); }
-        if (null != blinkService) {
-            blinkService.shutdownNow();
-            blinkService = null;
-        }
+        if (null != blinkService) { blinkService.shutdownNow(); }
     }
+
+    private void createShutdownHook() { Runtime.getRuntime().addShutdownHook(new Thread(() -> stop())); }
 
     @Override public String toString() {
         return new StringBuilder("{")
