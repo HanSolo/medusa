@@ -194,9 +194,11 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentTimeProperty().addListener(o ->
-            updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())))
-        );
+        if (getSkinnable().isAnimated()) {
+            getSkinnable().currentTimeProperty().addListener(o -> updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId()))));
+        } else {
+            getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
+        }
         getSkinnable().getAlarms().addListener((ListChangeListener<Alarm>) c -> {
             updateAlarms();
             redraw();

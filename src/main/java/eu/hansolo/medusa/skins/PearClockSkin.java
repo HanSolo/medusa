@@ -70,17 +70,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by hansolo on 29.01.16.
  */
 public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
-    private static final double             PREFERRED_WIDTH      = 250;
-    private static final double             PREFERRED_HEIGHT     = 250;
-    private static final double             MINIMUM_WIDTH        = 50;
-    private static final double             MINIMUM_HEIGHT       = 50;
-    private static final double             MAXIMUM_WIDTH        = 1024;
-    private static final double             MAXIMUM_HEIGHT       = 1024;
-    private static final DateTimeFormatter  DATE_TIME_FORMATTER  = DateTimeFormatter.ofPattern("EEEE\ndd.MM.YYYY\nHH:mm:ss");
-    private static final DateTimeFormatter  DATE_TEXT_FORMATER   = DateTimeFormatter.ofPattern("EE");
-    private static final DateTimeFormatter  DATE_NUMBER_FORMATER = DateTimeFormatter.ofPattern("d");
-    private static final DateTimeFormatter  TIME_FORMATTER       = DateTimeFormatter.ofPattern("HH:mm");
-    private              Map<Alarm, Circle> alarmMap             = new ConcurrentHashMap<>();
+    private static final double             PREFERRED_WIDTH       = 250;
+    private static final double             PREFERRED_HEIGHT      = 250;
+    private static final double             MINIMUM_WIDTH         = 50;
+    private static final double             MINIMUM_HEIGHT        = 50;
+    private static final double             MAXIMUM_WIDTH         = 1024;
+    private static final double             MAXIMUM_HEIGHT        = 1024;
+    private static final DateTimeFormatter  DATE_TIME_FORMATTER   = DateTimeFormatter.ofPattern("EEEE\ndd.MM.YYYY\nHH:mm:ss");
+    private static final DateTimeFormatter  DATE_TEXT_FORMATTER   = DateTimeFormatter.ofPattern("EE");
+    private static final DateTimeFormatter  DATE_NUMBER_FORMATTER = DateTimeFormatter.ofPattern("d");
+    private static final DateTimeFormatter  TIME_FORMATTER        = DateTimeFormatter.ofPattern("HH:mm");
+    private              Map<Alarm, Circle> alarmMap              = new ConcurrentHashMap<>();
     private              double             size;
     private              Canvas             ticksAndSectionsCanvas;
     private              GraphicsContext    ticksAndSections;
@@ -198,9 +198,11 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentTimeProperty().addListener(o ->
-             updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())))
-        );
+        if (getSkinnable().isAnimated()) {
+            getSkinnable().currentTimeProperty().addListener(o -> updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId()))));
+        } else {
+            getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
+        }
         getSkinnable().getAlarms().addListener((ListChangeListener<Alarm>) c -> {
             updateAlarms();
             redraw();
@@ -541,13 +543,13 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
 
         if (dateText.isVisible()) {
-            dateText.setText(DATE_TEXT_FORMATER.format(TIME).toUpperCase());
+            dateText.setText(DATE_TEXT_FORMATTER.format(TIME).toUpperCase());
             Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
             dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.4), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
         }
 
         if (dateNumber.isVisible()) {
-            dateNumber.setText(DATE_NUMBER_FORMATER.format(TIME).toUpperCase());
+            dateNumber.setText(DATE_NUMBER_FORMATTER.format(TIME).toUpperCase());
             Helper.adjustTextSize(dateNumber, 0.3 * size, size * 0.05);
             dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.51), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
         }
@@ -641,11 +643,11 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
         text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
 
-        dateText.setText(DATE_TEXT_FORMATER.format(time).toUpperCase());
+        dateText.setText(DATE_TEXT_FORMATTER.format(time).toUpperCase());
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.4), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
 
-        dateNumber.setText(DATE_NUMBER_FORMATER.format(time).toUpperCase());
+        dateNumber.setText(DATE_NUMBER_FORMATTER.format(time).toUpperCase());
         Helper.adjustTextSize(dateNumber, 0.3 * size, size * 0.05);
         dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.51), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
 
