@@ -81,13 +81,10 @@ public class Test extends Application {
                             .build();
 
         clock = ClockBuilder.create()
-                            //.skinType(ClockSkinType.DB)
+                            .skinType(ClockSkinType.DIGITAL)
                             .prefSize(400, 400)
-                            .discreteSeconds(false)
-                            .secondsVisible(true)
+                            .backgroundPaint(Clock.DARK_COLOR)
                             .running(true)
-                            //.animated(true)
-                            .animationDuration(5000)
                             .build();
 
         lastTimerCall = System.nanoTime();
