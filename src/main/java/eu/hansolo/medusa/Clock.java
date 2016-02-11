@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, DIGITAL }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -1621,8 +1621,7 @@ public class Clock extends Control {
         enableTickExecutorService();
         stopTask(periodicTickTask);
 
-        updateInterval   = (isDiscreteMinutes() && isDiscreteSeconds()) ? LONG_INTERVAL : SHORT_INTERVAL;
-
+        updateInterval = (isDiscreteMinutes() && isDiscreteSeconds()) ? LONG_INTERVAL : SHORT_INTERVAL;
         periodicTickTask = periodicTickExecutorService.scheduleAtFixedRate(() -> tick(), 0, updateInterval, TimeUnit.MILLISECONDS);
     }
 
@@ -1636,15 +1635,20 @@ public class Clock extends Control {
 
     private void stopTask(ScheduledFuture<?> task) {
         if (null == task) return;
-
         task.cancel(true);
         task = null;
     }
 
+    /**
+     * Calling this method will stop all threads. This is needed when using
+     * JavaFX on mobile devices when the device goes to sleep mode.
+     */
     public void stop() {
-        if (null == periodicTickTask) return;
-        stopTask(periodicTickTask);
+        if (null != periodicTickTask) { stopTask(periodicTickTask); }
+        if (null != periodicTickExecutorService) { periodicTickExecutorService.shutdownNow(); }
     }
+
+    private void createShutdownHook() { Runtime.getRuntime().addShutdownHook(new Thread(() -> stop())); }
 
 
     // ******************** Style related *************************************
@@ -1657,6 +1661,7 @@ public class Clock extends Control {
             case DB       : return new DBClockSkin(Clock.this);
             case FAT      : return new FatClockSkin(Clock.this);
             case ROUND_LCD: return new RoundLcdClockSkin(Clock.this);
+            case DIGITAL  : return new DigitalClockSkin(Clock.this);
             case CLOCK    :
             default       : return new ClockSkin(Clock.this);
         }
@@ -1721,6 +1726,13 @@ public class Clock extends Control {
                 setTextVisible(true);
                 setDateVisible(true);
                 break;
+            case DIGITAL:
+                setSecondsVisible(true);
+                setDateVisible(true);
+                setHourColor(Color.WHITE);
+                setMinuteColor(Color.rgb(0,191,255));
+                setSecondColor(Color.WHITE);
+                setDateColor(Color.WHITE);
             case CLOCK:
             default:
                 super.setSkin(new ClockSkin(Clock.this));

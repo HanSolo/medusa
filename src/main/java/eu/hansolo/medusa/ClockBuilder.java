@@ -438,6 +438,14 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 case FAT:
                     CONTROL.setDiscreteMinutes(true);
                     break;
+                case DIGITAL:
+                    CONTROL.setSecondsVisible(true);
+                    CONTROL.setDateVisible(true);
+                    CONTROL.setHourColor(Color.WHITE);
+                    CONTROL.setMinuteColor(Color.rgb(0,191,255));
+                    CONTROL.setSecondColor(Color.WHITE);
+                    CONTROL.setDateColor(Color.WHITE);
+                    break;
             }
         } else {
             CONTROL = new Clock();
