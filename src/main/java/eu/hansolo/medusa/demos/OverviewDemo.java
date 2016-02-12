@@ -16,26 +16,13 @@
 
 package eu.hansolo.medusa.demos;
 
-import eu.hansolo.medusa.Clock;
+import eu.hansolo.medusa.*;
 import eu.hansolo.medusa.Clock.ClockSkinType;
-import eu.hansolo.medusa.ClockBuilder;
-import eu.hansolo.medusa.FGauge;
-import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
-import eu.hansolo.medusa.GaugeBuilder;
-import eu.hansolo.medusa.GaugeDesign;
 import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
-import eu.hansolo.medusa.LcdDesign;
-import eu.hansolo.medusa.LcdFont;
-import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Marker.MarkerType;
-import eu.hansolo.medusa.Section;
-import eu.hansolo.medusa.TickLabelLocation;
-import eu.hansolo.medusa.TickLabelOrientation;
-import eu.hansolo.medusa.TickMarkType;
-import eu.hansolo.medusa.TimeSection;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
@@ -89,6 +76,7 @@ public class OverviewDemo extends Application {
     private Gauge          gauge21;
     private Gauge          gauge22;
     private Gauge          gauge23;
+    private Gauge          gauge24;
     private Clock          clock1;
     private Clock          clock2;
     private Clock          clock3;
@@ -421,6 +409,23 @@ public class OverviewDemo extends Application {
                               .animated(true)
                               .build();
 
+        gauge24 = GaugeBuilder.create()
+                              .skinType(SkinType.SECTION)
+                              .needleColor(Color.ORANGE)
+                              .minValue(0)
+                              .maxValue(105)
+                              .animated(true)
+                              .highlightSections(true)
+                              .sections(
+                                  SectionBuilder.create().start(0).stop(15).text("EXCELLENT").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(18, 158, 81)).textColor(Gauge.DARK_COLOR).build(),
+                                  SectionBuilder.create().start(15).stop(30).text("VERY\nGOOD").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(151, 208, 77)).textColor(Gauge.DARK_COLOR).build(),
+                                  SectionBuilder.create().start(30).stop(45).text("GOOD").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(197, 223, 0)).textColor(Gauge.DARK_COLOR).build(),
+                                  SectionBuilder.create().start(45).stop(60).text("FAIRLY\nGOOD").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(251, 245, 0)).textColor(Gauge.DARK_COLOR).build(),
+                                  SectionBuilder.create().start(60).stop(75).text("AVERAGE").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(247, 206, 0)).textColor(Gauge.DARK_COLOR).build(),
+                                  SectionBuilder.create().start(75).stop(90).text("BELOW\nAVERAGE").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(227, 124, 1)).textColor(Gauge.DARK_COLOR).build(),
+                                  SectionBuilder.create().start(90).stop(105).text("POOR").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(223, 49, 23)).textColor(Gauge.DARK_COLOR).build())
+                            .build();
+
         clock1 = ClockBuilder.create()
                              .skinType(ClockSkinType.YOTA2)
                              .sectionsVisible(true)
@@ -513,6 +518,7 @@ public class OverviewDemo extends Application {
                     gauge21.setValue(RND.nextDouble() * gauge21.getRange() + gauge21.getMinValue());
                     gauge22.setValue(RND.nextDouble() * gauge22.getRange() + gauge22.getMinValue());
                     gauge23.setValue(RND.nextDouble() * gauge23.getRange() + gauge23.getMinValue());
+                    gauge24.setValue(RND.nextDouble() * gauge24.getRange() + gauge24.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -552,6 +558,7 @@ public class OverviewDemo extends Application {
         pane.add(gauge20, 4, 3);
         pane.add(clock4, 5, 3);
         pane.add(clock7, 6, 3);
+        pane.add(gauge24, 7, 3);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));

@@ -869,6 +869,14 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 case SIMPLE_DIGITAL:
                     CONTROL.setBarColor(Gauge.DARK_COLOR);
                     break;
+                case SECTION:
+                    CONTROL.setBackgroundPaint(Gauge.DARK_COLOR);
+                    CONTROL.setAutoScale(false);
+                    CONTROL.setValueVisible(false);
+                    CONTROL.setKnobColor(Color.rgb(82,82,84));
+                    CONTROL.setSectionsVisible(true);
+                    CONTROL.setSectionTextVisible(true);
+                    break;
             }
         } else {
             CONTROL = new Gauge();
