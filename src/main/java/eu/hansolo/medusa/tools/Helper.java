@@ -897,6 +897,7 @@ public class Helper {
         double            offset            = 90;
         int               listSize          = SECTIONS.size();
         double            angleStep         = 360d / 60d;
+        boolean           highlightSections = CLOCK.isHighlightSections();
         for (int i = 0 ; i < listSize ; i++) {
             TimeSection section   = SECTIONS.get(i);
             LocalTime   start     = section.getStart();
@@ -911,7 +912,11 @@ public class Helper {
                 // check if start was already yesterday
                 if (start.getHour() > stop.getHour()) { sectionAngleExtend = (360d - Math.abs(sectionAngleExtend)); }
                 CTX.save();
-                CTX.setStroke(section.getColor());
+                if (highlightSections) {
+                    CTX.setStroke(section.contains(time.toLocalTime()) ? section.getHighlightColor() : section.getColor());
+                } else {
+                    CTX.setStroke(section.getColor());
+                }
                 CTX.setLineWidth(SIZE * LINE_WIDTH);
                 CTX.setLineCap(StrokeLineCap.BUTT);
                 CTX.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
@@ -924,13 +929,14 @@ public class Helper {
                                      final double XY_INSIDE, final double XY_OUTSIDE, final double WH_INSIDE, final double WH_OUTSIDE) {
         if (AREAS.isEmpty()) return;
         TickLabelLocation tickLabelLocation = CLOCK.getTickLabelLocation();
-        ZonedDateTime time      = CLOCK.getTime();
-        boolean       isAM      = time.get(ChronoField.AMPM_OF_DAY) == 0;
-        double        xy        = TickLabelLocation.OUTSIDE == tickLabelLocation ? XY_OUTSIDE * SIZE : XY_INSIDE * SIZE;
-        double        wh        = TickLabelLocation.OUTSIDE == tickLabelLocation ? WH_OUTSIDE * SIZE : WH_INSIDE * SIZE;
-        double        offset    = 90;
-        double        angleStep = 360d / 60d;
-        int           listSize  = AREAS.size();
+        ZonedDateTime     time              = CLOCK.getTime();
+        boolean           isAM              = time.get(ChronoField.AMPM_OF_DAY) == 0;
+        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? XY_OUTSIDE * SIZE : XY_INSIDE * SIZE;
+        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? WH_OUTSIDE * SIZE : WH_INSIDE * SIZE;
+        double            offset            = 90;
+        double            angleStep         = 360d / 60d;
+        int               listSize          = AREAS.size();
+        boolean           highlightAreas    = CLOCK.isHighlightAreas();
         for (int i = 0; i < listSize ; i++) {
             TimeSection area      = AREAS.get(i);
             LocalTime   start     = area.getStart();
@@ -945,6 +951,9 @@ public class Helper {
                 // check if start was already yesterday
                 if (start.getHour() > stop.getHour()) { areaAngleExtend = (360d - Math.abs(areaAngleExtend)); }
                 CTX.save();
+                if (highlightAreas) {
+                    CTX.setFill(area.contains(time.toLocalTime()) ? area.getHighlightColor() : area.getColor());
+                }
                 CTX.setFill(area.getColor());
                 CTX.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), -areaAngleExtend, ArcType.ROUND);
                 CTX.restore();
