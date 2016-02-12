@@ -46,6 +46,8 @@ public class TimeSection implements Comparable<TimeSection> {
     private ObjectProperty<Image>     icon;
     private Color                     _color;
     private ObjectProperty<Color>     color;
+    private Color                     _highlightColor;
+    private ObjectProperty<Color>     highlightColor;
     private Color                     _textColor;
     private ObjectProperty<Color>     textColor;
     private LocalTime                 checkedValue;
@@ -59,31 +61,38 @@ public class TimeSection implements Comparable<TimeSection> {
      * value enters or leaves the defined region.
      */
     public TimeSection() {
-        this(LocalTime.now(), LocalTime.now(), "", null, Color.TRANSPARENT, Color.TRANSPARENT);
+        this(LocalTime.now(), LocalTime.now(), "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP) {
-        this(START, STOP, "", null, Color.TRANSPARENT, Color.TRANSPARENT);
+        this(START, STOP, "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP, final Color COLOR) {
-        this(START, STOP, "", null, COLOR, Color.TRANSPARENT);
+        this(START, STOP, "", null, COLOR, COLOR, Color.TRANSPARENT);
+    }
+    public TimeSection(final LocalTime START, final LocalTime STOP, final Color COLOR, final Color HIGHLIGHT_COLOR) {
+        this(START, STOP, "", null, COLOR, HIGHLIGHT_COLOR, Color.TRANSPARENT);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP, final Image ICON, final Color COLOR) {
-        this(START, STOP, "", ICON, COLOR, Color.WHITE);
+        this(START, STOP, "", ICON, COLOR, COLOR, Color.WHITE);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP, final String TEXT, final Color COLOR) {
-        this(START, STOP, TEXT, null, COLOR, Color.WHITE);
+        this(START, STOP, TEXT, null, COLOR, COLOR, Color.WHITE);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP, final String TEXT, final Color COLOR, final Color TEXT_COLOR) {
-        this(START, STOP, TEXT, null, COLOR, TEXT_COLOR);
+        this(START, STOP, TEXT, null, COLOR, COLOR, TEXT_COLOR);
     }
     public TimeSection(final LocalTime START, final LocalTime STOP, final String TEXT, final Image ICON, final Color COLOR, final Color TEXT_COLOR) {
-        _start       = START;
-        _stop        = STOP;
-        _text        = TEXT;
-        _icon        = ICON;
-        _color       = COLOR;
-        _textColor   = TEXT_COLOR;
-        checkedValue = LocalTime.MIN;
+        this(START, STOP, TEXT, ICON, COLOR, COLOR, TEXT_COLOR);
+    }
+    public TimeSection(final LocalTime START, final LocalTime STOP, final String TEXT, final Image ICON, final Color COLOR, final Color HIGHLIGHT_COLOR, final Color TEXT_COLOR) {
+        _start          = START;
+        _stop           = STOP;
+        _text           = TEXT;
+        _icon           = ICON;
+        _color          = COLOR;
+        _highlightColor = HIGHLIGHT_COLOR;
+        _textColor      = TEXT_COLOR;
+        checkedValue    = LocalTime.MIN;
     }
 
 
@@ -196,6 +205,28 @@ public class TimeSection implements Comparable<TimeSection> {
     }
 
     /**
+     * Returns the color that will be used to colorize the section in
+     * a gauge when it is highlighted.
+     * @return the color that will be used to colorize a highlighted section
+     */
+    public Color getHighlightColor() { return null == highlightColor ? _highlightColor : highlightColor.get(); }
+    /**
+     * Defines the color that will be used to colorize a highlighted section
+     * @param COLOR
+     */
+    public void setHighlightColor(final Color COLOR) {
+        if (null == highlightColor) {
+            _highlightColor = COLOR;
+        } else {
+            highlightColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> highlightColorProperty() {
+        if (null == highlightColor) { highlightColor = new SimpleObjectProperty<>(TimeSection.this, "highlightColor", _highlightColor); }
+        return highlightColor;
+    }
+
+    /**
      * Returns the color that will be used to colorize the section text.
      * @return the color that will bused to colorize the section text
      */
@@ -260,12 +291,15 @@ public class TimeSection implements Comparable<TimeSection> {
 
     @Override public String toString() {
         return new StringBuilder()
-            .append("Section   : ").append("\n")
-            .append("text      : ").append(getText()).append("\n")
-            .append("startValue: ").append(getStart()).append("\n")
-            .append("stopValue : ").append(getStop()).append("\n")
-            .append("color     : ").append(getColor().toString())
-            .append("textColor : ").append(getTextColor().toString()).toString();
+            .append("{\n")
+            .append("\"text\":\"").append(getText()).append("\",\n")
+            .append("\"startValue\":").append(getStart()).append(",\n")
+            .append("\"stopValue\":").append(getStop()).append(",\n")
+            .append("\"color\":\"").append(getColor().toString().substring(0,8).replace("0x", "#")).append("\",\n")
+            .append("\"highlightColor\":\"").append(getHighlightColor().toString().substring(0,8).replace("0x", "#")).append("\",\n")
+            .append("\"textColor\":\"").append(getTextColor().toString().substring(0,8).replace("0x", "#")).append("\"\n")
+            .append("}")
+            .toString();
     }
 
 

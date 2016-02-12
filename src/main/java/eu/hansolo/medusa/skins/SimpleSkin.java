@@ -86,15 +86,21 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double              angleStep;
     private String              formatString;
     private List<Section>       sections;
+    private boolean             highlightSections;
+    private double              minValue;
+    private double              maxValue;
 
 
     // ******************** Constructors **************************************
     public SimpleSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleStep    = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        sections     = gauge.getSections();
+        angleStep         = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
+        formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        sections          = gauge.getSections();
+        highlightSections = gauge.isHighlightSections();
+        minValue          = gauge.getMinValue();
+        maxValue          = gauge.getMaxValue();
 
         init();
         initGraphics();
@@ -187,14 +193,21 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 int listSize = sections.size();
                 for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(currentValue); }
             }
+            // Highlight Sections if enabled
+            if (highlightSections) {
+                drawSections();
+            }
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
+            minValue  = getSkinnable().getMinValue();
+            maxValue  = getSkinnable().getMaxValue();
             angleStep = ANGLE_RANGE / getSkinnable().getRange();
             needleRotate.setAngle((180 - START_ANGLE) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
             resize();
         } else if ("SECTION".equals(EVENT_TYPE)) {
-            sections = getSkinnable().getSections();
+            sections          = getSkinnable().getSections();
+            highlightSections = getSkinnable().isHighlightSections();
             resize();
             redraw();
         }
@@ -212,17 +225,18 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void drawSections() {
         sectionsCtx.clearRect(0, 0, size, size);
-        double minValue       = getSkinnable().getMinValue();
-        double maxValue       = getSkinnable().getMaxValue();
-        double offset         = START_ANGLE - 90;
-        int noOfSections      = getSkinnable().getSections().size();
-        double sectionsOffset = size * 0.015;
-        double sectionsSize   = size - (size * 0.03);
-        angleStep             = ANGLE_RANGE / (getSkinnable().getRange());
+        double value               = getSkinnable().getCurrentValue();
+        boolean sectionTextVisible = getSkinnable().isSectionTextVisible();
+        boolean sectionIconVisible = getSkinnable().getSectionIconsVisible();
+        double offset              = START_ANGLE - 90;
+        int listSize               = sections.size();
+        double sectionsOffset      = size * 0.015;
+        double sectionsSize        = size - (size * 0.03);
+        angleStep                  = ANGLE_RANGE / (getSkinnable().getRange());
         double sinValue;
         double cosValue;
-        for (int i = 0 ; i < noOfSections ; i++) {
-            Section section = getSkinnable().getSections().get(i);
+        for (int i = 0 ; i < listSize ; i++) {
+            Section section = sections.get(i);
             final double SECTION_START_ANGLE;
             if (section.getStart() > maxValue || section.getStop() < minValue) continue;
 
@@ -238,11 +252,15 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 SECTION_ANGLE_EXTEND = (section.getStop() - section.getStart()) * angleStep;
             }
             sectionsCtx.save();
-            sectionsCtx.setFill(section.getColor());
+            if (highlightSections) {
+                sectionsCtx.setFill(section.contains(value) ? section.getHighlightColor() : section.getColor());
+            } else {
+                sectionsCtx.setFill(section.getColor());
+            }
             sectionsCtx.fillArc(sectionsOffset, sectionsOffset, sectionsSize, sectionsSize, (offset - SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.ROUND);
 
             // Draw Section Text
-            if (getSkinnable().isSectionTextVisible()) {
+            if (sectionTextVisible) {
                 sinValue = -Math.sin(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
                 cosValue = -Math.cos(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
                 Point2D textPoint = new Point2D(size * 0.5 + size * 0.365 * sinValue, size * 0.5 + size * 0.365 * cosValue);
@@ -251,7 +269,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 sectionsCtx.setTextBaseline(VPos.CENTER);
                 sectionsCtx.setFill(section.getTextColor());
                 sectionsCtx.fillText(section.getText(), textPoint.getX(), textPoint.getY(), 0.2 * size);
-            } else if (size > 0 && getSkinnable().getSectionIconsVisible()) {
+            } else if (size > 0 && sectionIconVisible) {
                 // Draw Section Icon
                 Image icon = section.getImage();
                 if (null != icon) {

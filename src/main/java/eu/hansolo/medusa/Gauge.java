@@ -277,8 +277,16 @@ public class Gauge extends Control {
     private BooleanProperty                      sectionTextVisible;
     private boolean                              _sectionIconsVisible;
     private BooleanProperty                      sectionIconsVisible;
+    private boolean                              _highlightSections;
+    private BooleanProperty                      highlightSections;
     private boolean                              _areasVisible;
     private BooleanProperty                      areasVisible;
+    private boolean                              _areaTextVisible;
+    private BooleanProperty                      areaTextVisible;
+    private boolean                              _areaIconsVisible;
+    private BooleanProperty                      areaIconsVisible;
+    private boolean                              _highlightAreas;
+    private BooleanProperty                      highlightAreas;
     private boolean                              _tickMarkSectionsVisible;
     private BooleanProperty                      tickMarkSectionsVisible;
     private boolean                              _tickLabelSectionsVisible;
@@ -488,7 +496,11 @@ public class Gauge extends Control {
         _sectionsVisible                  = false;
         _sectionTextVisible               = false;
         _sectionIconsVisible              = false;
+        _highlightSections                = false;
         _areasVisible                     = false;
+        _areaTextVisible                  = false;
+        _areaIconsVisible                 = false;
+        _highlightAreas                   = false;
         _tickMarkSectionsVisible          = false;
         _tickLabelSectionsVisible         = false;
         _markersVisible                   = false;
@@ -2835,6 +2847,30 @@ public class Gauge extends Control {
     }
 
     /**
+     * Returns true if sections should be highlighted in case they
+     * contain the current value.
+     * @return true if sections should be highlighted
+     */
+    public boolean isHighlightSections() { return null == highlightSections ? _highlightSections : highlightSections.get(); }
+    /**
+     * Defines if sections should be highlighted in case they
+     * contain the current value
+     * @param HIGHLIGHT
+     */
+    public void setHighlightSections(final boolean HIGHLIGHT) {
+        if (null == highlightSections) {
+            _highlightSections = HIGHLIGHT;
+        } else {
+            highlightSections.set(HIGHLIGHT);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty highlightSectionsProperty() {
+        if (null == highlightSections) { highlightSections = new SimpleBooleanProperty(Gauge.this, "highlightSections", _highlightSections); }
+        return highlightSections;
+    }
+
+    /**
      * Returns true if the areas should be drawn
      * @return true if the areas should be drawn
      */
@@ -2854,6 +2890,78 @@ public class Gauge extends Control {
     public BooleanProperty areasVisibleProperty() {
         if (null == areasVisible) { areasVisible = new SimpleBooleanProperty(Gauge.this, "areasVisible", _areasVisible); }
         return areasVisible;
+    }
+
+    /**
+     * Returns true if the text of the areas should be drawn inside
+     * the areas. This is currently only used in the SimpleSkin.
+     * @return true if the text of the areas should be drawn
+     */
+    public boolean isAreaTextVisible() { return null == areaTextVisible ? _areaTextVisible : areaTextVisible.get(); }
+    /**
+     * Defines if the text of the areas should be drawn inside
+     * the areas.
+     * @param VISIBLE
+     */
+    public void setAreaTextVisible(final boolean VISIBLE) {
+        if (null == areaTextVisible) {
+            _areaTextVisible = VISIBLE;
+        } else {
+            areaTextVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty areaTextVisibleProperty() {
+        if (null == areaTextVisible) { areaTextVisible = new SimpleBooleanProperty(Gauge.this, "areaTextVisible", _areaTextVisible); }
+        return areaTextVisible;
+    }
+
+    /**
+     * Returns true if the icon of the areas should be drawn inside
+     * the areas.
+     * @return true if the icon of the areas should be drawn
+     */
+    public boolean getAreaIconsVisible() { return null == areaIconsVisible ? _areaIconsVisible : areaIconsVisible.get(); }
+    /**
+     * Defines if the icon of the areas should be drawn inside
+     * the areas.
+     * @param VISIBLE
+     */
+    public void setAreaIconsVisible(final boolean VISIBLE) {
+        if (null == areaIconsVisible) {
+            _areaIconsVisible = VISIBLE;
+        } else {
+            areaIconsVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty areaIconsVisibleProperty() {
+        if (null == areaIconsVisible) { areaIconsVisible = new SimpleBooleanProperty(Gauge.this, "areaIconsVisible", _areaIconsVisible); }
+        return areaIconsVisible;
+    }
+
+    /**
+     * Returns true if areas should be highlighted in case they
+     * contain the current value.
+     * @return true if areas should be highlighted
+     */
+    public boolean isHighlightAreas() { return null == highlightAreas ? _highlightAreas : highlightAreas.get(); }
+    /**
+     * Defines if areas should be highlighted in case they
+     * contain the current value
+     * @param HIGHLIGHT
+     */
+    public void setHighlightAreas(final boolean HIGHLIGHT) {
+        if (null == highlightAreas) {
+            _highlightAreas = HIGHLIGHT;
+        } else {
+            highlightAreas.set(HIGHLIGHT);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty highlightAreasProperty() {
+        if (null == highlightAreas) { highlightAreas = new SimpleBooleanProperty(Gauge.this, "highlightAreas", _highlightAreas); }
+        return highlightAreas;
     }
 
     /**

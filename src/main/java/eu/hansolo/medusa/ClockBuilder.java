@@ -100,6 +100,11 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B)this;
     }
 
+    public final B highlightSections(final boolean HIGHLIGHT) {
+        properties.put("highlightSections", new SimpleBooleanProperty(HIGHLIGHT));
+        return (B)this;
+    }
+
     public final B areas(final TimeSection... AREAS) {
         properties.put("areasArray", new SimpleObjectProperty<>(AREAS));
         return (B)this;
@@ -112,6 +117,11 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
 
     public final B areasVisible(final boolean VISIBLE) {
         properties.put("areasVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B highlightAreas(final boolean HIGHLIGHT) {
+        properties.put("highlightAreas", new SimpleBooleanProperty(HIGHLIGHT));
         return (B)this;
     }
 
@@ -522,8 +532,12 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setCheckAreasForValue(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionsVisible".equals(key)) {
                 CONTROL.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("highlightSections".equals(key)) {
+                CONTROL.setHighlightSections(((BooleanProperty) properties.get(key)).get());
             } else if ("areasVisible".equals(key)) {
                 CONTROL.setAreasVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("highlightAreas".equals(key)) {
+                CONTROL.setHighlightAreas(((BooleanProperty) properties.get(key)).get());
             } else if ("discreteSeconds".equals(key)) {
                 CONTROL.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
             } else if ("discreteMinutes".equals(key)) {

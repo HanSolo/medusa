@@ -90,9 +90,13 @@ public class Clock extends Control {
     private ObservableList<TimeSection>       sections;
     private boolean                           _sectionsVisible;
     private BooleanProperty                   sectionsVisible;
+    private boolean                           _highlightSections;
+    private BooleanProperty                   highlightSections;
     private ObservableList<TimeSection>       areas;
     private boolean                           _areasVisible;
     private BooleanProperty                   areasVisible;
+    private boolean                           _highlightAreas;
+    private BooleanProperty                   highlightAreas;
     private String                            _text;
     private StringProperty                    text;
     private boolean                           _discreteSeconds;
@@ -220,8 +224,10 @@ public class Clock extends Control {
         _checkAreasForValue     = false;
         sections                = FXCollections.observableArrayList();
         _secondsVisible         = false;
+        _highlightSections      = false;
         areas                   = FXCollections.observableArrayList();
         _areasVisible           = false;
+        _highlightAreas         = false;
         _text                   = "";
         _discreteSeconds        = true;
         _discreteMinutes        = true;
@@ -477,6 +483,30 @@ public class Clock extends Control {
     }
 
     /**
+     * Returns true if sections should be highlighted in case they
+     * contain the current time.
+     * @return true if sections should be highlighted
+     */
+    public boolean isHighlightSections() { return null == highlightSections ? _highlightSections : highlightSections.get(); }
+    /**
+     * Defines if sections should be highlighted in case they
+     * contain the current time.
+     * @param HIGHLIGHT
+     */
+    public void setHighlightSections(final boolean HIGHLIGHT) {
+        if (null == highlightSections) {
+            _highlightSections = HIGHLIGHT;
+        } else {
+            highlightSections.set(HIGHLIGHT);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty highlightSectionsProperty() {
+        if (null == highlightSections) { highlightSections = new SimpleBooleanProperty(Clock.this, "highlightSections", _highlightSections); }
+        return highlightSections;
+    }
+
+    /**
      * Returns an observable list of TimeSection objects. The sections
      * will be used to colorize areas with a special meaning.
      * Areas in the Medusa library usually are more eye-catching
@@ -556,6 +586,30 @@ public class Clock extends Control {
     public BooleanProperty areasVisibleProperty() {
         if (null == areasVisible) { areasVisible = new SimpleBooleanProperty(Clock.this, "areasVisible", _areasVisible); }
         return areasVisible;
+    }
+
+    /**
+     * Returns true if areas should be highlighted in case they
+     * contain the current time.
+     * @return true if areas should be highlighted
+     */
+    public boolean isHighlightAreas() { return null == highlightAreas ? _highlightAreas : highlightAreas.get(); }
+    /**
+     * Defines if areas should be highlighted in case they
+     * contain the current time.
+     * @param HIGHLIGHT
+     */
+    public void setHighlightAreas(final boolean HIGHLIGHT) {
+        if (null == highlightAreas) {
+            _highlightAreas = HIGHLIGHT;
+        } else {
+            highlightAreas.set(HIGHLIGHT);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty highlightAreasProperty() {
+        if (null == highlightAreas) { highlightAreas = new SimpleBooleanProperty(Clock.this, "highlightAreas", _highlightAreas); }
+        return highlightAreas;
     }
 
     /**

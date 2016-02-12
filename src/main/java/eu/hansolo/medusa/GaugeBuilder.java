@@ -492,8 +492,28 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B highlightSections(final boolean HIGHLIGHT) {
+        properties.put("highlightSections", new SimpleBooleanProperty(HIGHLIGHT));
+        return (B)this;
+    }
+
     public final B areasVisible(final boolean VISIBLE) {
         properties.put("areasVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B areaTextVisible(final boolean VISIBLE) {
+        properties.put("areaTextVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B areaIconsVisible(final boolean VISIBLE) {
+        properties.put("areaIconsVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B highlightAreas(final boolean HIGHLIGHT) {
+        properties.put("highlightAreas", new SimpleBooleanProperty(HIGHLIGHT));
         return (B)this;
     }
 
@@ -1065,8 +1085,16 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setSectionTextVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionIconsVisible".equals(key)) {
                 CONTROL.setSectionIconsVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("highlightSections".equals(key)) {
+                CONTROL.setHighlightSections(((BooleanProperty) properties.get(key)).get());
             } else if ("areasVisible".equals(key)) {
                 CONTROL.setAreasVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("areaTextVisible".equals(key)) {
+                CONTROL.setAreaTextVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("areaIconsVisible".equals(key)) {
+                CONTROL.setAreaIconsVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("highlightAreas".equals(key)) {
+                CONTROL.setHighlightAreas(((BooleanProperty) properties.get(key)).get());
             } else if ("tickMarkSectionsVisible".equals(key)) {
                 CONTROL.setTickMarkSectionsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("tickLabelSectionsVisible".equals(key)) {

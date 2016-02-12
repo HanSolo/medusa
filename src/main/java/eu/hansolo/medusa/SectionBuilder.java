@@ -16,7 +16,6 @@
 
 package eu.hansolo.medusa;
 
-import eu.hansolo.medusa.Marker.MarkerEvent;
 import eu.hansolo.medusa.Section.SectionEvent;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -73,6 +72,11 @@ public class SectionBuilder<B extends SectionBuilder<B>> {
         return (B)this;
     }
 
+    public final B highlightColor(final Color COLOR) {
+        properties.put("highlightColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B textColor(final Color COLOR) {
         properties.put("textColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -101,6 +105,8 @@ public class SectionBuilder<B extends SectionBuilder<B>> {
                 SECTION.setIcon(((ObjectProperty<Image>) properties.get(key)).get());
             } else if ("color".equals(key)) {
                 SECTION.setColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("highlightColor".equals(key)) {
+                SECTION.setHighlightColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("textColor".equals(key)) {
                 SECTION.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("onSectionEntered".equals(key)) {

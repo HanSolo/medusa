@@ -53,23 +53,19 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.MODERN)
+                            .skinType(SkinType.SIMPLE)
                             .prefSize(400, 400)
+                            //.backgroundPaint(Gauge.DARK_COLOR)
+                            //.foregroundBaseColor(Color.WHITE)
                             .animated(true)
-                            .thresholdVisible(true)
-                            .threshold(75)
                             .sectionsVisible(true)
-                            .sectionTextVisible(true)
+                            .highlightSections(true)
                             .sections(
-                                new Section(70, 75, Color.rgb(252, 0, 0, 0.15)),
-                                new Section(75, 80, Color.rgb(252, 0, 0, 0.30)),
-                                new Section(80, 85, Color.rgb(252, 0, 0, 0.45)),
-                                new Section(85, 90, Color.rgb(252, 0, 0, 0.50)),
-                                new Section(90, 95, Color.rgb(252, 0, 0, 0.65)),
-                                new Section(95, 100, Color.rgb(252, 0, 0, 0.80)))
+                                new Section(0, 25, Color.rgb(0, 0, 252, 0.1), Color.rgb(0, 0, 252)),
+                                new Section(25, 50, Color.rgb(0, 252, 0, 0.1), Color.rgb(0, 252, 0)),
+                                new Section(50, 75, Color.rgb(252, 252, 0, 0.1), Color.rgb(252, 252, 0)),
+                                new Section(75, 100, Color.rgb(252, 0, 0, 0.1), Color.rgb(252, 0, 0)))
                             .interactive(true)
-                            .onButtonPressed(e -> gauge.setSubTitle("PRESSED"))
-                            .onButtonReleased(e -> gauge.setSubTitle(""))
                             .build();
 
         clock = ClockBuilder.create()
@@ -91,7 +87,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(clock);
+        StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,

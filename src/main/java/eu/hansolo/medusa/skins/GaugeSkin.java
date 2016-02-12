@@ -95,8 +95,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double                   size;
     private Pane                     pane;
     private InnerShadow              backgroundInnerShadow;
-    private Canvas                   ticksAndSectionsCanvas;
-    private GraphicsContext          ticksAndSections;
+    private Canvas                   tickMarkCanvas;
+    private GraphicsContext          tickMarkCtx;
+    private Canvas                   sectionsAndAreasCanvas;
+    private GraphicsContext          sectionsAndAreasCtx;
     private double                   ledSize;
     private InnerShadow              ledOnShadow;
     private InnerShadow              ledOffShadow;
@@ -105,7 +107,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Paint                    ledOffPaint;
     private Paint                    ledHighlightPaint;
     private Canvas                   ledCanvas;
-    private GraphicsContext          led;
+    private GraphicsContext          ledCtx;
     private Pane                     markerPane;
     private Path                     threshold;
     private Rectangle                lcd;
@@ -113,7 +115,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Rotate                   needleRotate;
     private Paint                    needlePaint;
     private Canvas                   knobCanvas;
-    private GraphicsContext          knob;
+    private GraphicsContext          knobCtx;
     private Group                    shadowGroup;
     private DropShadow               dropShadow;
     private Text                     titleText;
@@ -131,7 +133,13 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double                   minValue;
     private double                   maxValue;
     private List<Section>            sections;
+    private boolean                  highlightSections;
+    private boolean                  sectionsVisible;
     private List<Section>            areas;
+    private boolean                  highlightAreas;
+    private boolean                  areasVisible;
+    private TickLabelLocation        tickLabelLocation;
+    private ScaleDirection           scaleDirection;
     private NeedleBehavior           needleBehavior;
 
 
@@ -139,18 +147,24 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     public GaugeSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        startAngle     = gauge.getStartAngle();
-        angleRange     = gauge.getAngleRange();
-        angleStep      = gauge.getAngleStep();
-        oldValue       = gauge.getValue();
-        minValue       = gauge.getMinValue();
-        maxValue       = gauge.getMaxValue();
-        limitString    = "";
-        formatString   = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        sections       = gauge.getSections();
-        areas          = gauge.getAreas();
-        needleBehavior = gauge.getNeedleBehavior();
-        mouseHandler   = event -> handleMouseEvent(event);
+        startAngle        = gauge.getStartAngle();
+        angleRange        = gauge.getAngleRange();
+        angleStep         = gauge.getAngleStep();
+        oldValue          = gauge.getValue();
+        minValue          = gauge.getMinValue();
+        maxValue          = gauge.getMaxValue();
+        limitString       = "";
+        formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        sections          = gauge.getSections();
+        highlightSections = gauge.isHighlightSections();
+        sectionsVisible   = gauge.getSectionsVisible();
+        areas             = gauge.getAreas();
+        highlightAreas    = gauge.isHighlightAreas();
+        areasVisible      = gauge.getAreasVisible();
+        tickLabelLocation = gauge.getTickLabelLocation();
+        scaleDirection    = gauge.getScaleDirection();
+        needleBehavior    = gauge.getNeedleBehavior();
+        mouseHandler      = event -> handleMouseEvent(event);
         updateMarkers();
 
         init();
@@ -180,11 +194,16 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void initGraphics() {
         backgroundInnerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(10, 10, 10, 0.45), 8, 0d, 8d, 0d);
 
-        ticksAndSectionsCanvas = new Canvas();
-        ticksAndSections = ticksAndSectionsCanvas.getGraphicsContext2D();
+        sectionsAndAreasCanvas = new Canvas();
+        sectionsAndAreasCtx    = sectionsAndAreasCanvas.getGraphicsContext2D();
+        sectionsAndAreasCanvas.setVisible(areasVisible | sectionsVisible);
+        sectionsAndAreasCanvas.setManaged(areasVisible | sectionsVisible);
+
+        tickMarkCanvas = new Canvas();
+        tickMarkCtx    = tickMarkCanvas.getGraphicsContext2D();
 
         ledCanvas = new Canvas();
-        led = ledCanvas.getGraphicsContext2D();
+        ledCtx    = ledCanvas.getGraphicsContext2D();
 
         thresholdTooltip = new Tooltip("Threshold\n(" + String.format(Locale.US, formatString, getSkinnable().getThreshold()) + ")");
         thresholdTooltip.setTextAlignment(TextAlignment.CENTER);
@@ -213,7 +232,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         buttonTooltip.setTextAlignment(TextAlignment.CENTER);
 
         knobCanvas = new Canvas();
-        knob = knobCanvas.getGraphicsContext2D();
+        knobCtx    = knobCanvas.getGraphicsContext2D();
         knobCanvas.setPickOnBounds(false);
 
         dropShadow = new DropShadow();
@@ -249,7 +268,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needleRotate.setAngle(targetAngle);
 
         // Add all nodes
-        pane = new Pane(ticksAndSectionsCanvas,
+        pane = new Pane(sectionsAndAreasCanvas,
+                        tickMarkCanvas,
                         markerPane,
                         ledCanvas,
                         lcd,
@@ -298,6 +318,12 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 int listSize = areas.size();
                 for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(currentValue); }
             }
+
+            // Highlight Sections and/or Areas if enabled
+            if (highlightSections | highlightAreas) {
+                sectionsAndAreasCtx.clearRect(0, 0, size, size);
+                drawAreasAndSections(sectionsAndAreasCtx);
+            }
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
@@ -328,6 +354,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             threshold.setManaged(getSkinnable().isThresholdVisible());
             threshold.setVisible(getSkinnable().isThresholdVisible());
 
+            sectionsAndAreasCanvas.setVisible(areasVisible | sectionsVisible);
+            sectionsAndAreasCanvas.setManaged(areasVisible | sectionsVisible);
+
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }
@@ -352,8 +381,12 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resize();
             redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
-            sections = getSkinnable().getSections();
-            areas    = getSkinnable().getAreas();
+            sections          = getSkinnable().getSections();
+            highlightSections = getSkinnable().isHighlightSections();
+            sectionsVisible   = getSkinnable().getSectionsVisible();
+            areas             = getSkinnable().getAreas();
+            highlightAreas    = getSkinnable().isHighlightAreas();
+            areasVisible      = getSkinnable().getAreasVisible();
             resize();
             redraw();
         } else if ("INTERACTIVITY".equals(EVENT_TYPE)) {
@@ -418,12 +451,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawGradientBar() {
-        TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * size : 0.0515 * size;
-        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
-        double            offset            = 90 - startAngle;
-        ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
-        List<Stop>        stops             = getSkinnable().getGradientBarStops();
+        double     xy     = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * size : 0.0515 * size;
+        double     wh     = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
+        double     offset = 90 - startAngle;
+        List<Stop> stops  = getSkinnable().getGradientBarStops();
         Map<Double, Color> stopAngleMap     = new HashMap<>(stops.size());
         for (Stop stop : stops) { stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()); }
         double                  offsetFactor        = ScaleDirection.CLOCKWISE == scaleDirection ? (startAngle - 90) : (startAngle + 180);
@@ -431,111 +462,123 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         double barStartAngle  = ScaleDirection.CLOCKWISE == scaleDirection ? -minValue * angleStep : minValue * angleStep;
         double barAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? getSkinnable().getRange() * angleStep : -getSkinnable().getRange() * angleStep;
-        ticksAndSections.save();
-        ticksAndSections.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.026 * size, xy - 0.026 * size, wh + 0.052 * size, wh + 0.052 * size)));
-        ticksAndSections.setLineWidth(size * 0.052);
-        ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-        ticksAndSections.strokeArc(xy, xy, wh, wh, -(offset + barStartAngle), -barAngleExtend, ArcType.OPEN);
-        ticksAndSections.restore();
+        tickMarkCtx.save();
+        tickMarkCtx.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.026 * size, xy - 0.026 * size, wh + 0.052 * size, wh + 0.052 * size)));
+        tickMarkCtx.setLineWidth(size * 0.052);
+        tickMarkCtx.setLineCap(StrokeLineCap.BUTT);
+        tickMarkCtx.strokeArc(xy, xy, wh, wh, -(offset + barStartAngle), -barAngleExtend, ArcType.OPEN);
+        tickMarkCtx.restore();
     }
 
-    private void drawSections() {
-        if (sections.isEmpty()) return;
-        TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * size : 0.0515 * size;
-        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
-        double            offset            = 90 - startAngle;
-        ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
-        int               listSize          = sections.size();
-        for (int i = 0 ; i < listSize ; i++) {
-            Section section = sections.get(i);
-            double sectionStartAngle;
-            if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
-                if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
-                    sectionStartAngle = 0;
-                } else {
-                    sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStart() - minValue) * angleStep : -(section.getStart() - minValue) * angleStep;
+    private void drawAreasAndSections(final GraphicsContext CTX) {
+        if (areas.isEmpty() && sections.isEmpty()) return;
+        double value  = getSkinnable().getCurrentValue();
+        double offset = 90 - startAngle;
+        double xy;
+        double wh;
+        int    listSize;
+
+        // Draw Areas
+        if (areasVisible && !areas.isEmpty()) {
+            xy       = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0895 * size : 0.025 * size;
+            wh       = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.821 : size * 0.95;
+            listSize = areas.size();
+            for (int i = 0; i < listSize ; i++) {
+                Section area = areas.get(i);
+                double areaStartAngle;
+                if (Double.compare(area.getStart(), maxValue) <= 0 && Double.compare(area.getStop(), minValue) >= 0) {
+                    if (area.getStart() < minValue && area.getStop() < maxValue) {
+                        areaStartAngle = 0;
+                    } else {
+                        areaStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStart() - minValue) * angleStep : -(area.getStart() - minValue) * angleStep;
+                    }
+                    double areaAngleExtend;
+                    if (area.getStop() > maxValue) {
+                        areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - area.getStart()) * angleStep : -(maxValue - area.getStart()) * angleStep;
+                    } else {
+                        areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStop() - area.getStart()) * angleStep : -(area.getStop() - area.getStart()) * angleStep;
+                    }
+                    CTX.save();
+                    if (highlightAreas) {
+                        CTX.setFill(area.contains(value) ? area.getHighlightColor() : area.getColor());
+                    } else {
+                        CTX.setFill(area.getColor());
+                    }
+                    CTX.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
+                    CTX.restore();
                 }
-                double sectionAngleExtend;
-                if (Double.compare(section.getStop(), maxValue) > 0) {
-                    sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - section.getStart()) * angleStep : -(maxValue - section.getStart()) * angleStep;
-                } else {
-                    sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStop() - section.getStart()) * angleStep : -(section.getStop() - section.getStart()) * angleStep;
-                }
-                ticksAndSections.save();
-                ticksAndSections.setStroke(section.getColor());
-                ticksAndSections.setLineWidth(size * 0.052);
-                ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-                ticksAndSections.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
-                ticksAndSections.restore();
             }
         }
-    }
 
-    private void drawAreas() {
-        if (areas.isEmpty()) return;
-        TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0895 * size : 0.025 * size;
-        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.821 : size * 0.95;
-        double            offset            = 90 - startAngle;
-        ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
-
-        int listSize = areas.size();
-        for (int i = 0; i < listSize ; i++) {
-            Section area = areas.get(i);
-            double areaStartAngle;
-            if (Double.compare(area.getStart(), maxValue) <= 0 && Double.compare(area.getStop(), minValue) >= 0) {
-                if (area.getStart() < minValue && area.getStop() < maxValue) {
-                    areaStartAngle = 0;
-                } else {
-                    areaStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStart() - minValue) * angleStep : -(area.getStart() - minValue) * angleStep;
+        // Draw Sections
+        if (sectionsVisible && !sections.isEmpty()) {
+            xy       = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.115 * size : 0.0515 * size;
+            wh       = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.77 : size * 0.897;
+            listSize = sections.size();
+            CTX.setLineWidth(size * 0.052);
+            CTX.setLineCap(StrokeLineCap.BUTT);
+            for (int i = 0; i < listSize; i++) {
+                Section section = sections.get(i);
+                double  sectionStartAngle;
+                if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
+                    if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
+                        sectionStartAngle = 0;
+                    } else {
+                        sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStart() - minValue) * angleStep : -(section.getStart() - minValue) * angleStep;
+                    }
+                    double sectionAngleExtend;
+                    if (Double.compare(section.getStop(), maxValue) > 0) {
+                        sectionAngleExtend =
+                            ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - section.getStart()) * angleStep : -(maxValue - section.getStart()) * angleStep;
+                    } else {
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ?
+                                             (section.getStop() - section.getStart()) * angleStep : -(section.getStop() - section.getStart()) * angleStep;
+                    }
+                    CTX.save();
+                    if (highlightSections) {
+                        CTX.setStroke(section.contains(value) ? section.getHighlightColor() : section.getColor());
+                    } else {
+                        CTX.setStroke(section.getColor());
+                    }
+                    CTX.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
+                    CTX.restore();
                 }
-                double areaAngleExtend;
-                if (area.getStop() > maxValue) {
-                    areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - area.getStart()) * angleStep : -(maxValue - area.getStart()) * angleStep;
-                } else {
-                    areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStop() - area.getStart()) * angleStep : -(area.getStop() - area.getStart()) * angleStep;
-                }
-                ticksAndSections.save();
-                ticksAndSections.setFill(area.getColor());
-                ticksAndSections.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
-                ticksAndSections.restore();
             }
         }
     }
 
     private void drawLed() {
-        led.clearRect(0, 0, ledSize, ledSize);
+        ledCtx.clearRect(0, 0, ledSize, ledSize);
 
         boolean isFlatLed = LedType.FLAT == getSkinnable().getLedType();
 
         if (!isFlatLed) {
-            led.setFill(ledFramePaint);
-            led.fillOval(0, 0, ledSize, ledSize);
+            ledCtx.setFill(ledFramePaint);
+            ledCtx.fillOval(0, 0, ledSize, ledSize);
         } else {
             double lineWidth = 0.0037037 * size;
-            led.setStroke(ledFramePaint);
-            led.setLineWidth(lineWidth);
-            led.strokeOval(lineWidth, lineWidth, ledSize - 2 * lineWidth, ledSize - 2 * lineWidth);
+            ledCtx.setStroke(ledFramePaint);
+            ledCtx.setLineWidth(lineWidth);
+            ledCtx.strokeOval(lineWidth, lineWidth, ledSize - 2 * lineWidth, ledSize - 2 * lineWidth);
         }
 
-        led.save();
+        ledCtx.save();
         if (getSkinnable().isLedOn()) {
-            led.setEffect(ledOnShadow);
-            led.setFill(ledOnPaint);
+            ledCtx.setEffect(ledOnShadow);
+            ledCtx.setFill(ledOnPaint);
         } else {
-            led.setEffect(ledOffShadow);
-            led.setFill(ledOffPaint);
+            ledCtx.setEffect(ledOffShadow);
+            ledCtx.setFill(ledOffPaint);
         }
         if (isFlatLed) {
-            led.fillOval(0.2 * ledSize, 0.2 * ledSize, 0.6 * ledSize, 0.6 * ledSize);
+            ledCtx.fillOval(0.2 * ledSize, 0.2 * ledSize, 0.6 * ledSize, 0.6 * ledSize);
         } else {
-            led.fillOval(0.14 * ledSize, 0.14 * ledSize, 0.72 * ledSize, 0.72 * ledSize);
+            ledCtx.fillOval(0.14 * ledSize, 0.14 * ledSize, 0.72 * ledSize, 0.72 * ledSize);
         }
-        led.restore();
+        ledCtx.restore();
 
-        led.setFill(ledHighlightPaint);
-        led.fillOval(0.21 * ledSize, 0.21 * ledSize, 0.58 * ledSize, 0.58 * ledSize);
+        ledCtx.setFill(ledHighlightPaint);
+        ledCtx.fillOval(0.21 * ledSize, 0.21 * ledSize, 0.58 * ledSize, 0.58 * ledSize);
     }
 
     private void drawMarkers() {
@@ -755,7 +798,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         knobCanvas.setCache(false);
         double w = knobCanvas.getWidth();
         double h = knobCanvas.getHeight();
-        knob.clearRect(0, 0, w, h);
+        knobCtx.clearRect(0, 0, w, h);
 
         Color  knobColor = getSkinnable().getKnobColor();
         double hue       = knobColor.getHue();
@@ -767,109 +810,109 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         switch (getSkinnable().getKnobType()) {
             case PLAIN:
-                knob.setFill(new LinearGradient(0, 0, 0, h, false, CycleMethod.NO_CYCLE,
-                                               new Stop(0.0, Color.rgb(180,180,180)),
-                                               new Stop(0.46, Color.rgb(63,63,63)),
-                                               new Stop(1.0, Color.rgb(40,40,40))));
-                knob.fillOval(0, 0, w, h);
+                knobCtx.setFill(new LinearGradient(0, 0, 0, h, false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.rgb(180,180,180)),
+                                                   new Stop(0.46, Color.rgb(63,63,63)),
+                                                   new Stop(1.0, Color.rgb(40,40,40))));
+                knobCtx.fillOval(0, 0, w, h);
 
-                knob.setFill(new LinearGradient(0, 0.11764706 * h, 0, 0.76470588 * h, false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.9 : brg * 1.0, alp)),
-                                                new Stop(0.01, Color.hsb(hue, sat, PRESSED ? brg * 0.75 : brg * 0.85, alp)),
-                                                new Stop(0.5, Color.hsb(hue, sat, PRESSED ? brg * 0.4 : brg * 0.5, alp)),
-                                                new Stop(0.51, Color.hsb(hue, sat, PRESSED ? brg * 0.35 : brg * 0.45, alp)),
-                                                new Stop(1.0, Color.hsb(hue, sat, PRESSED ? brg * 0.7 : brg * 0.8, alp))));
-                knob.fillOval(w * 0.11764706, h * 0.11764706, w - w * 0.23529412, h - h * 0.23529412);
+                knobCtx.setFill(new LinearGradient(0, 0.11764706 * h, 0, 0.76470588 * h, false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.9 : brg * 1.0, alp)),
+                                                   new Stop(0.01, Color.hsb(hue, sat, PRESSED ? brg * 0.75 : brg * 0.85, alp)),
+                                                   new Stop(0.5, Color.hsb(hue, sat, PRESSED ? brg * 0.4 : brg * 0.5, alp)),
+                                                   new Stop(0.51, Color.hsb(hue, sat, PRESSED ? brg * 0.35 : brg * 0.45, alp)),
+                                                   new Stop(1.0, Color.hsb(hue, sat, PRESSED ? brg * 0.7 : brg * 0.8, alp))));
+                knobCtx.fillOval(w * 0.11764706, h * 0.11764706, w - w * 0.23529412, h - h * 0.23529412);
 
-                knob.setFill(new RadialGradient(0, 0, 0.5 * w, 0.47 * h, w * 0.38, false, CycleMethod.NO_CYCLE,
-                                               new Stop(0, Color.TRANSPARENT),
-                                               new Stop(0.76, Color.TRANSPARENT),
-                                               new Stop(1.0, Color.rgb(0, 0, 0, PRESSED ? 0.5 : 0.2))));
-                knob.fillOval(w * 0.11764706, h * 0.11764706, w - w * 0.23529412, h - h * 0.23529412);
+                knobCtx.setFill(new RadialGradient(0, 0, 0.5 * w, 0.47 * h, w * 0.38, false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0, Color.TRANSPARENT),
+                                                   new Stop(0.76, Color.TRANSPARENT),
+                                                   new Stop(1.0, Color.rgb(0, 0, 0, PRESSED ? 0.5 : 0.2))));
+                knobCtx.fillOval(w * 0.11764706, h * 0.11764706, w - w * 0.23529412, h - h * 0.23529412);
                 break;
             case METAL:
-                knob.setFill(new LinearGradient(0, 0, 0, h,
-                                                false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.rgb(92,95,101)),
-                                                new Stop(0.47, Color.rgb(46,49,53)),
-                                                new Stop(1.0, Color.rgb(22,23,26))));
-                knob.fillOval(0, 0, w, h);
+                knobCtx.setFill(new LinearGradient(0, 0, 0, h,
+                                                   false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.rgb(92,95,101)),
+                                                   new Stop(0.47, Color.rgb(46,49,53)),
+                                                   new Stop(1.0, Color.rgb(22,23,26))));
+                knobCtx.fillOval(0, 0, w, h);
 
-                knob.setFill(new LinearGradient(0, 0.058823529411764705 * h, 0, 0.9411764705882353 * h,
-                                                false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.7 : brg * 0.9, alp)),
-                                                new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.3 : brg * 0.5, alp))));
-                knob.fillOval(0.05882353 * w, 0.05882353 * h, w * 0.88235294, h * 0.88235294);
+                knobCtx.setFill(new LinearGradient(0, 0.058823529411764705 * h, 0, 0.9411764705882353 * h,
+                                                   false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.7 : brg * 0.9, alp)),
+                                                   new Stop(0.0, Color.hsb(hue, sat, PRESSED ? brg * 0.3 : brg * 0.5, alp))));
+                knobCtx.fillOval(0.05882353 * w, 0.05882353 * h, w * 0.88235294, h * 0.88235294);
 
-                knob.beginPath();
-                knob.moveTo(0.17647058823529413 * w, 0.8235294117647058 * h);
-                knob.bezierCurveTo(0.29411764705882354 * w, 0.8823529411764706 * h, 0.35294117647058826 * w, 0.9411764705882353 * h, 0.5294117647058824 * w, 0.9411764705882353 * h);
-                knob.bezierCurveTo(0.6470588235294118 * w, 0.9411764705882353 * h, 0.7058823529411765 * w, 0.8823529411764706 * h, 0.8235294117647058 * w, 0.8235294117647058 * h);
-                knob.bezierCurveTo(0.7647058823529411 * w, 0.7058823529411765 * h, 0.6470588235294118 * w, 0.5882352941176471 * h, 0.5294117647058824 * w, 0.5882352941176471 * h);
-                knob.bezierCurveTo(0.35294117647058826 * w, 0.5882352941176471 * h, 0.23529411764705882 * w, 0.7058823529411765 * h, 0.17647058823529413 * w, 0.8235294117647058 * h);
-                knob.closePath();
-                knob.setFill(new RadialGradient(0, 0,
+                knobCtx.beginPath();
+                knobCtx.moveTo(0.17647058823529413 * w, 0.8235294117647058 * h);
+                knobCtx.bezierCurveTo(0.29411764705882354 * w, 0.8823529411764706 * h, 0.35294117647058826 * w, 0.9411764705882353 * h, 0.5294117647058824 * w, 0.9411764705882353 * h);
+                knobCtx.bezierCurveTo(0.6470588235294118 * w, 0.9411764705882353 * h, 0.7058823529411765 * w, 0.8823529411764706 * h, 0.8235294117647058 * w, 0.8235294117647058 * h);
+                knobCtx.bezierCurveTo(0.7647058823529411 * w, 0.7058823529411765 * h, 0.6470588235294118 * w, 0.5882352941176471 * h, 0.5294117647058824 * w, 0.5882352941176471 * h);
+                knobCtx.bezierCurveTo(0.35294117647058826 * w, 0.5882352941176471 * h, 0.23529411764705882 * w, 0.7058823529411765 * h, 0.17647058823529413 * w, 0.8235294117647058 * h);
+                knobCtx.closePath();
+                knobCtx.setFill(new RadialGradient(0, 0,
                                                 0.47058823529411764 * w, 0.8823529411764706 * h,
                                                 0.3235294117647059 * w,
-                                                false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.rgb(255, 255, 255, PRESSED ? 0.3 : 0.6)),
-                                                new Stop(1.0, Color.TRANSPARENT)));
-                knob.fill();
+                                                   false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.rgb(255, 255, 255, PRESSED ? 0.3 : 0.6)),
+                                                   new Stop(1.0, Color.TRANSPARENT)));
+                knobCtx.fill();
 
-                knob.beginPath();
-                knob.moveTo(0.058823529411764705 * w, 0.29411764705882354 * h);
-                knob.bezierCurveTo(0.17647058823529413 * w, 0.35294117647058826 * h, 0.35294117647058826 * w, 0.35294117647058826 * h, 0.5294117647058824 * w, 0.35294117647058826 * h);
-                knob.bezierCurveTo(0.6470588235294118 * w, 0.35294117647058826 * h, 0.8235294117647058 * w, 0.35294117647058826 * h, 0.9411764705882353 * w, 0.29411764705882354 * h);
-                knob.bezierCurveTo(0.8823529411764706 * w, 0.11764705882352941 * h, 0.7058823529411765 * w, 0.0 * h, 0.5294117647058824 * w, 0.0 * h);
-                knob.bezierCurveTo(0.29411764705882354 * w, 0.0 * h, 0.11764705882352941 * w, 0.11764705882352941 * h, 0.058823529411764705 * w, 0.29411764705882354 * h);
-                knob.closePath();
-                knob.setFill(new RadialGradient(0, 0,
+                knobCtx.beginPath();
+                knobCtx.moveTo(0.058823529411764705 * w, 0.29411764705882354 * h);
+                knobCtx.bezierCurveTo(0.17647058823529413 * w, 0.35294117647058826 * h, 0.35294117647058826 * w, 0.35294117647058826 * h, 0.5294117647058824 * w, 0.35294117647058826 * h);
+                knobCtx.bezierCurveTo(0.6470588235294118 * w, 0.35294117647058826 * h, 0.8235294117647058 * w, 0.35294117647058826 * h, 0.9411764705882353 * w, 0.29411764705882354 * h);
+                knobCtx.bezierCurveTo(0.8823529411764706 * w, 0.11764705882352941 * h, 0.7058823529411765 * w, 0.0 * h, 0.5294117647058824 * w, 0.0 * h);
+                knobCtx.bezierCurveTo(0.29411764705882354 * w, 0.0 * h, 0.11764705882352941 * w, 0.11764705882352941 * h, 0.058823529411764705 * w, 0.29411764705882354 * h);
+                knobCtx.closePath();
+                knobCtx.setFill(new RadialGradient(0, 0,
                                                 0.47058823529411764 * w, 0.0,
                                                 0.4411764705882353 * w,
-                                                false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.rgb(255, 255, 255, PRESSED ? 0.45 : 0.75)),
-                                                new Stop(1.0, Color.TRANSPARENT)));
-                knob.fill();
+                                                   false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.rgb(255, 255, 255, PRESSED ? 0.45 : 0.75)),
+                                                   new Stop(1.0, Color.TRANSPARENT)));
+                knobCtx.fill();
 
-                knob.setFill(new LinearGradient(0.5294117647058824 * w, 0.23529411764705882 * h,
+                knobCtx.setFill(new LinearGradient(0.5294117647058824 * w, 0.23529411764705882 * h,
                                                 0.5294117647058824 * w, 0.7647058823529411 * h,
-                                                false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.BLACK),
-                                                new Stop(1.0, Color.rgb(204, 204, 204))));
-                knob.fillOval(0.23529412 * w, 0.23529412 * h, 0.52941176 * w, 0.52941176 * h);
+                                                   false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.BLACK),
+                                                   new Stop(1.0, Color.rgb(204, 204, 204))));
+                knobCtx.fillOval(0.23529412 * w, 0.23529412 * h, 0.52941176 * w, 0.52941176 * h);
 
-                knob.setFill(new LinearGradient(0.5294117647058824 * w, 0.29411764705882354 * h,
+                knobCtx.setFill(new LinearGradient(0.5294117647058824 * w, 0.29411764705882354 * h,
                                                 0.5294117647058824 * w, 0.7058823529411765 * h,
-                                                false, CycleMethod.NO_CYCLE,
-                                                new Stop(0.0, Color.rgb(1,6,11)),
-                                                new Stop(1.0, Color.rgb(50,52,56))));
-                knob.fillOval(0.29411765 * w, 0.29411765 * h, 0.41176471 * w, 0.41176471 * h);
+                                                   false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.rgb(1,6,11)),
+                                                   new Stop(1.0, Color.rgb(50,52,56))));
+                knobCtx.fillOval(0.29411765 * w, 0.29411765 * h, 0.41176471 * w, 0.41176471 * h);
                 break;
             case FLAT:
                 double lineWidth = 0.00740741 * size;
                 double knobSize  = w - 2 * lineWidth;
-                knob.setFill(PRESSED ? knobColor.darker() : knobColor);
-                knob.setStroke(PRESSED ? Color.WHITE.darker() : Color.WHITE);
-                knob.setLineWidth(lineWidth);
-                knob.fillOval(lineWidth, lineWidth, knobSize, knobSize);
-                knob.strokeOval(lineWidth, lineWidth, knobSize, knobSize);
+                knobCtx.setFill(PRESSED ? knobColor.darker() : knobColor);
+                knobCtx.setStroke(PRESSED ? Color.WHITE.darker() : Color.WHITE);
+                knobCtx.setLineWidth(lineWidth);
+                knobCtx.fillOval(lineWidth, lineWidth, knobSize, knobSize);
+                knobCtx.strokeOval(lineWidth, lineWidth, knobSize, knobSize);
                 break;
             case STANDARD:
             default:
-                knob.setFill(new LinearGradient(0, 0, 0, h,
-                                                       false, CycleMethod.NO_CYCLE,
-                                                       new Stop(0.0, Color.rgb(133, 133, 133).brighter().brighter()),
-                                                       new Stop(0.52, Color.rgb(133, 133, 133)),
-                                                       new Stop(1.0, Color.rgb(133, 133, 133).darker().darker())));
-                knob.fillOval(0, 0, w, h);
+                knobCtx.setFill(new LinearGradient(0, 0, 0, h,
+                                                   false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.rgb(133, 133, 133).brighter().brighter()),
+                                                   new Stop(0.52, Color.rgb(133, 133, 133)),
+                                                   new Stop(1.0, Color.rgb(133, 133, 133).darker().darker())));
+                knobCtx.fillOval(0, 0, w, h);
                 gradTop = PRESSED ? h - size * 0.01 : size * 0.005;
                 gradBot = PRESSED ? size * 0.005 : h - size * 0.01;
-                knob.setFill(new LinearGradient(0,gradTop, 0, gradBot,
-                                                       false, CycleMethod.NO_CYCLE,
-                                                       new Stop(0.0, Color.hsb(hue, sat, brg * 0.85, alp)),
-                                                       new Stop(0.45, Color.hsb(hue, sat, brg * 0.65, alp)),
-                                                       new Stop(1.0, Color.hsb(hue, sat, brg * 0.4, alp))));
-                knob.fillOval(size * 0.005, size * 0.005, w - size * 0.01, h - size * 0.01);
+                knobCtx.setFill(new LinearGradient(0, gradTop, 0, gradBot,
+                                                   false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.hsb(hue, sat, brg * 0.85, alp)),
+                                                   new Stop(0.45, Color.hsb(hue, sat, brg * 0.65, alp)),
+                                                   new Stop(1.0, Color.hsb(hue, sat, brg * 0.4, alp))));
+                knobCtx.fillOval(size * 0.005, size * 0.005, w - size * 0.01, h - size * 0.01);
                 break;
         }
         knobCanvas.setCache(true);
@@ -918,8 +961,11 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             pane.setEffect(getSkinnable().isInnerShadowEnabled() ? backgroundInnerShadow : null);
 
-            ticksAndSectionsCanvas.setWidth(size);
-            ticksAndSectionsCanvas.setHeight(size);
+            sectionsAndAreasCanvas.setWidth(size);
+            sectionsAndAreasCanvas.setHeight(size);
+
+            tickMarkCanvas.setWidth(size);
+            tickMarkCanvas.setHeight(size);
 
             markerPane.setPrefSize(size, size);
 
@@ -990,17 +1036,20 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         // Areas, Sections and Tick Marks
-        ticksAndSectionsCanvas.setCache(false);
-        ticksAndSections.clearRect(0, 0, size, size);
-        if (getSkinnable().getAreasVisible()) drawAreas();
+        tickLabelLocation = getSkinnable().getTickLabelLocation();
+        scaleDirection    = getSkinnable().getScaleDirection();
+        if (getSkinnable().getAreasVisible() | getSkinnable().getSectionsVisible()) {
+            sectionsAndAreasCtx.clearRect(0, 0, size, size);
+            drawAreasAndSections(sectionsAndAreasCtx);
+        }
+        tickMarkCanvas.setCache(false);
+        tickMarkCtx.clearRect(0, 0, size, size);
         if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
             drawGradientBar();
-        } else if (getSkinnable().getSectionsVisible()) {
-            drawSections();
         }
-        Helper.drawRadialTickMarks(getSkinnable(), ticksAndSections, minValue, maxValue, startAngle, angleRange, angleStep, size * 0.5, size * 0.5, size);
-        ticksAndSectionsCanvas.setCache(true);
-        ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
+        Helper.drawRadialTickMarks(getSkinnable(), tickMarkCtx, minValue, maxValue, startAngle, angleRange, angleStep, size * 0.5, size * 0.5, size);
+        tickMarkCanvas.setCache(true);
+        tickMarkCanvas.setCacheHint(CacheHint.QUALITY);
 
         // LED
         if (getSkinnable().isLedVisible()) {

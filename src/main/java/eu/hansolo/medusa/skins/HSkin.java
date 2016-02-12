@@ -97,8 +97,10 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double                   height;
     private Pane                     pane;
     private InnerShadow              backgroundInnerShadow;
-    private Canvas                   ticksAndSectionsCanvas;
-    private GraphicsContext          ticksAndSections;
+    private Canvas                   sectionsAndAreasCanvas;
+    private GraphicsContext          sectionsAndAreasCtx;
+    private Canvas                   tickMarkCanvas;
+    private GraphicsContext          tickMarkCtx;
     private double                   ledSize;
     private InnerShadow              ledOnShadow;
     private InnerShadow              ledOffShadow;
@@ -107,7 +109,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Paint                    ledOffPaint;
     private Paint                    ledHighlightPaint;
     private Canvas                   ledCanvas;
-    private GraphicsContext          led;
+    private GraphicsContext          ledCtx;
     private Pane                     markerPane;
     private Path                     threshold;
     private Rectangle                lcd;
@@ -140,24 +142,36 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double                   minValue;
     private double                   maxValue;
     private List<Section>            sections;
+    private boolean                  highlightSections;
+    private boolean                  sectionsVisible;
     private List<Section>            areas;
+    private boolean                  highlightAreas;
+    private boolean                  areasVisible;
+    private TickLabelLocation        tickLabelLocation;
+    private ScaleDirection           scaleDirection;
 
 
     // ******************** Constructors **************************************
     public HSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleRange   = Helper.clamp(90d, 180d, gauge.getAngleRange());
-        startAngle   = getStartAngle();
-        angleStep    = angleRange / gauge.getRange();
-        oldValue     = gauge.getValue();
-        minValue     = gauge.getMinValue();
-        maxValue     = gauge.getMaxValue();
-        limitString  = "";
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        sections     = gauge.getSections();
-        areas        = gauge.getAreas();
-        mouseHandler = event -> handleMouseEvent(event);
+        angleRange        = Helper.clamp(90d, 180d, gauge.getAngleRange());
+        startAngle        = getStartAngle();
+        angleStep         = angleRange / gauge.getRange();
+        oldValue          = gauge.getValue();
+        minValue          = gauge.getMinValue();
+        maxValue          = gauge.getMaxValue();
+        limitString       = "";
+        formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        sections          = gauge.getSections();
+        highlightSections = gauge.isHighlightSections();
+        sectionsVisible   = gauge.getSectionsVisible();
+        areas             = gauge.getAreas();
+        highlightAreas    = gauge.isHighlightAreas();
+        areasVisible      = gauge.getAreasVisible();
+        tickLabelLocation = gauge.getTickLabelLocation();
+        scaleDirection    = gauge.getScaleDirection();
+        mouseHandler      = event -> handleMouseEvent(event);
 
         updateMarkers();
 
@@ -188,11 +202,16 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void initGraphics() {
         backgroundInnerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(10, 10, 10, 0.45), 8, 0d, 8d, 0d);
 
-        ticksAndSectionsCanvas = new Canvas();
-        ticksAndSections = ticksAndSectionsCanvas.getGraphicsContext2D();
+        sectionsAndAreasCanvas = new Canvas();
+        sectionsAndAreasCtx    = sectionsAndAreasCanvas.getGraphicsContext2D();
+        sectionsAndAreasCanvas.setVisible(areasVisible | sectionsVisible);
+        sectionsAndAreasCanvas.setManaged(areasVisible | sectionsVisible);
+
+        tickMarkCanvas = new Canvas();
+        tickMarkCtx    = tickMarkCanvas.getGraphicsContext2D();
 
         ledCanvas = new Canvas();
-        led = ledCanvas.getGraphicsContext2D();
+        ledCtx    = ledCanvas.getGraphicsContext2D();
 
         thresholdTooltip = new Tooltip("Threshold\n(" + String.format(Locale.US, formatString, getSkinnable().getThreshold()) + ")");
         thresholdTooltip.setTextAlignment(TextAlignment.CENTER);
@@ -264,7 +283,8 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needleRotate.setAngle(targetAngle);
 
         // Add all nodes
-        pane = new Pane(ticksAndSectionsCanvas,
+        pane = new Pane(sectionsAndAreasCanvas,
+                        tickMarkCanvas,
                         markerPane,
                         ledCanvas,
                         lcd,
@@ -313,6 +333,12 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 int listSize = areas.size();
                 for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(currentValue); }
             }
+
+            // Highlight Sections and/or Areas if enabled
+            if (highlightSections | highlightAreas) {
+                sectionsAndAreasCtx.clearRect(0, 0, width, width);
+                drawAreasAndSections(sectionsAndAreasCtx);
+            }
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
@@ -343,15 +369,18 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             threshold.setManaged(getSkinnable().isThresholdVisible());
             threshold.setVisible(getSkinnable().isThresholdVisible());
 
+            sectionsAndAreasCanvas.setVisible(areasVisible | sectionsVisible);
+            sectionsAndAreasCanvas.setManaged(areasVisible | sectionsVisible);
+
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }
         } else if ("LCD".equals(EVENT_TYPE)) {
             if (getSkinnable().isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
+            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             angleRange = Helper.clamp(90d, 180d, getSkinnable().getAngleRange());
             startAngle = getStartAngle();
-            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             minValue   = getSkinnable().getMinValue();
             maxValue   = getSkinnable().getMaxValue();
             angleStep  = angleRange / getSkinnable().getRange();
@@ -367,8 +396,12 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resize();
             redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
-            sections = getSkinnable().getSections();
-            areas    = getSkinnable().getAreas();
+            sections          = getSkinnable().getSections();
+            highlightSections = getSkinnable().isHighlightSections();
+            sectionsVisible   = getSkinnable().getSectionsVisible();
+            areas             = getSkinnable().getAreas();
+            highlightAreas    = getSkinnable().isHighlightAreas();
+            areasVisible      = getSkinnable().getAreasVisible();
             resize();
             redraw();
         } else if ("INTERACTIVITY".equals(EVENT_TYPE)) {
@@ -430,141 +463,147 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawGradientBar() {
-        TickLabelLocation  tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double             scaledWidth       = width * 0.9;
-        double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1705 * scaledWidth : 0.107 * scaledWidth;
-        double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledWidth * 0.77 : scaledWidth * 0.897;
-        double             offsetY           = -0.1 * height;
-        double             offset            = 90 - startAngle;
-        ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
-        List<Stop>         stops             = getSkinnable().getGradientBarStops();
-        Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
+        double     scaledWidth = width * 0.9;
+        double     xy          = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1705 * scaledWidth : 0.107 * scaledWidth;
+        double     wh          = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledWidth * 0.77 : scaledWidth * 0.897;
+        double     offsetY     = -0.1 * height;
+        double     offset      = 90 - startAngle;
+        List<Stop> stops       = getSkinnable().getGradientBarStops();
+        Map<Double, Color> stopAngleMap = new HashMap<>(stops.size());
         for (Stop stop : stops) { stopAngleMap.put(stop.getOffset() * angleRange, stop.getColor()); }
         double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? startAngle - angleRange + 180 : (startAngle + 180);
         AngleConicalGradient gradient     = new AngleConicalGradient(width * 0.5, width * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
 
         double barStartAngle  = ScaleDirection.CLOCKWISE == scaleDirection ? -minValue * angleStep : minValue * angleStep;
         double barAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? getSkinnable().getRange() * angleStep : -getSkinnable().getRange() * angleStep;
-        ticksAndSections.save();
-        ticksAndSections.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.026 * width, xy - 0.026 * width + offsetY, wh + 0.052 * width, wh + 0.052 * width)));
-        ticksAndSections.setLineWidth(scaledWidth * 0.052);
-        ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-        ticksAndSections.strokeArc(xy, xy + offsetY, wh, wh, -(offset + barStartAngle), -barAngleExtend, ArcType.OPEN);
-        ticksAndSections.restore();
+        tickMarkCtx.save();
+        tickMarkCtx.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.026 * width, xy - 0.026 * width + offsetY, wh + 0.052 * width, wh + 0.052 * width)));
+        tickMarkCtx.setLineWidth(scaledWidth * 0.052);
+        tickMarkCtx.setLineCap(StrokeLineCap.BUTT);
+        tickMarkCtx.strokeArc(xy, xy + offsetY, wh, wh, -(offset + barStartAngle), -barAngleExtend, ArcType.OPEN);
+        tickMarkCtx.restore();
     }
 
-    private void drawSections() {
-        if (sections.isEmpty()) return;
-        TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double            scaledWidth       = width * 0.9;
-        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1705 * scaledWidth : 0.107 * scaledWidth;
-        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledWidth * 0.77 : scaledWidth * 0.897;
-        double            offsetY           = -0.1 * height;
-        double            offset            = 90 - startAngle;
-        ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
-        int               listSize          = sections.size();
-        for (int i = 0 ; i < listSize ; i++) {
-            Section section = sections.get(i);
-            double sectionStartAngle;
-            if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
-                if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
-                    sectionStartAngle = 0;
-                } else {
-                    sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStart() - minValue) * angleStep : -(section.getStart() - minValue) * angleStep;
+    private void drawAreasAndSections(final GraphicsContext CTX) {
+        if (areas.isEmpty() && sections.isEmpty()) return;
+
+        double value       = getSkinnable().getCurrentValue();
+        double scaledWidth = width * 0.9;
+        double offset      = 90 - startAngle;
+        double offsetY     = -0.1 * height;
+        double xy;
+        double wh;
+        int    listSize;
+
+        // Draw areas
+        if (areasVisible && !areas.isEmpty()) {
+            xy       = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1445 * scaledWidth : 0.081 * scaledWidth;
+            wh       = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledWidth * 0.821 : scaledWidth * 0.9505;
+            listSize = areas.size();
+            for (int i = 0 ; i < listSize ; i++) {
+                Section area = areas.get(i);
+                double areaStartAngle;
+                if (Double.compare(area.getStart(), maxValue) <= 0 && Double.compare(area.getStop(), minValue) >= 0) {
+                    if (area.getStart() < minValue && area.getStop() < maxValue) {
+                        areaStartAngle = 0;
+                    } else {
+                        areaStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStart() - minValue) * angleStep : -(area.getStart() - minValue) * angleStep;
+                    }
+                    double areaAngleExtend;
+                    if (area.getStop() > maxValue) {
+                        areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - area.getStart()) * angleStep : -(maxValue - area.getStart()) * angleStep;
+                    } else {
+                        areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStop() - area.getStart()) * angleStep : -(area.getStop() - area.getStart()) * angleStep;
+                    }
+                    CTX.save();
+                    if (highlightAreas) {
+                        CTX.setFill(area.contains(value) ? area.getHighlightColor() : area.getColor());
+                    } else {
+                        CTX.setFill(area.getColor());
+                    }
+                    CTX.fillArc(xy, xy + offsetY, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
+                    CTX.restore();
                 }
-                double sectionAngleExtend;
-                if (Double.compare(section.getStop(), maxValue) > 0) {
-                    sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - section.getStart()) * angleStep : -(maxValue - section.getStart()) * angleStep;
-                } else {
-                    sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStop() - section.getStart()) * angleStep : -(section.getStop() - section.getStart()) * angleStep;
-                }
-                ticksAndSections.save();
-                ticksAndSections.setStroke(section.getColor());
-                ticksAndSections.setLineWidth(scaledWidth * 0.052);
-                ticksAndSections.setLineCap(StrokeLineCap.BUTT);
-                ticksAndSections.strokeArc(xy, xy + offsetY, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
-                ticksAndSections.restore();
             }
         }
-    }
 
-    private void drawAreas() {
-        if (areas.isEmpty()) return;
-        TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double            scaledWidth       = width * 0.9;
-        double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1445 * scaledWidth : 0.081 * scaledWidth;
-        double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledWidth * 0.821 : scaledWidth * 0.9505;
-        double            offsetY           = -0.1 * height;
-        double            offset            = 90 - startAngle;
-        ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
-        int               listSize          = areas.size();
-        for (int i = 0 ; i < listSize ; i++) {
-            Section area = areas.get(i);
-            double areaStartAngle;
-            if (Double.compare(area.getStart(), maxValue) <= 0 && Double.compare(area.getStop(), minValue) >= 0) {
-                if (area.getStart() < minValue && area.getStop() < maxValue) {
-                    areaStartAngle = 0;
-                } else {
-                    areaStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStart() - minValue) * angleStep : -(area.getStart() - minValue) * angleStep;
+        // Draw sections
+        if (sectionsVisible && !sections.isEmpty()) {
+            xy       = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.1705 * scaledWidth : 0.107 * scaledWidth;
+            wh       = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledWidth * 0.77 : scaledWidth * 0.897;
+            listSize = sections.size();
+            CTX.setLineWidth(scaledWidth * 0.052);
+            CTX.setLineCap(StrokeLineCap.BUTT);
+            for (int i = 0; i < listSize; i++) {
+                Section section = sections.get(i);
+                double  sectionStartAngle;
+                if (Double.compare(section.getStart(), maxValue) <= 0 && Double.compare(section.getStop(), minValue) >= 0) {
+                    if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
+                        sectionStartAngle = 0;
+                    } else {
+                        sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStart() - minValue) * angleStep : -(section.getStart() - minValue) * angleStep;
+                    }
+                    double sectionAngleExtend;
+                    if (Double.compare(section.getStop(), maxValue) > 0) {
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - section.getStart()) * angleStep : -(maxValue - section.getStart()) * angleStep;
+                    } else {
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStop() - section.getStart()) * angleStep : -(section.getStop() - section.getStart()) * angleStep;
+                    }
+                    CTX.save();
+                    if (highlightSections) {
+                        CTX.setStroke(section.contains(value) ? section.getHighlightColor() : section.getColor());
+                    } else {
+                        CTX.setStroke(section.getColor());
+                    }
+                    CTX.strokeArc(xy, xy + offsetY, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
+                    CTX.restore();
                 }
-                double areaAngleExtend;
-                if (area.getStop() > maxValue) {
-                    areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - area.getStart()) * angleStep : -(maxValue - area.getStart()) * angleStep;
-                } else {
-                    areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStop() - area.getStart()) * angleStep : -(area.getStop() - area.getStart()) * angleStep;
-                }
-                ticksAndSections.save();
-                ticksAndSections.setFill(area.getColor());
-                ticksAndSections.fillArc(xy, xy + offsetY, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
-                ticksAndSections.restore();
             }
         }
     }
 
     private void drawLed() {
-        led.clearRect(0, 0, ledSize, ledSize);
+        ledCtx.clearRect(0, 0, ledSize, ledSize);
 
         boolean isFlatLed = LedType.FLAT == getSkinnable().getLedType();
 
         if (!isFlatLed) {
-            led.setFill(ledFramePaint);
-            led.fillOval(0, 0, ledSize, ledSize);
+            ledCtx.setFill(ledFramePaint);
+            ledCtx.fillOval(0, 0, ledSize, ledSize);
         } else {
             double lineWidth = 0.0037037 * width;
-            led.setStroke(ledFramePaint);
-            led.setLineWidth(lineWidth);
-            led.strokeOval(lineWidth, lineWidth, ledSize - 2 * lineWidth, ledSize - 2 * lineWidth);
+            ledCtx.setStroke(ledFramePaint);
+            ledCtx.setLineWidth(lineWidth);
+            ledCtx.strokeOval(lineWidth, lineWidth, ledSize - 2 * lineWidth, ledSize - 2 * lineWidth);
         }
 
-        led.save();
+        ledCtx.save();
         if (getSkinnable().isLedOn()) {
-            led.setEffect(ledOnShadow);
-            led.setFill(ledOnPaint);
+            ledCtx.setEffect(ledOnShadow);
+            ledCtx.setFill(ledOnPaint);
         } else {
-            led.setEffect(ledOffShadow);
-            led.setFill(ledOffPaint);
+            ledCtx.setEffect(ledOffShadow);
+            ledCtx.setFill(ledOffPaint);
         }
         if (isFlatLed) {
-            led.fillOval(0.2 * ledSize, 0.2 * ledSize, 0.6 * ledSize, 0.6 * ledSize);
+            ledCtx.fillOval(0.2 * ledSize, 0.2 * ledSize, 0.6 * ledSize, 0.6 * ledSize);
         } else {
-            led.fillOval(0.14 * ledSize, 0.14 * ledSize, 0.72 * ledSize, 0.72 * ledSize);
+            ledCtx.fillOval(0.14 * ledSize, 0.14 * ledSize, 0.72 * ledSize, 0.72 * ledSize);
         }
-        led.restore();
+        ledCtx.restore();
 
-        led.setFill(ledHighlightPaint);
-        led.fillOval(0.21 * ledSize, 0.21 * ledSize, 0.58 * ledSize, 0.58 * ledSize);
+        ledCtx.setFill(ledHighlightPaint);
+        ledCtx.fillOval(0.21 * ledSize, 0.21 * ledSize, 0.58 * ledSize, 0.58 * ledSize);
     }
 
     private void drawMarkers() {
         markerPane.getChildren().setAll(markerMap.values());
         markerPane.getChildren().add(threshold);
-        TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
-        double            markerSize        = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0125 * width : 0.015 * width;
-        double            pathHalf          = markerSize * 0.3;
-        double            scaledWidth       = width * 0.9;
-        double            centerX           = width * 0.5;
-        double            centerY           = Pos.TOP_CENTER == getSkinnable().getKnobPosition() ? height * 0.1 : height * 0.9;
-        ScaleDirection    scaleDirection    = getSkinnable().getScaleDirection();
+        double markerSize  = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0125 * width : 0.015 * width;
+        double pathHalf    = markerSize * 0.3;
+        double scaledWidth = width * 0.9;
+        double centerX     = width * 0.5;
+        double centerY     = Pos.TOP_CENTER == getSkinnable().getKnobPosition() ? height * 0.1 : height * 0.9;
         if (getSkinnable().getMarkersVisible()) {
             for (Map.Entry<Marker, Shape> entry : markerMap.entrySet()) {
                 Marker marker = entry.getKey();
@@ -899,9 +938,13 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             pane.setEffect(getSkinnable().isInnerShadowEnabled() ? backgroundInnerShadow : null);
 
-            ticksAndSectionsCanvas.setWidth(width);
-            ticksAndSectionsCanvas.setHeight(width);
-            ticksAndSectionsCanvas.relocate(0, Pos.TOP_CENTER == getSkinnable().getKnobPosition() ? -height * 0.8 : 0);
+            sectionsAndAreasCanvas.setWidth(width);
+            sectionsAndAreasCanvas.setHeight(width);
+            sectionsAndAreasCanvas.relocate(0, Pos.TOP_CENTER == getSkinnable().getKnobPosition() ? -height * 0.8 : 0);
+
+            tickMarkCanvas.setWidth(width);
+            tickMarkCanvas.setHeight(width);
+            tickMarkCanvas.relocate(0, Pos.TOP_CENTER == getSkinnable().getKnobPosition() ? -height * 0.8 : 0);
 
             markerPane.setPrefSize(width, width);
 
@@ -1002,17 +1045,20 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         // Areas, Sections and Tick Marks
-        ticksAndSectionsCanvas.setCache(false);
-        ticksAndSections.clearRect(0, 0, width, width);
-        if (getSkinnable().getAreasVisible()) drawAreas();
+        tickLabelLocation = getSkinnable().getTickLabelLocation();
+        scaleDirection    = getSkinnable().getScaleDirection();
+        if (getSkinnable().getAreasVisible() | getSkinnable().getSectionsVisible()) {
+            sectionsAndAreasCtx.clearRect(0, 0, width, width);
+            drawAreasAndSections(sectionsAndAreasCtx);
+        }
+        tickMarkCanvas.setCache(false);
+        tickMarkCtx.clearRect(0, 0, width, width);
         if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
             drawGradientBar();
-        } else if (getSkinnable().getSectionsVisible()) {
-            drawSections();
         }
-        Helper.drawRadialTickMarks(getSkinnable(), ticksAndSections, minValue, maxValue, startAngle, angleRange, angleStep, width * 0.5, height * 0.9, width * 0.9);
-        ticksAndSectionsCanvas.setCache(true);
-        ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
+        Helper.drawRadialTickMarks(getSkinnable(), tickMarkCtx, minValue, maxValue, startAngle, angleRange, angleStep, width * 0.5, height * 0.9, width * 0.9);
+        tickMarkCanvas.setCache(true);
+        tickMarkCanvas.setCacheHint(CacheHint.QUALITY);
 
         // LED
         if (getSkinnable().isLedVisible()) {
