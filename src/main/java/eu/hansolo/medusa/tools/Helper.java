@@ -953,8 +953,9 @@ public class Helper {
                 CTX.save();
                 if (highlightAreas) {
                     CTX.setFill(area.contains(time.toLocalTime()) ? area.getHighlightColor() : area.getColor());
+                } else {
+                    CTX.setFill(area.getColor());
                 }
-                CTX.setFill(area.getColor());
                 CTX.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), -areaAngleExtend, ArcType.ROUND);
                 CTX.restore();
             }

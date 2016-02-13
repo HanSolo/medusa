@@ -262,8 +262,8 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         Color   minuteTickMarkColor    = getSkinnable().getMinuteTickMarkColor();
         boolean hourTickMarksVisible   = getSkinnable().isHourTickMarksVisible();
         boolean minuteTickMarksVisible = getSkinnable().isMinuteTickMarksVisible();
-        tickCtx.setLineCap(StrokeLineCap.ROUND);
         tickCtx.clearRect(0, 0, size, size);
+        tickCtx.setLineCap(StrokeLineCap.ROUND);
         for (double angle = 0, counter = 0 ; Double.compare(counter, 59) <= 0 ; angle -= angleStep, counter++) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
@@ -337,8 +337,8 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         // Highlight Areas and Sections
         if (highlightAreas | highlightSections) {
             sectionsAndAreasCtx.clearRect(0, 0, size, size);
-            if (getSkinnable().getAreasVisible()) Helper.drawTimeAreas(getSkinnable(), sectionsAndAreasCtx, areas, size, 0.03, 0.03, 0.94, 0.94);
-            if (getSkinnable().getSectionsVisible()) Helper.drawTimeSections(getSkinnable(), sectionsAndAreasCtx, sections, size, 0.065, 0.065, 0.87, 0.87, 0.07);
+            if (areasVisible) Helper.drawTimeAreas(getSkinnable(), sectionsAndAreasCtx, areas, size, 0.03, 0.03, 0.94, 0.94);
+            if (sectionsVisible) Helper.drawTimeSections(getSkinnable(), sectionsAndAreasCtx, sections, size, 0.065, 0.065, 0.87, 0.87, 0.07);
         }
     }
 
@@ -430,8 +430,8 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
         // Areas, Sections
         sectionsAndAreasCtx.clearRect(0, 0, size, size);
-        if (getSkinnable().getAreasVisible())    Helper.drawTimeAreas(getSkinnable(), sectionsAndAreasCtx, areas, size, 0.03, 0.03, 0.94, 0.94);
-        if (getSkinnable().getSectionsVisible()) Helper.drawTimeSections(getSkinnable(), sectionsAndAreasCtx, sections, size, 0.065, 0.065, 0.87, 0.87, 0.07);
+        if (areasVisible)    Helper.drawTimeAreas(getSkinnable(), sectionsAndAreasCtx, areas, size, 0.03, 0.03, 0.94, 0.94);
+        if (sectionsVisible) Helper.drawTimeSections(getSkinnable(), sectionsAndAreasCtx, sections, size, 0.065, 0.065, 0.87, 0.87, 0.07);
 
         // Tick Marks
         tickCanvas.setCache(false);
