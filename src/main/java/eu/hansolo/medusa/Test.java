@@ -57,48 +57,11 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.SECTION)
                             .prefSize(400, 400)
-                            .needleColor(Color.ORANGE)
-                            .minValue(0)
-                            .maxValue(105)
-                            .animated(true)
-                            .highlightSections(true)
-                            .sections(
-                                SectionBuilder.create().start(0).stop(15).text("EXCELLENT").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(18, 158, 81)).textColor(Gauge.DARK_COLOR).build(),
-                                SectionBuilder.create().start(15).stop(30).text("VERY\nGOOD").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(151, 208, 77)).textColor(Gauge.DARK_COLOR).build(),
-                                SectionBuilder.create().start(30).stop(45).text("GOOD").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(197, 223, 0)).textColor(Gauge.DARK_COLOR).build(),
-                                SectionBuilder.create().start(45).stop(60).text("FAIRLY\nGOOD").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(251, 245, 0)).textColor(Gauge.DARK_COLOR).build(),
-                                SectionBuilder.create().start(60).stop(75).text("AVERAGE").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(247, 206, 0)).textColor(Gauge.DARK_COLOR).build(),
-                                SectionBuilder.create().start(75).stop(90).text("BELOW\nAVERAGE").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(227, 124, 1)).textColor(Gauge.DARK_COLOR).build(),
-                                SectionBuilder.create().start(90).stop(105).text("POOR").color(Color.rgb(223, 223, 223)).highlightColor(Color.rgb(223, 49, 23)).textColor(Gauge.DARK_COLOR).build())
                             .build();
-
-        TimeSection gardenLightOn = TimeSectionBuilder.create()
-                                                      .start(LocalTime.of(18, 00, 00))
-                                                      .stop(LocalTime.of(22, 00, 00))
-                                                      .color(Color.rgb(200, 100, 0, 0.1))
-                                                      .highlightColor(Color.rgb(200, 100, 0, 0.75))
-                                                      .onTimeSectionEntered(event -> System.out.println("Garden light on"))
-                                                      .onTimeSectionLeft(event -> System.out.println("Garden light off"))
-                                                      .build();
-
-        TimeSection lunchBreak = TimeSectionBuilder.create()
-                                                   .start(LocalTime.of(12, 00, 00))
-                                                   .stop(LocalTime.of(13, 00, 00))
-                                                   .color(Color.rgb(200, 0, 0, 0.1))
-                                                   .highlightColor(Color.rgb(200, 0, 0, 0.75))
-                                                   .build();
-
+        
         clock = ClockBuilder.create()
-                            //.skinType(ClockSkinType.SLIM)
                             .prefSize(400, 400)
-                            .sectionsVisible(true)
-                            .highlightSections(true)
-                            .sections(gardenLightOn)
-                            .areasVisible(true)
-                            .areas(lunchBreak)
-                            .running(true)
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -137,7 +100,7 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        timer.start();
+        //timer.start();
     }
 
     @Override public void stop() {
