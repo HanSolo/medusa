@@ -27,6 +27,7 @@ import javafx.scene.Parent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -57,18 +58,37 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
+                            .skinType(SkinType.SIMPLE)
                             .prefSize(400, 400)
+                            .borderPaint(Gauge.DARK_COLOR)
+                            .tickLabelColor(Gauge.DARK_COLOR)
+                            .needleColor(Gauge.DARK_COLOR)
+                            .needleBorderColor(Gauge.DARK_COLOR)
+                            .sections(new Section(0, 10, Color.rgb(146, 172, 0)),
+                                      new Section(10, 20, Color.rgb(171, 206, 0)),
+                                      new Section(20, 30, Color.rgb(220, 239, 0)),
+                                      new Section(30, 40, Color.rgb(243, 228, 0)),
+                                      new Section(40, 50, Color.rgb(253, 212, 0)),
+                                      new Section(50, 60, Color.rgb(248, 174, 0)),
+                                      new Section(60, 70, Color.rgb(252, 153, 0)),
+                                      new Section(70, 80, Color.rgb(251, 97, 0)),
+                                      new Section(80, 90, Color.rgb(249, 57, 0)),
+                                      new Section(90, 100, Color.rgb(248, 0, 0)))
+                            .animated(true)
                             .build();
-        
+
         clock = ClockBuilder.create()
+                            .skinType(ClockSkinType.ROUND_LCD)
                             .prefSize(400, 400)
+                            .running(true)
                             .build();
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
                 if (now > lastTimerCall + 3_000_000_000l) {
-                    gauge.setValue(RND.nextDouble() * gauge.getRange() + gauge.getMinValue());
+                    double value = RND.nextDouble() * gauge.getRange() + gauge.getMinValue();
+                    gauge.setValue(value);
                     lastTimerCall = now;
                 }
             }
@@ -76,7 +96,8 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(clock);
+        HBox pane = new HBox(gauge, clock);
+        pane.setSpacing(10);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
@@ -85,7 +106,7 @@ public class Test extends Application {
         //pane.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
         //pane.setBackground(new Background(new BackgroundFill(Color.rgb(39,44,50), CornerRadii.EMPTY, Insets.EMPTY)));
         //pane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-        //pane.setBackground(new Background(new BackgroundFill(Color.rgb(67,66,64), CornerRadii.EMPTY, Insets.EMPTY)));
+        //pane.setBackground(new Background(new BackgroundFill(Color.rgb(10,37,64), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
 
@@ -100,7 +121,7 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        //timer.start();
+        timer.start();
     }
 
     @Override public void stop() {
