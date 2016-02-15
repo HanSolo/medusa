@@ -239,8 +239,12 @@ public class Gauge extends Control {
     private ObjectProperty<NeedleBehavior>       needleBehavior;
     private Color                                _needleColor;
     private ObjectProperty<Color>                needleColor;
+    private Color                                _needleBorderColor;
+    private ObjectProperty<Color>                needleBorderColor;
     private Color                                _barColor;
     private ObjectProperty<Color>                barColor;
+    private Color                                _barBorderColor;
+    private ObjectProperty<Color>                barBorderColor;
     private Color                                _barBackgroundColor;
     private ObjectProperty<Color>                barBackgroundColor;
     private LcdDesign                            _lcdDesign;
@@ -477,7 +481,9 @@ public class Gauge extends Control {
         _needleSize                       = NeedleSize.STANDARD;
         _needleBehavior                   = NeedleBehavior.STANDARD;
         _needleColor                      = Color.rgb(200, 0, 0);
+        _needleBorderColor                = Color.TRANSPARENT;
         _barColor                         = BRIGHT_COLOR;
+        _barBorderColor                   = Color.TRANSPARENT;
         _barBackgroundColor               = DARK_COLOR;
         _lcdDesign                        = LcdDesign.STANDARD;
         _lcdFont                          = LcdFont.DIGITAL_BOLD;
@@ -2355,6 +2361,33 @@ public class Gauge extends Control {
     }
 
     /**
+     * Returns the color that is used to colorize the border of the needle.
+     * @return the color that is used to colorize the border of the needle
+     */
+    public Color getNeedleBorderColor() { return null == needleBorderColor ? _needleBorderColor : needleBorderColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the border of the needle.
+     * @param COLOR
+     */
+    public void setNeedleBorderColor(final Color COLOR) {
+        if (null == needleBorderColor) {
+            _needleBorderColor = COLOR;
+        } else {
+            needleBorderColor.set(COLOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public ObjectProperty<Color> needleBorderColorProperty() {
+        if (null == needleBorderColor) { needleBorderColor = new ObjectPropertyBase<Color>(_needleBorderColor) {
+            @Override public void set(final Color COLOR) { super.set(null == COLOR ? Color.TRANSPARENT : COLOR); }
+            @Override public Object getBean() { return Gauge.this; }
+            @Override public String getName() { return "needleBorderColor"; }
+            };
+        }
+        return needleBorderColor;
+    }
+    
+    /**
      * Returns the color that will be used to colorize the bar of
      * the gauge (if it has a bar).
      * @return the color that will be used to colorized the bar (if available)
@@ -2378,6 +2411,33 @@ public class Gauge extends Control {
         return barColor;
     }
 
+    /**
+     * Returns the color that is used to colorize the border of the bar.
+     * @return the color that is used to colorize the border of the bar
+     */
+    public Color getBarBorderColor() { return null == barBorderColor ? _barBorderColor : barBorderColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the border of the bar.
+     * @param COLOR
+     */
+    public void setBarBorderColor(final Color COLOR) {
+        if (null == barBorderColor) {
+            _barBorderColor = COLOR;
+        } else {
+            barBorderColor.set(COLOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public ObjectProperty<Color> barBorderColorProperty() {
+        if (null == barBorderColor) { barBorderColor = new ObjectPropertyBase<Color>(_barBorderColor) {
+            @Override public void set(final Color COLOR) { super.set(null == COLOR ? Color.TRANSPARENT : COLOR); }
+            @Override public Object getBean() { return Gauge.this; }
+            @Override public String getName() { return "barBorderColor"; }
+        };
+        }
+        return barBorderColor;
+    }
+    
     /**
      * Returns the color that will be used to colorize the bar background of
      * the gauge (if it has a bar).
@@ -3774,8 +3834,10 @@ public class Gauge extends Control {
             case SIMPLE      :
                 setKnobPosition(Pos.CENTER);
                 setBorderPaint(Color.WHITE);
+                setNeedleBorderColor(Color.WHITE);
                 setBackgroundPaint(Color.DARKGRAY);
                 setDecimals(0);
+                setTickLabelColor(Color.WHITE);
                 setNeedleColor(Color.web("#5a615f"));
                 setValueColor(Color.WHITE);
                 setTitleColor(Color.WHITE);

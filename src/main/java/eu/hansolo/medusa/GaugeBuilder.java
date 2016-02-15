@@ -242,8 +242,18 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B needleBorderColor(final Color COLOR) {
+        properties.put("needleBorderColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B barColor(final Color COLOR) {
         properties.put("barColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
+    public final B barBorderColor(final Color COLOR) {
+        properties.put("barBorderColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
@@ -795,8 +805,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 case SIMPLE      :
                     CONTROL.setKnobPosition(Pos.CENTER);
                     CONTROL.setBorderPaint(Color.WHITE);
+                    CONTROL.setNeedleBorderColor(Color.WHITE);
                     CONTROL.setBackgroundPaint(Color.DARKGRAY);
                     CONTROL.setDecimals(0);
+                    CONTROL.setTickLabelColor(Color.WHITE);
                     CONTROL.setNeedleColor(Color.web("#5a615f"));
                     CONTROL.setValueColor(Color.WHITE);
                     CONTROL.setTitleColor(Color.WHITE);
@@ -1037,8 +1049,12 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setNeedleBehavior(((ObjectProperty<NeedleBehavior>) properties.get(key)).get());
             } else if("needleColor".equals(key)) {
                 CONTROL.setNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if("needleBorderColor".equals(key)) {
+                CONTROL.setNeedleBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("barColor".equals(key)) {
                 CONTROL.setBarColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if("barBorderColor".equals(key)) {
+                CONTROL.setBarBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("barBackgroundColor".equals(key)) {
                 CONTROL.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("tickLabelOrientation".equals(key)) {
