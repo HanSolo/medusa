@@ -21,7 +21,6 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.collections.ListChangeListener;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
@@ -30,13 +29,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.ClosePath;
@@ -223,6 +215,8 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (valueText.getLayoutBounds().getWidth() > 0.395 * size) { resizeText(); }
     }
 
+
+    // ******************** Drawing *******************************************
     private void drawSections() {
         sectionsCtx.clearRect(0, 0, size, size);
         double value               = getSkinnable().getCurrentValue();
@@ -230,11 +224,15 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         boolean sectionIconVisible = getSkinnable().getSectionIconsVisible();
         double offset              = START_ANGLE - 90;
         int listSize               = sections.size();
-        double sectionsOffset      = size * 0.015;
-        double sectionsSize        = size - (size * 0.03);
+        double xy                  = size * 0.015;
+        double wh                  = size - (size * 0.03);
+        double sectionXY           = size * 0.1375;
+        double sectionWH           = size - (size * 0.275);
         angleStep                  = ANGLE_RANGE / (getSkinnable().getRange());
         double sinValue;
         double cosValue;
+        sectionsCtx.setLineWidth(size * 0.27);
+        sectionsCtx.setLineCap(StrokeLineCap.BUTT);
         for (int i = 0 ; i < listSize ; i++) {
             Section section = sections.get(i);
             final double SECTION_START_ANGLE;
@@ -253,11 +251,11 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
             sectionsCtx.save();
             if (highlightSections) {
-                sectionsCtx.setFill(section.contains(value) ? section.getHighlightColor() : section.getColor());
+                sectionsCtx.setStroke(section.contains(value) ? section.getHighlightColor() : section.getColor());
             } else {
-                sectionsCtx.setFill(section.getColor());
+                sectionsCtx.setStroke(section.getColor());
             }
-            sectionsCtx.fillArc(sectionsOffset, sectionsOffset, sectionsSize, sectionsSize, (offset - SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.ROUND);
+            sectionsCtx.strokeArc(sectionXY, sectionXY, sectionWH, sectionWH, (offset - SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
 
             // Draw Section Text
             if (sectionTextVisible) {
@@ -284,22 +282,33 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Draw white border around area
         sectionsCtx.setStroke(getSkinnable().getBorderPaint());
         sectionsCtx.setLineWidth(size * 0.025);
-        sectionsCtx.strokeArc(sectionsOffset, sectionsOffset, sectionsSize, sectionsSize, offset + 90, ANGLE_RANGE, ArcType.ROUND);
+        sectionsCtx.strokeArc(xy, xy, wh, wh, offset + 90, ANGLE_RANGE, ArcType.ROUND);
+
+        if (getSkinnable().getTickLabelsVisible()) {
+            sectionsCtx.setFont(Fonts.robotoRegular(size * 0.1));
+            sectionsCtx.setFill(getSkinnable().getTickLabelColor());
+            sectionsCtx.setTextBaseline(VPos.TOP);
+            sectionsCtx.setTextAlign(TextAlignment.LEFT);
+            sectionsCtx.fillText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()), size * 0.15075377, size * 0.86180905, size * 0.3);
+            sectionsCtx.setTextAlign(TextAlignment.RIGHT);
+            sectionsCtx.fillText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()), size * 0.84924623, size * 0.86180905, size * 0.3);
+        }
     }
 
     private void resizeText() {
-        double fontSize = size * 0.145;
+        double fontSize = size * 0.25;
+        double maxWidth = 0.35 * size;
         valueText.setFont(Fonts.robotoMedium(fontSize));
-        double maxWidth = 0.395 * size;
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
-        valueText.setTranslateY(size * (titleText.getText().isEmpty() ? 0.5 : 0.48));
+        valueText.setTranslateY(size * (titleText.getText().isEmpty() ? 0.5 : 0.46));
 
-        fontSize = size * 0.045;
+        fontSize = size * 0.075;
+        maxWidth = size * 0.3;
         titleText.setFont(Fonts.robotoMedium(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.setTranslateX((size - titleText.getLayoutBounds().getWidth()) * 0.5);
-        titleText.setTranslateY(size * 0.5 + valueText.getFont().getSize() * 0.7);
+        titleText.setTranslateY(size * 0.5 + valueText.getFont().getSize() * 0.45);
     }
     
     private void resize() {
@@ -334,7 +343,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleCubicCurveTo4.setControlX2(0.6448105 * size); needleCubicCurveTo4.setControlY2(0.296985 * size);
             needleCubicCurveTo4.setX(0.5392625 * size); needleCubicCurveTo4.setY(0.2784125 * size);
 
-            needleLineTo5.setX(0.5 * size); needleLineTo5.setY(0.0225 * size);
+            needleLineTo5.setX(0.5 * size); needleLineTo5.setY(0.004 * size);
 
             needleLineTo6.setX(0.4607375 * size); needleLineTo6.setY(0.2784125 * size);
 
@@ -363,7 +372,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void redraw() {
         needle.setFill(getSkinnable().getNeedleColor());
-        needle.setStroke(getSkinnable().getBorderPaint());
+        needle.setStroke(getSkinnable().getNeedleBorderColor());
         titleText.setFill(getSkinnable().getTitleColor());
         valueText.setFill(getSkinnable().getValueColor());
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
