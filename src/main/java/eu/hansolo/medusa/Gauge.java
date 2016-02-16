@@ -3885,6 +3885,8 @@ public class Gauge extends Control {
                 setMinMeasuredValueVisible(true);
                 setMaxMeasuredValueVisible(true);
                 setOldValueVisible(true);
+                setBorderPaint(Color.WHITE);
+                setForegroundPaint(Color.WHITE);
                 super.setSkin(new LcdSkin(Gauge.this));
                 break;
             case TINY:

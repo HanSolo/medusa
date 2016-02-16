@@ -59,10 +59,7 @@ public enum LcdDesign {
     GRAY_PURPLE(Color.rgb(153, 164, 161), Color.rgb(203, 215, 213), Color.rgb(202, 212, 211), Color.rgb(202, 212, 211), Color.rgb(198, 209, 213), Color.rgb(99, 124, 204), Color.rgb(99, 124, 204, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
     YOCTOPUCE(Color.web("#0E181F"), Color.web("#232341"), Color.web("#1E1E3C"), Color.web("#1E1E3C"), Color.web("#191937"), Color.web("#99E5FF"), Color.rgb(153,229,255, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
     SECTIONS(Color.web("#B2B2B2"), Color.web("#FFFFFF"), Color.web("#C4C4C4"), Color.web("#C4C4C4"), Color.web("#B2B2B2"), Color.web("#000000"), Color.rgb(0, 0, 0, 0.1)) { @Override public Color[] getColors() { return this.COLORS; } },
-    FLAT_CUSTOM(Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, Color.WHITE, Color.TRANSPARENT) { @Override public Color[] getColors() {
-        return new Color[] {lcdBackgroundColor, lcdBackgroundColor, lcdBackgroundColor, lcdBackgroundColor, lcdBackgroundColor,
-                            lcdForegroundColor, Color.color(lcdForegroundColor.getRed(), lcdForegroundColor.getGreen(), lcdForegroundColor.getBlue(), 0.1)};
-    } };
+    FLAT_CUSTOM(Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, Color.WHITE, Color.TRANSPARENT) { @Override public Color[] getColors() { return this.COLORS; } };
 
 
     protected final Color[] COLORS;

@@ -318,7 +318,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         }
 
-
         lcdPaint = new LinearGradient(0, 1, 0, HEIGHT - 1,
                                       false, CycleMethod.NO_CYCLE,
                                       new Stop(0, lcdColors[0]),
@@ -327,7 +326,20 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                       new Stop(0.5, lcdColors[3]),
                                       new Stop(1.0, lcdColors[4]));
         if (lcdDesign.name().startsWith("FLAT")) {
-            lcdFramePaint = Color.WHITE;
+            lcdFramePaint = getSkinnable().getBorderPaint();
+
+            lcdPaint      = getSkinnable().getBackgroundPaint();
+
+            Color foregroundPaint = (Color) getSkinnable().getForegroundPaint();
+            backgroundText.setFill(Color.color(foregroundPaint.getRed(), foregroundPaint.getGreen(), foregroundPaint.getBlue(), 0.1));
+            valueText.setFill(foregroundPaint);
+            upperLeftText.setFill(foregroundPaint);
+            title.setFill(foregroundPaint);
+            upperRightText.setFill(foregroundPaint);
+            unitText.setFill(foregroundPaint);
+            lowerRightText.setFill(foregroundPaint);
+            lowerCenterText.setFill(foregroundPaint);
+            threshold.setFill(foregroundPaint);
         } else {
             lcdFramePaint = new LinearGradient(0, 0.02083333 * height, 0, HEIGHT - 0.02083333 * HEIGHT,
                                                false, CycleMethod.NO_CYCLE,
@@ -335,20 +347,28 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                new Stop(0.015, Color.rgb(77, 77, 77)),
                                                new Stop(0.985, Color.rgb(77, 77, 77)),
                                                new Stop(1.0, Color.rgb(221, 221, 221)));
+
+            lcdPaint = new LinearGradient(0, 1, 0, HEIGHT - 1,
+                                          false, CycleMethod.NO_CYCLE,
+                                          new Stop(0, lcdColors[0]),
+                                          new Stop(0.03, lcdColors[1]),
+                                          new Stop(0.5, lcdColors[2]),
+                                          new Stop(0.5, lcdColors[3]),
+                                          new Stop(1.0, lcdColors[4]));
+
+            backgroundText.setFill(lcdDesign.lcdBackgroundColor);
+            valueText.setFill(lcdDesign.lcdForegroundColor);
+            upperLeftText.setFill(lcdDesign.lcdForegroundColor);
+            title.setFill(lcdDesign.lcdForegroundColor);
+            upperRightText.setFill(lcdDesign.lcdForegroundColor);
+            unitText.setFill(lcdDesign.lcdForegroundColor);
+            lowerRightText.setFill(lcdDesign.lcdForegroundColor);
+            lowerCenterText.setFill(lcdDesign.lcdForegroundColor);
+            threshold.setFill(lcdDesign.lcdForegroundColor);
         }
 
         pane.setBackground(new Background(new BackgroundFill(lcdPaint, new CornerRadii(0.10416667 * HEIGHT), Insets.EMPTY)));
         pane.setBorder(new Border(new BorderStroke(lcdFramePaint, BorderStrokeStyle.SOLID, new CornerRadii(0.05 * HEIGHT), new BorderWidths(0.02083333 * HEIGHT))));
-
-        backgroundText.setFill(lcdDesign.lcdBackgroundColor);
-        valueText.setFill(lcdDesign.lcdForegroundColor);
-        upperLeftText.setFill(lcdDesign.lcdForegroundColor);
-        title.setFill(lcdDesign.lcdForegroundColor);
-        upperRightText.setFill(lcdDesign.lcdForegroundColor);
-        unitText.setFill(lcdDesign.lcdForegroundColor);
-        lowerRightText.setFill(lcdDesign.lcdForegroundColor);
-        lowerCenterText.setFill(lcdDesign.lcdForegroundColor);
-        threshold.setFill(lcdDesign.lcdForegroundColor);
     }
 
     private void updateSectionColors() {
@@ -604,17 +624,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void redraw() {
         valueFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         otherFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
-
-        LcdDesign lcdDesign = getSkinnable().getLcdDesign();
-        backgroundText.setFill(lcdDesign.lcdBackgroundColor);
-        valueText.setFill(lcdDesign.lcdForegroundColor);
-        upperLeftText.setFill(lcdDesign.lcdForegroundColor);
-        title.setFill(lcdDesign.lcdForegroundColor);
-        upperRightText.setFill(lcdDesign.lcdForegroundColor);
-        unitText.setFill(lcdDesign.lcdForegroundColor);
-        lowerRightText.setFill(lcdDesign.lcdForegroundColor);
-        lowerCenterText.setFill(lcdDesign.lcdForegroundColor);
-        threshold.setFill(lcdDesign.lcdForegroundColor);
 
         threshold.setVisible(Double.compare(getSkinnable().getCurrentValue(), getSkinnable().getThreshold()) >= 0);
 

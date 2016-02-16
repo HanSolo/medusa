@@ -850,6 +850,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setMinMeasuredValueVisible(true);
                     CONTROL.setMaxMeasuredValueVisible(true);
                     CONTROL.setOldValueVisible(true);
+                    CONTROL.setBorderPaint(Color.WHITE);
+                    CONTROL.setForegroundPaint(Color.WHITE);
                     break;
                 case TINY:
                     CONTROL.setBorderWidth(24);
