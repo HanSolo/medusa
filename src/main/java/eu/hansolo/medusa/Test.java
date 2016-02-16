@@ -58,23 +58,11 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.SIMPLE)
-                            .prefSize(400, 400)
-                            .borderPaint(Gauge.DARK_COLOR)
-                            .tickLabelColor(Gauge.DARK_COLOR)
-                            .needleColor(Gauge.DARK_COLOR)
-                            .needleBorderColor(Gauge.DARK_COLOR)
-                            .sections(new Section(0, 10, Color.rgb(146, 172, 0)),
-                                      new Section(10, 20, Color.rgb(171, 206, 0)),
-                                      new Section(20, 30, Color.rgb(220, 239, 0)),
-                                      new Section(30, 40, Color.rgb(243, 228, 0)),
-                                      new Section(40, 50, Color.rgb(253, 212, 0)),
-                                      new Section(50, 60, Color.rgb(248, 174, 0)),
-                                      new Section(60, 70, Color.rgb(252, 153, 0)),
-                                      new Section(70, 80, Color.rgb(251, 97, 0)),
-                                      new Section(80, 90, Color.rgb(249, 57, 0)),
-                                      new Section(90, 100, Color.rgb(248, 0, 0)))
-                            .animated(true)
+                            .skinType(SkinType.LCD)
+                            .lcdDesign(LcdDesign.FLAT_CUSTOM)
+                            .borderPaint(Color.RED)
+                            .backgroundPaint(Color.ORANGE)
+                            //.foregroundPaint(Color.CYAN)
                             .build();
 
         clock = ClockBuilder.create()
@@ -97,7 +85,7 @@ public class Test extends Application {
 
     @Override public void start(Stage stage) {
         HBox pane = new HBox(gauge, clock);
-        pane.setSpacing(10);
+        pane.setSpacing(30);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
