@@ -1739,6 +1739,8 @@ public class Clock extends Control {
                 super.setSkin(new ClockSkin(Clock.this));
                 break;
             case LCD:
+                setBorderPaint(Color.WHITE);
+                setForegroundPaint(Color.WHITE);
                 super.setSkin(new LcdClockSkin(Clock.this));
                 break;
             case PEAR:

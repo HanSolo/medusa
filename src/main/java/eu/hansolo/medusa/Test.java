@@ -66,9 +66,15 @@ public class Test extends Application {
                             .build();
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.ROUND_LCD)
-                            .prefSize(400, 400)
-                            .running(true)
+                            .skinType(ClockSkinType.LCD)
+                            .lcdDesign(LcdDesign.FLAT_CUSTOM)
+                            .title("Surfboard")
+                            .titleVisible(true)
+                            .dateVisible(true)
+                            .borderPaint(Color.RED)
+                            .backgroundPaint(Color.ORANGE)
+                            //.foregroundPaint(Color.CYAN)
+                            .secondsVisible(true)
                             .build();
 
         lastTimerCall = System.nanoTime();

@@ -330,16 +330,16 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             lcdPaint      = getSkinnable().getBackgroundPaint();
 
-            Color foregroundPaint = (Color) getSkinnable().getForegroundPaint();
-            backgroundText.setFill(Color.color(foregroundPaint.getRed(), foregroundPaint.getGreen(), foregroundPaint.getBlue(), 0.1));
-            valueText.setFill(foregroundPaint);
-            upperLeftText.setFill(foregroundPaint);
-            title.setFill(foregroundPaint);
-            upperRightText.setFill(foregroundPaint);
-            unitText.setFill(foregroundPaint);
-            lowerRightText.setFill(foregroundPaint);
-            lowerCenterText.setFill(foregroundPaint);
-            threshold.setFill(foregroundPaint);
+            Color lcdForegroundColor = (Color) getSkinnable().getForegroundPaint();
+            backgroundText.setFill(Color.color(lcdForegroundColor.getRed(), lcdForegroundColor.getGreen(), lcdForegroundColor.getBlue(), 0.1));
+            valueText.setFill(lcdForegroundColor);
+            upperLeftText.setFill(lcdForegroundColor);
+            title.setFill(lcdForegroundColor);
+            upperRightText.setFill(lcdForegroundColor);
+            unitText.setFill(lcdForegroundColor);
+            lowerRightText.setFill(lcdForegroundColor);
+            lowerCenterText.setFill(lcdForegroundColor);
+            threshold.setFill(lcdForegroundColor);
         } else {
             lcdFramePaint = new LinearGradient(0, 0.02083333 * height, 0, HEIGHT - 0.02083333 * HEIGHT,
                                                false, CycleMethod.NO_CYCLE,

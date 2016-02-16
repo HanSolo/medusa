@@ -298,7 +298,19 @@ public class LcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
                                       new Stop(0.5, lcdColors[3]),
                                       new Stop(1.0, lcdColors[4]));
         if (lcdDesign.name().startsWith("FLAT")) {
-            lcdFramePaint = Color.WHITE;
+            lcdFramePaint = getSkinnable().getBorderPaint();
+
+            lcdPaint      = getSkinnable().getBackgroundPaint();
+
+            Color lcdForegroundColor = (Color) getSkinnable().getForegroundPaint();
+            backgroundTimeText.setFill(Color.color(lcdForegroundColor.getRed(), lcdForegroundColor.getGreen(), lcdForegroundColor.getBlue(), 0.1));
+            backgroundSecondText.setFill(Color.color(lcdForegroundColor.getRed(), lcdForegroundColor.getGreen(), lcdForegroundColor.getBlue(), 0.1));
+            timeText.setFill(lcdForegroundColor);
+            secondText.setFill(lcdForegroundColor);
+            title.setFill(lcdForegroundColor);
+            dateText.setFill(lcdForegroundColor);
+            dayOfWeekText.setFill(lcdForegroundColor);
+            alarm.setFill(lcdForegroundColor);
         } else {
             lcdFramePaint = new LinearGradient(0, 0.02083333 * height, 0, HEIGHT - 0.02083333 * HEIGHT,
                                                false, CycleMethod.NO_CYCLE,
@@ -306,18 +318,27 @@ public class LcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
                                                new Stop(0.015, Color.rgb(77, 77, 77)),
                                                new Stop(0.985, Color.rgb(77, 77, 77)),
                                                new Stop(1.0, Color.rgb(221, 221, 221)));
+
+            lcdPaint = new LinearGradient(0, 1, 0, HEIGHT - 1,
+                                          false, CycleMethod.NO_CYCLE,
+                                          new Stop(0, lcdColors[0]),
+                                          new Stop(0.03, lcdColors[1]),
+                                          new Stop(0.5, lcdColors[2]),
+                                          new Stop(0.5, lcdColors[3]),
+                                          new Stop(1.0, lcdColors[4]));
+
+            backgroundTimeText.setFill(lcdDesign.lcdBackgroundColor);
+            backgroundSecondText.setFill(lcdDesign.lcdBackgroundColor);
+            timeText.setFill(lcdDesign.lcdForegroundColor);
+            secondText.setFill(lcdDesign.lcdForegroundColor);
+            title.setFill(lcdDesign.lcdForegroundColor);
+            dateText.setFill(lcdDesign.lcdForegroundColor);
+            dayOfWeekText.setFill(lcdDesign.lcdForegroundColor);
+            alarm.setFill(lcdDesign.lcdForegroundColor);
         }
 
         pane.setBackground(new Background(new BackgroundFill(lcdPaint, new CornerRadii(0.10416667 * HEIGHT), Insets.EMPTY)));
         pane.setBorder(new Border(new BorderStroke(lcdFramePaint, BorderStrokeStyle.SOLID, new CornerRadii(0.05 * HEIGHT), new BorderWidths(0.02083333 * HEIGHT))));
-
-        backgroundTimeText.setFill(lcdDesign.lcdBackgroundColor);
-        backgroundSecondText.setFill(lcdDesign.lcdBackgroundColor);
-        timeText.setFill(lcdDesign.lcdForegroundColor);
-        secondText.setFill(lcdDesign.lcdForegroundColor);
-        title.setFill(lcdDesign.lcdForegroundColor);
-        dateText.setFill(lcdDesign.lcdForegroundColor);
-        dayOfWeekText.setFill(lcdDesign.lcdForegroundColor);
     }
 
     private void adjustDateFormat() {
@@ -623,16 +644,6 @@ public class LcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     }
 
     private void redraw() {
-        LcdDesign lcdDesign = getSkinnable().getLcdDesign();
-        backgroundTimeText.setFill(lcdDesign.lcdBackgroundColor);
-        backgroundSecondText.setFill(lcdDesign.lcdBackgroundColor);
-        timeText.setFill(lcdDesign.lcdForegroundColor);
-        secondText.setFill(lcdDesign.lcdForegroundColor);
-        title.setFill(lcdDesign.lcdForegroundColor);
-        dateText.setFill(lcdDesign.lcdForegroundColor);
-        dayOfWeekText.setFill(lcdDesign.lcdForegroundColor);
-        alarm.setFill(lcdDesign.lcdForegroundColor);
-
         updateBackgroundText();
 
         backgroundTimeText.setX(width - 2 - backgroundTimeText.getLayoutBounds().getWidth() - valueOffsetRight);
@@ -649,6 +660,14 @@ public class LcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
         title.setText(getSkinnable().getTitle());
         title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
+
+        dateText.setText(dateFormat.format(time));
+        dateText.setX(width - dateText.getLayoutBounds().getWidth() - 0.0416666667 * height);
+        dateText.setY(pane.getLayoutBounds().getMinY() + height - 3 - 0.0416666667 * height);
+
+        dayOfWeekText.setText(time.getDayOfWeek().getDisplayName(TextStyle.FULL_STANDALONE, getSkinnable().getLocale()));
+        dayOfWeekText.setX(0.0416666667 * height);
+        dayOfWeekText.setY(pane.getLayoutBounds().getMinY() + height - 3 - 0.0416666667 * height);
 
         createAlarmIcon(getSkinnable().isAlarmsEnabled());
         alarm.relocate(width * 0.885, height * 0.28);

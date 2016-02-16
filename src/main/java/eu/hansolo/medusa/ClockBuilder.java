@@ -410,6 +410,8 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setDateColor(Color.rgb(255, 255, 255));
                     break;
                 case LCD:
+                    CONTROL.setBorderPaint(Color.WHITE);
+                    CONTROL.setForegroundPaint(Color.WHITE);
                     break;
                 case PEAR:
                     CONTROL.setBackgroundPaint(Color.BLACK);
