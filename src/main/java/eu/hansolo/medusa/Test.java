@@ -51,30 +51,12 @@ public class Test extends Application {
     private static final Random         RND = new Random();
     private static       int            noOfNodes = 0;
     private              Gauge          gauge;
-    private              Clock          clock;
     private              long           lastTimerCall;
     private              AnimationTimer timer;
 
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LCD)
-                            .lcdDesign(LcdDesign.FLAT_CUSTOM)
-                            .borderPaint(Color.RED)
-                            .backgroundPaint(Color.ORANGE)
-                            //.foregroundPaint(Color.CYAN)
-                            .build();
-
-        clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.LCD)
-                            .lcdDesign(LcdDesign.FLAT_CUSTOM)
-                            .title("Surfboard")
-                            .titleVisible(true)
-                            .dateVisible(true)
-                            .borderPaint(Color.RED)
-                            .backgroundPaint(Color.ORANGE)
-                            //.foregroundPaint(Color.CYAN)
-                            .secondsVisible(true)
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -90,8 +72,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        HBox pane = new HBox(gauge, clock);
-        pane.setSpacing(30);
+        StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
@@ -109,7 +90,6 @@ public class Test extends Application {
         stage.show();
 
         //gauge.setValue(105);
-        //clock.setTime(ZonedDateTime.now().plusHours(2));
 
         // Calculate number of nodes
         calcNoOfNodes(pane);
