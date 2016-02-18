@@ -357,7 +357,7 @@ public class LcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         switch(getSkinnable().getLcdFont()) {
             case LCD:
                 digitalFontSizeFactor = 1.05;
-                timeFont   = Fonts.digital(0.7 * height);
+                timeFont   = Fonts.digital(0.675 * height);
                 secondFont = Fonts.digital(0.2 * height);
                 break;
             case DIGITAL:
