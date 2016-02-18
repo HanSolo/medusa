@@ -22,6 +22,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.Background;
@@ -57,6 +58,7 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
+                            .animated(true)
                             .build();
 
         lastTimerCall = System.nanoTime();
