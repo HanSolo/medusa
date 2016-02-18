@@ -20,6 +20,7 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
+import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TickMarkType;
@@ -600,14 +601,61 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double trapezoidMinorOuterPoint2X;
         double trapezoidMinorOuterPoint2Y;
 
+        ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
+        
+        // Draw tickmark ring
+        if (getSkinnable().isTickMarkRingVisible()) {
+            Pos    knobPosition = getSkinnable().getKnobPosition();
+            double xy           = TickLabelLocation.INSIDE == tickLabelLocation ? scaledSize * 0.0125 : scaledSize * 0.1285;
+            double wh           = TickLabelLocation.INSIDE == tickLabelLocation ? scaledSize * 0.948 : scaledSize * 0.716;
+            double offset       = -90 + startAngle;
+            tickMarkCtx.setLineWidth(scaledSize * 0.004);
+            tickMarkCtx.setLineCap(StrokeLineCap.SQUARE);
+            tickMarkCtx.save();
+            tickMarkCtx.setStroke(tickMarkColor);
+            switch(knobPosition) {
+                case BOTTOM_LEFT: tickMarkCtx.strokeArc((-scaledSize * 0.46) + xy, xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+                case TOP_LEFT   : tickMarkCtx.strokeArc((-scaledSize * 0.46) + xy, (-scaledSize * 0.46) + xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+                case TOP_RIGHT  : tickMarkCtx.strokeArc(xy, (-scaledSize * 0.46) + xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+                default         : tickMarkCtx.strokeArc(xy, xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+            }
+            tickMarkCtx.restore();
+            if (tickMarkSections.size() > 0) {
+                tickMarkCtx.setLineCap(StrokeLineCap.BUTT);
+                int    listSize = tickMarkSections.size();
+                double sectionStartAngle;
+                for (int i = 0; i < listSize; i++) {
+                    Section section = tickMarkSections.get(i);
+                    if (Double.compare(section.getStart(), minValue) < 0 && Double.compare(section.getStop(), maxValue) < 0) {
+                        sectionStartAngle = 0;
+                    } else {
+                        sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStart() - minValue) * angleStep : -(section.getStart() - minValue) * angleStep;
+                    }
+                    double sectionAngleExtend;
+                    if (Double.compare(section.getStop(), maxValue) > 0) {
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - section.getStart()) * angleStep : -(maxValue - section.getStart()) * angleStep;
+                    } else {
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStop() - section.getStart()) * angleStep : -(section.getStop() - section.getStart()) * angleStep;
+                    }
+                    tickMarkCtx.save();
+                    tickMarkCtx.setStroke(section.getColor());
+                    switch(knobPosition) {
+                        case BOTTOM_LEFT: tickMarkCtx.strokeArc((-scaledSize * 0.46) + xy, xy, wh, wh, offset - sectionStartAngle, -sectionAngleExtend, ArcType.OPEN); break;
+                        case TOP_LEFT   : tickMarkCtx.strokeArc((-scaledSize * 0.46) + xy, (-scaledSize * 0.46) + xy, wh, wh, offset - sectionStartAngle, -sectionAngleExtend, ArcType.OPEN); break;
+                        case TOP_RIGHT  : tickMarkCtx.strokeArc(xy, (-scaledSize * 0.46) + xy, wh, wh, offset - sectionStartAngle, -sectionAngleExtend, ArcType.OPEN); break;
+                        default         : tickMarkCtx.strokeArc(xy, xy, wh, wh, offset - sectionStartAngle, -sectionAngleExtend, ArcType.OPEN); break;
+                    }
+                    tickMarkCtx.restore();
+                }
+            }
+        }
 
         // Main loop
-        ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
-        BigDecimal     tmpStepBD      = new BigDecimal(tmpAngleStep);
-        tmpStepBD                     = tmpStepBD.setScale(3, BigDecimal.ROUND_HALF_UP);
-        double tmpStep                = tmpStepBD.doubleValue();
-        double angle                  = 0;
-        int    customTickLabelCounter = 0;
+        BigDecimal tmpStepBD              = new BigDecimal(tmpAngleStep);
+        tmpStepBD                         = tmpStepBD.setScale(3, BigDecimal.ROUND_HALF_UP);
+        double     tmpStep                = tmpStepBD.doubleValue();
+        double     angle                  = 0;
+        int        customTickLabelCounter = 0;
         for (double i = 0 ; Double.compare(-ANGLE_RANGE - tmpStep, i) <= 0 ; i -= tmpStep) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
