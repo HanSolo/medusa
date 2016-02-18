@@ -567,6 +567,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B tickMarkRingVisible(final boolean VISIBLE) {
+        properties.put("tickMarkRingVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B ledOn(final boolean ON) {
         properties.put("ledOn", new SimpleBooleanProperty(ON));
         return (B)this;
@@ -1153,6 +1158,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setMediumTickMarksVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("minorTickMarksVisible".equals(key)) {
                 CONTROL.setMinorTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("tickMarkRingVisible".equals(key)) {
+                CONTROL.setTickMarkRingVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("ledBlinking".equals(key)) {
                 CONTROL.setLedBlinking(((BooleanProperty) properties.get(key)).get());
             } else if ("ledOn".equals(key)) {

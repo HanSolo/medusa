@@ -303,6 +303,8 @@ public class Gauge extends Control {
     private BooleanProperty                      mediumTickMarksVisible;
     private boolean                              _minorTickMarksVisible;
     private BooleanProperty                      minorTickMarksVisible;
+    private boolean                              _tickMarkRingVisible;
+    private BooleanProperty                      tickMarkRingVisible;
     private boolean                              _tickLabelsVisible;
     private BooleanProperty                      tickLabelsVisible;
     private boolean                              _onlyFirstAndLastTickLabelVisible;
@@ -515,6 +517,7 @@ public class Gauge extends Control {
         _majorTickMarksVisible            = true;
         _mediumTickMarksVisible           = true;
         _minorTickMarksVisible            = true;
+        _tickMarkRingVisible              = false;
         _majorTickSpace                   = 10;
         _minorTickSpace                   = 1;
         _lcdVisible                       = false;
@@ -3208,6 +3211,29 @@ public class Gauge extends Control {
     public BooleanProperty MinorTickMarksVisibleProperty() {
         if (null == minorTickMarksVisible) { minorTickMarksVisible = new SimpleBooleanProperty(Gauge.this, "minorTickMarksVisible", _minorTickMarksVisible); }
         return minorTickMarksVisible;
+    }
+
+    /**
+     * Returns true when an additional ring will be drawn that "connects" the
+     * tick marks.
+     * @return true when an additional ring will be drawn that "connects" the tick marks
+     */
+    public boolean isTickMarkRingVisible() { return null == tickMarkRingVisible ? _tickMarkRingVisible : tickMarkRingVisible.get(); }
+    /**
+     * Defines if an additional ring should be drawn that "connects" the tick marks.
+     * @param VISIBLE
+     */
+    public void setTickMarkRingVisible(final boolean VISIBLE) {
+        if (null == tickMarkRingVisible) {
+            _tickMarkRingVisible = VISIBLE;
+        } else {
+            tickMarkRingVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public BooleanProperty tickMarkRingVisibleProperty() {
+        if (null == tickMarkRingVisible) { tickMarkRingVisible = new SimpleBooleanProperty(Gauge.this, "tickMarkRingVisible", _tickMarkRingVisible); }
+        return tickMarkRingVisible;
     }
 
     /**

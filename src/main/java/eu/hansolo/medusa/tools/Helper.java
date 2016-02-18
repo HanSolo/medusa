@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
+import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TickMarkType;
@@ -304,8 +305,10 @@ public class Helper {
         return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), Helper.clamp(0d, 1d, FACTOR));
     }
 
-    public static void drawRadialTickMarks(final Gauge GAUGE, final GraphicsContext CTX, final double MIN_VALUE, final double MAX_VALUE,
-                                           final double START_ANGLE, final double ANGLE_RANGE, final double ANGLE_STEP, final double CENTER_X, final double CENTER_Y, final double SIZE) {
+    public static void drawRadialTickMarks(final Gauge GAUGE, final GraphicsContext CTX,
+                                           final double MIN_VALUE, final double MAX_VALUE,
+                                           final double START_ANGLE, final double ANGLE_RANGE, final double ANGLE_STEP,
+                                           final double CENTER_X, final double CENTER_Y, final double SIZE) {
         double               sinValue;
         double               cosValue;
         double               centerX               = CENTER_X;
@@ -461,9 +464,55 @@ public class Helper {
         double triangleMinorOuterPointX;
         double triangleMinorOuterPointY;
 
+        ScaleDirection scaleDirection = GAUGE.getScaleDirection();
+
+        // Draw tickmark ring
+        if (GAUGE.isTickMarkRingVisible()) {
+            SkinType skinType     = GAUGE.getSkinType();
+            double   xy           = TickLabelLocation.INSIDE == tickLabelLocation ? SIZE * 0.026 : SIZE * 0.14;
+            double   wh           = TickLabelLocation.INSIDE == tickLabelLocation ? SIZE * 0.948 : SIZE * 0.72;
+            double   offset       = -90 + START_ANGLE;
+            double   horVerOffset = SIZE * 0.055555555;
+            CTX.setLineWidth(SIZE * 0.004);
+            CTX.setLineCap(StrokeLineCap.SQUARE);
+            CTX.save();
+            CTX.setStroke(tickMarkColor);
+            switch(skinType) {
+                case HORIZONTAL: CTX.strokeArc(xy + horVerOffset, xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+                case VERTICAL  : CTX.strokeArc(xy, xy + horVerOffset, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+                default        : CTX.strokeArc(xy, xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+            }
+
+            CTX.restore();
+            if (tickMarkSections.size() > 0) {
+                int    listSize = tickMarkSections.size();
+                double sectionStartAngle;
+                for (int i = 0; i < listSize; i++) {
+                    Section section = tickMarkSections.get(i);
+                    if (Double.compare(section.getStart(), MIN_VALUE) < 0 && Double.compare(section.getStop(), MAX_VALUE) < 0) {
+                        sectionStartAngle = 0;
+                    } else {
+                        sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStart() - MIN_VALUE) * ANGLE_STEP : -(section.getStart() - MIN_VALUE) * ANGLE_STEP;
+                    }
+                    double sectionAngleExtend;
+                    if (Double.compare(section.getStop(), MAX_VALUE) > 0) {
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (MAX_VALUE - section.getStart()) * ANGLE_STEP : -(MAX_VALUE - section.getStart()) * ANGLE_STEP;
+                    } else {
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStop() - section.getStart()) * ANGLE_STEP : -(section.getStop() - section.getStart()) * ANGLE_STEP;
+                    }
+                    CTX.save();
+                    CTX.setStroke(section.getColor());
+                    switch(skinType) {
+                        case HORIZONTAL: CTX.strokeArc(xy + horVerOffset, xy, wh, wh, offset - sectionStartAngle, -sectionAngleExtend, ArcType.OPEN); break;
+                        case VERTICAL  : CTX.strokeArc(xy, xy + horVerOffset, wh, wh, offset - sectionStartAngle, -sectionAngleExtend, ArcType.OPEN); break;
+                        default        : CTX.strokeArc(xy, xy, wh, wh, offset - sectionStartAngle, -sectionAngleExtend, ArcType.OPEN); break;
+                    }
+                    CTX.restore();
+                }
+            }
+        }
 
         // Main loop
-        ScaleDirection scaleDirection = GAUGE.getScaleDirection();
         BigDecimal     tmpStepBD      = new BigDecimal(tmpAngleStep);
         tmpStepBD                     = tmpStepBD.setScale(3, BigDecimal.ROUND_HALF_UP);
         double tmpStep                = tmpStepBD.doubleValue();
