@@ -41,6 +41,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
@@ -734,6 +735,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B padding(final Insets INSETS) {
+        properties.put("padding", new SimpleObjectProperty<>(INSETS));
+        return (B)this;
+    }
+
     public final Gauge build() {
         final Gauge CONTROL;
         if (properties.containsKey("skinType")) {
@@ -961,10 +967,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
             } else if("minSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
+                CONTROL.setMinSize(dim.getWidth(), dim.getHeight());
             } else if("maxSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
+                CONTROL.setMaxSize(dim.getWidth(), dim.getHeight());
             } else if("prefWidth".equals(key)) {
                 CONTROL.setPrefWidth(((DoubleProperty) properties.get(key)).get());
             } else if("prefHeight".equals(key)) {
@@ -989,6 +995,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setTranslateX(((DoubleProperty) properties.get(key)).get());
             } else if ("translateY".equals(key)) {
                 CONTROL.setTranslateY(((DoubleProperty) properties.get(key)).get());
+            } else if ("padding".equals(key)) {
+                CONTROL.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
             } else if("styleClass".equals(key)) {
                 CONTROL.getStyleClass().setAll("gauge");
                 CONTROL.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
