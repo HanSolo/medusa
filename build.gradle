@@ -55,7 +55,7 @@ artifacts {
 
 def pomConfig = {
     name 'Medusa'
-    desc 'Medusa is a JavaFX 8 gauges library'
+    description 'Medusa is a JavaFX 8 gauges library'
     url 'https://github.com/HanSolo/Medusa/wiki'
     inceptionYear '2016'
     licenses {
