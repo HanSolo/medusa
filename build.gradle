@@ -55,7 +55,9 @@ artifacts {
 
 def pomConfig = {
     name 'Medusa'
-    description 'Medusa is a JavaFX 8 gauges library'
+    // Description won't be used when creating the pom file automatically.
+    // So I've added it manually in the pom.withXml{} section in the publishing task
+    //description 'Medusa is a JavaFX 8 library containing gauges and clocks'
     url 'https://github.com/HanSolo/Medusa/wiki'
     inceptionYear '2016'
     licenses {
@@ -87,6 +89,7 @@ publishing {
 
             pom.withXml {
                 asNode().children().last() + pomConfig
+                asNode().appendNode('description', 'Medusa is a JavaFX 8 library containing gauges and clocks')
             }
         }
     }
