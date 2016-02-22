@@ -46,6 +46,27 @@ public enum Needle {
     public Path getPath(final Path PATH, final double NEEDLE_WIDTH, final double NEEDLE_HEIGHT, final NeedleType NEEDLE_TYPE, final TickLabelLocation TICK_LABEL_LOCATION) {
         PATH.getElements().clear();
         switch(NEEDLE_TYPE) {
+            case BIG:
+                switch(TICK_LABEL_LOCATION) {
+                    case OUTSIDE:
+                        PATH.getElements().add(new MoveTo(0.0, 0.927710843373494 * NEEDLE_HEIGHT));
+                        PATH.getElements().add(new CubicCurveTo(0.0, 0.9698795180722891 * NEEDLE_HEIGHT, 0.20833333333333334 * NEEDLE_WIDTH, NEEDLE_HEIGHT, 0.5 * NEEDLE_WIDTH, NEEDLE_HEIGHT));
+                        PATH.getElements().add(new CubicCurveTo(0.7916666666666666 * NEEDLE_WIDTH, NEEDLE_HEIGHT, NEEDLE_WIDTH, 0.9698795180722891 * NEEDLE_HEIGHT, NEEDLE_WIDTH, 0.927710843373494 * NEEDLE_HEIGHT));
+                        PATH.getElements().add(new CubicCurveTo(NEEDLE_WIDTH, 0.9096385542168675 * NEEDLE_HEIGHT, 0.5 * NEEDLE_WIDTH, 0.0, 0.5 * NEEDLE_WIDTH, 0.0));
+                        PATH.getElements().add(new CubicCurveTo(0.5 * NEEDLE_WIDTH, 0.0, 0.0, 0.9096385542168675 * NEEDLE_HEIGHT, 0.0, 0.927710843373494 * NEEDLE_HEIGHT));
+                        PATH.getElements().add(new ClosePath());
+                        break;
+                    case INSIDE:
+                    default:
+                        PATH.getElements().add(new MoveTo(0.0, 0.9396984924623115 * NEEDLE_HEIGHT));
+                        PATH.getElements().add(new CubicCurveTo(0.0, 0.9748743718592965 * NEEDLE_HEIGHT, 0.20833333333333334 * NEEDLE_WIDTH, NEEDLE_HEIGHT, 0.5 * NEEDLE_WIDTH, NEEDLE_HEIGHT));
+                        PATH.getElements().add(new CubicCurveTo(0.7916666666666666 * NEEDLE_WIDTH, NEEDLE_HEIGHT, NEEDLE_WIDTH, 0.9748743718592965 * NEEDLE_HEIGHT, NEEDLE_WIDTH, 0.9396984924623115 * NEEDLE_HEIGHT));
+                        PATH.getElements().add(new CubicCurveTo(NEEDLE_WIDTH, 0.9246231155778895 * NEEDLE_HEIGHT, 0.5 * NEEDLE_WIDTH, 0.0, 0.5 * NEEDLE_WIDTH, 0.0));
+                        PATH.getElements().add(new CubicCurveTo(0.5 * NEEDLE_WIDTH, 0.0, 0.0, 0.9246231155778895 * NEEDLE_HEIGHT, 0.0, 0.9396984924623115 * NEEDLE_HEIGHT));
+                        PATH.getElements().add(new ClosePath());
+                        break;
+                }
+                break;
             case FAT:
                 PATH.getElements().add(new MoveTo(0.275 * NEEDLE_WIDTH, 0.7029702970297029 * NEEDLE_HEIGHT));
                 PATH.getElements().add(new CubicCurveTo(0.275 * NEEDLE_WIDTH, 0.6287128712871287 * NEEDLE_HEIGHT, 0.375 * NEEDLE_WIDTH, 0.5693069306930693 * NEEDLE_HEIGHT, 0.5 * NEEDLE_WIDTH, 0.5693069306930693 * NEEDLE_HEIGHT));

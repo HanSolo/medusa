@@ -61,7 +61,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 11.12.15.
  */
 public class Gauge extends Control {
-    public enum NeedleType { FAT, STANDARD, SCIENTIFIC, AVIONIC, VARIOMETER }
+    public enum NeedleType { BIG, FAT, STANDARD, SCIENTIFIC, AVIONIC, VARIOMETER }
     public enum NeedleShape { ANGLED, ROUND, FLAT }
     public enum NeedleSize {
         THIN(0.015),
@@ -99,35 +99,35 @@ public class Gauge extends Control {
                            MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL,
                            LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL, SIMPLE_DIGITAL, SECTION }
 
-    public  static final Color                   DARK_COLOR           = Color.rgb(36, 36, 36);
-    public  static final Color                   BRIGHT_COLOR         = Color.rgb(223, 223, 223);
-    private static final long                    LED_BLINK_INTERVAL   = 500l;
-    private static final int                     MAX_NO_OF_DECIMALS   = 3;
+    public  static final Color                   DARK_COLOR            = Color.rgb(36, 36, 36);
+    public  static final Color                   BRIGHT_COLOR          = Color.rgb(223, 223, 223);
+    private static final long                    LED_BLINK_INTERVAL    = 500l;
+    private static final int                     MAX_NO_OF_DECIMALS    = 3;
 
-    public         final ButtonEvent             BUTTON_PRESSED_EVENT = new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_PRESSED);
-    public         final ButtonEvent             BUTTON_RELEASED_EVENT= new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_RELEASED);
-    private        final ThresholdEvent          EXCEEDED_EVENT       = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_EXCEEDED);
-    private        final ThresholdEvent          UNDERRUN_EVENT       = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_UNDERRUN);
-    private        final UpdateEvent             RECALC_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
-    private        final UpdateEvent             REDRAW_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
-    private        final UpdateEvent             RESIZE_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
-    private        final UpdateEvent             LED_EVENT            = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED);
-    private        final UpdateEvent             LCD_EVENT            = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LCD);
-    private        final UpdateEvent             VISIBILITY_EVENT     = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
-    private        final UpdateEvent             INTERACTIVITY_EVENT  = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
-    private        final UpdateEvent             FINISHED_EVENT       = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
-    private        final UpdateEvent             SECTION_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.SECTION);
+    public         final ButtonEvent             BUTTON_PRESSED_EVENT  = new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_PRESSED);
+    public         final ButtonEvent             BUTTON_RELEASED_EVENT = new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_RELEASED);
+    private        final ThresholdEvent          EXCEEDED_EVENT        = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_EXCEEDED);
+    private        final ThresholdEvent          UNDERRUN_EVENT        = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_UNDERRUN);
+    private        final UpdateEvent             RECALC_EVENT          = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
+    private        final UpdateEvent             REDRAW_EVENT          = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
+    private        final UpdateEvent             RESIZE_EVENT          = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
+    private        final UpdateEvent             LED_EVENT             = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED);
+    private        final UpdateEvent             LCD_EVENT             = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LCD);
+    private        final UpdateEvent             VISIBILITY_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
+    private        final UpdateEvent             INTERACTIVITY_EVENT   = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
+    private        final UpdateEvent             FINISHED_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
+    private        final UpdateEvent             SECTION_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.SECTION);
 
     private static volatile Future               blinkFuture;
-    private static ScheduledExecutorService      blinkService         = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
+    private static ScheduledExecutorService      blinkService          = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
     private static volatile Callable<Void>       blinkTask;
 
     // Update events
-    private List<UpdateEventListener>            listenerList         = new CopyOnWriteArrayList();
-    private List<EventHandler<ButtonEvent>>      pressedHandlerList   = new CopyOnWriteArrayList<>();
-    private List<EventHandler<ButtonEvent>>      releasedHandlerList  = new CopyOnWriteArrayList<>();
-    private List<EventHandler<ThresholdEvent>>   exceededHandlerList  = new CopyOnWriteArrayList<>();
-    private List<EventHandler<ThresholdEvent>>   underrunHandlerList  = new CopyOnWriteArrayList<>();
+    private List<UpdateEventListener>            listenerList          = new CopyOnWriteArrayList();
+    private List<EventHandler<ButtonEvent>>      pressedHandlerList    = new CopyOnWriteArrayList<>();
+    private List<EventHandler<ButtonEvent>>      releasedHandlerList   = new CopyOnWriteArrayList<>();
+    private List<EventHandler<ThresholdEvent>>   exceededHandlerList   = new CopyOnWriteArrayList<>();
+    private List<EventHandler<ThresholdEvent>>   underrunHandlerList   = new CopyOnWriteArrayList<>();
 
     // Data related
     private DoubleProperty                       value;

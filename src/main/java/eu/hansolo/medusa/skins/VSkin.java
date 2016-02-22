@@ -917,6 +917,14 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             double needleHeight;
             needle.setCache(false);
             switch(getSkinnable().getNeedleType()) {
+                case BIG:
+                    needleWidth  = 0.06 * scaledHeight;
+                    needleHeight = TickLabelLocation.INSIDE == tickLabelLocation ? 0.4975 * scaledHeight : 0.415 * scaledHeight;
+                    Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, NeedleType.BIG, tickLabelLocation);
+                    needle.relocate(centerX - needle.getLayoutBounds().getWidth() * 0.5, centerY - needle.getLayoutBounds().getHeight() * (TickLabelLocation.INSIDE == tickLabelLocation ? 0.93969849 : 0.92771084));
+                    needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
+                    needleRotate.setPivotY(needle.getLayoutBounds().getHeight() * (TickLabelLocation.INSIDE == tickLabelLocation ? 0.93969849 : 0.92771084));
+                    break;
                 case FAT:
                     needleWidth  = scaledHeight * 0.3;
                     needleHeight = scaledHeight * 0.505;

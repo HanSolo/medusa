@@ -863,6 +863,14 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setCache(false);
         needle.getElements().clear();
         switch(getSkinnable().getNeedleType()) {
+            case BIG:
+                needleWidth  = 0.06 * size;
+                needleHeight = TickLabelLocation.INSIDE == tickLabelLocation ? 0.4975 * size : 0.415 * size;
+                Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, NeedleType.BIG, tickLabelLocation);
+                needle.relocate(center - needle.getLayoutBounds().getWidth() * 0.5, center - needle.getLayoutBounds().getHeight() * (TickLabelLocation.INSIDE == tickLabelLocation ? 0.93969849 : 0.92771084));
+                needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
+                needleRotate.setPivotY(needle.getLayoutBounds().getHeight() * (TickLabelLocation.INSIDE == tickLabelLocation ? 0.93969849 : 0.92771084));
+                break;
             case FAT:
                 needleWidth  = 0.3 * size;
                 needleHeight = 0.505 * size;
