@@ -986,6 +986,14 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
                     needleRotate.setPivotY(needle.getLayoutBounds().getHeight() * (TickLabelLocation.INSIDE == tickLabelLocation ? 0.7248062 : 0.68444444));
                     break;
+                case AVIONIC:
+                    needleWidth  = 0.06 * scaledWidth;
+                    needleHeight = TickLabelLocation.INSIDE == tickLabelLocation ? 0.5975 * scaledWidth : 0.515 * scaledWidth;
+                    Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, NeedleType.AVIONIC, tickLabelLocation);
+                    needle.relocate(centerX - needle.getLayoutBounds().getWidth() * 0.5, centerY - needle.getLayoutBounds().getHeight() * (TickLabelLocation.INSIDE == tickLabelLocation ? 0.78242678 : 0.74757282));
+                    needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
+                    needleRotate.setPivotY(needle.getLayoutBounds().getHeight() * (TickLabelLocation.INSIDE == tickLabelLocation ? 0.78242678 : 0.74757282));
+                    break;
                 case STANDARD:
                 default      :
                     needleWidth  = scaledWidth * getSkinnable().getNeedleSize().FACTOR;
@@ -1143,6 +1151,15 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                  new Stop(1.0, needleColor.brighter()));
                 needle.setStrokeWidth(0);
                 break;
+        }
+        if (NeedleType.AVIONIC == getSkinnable().getNeedleType()) {
+            needlePaint = new LinearGradient(0, needle.getLayoutBounds().getMinY(),
+                                             0, needle.getLayoutBounds().getMaxY(),
+                                             false, CycleMethod.NO_CYCLE,
+                                             new Stop(0.0, needleColor),
+                                             new Stop(0.3, needleColor),
+                                             new Stop(0.3, Color.BLACK),
+                                             new Stop(1.0, Color.BLACK));
         }
         needle.setFill(needlePaint);
         needle.setStroke(getSkinnable().getNeedleBorderColor());

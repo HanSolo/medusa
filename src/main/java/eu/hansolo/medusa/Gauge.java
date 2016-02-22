@@ -61,7 +61,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 11.12.15.
  */
 public class Gauge extends Control {
-    public enum NeedleType { FAT, STANDARD, SCIENTIFIC }
+    public enum NeedleType { FAT, STANDARD, SCIENTIFIC, AVIONIC }
     public enum NeedleShape { ANGLED, ROUND, FLAT }
     public enum NeedleSize {
         THIN(0.015),
