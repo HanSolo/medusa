@@ -33,7 +33,16 @@ public enum Needle {
     Needle() {
 
     }
-    
+
+    /**
+     * Returns the path for the given NeedleType.
+     * @param PATH
+     * @param NEEDLE_WIDTH
+     * @param NEEDLE_HEIGHT
+     * @param NEEDLE_TYPE
+     * @param TICK_LABEL_LOCATION
+     * @return the path for the given NeedleType
+     */
     public Path getPath(final Path PATH, final double NEEDLE_WIDTH, final double NEEDLE_HEIGHT, final NeedleType NEEDLE_TYPE, final TickLabelLocation TICK_LABEL_LOCATION) {
         PATH.getElements().clear();
         switch(NEEDLE_TYPE) {
