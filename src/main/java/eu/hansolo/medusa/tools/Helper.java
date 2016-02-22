@@ -28,6 +28,7 @@ import eu.hansolo.medusa.TickMarkType;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TimeSection;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -176,6 +177,11 @@ public class Helper {
     }
     public static DateTimeFormatter getLocalizedDateFormat(final Locale LOCALE) {
         return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(LOCALE);
+    }
+
+    public static void enableNode(final Node NODE, final boolean ENABLE) {
+        NODE.setManaged(ENABLE);
+        NODE.setVisible(ENABLE);
     }
 
     public static final String colorToCss(final Color COLOR) {
