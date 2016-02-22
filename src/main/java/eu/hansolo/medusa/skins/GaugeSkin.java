@@ -887,10 +887,18 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
                 needleRotate.setPivotY(needle.getLayoutBounds().getHeight() * (TickLabelLocation.INSIDE == tickLabelLocation ? 0.78242678 : 0.74757282));
                 break;
+            case VARIOMETER:
+                needleWidth  = size * getSkinnable().getNeedleSize().FACTOR;
+                needleHeight = TickLabelLocation.INSIDE == tickLabelLocation ? size * 0.4675 : size * 0.385;
+                Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, NeedleType.VARIOMETER, tickLabelLocation);
+                needle.relocate(center - needle.getLayoutBounds().getWidth() * 0.5, center - needle.getLayoutBounds().getHeight());
+                needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
+                needleRotate.setPivotY(needle.getLayoutBounds().getHeight());
+                break;
             case STANDARD:
             default      :
                 needleWidth  = size * getSkinnable().getNeedleSize().FACTOR;
-                needleHeight = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.3965 : size * 0.455;
+                needleHeight = TickLabelLocation.INSIDE == tickLabelLocation ? size * 0.455 : size * 0.3965;
                 Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, NeedleType.STANDARD, tickLabelLocation);
                 needle.relocate(center - needle.getLayoutBounds().getWidth() * 0.5, center - needle.getLayoutBounds().getHeight());
                 needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
