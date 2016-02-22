@@ -188,6 +188,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B knobVisible(final boolean VISIBLE) {
+        properties.put("knobVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B knobPosition(final Pos POSITION) {
         properties.put("knobPosition", new SimpleObjectProperty<>(POSITION));
         return (B)this;
@@ -1046,6 +1051,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setKnobType(((ObjectProperty<KnobType>) properties.get(key)).get());
             } else if ("knobPosition".equals(key)) {
                 CONTROL.setKnobPosition(((ObjectProperty<Pos>) properties.get(key)).get());
+            } else if ("knobVisible".equals(key)) {
+                CONTROL.setKnobVisible(((BooleanProperty) properties.get(key)).get());
             } else if("animated".equals(key)) {
                 CONTROL.setAnimated(((BooleanProperty) properties.get(key)).get());
             } else if("animationDuration".equals(key)) {

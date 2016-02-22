@@ -61,7 +61,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 11.12.15.
  */
 public class Gauge extends Control {
-    public enum NeedleType { FAT, STANDARD }
+    public enum NeedleType { FAT, STANDARD, SCIENTIFIC }
     public enum NeedleShape { ANGLED, ROUND, FLAT }
     public enum NeedleSize {
         THIN(0.015),
@@ -186,6 +186,8 @@ public class Gauge extends Control {
     private ObjectProperty<KnobType>             knobType;
     private Pos                                  _knobPosition;
     private ObjectProperty<Pos>                  knobPosition;
+    private boolean                              _knobVisible;
+    private BooleanProperty                      knobVisible;
     private boolean                              _animated;
     private BooleanProperty                      animated;
     private long                                 animationDuration;
@@ -456,6 +458,7 @@ public class Gauge extends Control {
         _knobColor                        = Color.rgb(204, 204, 204);
         _knobType                         = KnobType.STANDARD;
         _knobPosition                     = Pos.CENTER;
+        _knobVisible                      = true;
         _animated                         = false;
         animationDuration                 = 800;
         _startAngle                       = 320;
@@ -1532,6 +1535,28 @@ public class Gauge extends Control {
             };
         }
         return knobPosition;
+    }
+
+    /**
+     * Returns true if the knob is visible.
+     * @return true if the knob is visible
+     */
+    public boolean isKnobVisible() { return null == knobVisible ? _knobVisible : knobVisible.get(); }
+    /**
+     * Defines if the knob is visible.
+     * @param VISIBLE
+     */
+    public void setKnobVisible(final boolean VISIBLE) {
+        if (null == knobVisible) {
+            _knobVisible = VISIBLE;
+        } else {
+            knobVisible.set(VISIBLE);
+        }
+        fireUpdateEvent(VISIBILITY_EVENT);
+    }
+    public BooleanProperty knobVisibleProperty() {
+        if (null == knobVisible) { knobVisible = new SimpleBooleanProperty(Gauge.this, "knobVisible", _knobVisible); }
+        return knobVisible;
     }
 
     /**
