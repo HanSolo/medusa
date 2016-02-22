@@ -19,6 +19,7 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleBehavior;
+import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
@@ -197,19 +198,20 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         sectionsAndAreasCanvas = new Canvas();
         sectionsAndAreasCtx    = sectionsAndAreasCanvas.getGraphicsContext2D();
-        sectionsAndAreasCanvas.setVisible(areasVisible | sectionsVisible);
-        sectionsAndAreasCanvas.setManaged(areasVisible | sectionsVisible);
+        Helper.enableNode(sectionsAndAreasCanvas, areasVisible | sectionsVisible);
 
         tickMarkCanvas = new Canvas();
         tickMarkCtx    = tickMarkCanvas.getGraphicsContext2D();
 
         ledCanvas = new Canvas();
         ledCtx    = ledCanvas.getGraphicsContext2D();
+        Helper.enableNode(ledCanvas, getSkinnable().isLedVisible());
 
         thresholdTooltip = new Tooltip("Threshold\n(" + String.format(Locale.US, formatString, getSkinnable().getThreshold()) + ")");
         thresholdTooltip.setTextAlignment(TextAlignment.CENTER);
 
         threshold = new Path();
+        Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
         Tooltip.install(threshold, thresholdTooltip);
 
         markerPane = new Pane();
@@ -218,8 +220,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         lcd.setArcWidth(0.0125 * PREFERRED_HEIGHT);
         lcd.setArcHeight(0.0125 * PREFERRED_HEIGHT);
         lcd.relocate((PREFERRED_WIDTH - lcd.getWidth()) * 0.5, 0.44 * PREFERRED_HEIGHT);
-        lcd.setManaged(getSkinnable().isLcdVisible());
-        lcd.setVisible(getSkinnable().isLcdVisible());
+        Helper.enableNode(lcd, getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
 
         needleRotate = new Rotate(180 - startAngle);
         needleRotate.setAngle(needleRotate.getAngle() + (getSkinnable().getValue() - oldValue - minValue) * angleStep);
@@ -235,6 +236,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         knobCanvas = new Canvas();
         knobCtx    = knobCanvas.getGraphicsContext2D();
         knobCanvas.setPickOnBounds(false);
+        Helper.enableNode(knobCanvas, getSkinnable().isKnobVisible());
 
         dropShadow = new DropShadow();
         dropShadow.setColor(Color.rgb(0, 0, 0, 0.25));
@@ -328,36 +330,17 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            ledCanvas.setManaged(getSkinnable().isLedVisible());
-            ledCanvas.setVisible(getSkinnable().isLedVisible());
-
-            titleText.setVisible(!getSkinnable().getTitle().isEmpty());
-            titleText.setManaged(!getSkinnable().getTitle().isEmpty());
-
-            subTitleText.setVisible(!getSkinnable().getSubTitle().isEmpty());
-            subTitleText.setManaged(!getSkinnable().getSubTitle().isEmpty());
-
-            unitText.setVisible(!getSkinnable().getUnit().isEmpty());
-            unitText.setManaged(!getSkinnable().getUnit().isEmpty());
-
-            valueText.setManaged(getSkinnable().isValueVisible());
-            valueText.setVisible(getSkinnable().isValueVisible());
-
-            lcd.setManaged(getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
-            lcd.setVisible(getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
-
+            Helper.enableNode(ledCanvas, getSkinnable().isLedVisible());
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
+            Helper.enableNode(lcd, getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
+            Helper.enableNode(knobCanvas, getSkinnable().isKnobVisible());
+            Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
+            Helper.enableNode(sectionsAndAreasCanvas, areasVisible | sectionsVisible);
             boolean markersVisible = getSkinnable().getMarkersVisible();
-            for (Shape shape : markerMap.values()) {
-                shape.setManaged(markersVisible);
-                shape.setVisible(markersVisible);
-            }
-
-            threshold.setManaged(getSkinnable().isThresholdVisible());
-            threshold.setVisible(getSkinnable().isThresholdVisible());
-
-            sectionsAndAreasCanvas.setVisible(areasVisible | sectionsVisible);
-            sectionsAndAreasCanvas.setManaged(areasVisible | sectionsVisible);
-
+            for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }
@@ -883,16 +866,24 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             case FAT:
                 needleWidth  = 0.3 * size;
                 needleHeight = 0.505 * size;
-                Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, getSkinnable().getNeedleType());
+                Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, NeedleType.FAT, tickLabelLocation);
                 needle.relocate(center - needle.getLayoutBounds().getWidth() * 0.5, size * 0.145);
                 needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
                 needleRotate.setPivotY(needle.getLayoutBounds().getHeight() * 0.7029703);
                 break;
+            case SCIENTIFIC:
+                needleWidth  = 0.1 * size;
+                needleHeight = TickLabelLocation.INSIDE == tickLabelLocation ? 0.645 * size : 0.5625 * size;
+                Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, NeedleType.SCIENTIFIC, tickLabelLocation);
+                needle.relocate(center - needle.getLayoutBounds().getWidth() * 0.5, TickLabelLocation.INSIDE == tickLabelLocation ? size * 0.0325 : size * 0.115);
+                needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
+                needleRotate.setPivotY(needle.getLayoutBounds().getHeight() * (TickLabelLocation.INSIDE == tickLabelLocation ? 0.7248062 : 0.68444444));
+                break;
             case STANDARD:
             default      :
                 needleWidth  = size * getSkinnable().getNeedleSize().FACTOR;
-                needleHeight = TickLabelLocation.OUTSIDE == getSkinnable().getTickLabelLocation() ? size * 0.3965 : size * 0.455;
-                Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, getSkinnable().getNeedleType());
+                needleHeight = TickLabelLocation.OUTSIDE == tickLabelLocation ? size * 0.3965 : size * 0.455;
+                Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, NeedleType.STANDARD, tickLabelLocation);
                 needle.relocate(center - needle.getLayoutBounds().getWidth() * 0.5, center - needle.getLayoutBounds().getHeight());
                 needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
                 needleRotate.setPivotY(needle.getLayoutBounds().getHeight());
@@ -1130,12 +1121,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                  new Stop(0.5, needleColor.brighter().brighter()),
                                                  new Stop(1.0, needleColor.darker()));
                 needle.setStrokeWidth(0);
-                needle.setStroke(Color.TRANSPARENT);
                 break;
             case FLAT:
                 needlePaint = needleColor;
                 needle.setStrokeWidth(0.0037037 * size);
-                needle.setStroke(Color.WHITE);
                 break;
             case ANGLED:
             default:
@@ -1147,10 +1136,10 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                  new Stop(0.5, needleColor.brighter()),
                                                  new Stop(1.0, needleColor.brighter()));
                 needle.setStrokeWidth(0);
-                needle.setStroke(Color.TRANSPARENT);
                 break;
         }
         needle.setFill(needlePaint);
+        needle.setStroke(getSkinnable().getNeedleBorderColor());
 
         // Knob
         drawKnob(false);
