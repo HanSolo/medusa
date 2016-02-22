@@ -22,6 +22,7 @@ import eu.hansolo.medusa.Gauge.NeedleBehavior;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
+import eu.hansolo.medusa.Needle;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.TickLabelLocation;
@@ -747,53 +748,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void drawNeedle() {
-        double center = size * 0.5;
-        double needleWidth;
-        double needleHeight;
-        needle.setCache(false);
-        needle.getElements().clear();
-        switch(getSkinnable().getNeedleType()) {
-            case FAT:
-                needleWidth  = 0.3 * size;
-                needleHeight = 0.505 * size;
-                needle.getElements().add(new MoveTo(0.275 * needleWidth, 0.7029702970297029 * needleHeight));
-                needle.getElements().add(new CubicCurveTo(0.275 * needleWidth, 0.6287128712871287 * needleHeight, 0.375 * needleWidth, 0.5693069306930693 * needleHeight, 0.5 * needleWidth, 0.5693069306930693 * needleHeight));
-                needle.getElements().add(new CubicCurveTo(0.625 * needleWidth, 0.5693069306930693 * needleHeight, 0.725 * needleWidth, 0.6287128712871287 * needleHeight, 0.725 * needleWidth, 0.7029702970297029 * needleHeight));
-                needle.getElements().add(new CubicCurveTo(0.725 * needleWidth, 0.7772277227722773 * needleHeight, 0.625 * needleWidth, 0.8366336633663366 * needleHeight, 0.5 * needleWidth, 0.8366336633663366 * needleHeight));
-                needle.getElements().add(new CubicCurveTo(0.375 * needleWidth, 0.8366336633663366 * needleHeight, 0.275 * needleWidth, 0.7772277227722773 * needleHeight, 0.275 * needleWidth, 0.7029702970297029 * needleHeight));
-                needle.getElements().add(new ClosePath());
-                needle.getElements().add(new MoveTo(0.0, 0.7029702970297029 * needleHeight));
-                needle.getElements().add(new CubicCurveTo(0.0, 0.8663366336633663 * needleHeight, 0.225 * needleWidth, needleHeight, 0.5 * needleWidth, needleHeight));
-                needle.getElements().add(new CubicCurveTo(0.775 * needleWidth, needleHeight, needleWidth, 0.8663366336633663 * needleHeight, needleWidth, 0.7029702970297029 * needleHeight));
-                needle.getElements().add(new CubicCurveTo(needleWidth, 0.5396039603960396 * needleHeight, 0.5 * needleWidth, 0.0, 0.5 * needleWidth, 0.0));
-                needle.getElements().add(new CubicCurveTo(0.5 * needleWidth, 0.0, 0.0, 0.5396039603960396 * needleHeight, 0.0, 0.7029702970297029 * needleHeight));
-                needle.getElements().add(new ClosePath());
-                needle.relocate(center - needle.getLayoutBounds().getWidth() * 0.5, size * 0.145);
-                needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
-                needleRotate.setPivotY(needle.getLayoutBounds().getHeight() * 0.7029703);
-                break;
-            case STANDARD:
-            default      :
-                needleWidth  = size * getSkinnable().getNeedleSize().FACTOR;
-                needleHeight = TickLabelLocation.OUTSIDE == getSkinnable().getTickLabelLocation() ? size * 0.3965 : size * 0.455;
-
-                needle.getElements().add(new MoveTo(0.25 * needleWidth, 0.025423728813559324 * needleHeight));
-                needle.getElements().add(new CubicCurveTo(0.25 * needleWidth, 0.00847457627118644 * needleHeight, 0.375 * needleWidth, 0, 0.5 * needleWidth, 0));
-                needle.getElements().add(new CubicCurveTo(0.625 * needleWidth, 0, 0.75 * needleWidth, 0.00847457627118644 * needleHeight, 0.75 * needleWidth, 0.025423728813559324 * needleHeight));
-                needle.getElements().add(new CubicCurveTo(0.75 * needleWidth, 0.025423728813559324 * needleHeight, needleWidth, needleHeight, needleWidth, needleHeight));
-                needle.getElements().add(new LineTo(0, needleHeight));
-                needle.getElements().add(new CubicCurveTo(0, needleHeight, 0.25 * needleWidth, 0.025423728813559324 * needleHeight, 0.25 * needleWidth, 0.025423728813559324 * needleHeight));
-                needle.getElements().add(new ClosePath());
-                needle.relocate(center - needle.getLayoutBounds().getWidth() * 0.5, center - needle.getLayoutBounds().getHeight());
-                needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
-                needleRotate.setPivotY(needle.getLayoutBounds().getHeight());
-                break;
-        }
-        needle.setCache(true);
-        needle.setCacheHint(CacheHint.ROTATE);
-    }
-
     private void drawKnob(final boolean PRESSED) {
         knobCanvas.setCache(false);
         double w = knobCanvas.getWidth();
@@ -917,6 +871,35 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
         knobCanvas.setCache(true);
         knobCanvas.setCacheHint(CacheHint.QUALITY);
+    }
+
+    private void drawNeedle() {
+        double center = size * 0.5;
+        double needleWidth;
+        double needleHeight;
+        needle.setCache(false);
+        needle.getElements().clear();
+        switch(getSkinnable().getNeedleType()) {
+            case FAT:
+                needleWidth  = 0.3 * size;
+                needleHeight = 0.505 * size;
+                Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, getSkinnable().getNeedleType());
+                needle.relocate(center - needle.getLayoutBounds().getWidth() * 0.5, size * 0.145);
+                needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
+                needleRotate.setPivotY(needle.getLayoutBounds().getHeight() * 0.7029703);
+                break;
+            case STANDARD:
+            default      :
+                needleWidth  = size * getSkinnable().getNeedleSize().FACTOR;
+                needleHeight = TickLabelLocation.OUTSIDE == getSkinnable().getTickLabelLocation() ? size * 0.3965 : size * 0.455;
+                Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, getSkinnable().getNeedleType());
+                needle.relocate(center - needle.getLayoutBounds().getWidth() * 0.5, center - needle.getLayoutBounds().getHeight());
+                needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
+                needleRotate.setPivotY(needle.getLayoutBounds().getHeight());
+                break;
+        }
+        needle.setCache(true);
+        needle.setCacheHint(CacheHint.ROTATE);
     }
 
     private void resizeText() {

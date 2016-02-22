@@ -22,6 +22,7 @@ import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
+import eu.hansolo.medusa.Needle;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.tools.AngleConicalGradient;
@@ -114,13 +115,6 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Path                     threshold;
     private Rectangle                lcd;
     private Path                     needle;
-    private MoveTo                   needleMoveTo1;
-    private CubicCurveTo             needleCubicCurveTo2;
-    private CubicCurveTo             needleCubicCurveTo3;
-    private CubicCurveTo             needleCubicCurveTo4;
-    private LineTo                   needleLineTo5;
-    private CubicCurveTo             needleCubicCurveTo6;
-    private ClosePath                needleClosePath7;
     private Rotate                   needleRotate;
     private Paint                    needlePaint;
     private Canvas                   knobCanvas;
@@ -230,14 +224,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         needleRotate = new Rotate(180 - startAngle);
         needleRotate.setAngle(needleRotate.getAngle() + (getSkinnable().getValue() - oldValue - minValue) * angleStep);
-        needleMoveTo1       = new MoveTo();
-        needleCubicCurveTo2 = new CubicCurveTo();
-        needleCubicCurveTo3 = new CubicCurveTo();
-        needleCubicCurveTo4 = new CubicCurveTo();
-        needleLineTo5       = new LineTo();
-        needleCubicCurveTo6 = new CubicCurveTo();
-        needleClosePath7    = new ClosePath();
-        needle              = new Path(needleMoveTo1, needleCubicCurveTo2, needleCubicCurveTo3, needleCubicCurveTo4, needleLineTo5, needleCubicCurveTo6, needleClosePath7);
+        needle = new Path();
         needle.setFillRule(FillRule.EVEN_ODD);
         needle.getTransforms().setAll(needleRotate);
         needle.setStrokeType(StrokeType.INSIDE);
@@ -996,37 +983,30 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? height * 0.29 : height * 0.7);
             }
 
-            double needleWidth  = scaledWidth * getSkinnable().getNeedleSize().FACTOR;
-            double needleHeight = TickLabelLocation.OUTSIDE == getSkinnable().getTickLabelLocation() ? scaledWidth * 0.3965 : scaledWidth * 0.455;
-
+            double needleWidth;
+            double needleHeight;
             needle.setCache(false);
-
-            needleMoveTo1.setX(0.25 * needleWidth); needleMoveTo1.setY(0.025423728813559324 * needleHeight);
-
-            needleCubicCurveTo2.setControlX1(0.25 * needleWidth); needleCubicCurveTo2.setControlY1(0.00847457627118644 * needleHeight);
-            needleCubicCurveTo2.setControlX2(0.375 * needleWidth); needleCubicCurveTo2.setControlY2(0);
-            needleCubicCurveTo2.setX(0.5 * needleWidth); needleCubicCurveTo2.setY(0);
-
-            needleCubicCurveTo3.setControlX1(0.625 * needleWidth); needleCubicCurveTo3.setControlY1(0);
-            needleCubicCurveTo3.setControlX2(0.75 * needleWidth); needleCubicCurveTo3.setControlY2(0.00847457627118644 * needleHeight);
-            needleCubicCurveTo3.setX(0.75 * needleWidth); needleCubicCurveTo3.setY(0.025423728813559324 * needleHeight);
-
-            needleCubicCurveTo4.setControlX1(0.75 * needleWidth); needleCubicCurveTo4.setControlY1(0.025423728813559324 * needleHeight);
-            needleCubicCurveTo4.setControlX2(needleWidth); needleCubicCurveTo4.setControlY2(needleHeight);
-            needleCubicCurveTo4.setX(needleWidth); needleCubicCurveTo4.setY(needleHeight);
-
-            needleLineTo5.setX(0); needleLineTo5.setY(needleHeight);
-
-            needleCubicCurveTo6.setControlX1(0); needleCubicCurveTo6.setControlY1(needleHeight);
-            needleCubicCurveTo6.setControlX2(0.25 * needleWidth); needleCubicCurveTo6.setControlY2(0.025423728813559324 * needleHeight);
-            needleCubicCurveTo6.setX(0.25 * needleWidth); needleCubicCurveTo6.setY(0.025423728813559324 * needleHeight);
-
+            switch(getSkinnable().getNeedleType()) {
+                case FAT:
+                    needleWidth  = scaledWidth * 0.3;
+                    needleHeight = scaledWidth * 0.505;
+                    Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, getSkinnable().getNeedleType());
+                    needle.relocate(centerX - needle.getLayoutBounds().getWidth() * 0.5, centerY - needle.getLayoutBounds().getHeight() * 0.7029703);
+                    needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
+                    needleRotate.setPivotY(needle.getLayoutBounds().getHeight() * 0.7029703);
+                    break;
+                case STANDARD:
+                default      :
+                    needleWidth  = scaledWidth * getSkinnable().getNeedleSize().FACTOR;
+                    needleHeight = TickLabelLocation.OUTSIDE == getSkinnable().getTickLabelLocation() ? scaledWidth * 0.3965 : scaledWidth * 0.455;
+                    Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, getSkinnable().getNeedleType());
+                    needle.relocate(centerX - needle.getLayoutBounds().getWidth() * 0.5, centerY - needle.getLayoutBounds().getHeight());
+                    needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
+                    needleRotate.setPivotY(needle.getLayoutBounds().getHeight());
+                    break;
+            }
             needle.setCache(true);
             needle.setCacheHint(CacheHint.ROTATE);
-
-            needle.relocate(centerX - needle.getLayoutBounds().getWidth() * 0.5, centerY - needle.getLayoutBounds().getHeight());
-            needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
-            needleRotate.setPivotY(needle.getLayoutBounds().getHeight());
 
             knobCanvas.setWidth(width * 0.1);
             knobCanvas.setHeight(width * 0.1);
