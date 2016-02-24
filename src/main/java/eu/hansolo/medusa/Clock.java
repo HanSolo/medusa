@@ -18,6 +18,9 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.events.AlarmEvent;
 import eu.hansolo.medusa.events.AlarmEventListener;
+import eu.hansolo.medusa.events.TimeEvent;
+import eu.hansolo.medusa.events.TimeEvent.TimeEventType;
+import eu.hansolo.medusa.events.TimeEventListener;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEvent.EventType;
 import eu.hansolo.medusa.events.UpdateEventListener;
@@ -73,8 +76,9 @@ public class Clock extends Control {
     private static   ScheduledExecutorService periodicTickExecutorService;
 
     // Alarm events
-    private List<UpdateEventListener>         listenerList      = new CopyOnWriteArrayList();
-    private List<AlarmEventListener>          alarmListenerList = new CopyOnWriteArrayList();
+    private List<UpdateEventListener> listenerList          = new CopyOnWriteArrayList<>();
+    private List<AlarmEventListener>  alarmListenerList     = new CopyOnWriteArrayList<>();
+    private List<TimeEventListener>   timeEventListenerList = new CopyOnWriteArrayList<>();
 
     private ObjectProperty<ZonedDateTime>     time;
     private LongProperty                      currentTime;
@@ -1650,6 +1654,7 @@ public class Clock extends Control {
 
     private void tick() { Platform.runLater(() -> {
         if (isAnimated()) return;
+        ZonedDateTime oldTime = getTime();
         setTime(getTime().plus(Duration.ofMillis(updateInterval)));
         ZonedDateTime now = time.get();
         if (isAlarmsEnabled()) checkAlarms(now);
@@ -1662,6 +1667,12 @@ public class Clock extends Control {
             int listSize = areas.size();
             for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(LocalTime.from(now)); }
         }
+
+        if (timeEventListenerList.isEmpty()) return;
+        // Fire TimeEvents
+        if (oldTime.getSecond() != now.getSecond()) fireTimeEvent(new TimeEvent(Clock.this, now, TimeEventType.SECOND));
+        if (oldTime.getMinute() != now.getMinute()) fireTimeEvent(new TimeEvent(Clock.this, now, TimeEventType.MINUTE));
+        if (oldTime.getHour() != now.getHour()) fireTimeEvent(new TimeEvent(Clock.this, now, TimeEventType.HOUR));
     }); }
 
 
@@ -1815,5 +1826,15 @@ public class Clock extends Control {
     public void fireAlarmEvent(final AlarmEvent EVENT) {
         int listSize = alarmListenerList.size();
         for (int i = 0 ; i < listSize ; i++) { alarmListenerList.get(i).onAlarmEvent(EVENT); }
+    }
+
+
+    public void setOnTimeEvent(final TimeEventListener LISTENER) { addTimeEventListener(LISTENER); }
+    public void addTimeEventListener(final TimeEventListener LISTENER) { timeEventListenerList.add(LISTENER); }
+    public void removeTimeEventListener(final TimeEventListener LISTENER) { timeEventListenerList.remove(LISTENER); }
+
+    public void fireTimeEvent(final TimeEvent EVENT) {
+        int listSize = timeEventListenerList.size();
+        for (int i = 0 ; i < listSize ; i++) { timeEventListenerList.get(i).onTimeEvent(EVENT); }
     }
 }
