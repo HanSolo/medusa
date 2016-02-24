@@ -123,7 +123,7 @@ public class Gauge extends Control {
     private static volatile Callable<Void>       blinkTask;
 
     // Update events
-    private List<UpdateEventListener>            listenerList          = new CopyOnWriteArrayList();
+    private List<UpdateEventListener>            listenerList          = new CopyOnWriteArrayList<>();
     private List<EventHandler<ButtonEvent>>      pressedHandlerList    = new CopyOnWriteArrayList<>();
     private List<EventHandler<ButtonEvent>>      releasedHandlerList   = new CopyOnWriteArrayList<>();
     private List<EventHandler<ThresholdEvent>>   exceededHandlerList   = new CopyOnWriteArrayList<>();
