@@ -76,9 +76,9 @@ public class Clock extends Control {
     private static   ScheduledExecutorService periodicTickExecutorService;
 
     // Alarm events
-    private List<UpdateEventListener> listenerList          = new CopyOnWriteArrayList<>();
-    private List<AlarmEventListener>  alarmListenerList     = new CopyOnWriteArrayList<>();
-    private List<TimeEventListener>   timeEventListenerList = new CopyOnWriteArrayList<>();
+    private List<UpdateEventListener>         listenerList          = new CopyOnWriteArrayList<>();
+    private List<AlarmEventListener>          alarmListenerList     = new CopyOnWriteArrayList<>();
+    private List<TimeEventListener>           timeEventListenerList = new CopyOnWriteArrayList<>();
 
     private ObjectProperty<ZonedDateTime>     time;
     private LongProperty                      currentTime;
