@@ -18,6 +18,7 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Clock.ClockSkinType;
 import eu.hansolo.medusa.events.AlarmEventListener;
+import eu.hansolo.medusa.events.TimeEventListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.LongProperty;
@@ -293,6 +294,11 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
 
     public final B onAlarm(final AlarmEventListener LISTENER) {
         properties.put("onAlarm", new SimpleObjectProperty<>(LISTENER));
+        return (B)this;
+    }
+
+    public final B onTimeEvent(final TimeEventListener LISTENER) {
+        properties.put("onTimeEvent", new SimpleObjectProperty<>(LISTENER));
         return (B)this;
     }
 
@@ -606,6 +612,8 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setLcdDesign(((ObjectProperty<LcdDesign>) properties.get(key)).get());
             } else if ("onAlarm".equals(key)) {
                 CONTROL.setOnAlarm(((ObjectProperty<AlarmEventListener>) properties.get(key)).get());
+            } else if ("onTimeEvent".equals(key)) {
+                CONTROL.setOnTimeEvent(((ObjectProperty<TimeEventListener>) properties.get(key)).get());
             } else if ("alarmsEnabled".equals(key)) {
                 CONTROL.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("alarmsVisible".equals(key)) {
