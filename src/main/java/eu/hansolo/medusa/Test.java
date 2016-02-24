@@ -56,6 +56,7 @@ public class Test extends Application {
     private static final Random         RND = new Random();
     private static       int            noOfNodes = 0;
     private              Gauge          gauge;
+    private              Clock          clock;
     private              long           lastTimerCall;
     private              AnimationTimer timer;
 
@@ -64,6 +65,11 @@ public class Test extends Application {
         gauge = GaugeBuilder.create()
                             .prefSize(400, 400)
                             .animated(true)
+                            .build();
+
+        clock = ClockBuilder.create()
+                            //.onTimeEvent(e -> System.out.println(e.TYPE))
+                            //.running(true)
                             .build();
 
         lastTimerCall = System.nanoTime();
