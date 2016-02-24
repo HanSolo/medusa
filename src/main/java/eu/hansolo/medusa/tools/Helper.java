@@ -66,7 +66,9 @@ import java.util.concurrent.ThreadFactory;
  * Created by hansolo on 11.12.15.
  */
 public class Helper {
-    public static final Color INACTIVE_ALARM_COLOR = Color.rgb(90, 90, 90, 0.5);
+    public static final double MAX_TICK_MARK_LENGTH = 0.125;
+    public static final double MAX_TICK_MARK_WIDTH  = 0.02;
+    public static final Color  INACTIVE_ALARM_COLOR = Color.rgb(90, 90, 90, 0.5);
 
 
     public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
@@ -338,6 +340,12 @@ public class Helper {
         Color         majorTickMarkColor           = GAUGE.getMajorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : GAUGE.getMajorTickMarkColor();
         Color         mediumTickMarkColor          = GAUGE.getMediumTickMarkColor().equals(tickMarkColor) ? tickMarkColor : GAUGE.getMediumTickMarkColor();
         Color         minorTickMarkColor           = GAUGE.getMinorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : GAUGE.getMinorTickMarkColor();
+        double        majorTickMarkLengthFactor    = GAUGE.getMajorTickMarkLengthFactor();
+        double        majorTickMarkWidthFactor     = GAUGE.getMajorTickMarkWidthFactor();
+        double        mediumTickMarkLengthFactor   = GAUGE.getMediumTickMarkLengthFactor();
+        double        mediumTickMarkWidthFactor    = GAUGE.getMediumTickMarkWidthFactor();
+        double        minorTickMarkLengthFactor    = GAUGE.getMinorTickMarkLengthFactor();
+        double        minorTickMarkWidthFactor     = GAUGE.getMinorTickMarkWidthFactor();
         Color         tickLabelColor               = GAUGE.getTickLabelColor();
         Color         zeroColor                    = GAUGE.getZeroColor();
         boolean       isNotZero                    = true;
@@ -536,12 +544,12 @@ public class Helper {
                     innerMediumPointY           = innerPointY;
                     innerMinorPointX            = innerPointX;
                     innerMinorPointY            = innerPointY;
-                    outerPointX                 = centerX + SIZE * 0.4105 * sinValue;
-                    outerPointY                 = centerY + SIZE * 0.4105 * cosValue;
-                    outerMediumPointX           = centerX + SIZE * 0.4045 * sinValue;
-                    outerMediumPointY           = centerY + SIZE * 0.4045 * cosValue;
-                    outerMinorPointX            = centerX + SIZE * 0.3975 * sinValue;
-                    outerMinorPointY            = centerY + SIZE * 0.3975 * cosValue;
+                    outerPointX                 = centerX + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * majorTickMarkLengthFactor) * sinValue;
+                    outerPointY                 = centerY + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * majorTickMarkLengthFactor) * cosValue;
+                    outerMediumPointX           = centerX + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * mediumTickMarkLengthFactor) * sinValue;
+                    outerMediumPointY           = centerY + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * mediumTickMarkLengthFactor) * cosValue;
+                    outerMinorPointX            = centerX + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * minorTickMarkLengthFactor) * sinValue;
+                    outerMinorPointY            = centerY + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * minorTickMarkLengthFactor) * cosValue;
                     textPointX                  = centerX + SIZE * orthTextFactor * sinValue;
                     textPointY                  = centerY + SIZE * orthTextFactor * cosValue;
                     dotCenterX                  = centerX + SIZE * 0.3685 * sinValue;
@@ -609,12 +617,12 @@ public class Helper {
                     break;
                 case INSIDE:
                 default:
-                    innerPointX                 = centerX + SIZE * 0.423 * sinValue;
-                    innerPointY                 = centerY + SIZE * 0.423 * cosValue;
-                    innerMediumPointX           = centerX + SIZE * 0.43 * sinValue;
-                    innerMediumPointY           = centerY + SIZE * 0.43 * cosValue;
-                    innerMinorPointX            = centerX + SIZE * 0.436 * sinValue;
-                    innerMinorPointY            = centerY + SIZE * 0.436 * cosValue;
+                    innerPointX                 = centerX + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * majorTickMarkLengthFactor) * sinValue;
+                    innerPointY                 = centerY + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * majorTickMarkLengthFactor) * cosValue;
+                    innerMediumPointX           = centerX + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * mediumTickMarkLengthFactor) * sinValue;
+                    innerMediumPointY           = centerY + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * mediumTickMarkLengthFactor) * cosValue;
+                    innerMinorPointX            = centerX + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * minorTickMarkLengthFactor) * sinValue;
+                    innerMinorPointY            = centerY + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * minorTickMarkLengthFactor) * cosValue;
                     outerPointX                 = centerX + SIZE * 0.475 * sinValue;
                     outerPointY                 = centerY + SIZE * 0.475 * cosValue;
                     outerMediumPointX           = outerPointX;
@@ -701,13 +709,13 @@ public class Helper {
                     tickMarkType = majorTickMarkType;
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
                     CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
-                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.016 : 0.0055));
+                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.016 : MAX_TICK_MARK_WIDTH * majorTickMarkWidthFactor));
                     CTX.setLineCap(TickMarkType.PILL == tickMarkType ? StrokeLineCap.ROUND : StrokeLineCap.BUTT);
                 } else if (minorTickMarksVisible) {
                     tickMarkType = minorTickMarkType;
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
-                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.007 : 0.00225));
+                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.007 : MAX_TICK_MARK_WIDTH * minorTickMarkWidthFactor));
                     CTX.setLineCap(TickMarkType.PILL == tickMarkType ? StrokeLineCap.ROUND : StrokeLineCap.BUTT);
                 }
                 if (fullRange && !isNotZero) {
@@ -855,7 +863,7 @@ public class Helper {
                         break;
                     case LINE:
                     default:
-                        CTX.setLineWidth(SIZE * 0.0035);
+                        CTX.setLineWidth(SIZE * MAX_TICK_MARK_WIDTH * mediumTickMarkWidthFactor);
                         if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
                             Helper.drawLine(CTX, innerPointX, innerPointY, outerMediumPointX, outerMediumPointY);
                         } else {
@@ -902,7 +910,7 @@ public class Helper {
                             break;
                         case LINE:
                         default:
-                            CTX.setLineWidth(SIZE * 0.00225);
+                            CTX.setLineWidth(SIZE * MAX_TICK_MARK_WIDTH * minorTickMarkWidthFactor);
                             if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
                                 Helper.drawLine(CTX, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
                             } else {

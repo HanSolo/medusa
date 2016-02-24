@@ -323,16 +323,46 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B majorTickMarkLengthFactor(final double FACTOR) {
+        properties.put("majorTickMarkLengthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+    
+    public final B majorTickMarkWidthFactor(final double FACTOR) {
+        properties.put("majorTickMarkWidthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+    
     public final B mediumTickMarkColor(final Color COLOR) {
         properties.put("mediumTickMarkColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
+    public final B mediumTickMarkLengthFactor(final double FACTOR) {
+        properties.put("mediumTickMarkLengthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+
+    public final B mediumTickMarkWidthFactor(final double FACTOR) {
+        properties.put("mediumTickMarkWidthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+    
     public final B minorTickMarkColor(final Color COLOR) {
         properties.put("minorTickMarkColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
+    public final B minorTickMarkLengthFactor(final double FACTOR) {
+        properties.put("minorTickMarkLengthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+
+    public final B minorTickMarkWidthFactor(final double FACTOR) {
+        properties.put("minorTickMarkWidthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+    
     public final B majorTickMarkType(final TickMarkType TYPE) {
         properties.put("majorTickMarkType", new SimpleObjectProperty<>(TYPE));
         return (B)this;
@@ -1101,10 +1131,22 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("majorTickMarkColor".equals(key)) {
                 CONTROL.setMajorTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("majorTickMarkLengthFactor".equals(key)) {
+                CONTROL.setMajorTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
+            } else if ("majorTickMarkWidthFactor".equals(key)) {
+                CONTROL.setMajorTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
             } else if ("mediumTickMarkColor".equals(key)) {
                 CONTROL.setMediumTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("mediumTickMarkLengthFactor".equals(key)) {
+                CONTROL.setMediumTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
+            } else if ("mediumTickMarkWidthFactor".equals(key)) {
+                CONTROL.setMediumTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
             } else if ("minorTickMarkColor".equals(key)) {
                 CONTROL.setMinorTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("minorTickMarkLengthFactor".equals(key)) {
+                CONTROL.setMinorTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
+            } else if ("minorTickMarkWidthFactor".equals(key)) {
+                CONTROL.setMinorTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
             } else if ("style".equals(key)) {
                 CONTROL.setStyle(((StringProperty) properties.get(key)).get());
             } else if("ledColor".equals(key)) {

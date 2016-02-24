@@ -215,10 +215,22 @@ public class Gauge extends Control {
     private ObjectProperty<Color>                tickMarkColor;
     private Color                                _majorTickMarkColor;
     private ObjectProperty<Color>                majorTickMarkColor;
+    private double                               _majorTickMarkLengthFactor;
+    private DoubleProperty                       majorTickMarkLengthFactor;
+    private double                               _majorTickMarkWidthFactor;
+    private DoubleProperty                       majorTickMarkWidthFactor;
     private Color                                _mediumTickMarkColor;
     private ObjectProperty<Color>                mediumTickMarkColor;
+    private double                               _mediumTickMarkLengthFactor;
+    private DoubleProperty                       mediumTickMarkLengthFactor;
+    private double                               _mediumTickMarkWidthFactor;
+    private DoubleProperty                       mediumTickMarkWidthFactor;
     private Color                                _minorTickMarkColor;
     private ObjectProperty<Color>                minorTickMarkColor;
+    private double                               _minorTickMarkLengthFactor;
+    private DoubleProperty                       minorTickMarkLengthFactor;
+    private double                               _minorTickMarkWidthFactor;
+    private DoubleProperty                       minorTickMarkWidthFactor;
     private TickMarkType                         _majorTickMarkType;
     private ObjectProperty<TickMarkType>         majorTickMarkType;
     private TickMarkType                         _mediumTickMarkType;
@@ -473,8 +485,14 @@ public class Gauge extends Control {
         _tickLabelColor                   = DARK_COLOR;
         _tickMarkColor                    = DARK_COLOR;
         _majorTickMarkColor               = DARK_COLOR;
+        _majorTickMarkLengthFactor        = 0.42;
+        _majorTickMarkWidthFactor         = 0.275;
         _mediumTickMarkColor              = DARK_COLOR;
+        _mediumTickMarkLengthFactor       = 0.41;
+        _mediumTickMarkWidthFactor        = 0.175;
         _minorTickMarkColor               = DARK_COLOR;
+        _minorTickMarkLengthFactor        = 0.40;
+        _minorTickMarkWidthFactor         = 0.1125;
         _majorTickMarkType                = TickMarkType.LINE;
         _mediumTickMarkType               = TickMarkType.LINE;
         _minorTickMarkType                = TickMarkType.LINE;
@@ -1984,6 +2002,66 @@ public class Gauge extends Control {
     }
 
     /**
+     * Returns the factor that defines the length of the major tick mark.
+     * The value can be in the range from 0 - 1;
+     * @return the factor that defines the length of the major tick mark
+     */
+    public double getMajorTickMarkLengthFactor() { return null == majorTickMarkLengthFactor ? _majorTickMarkLengthFactor : majorTickMarkLengthFactor.get(); }
+    /**
+     * The factor defines the length of the major tick mark.
+     * It can be in the range from 0 - 1.
+     * @param FACTOR
+     */
+    public void setMajorTickMarkLengthFactor(final double FACTOR) {
+        if (null == majorTickMarkLengthFactor) {
+            _majorTickMarkLengthFactor = Helper.clamp(0d, 1d, FACTOR);
+        } else {
+            majorTickMarkLengthFactor.set(FACTOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public DoubleProperty majorTickMarkLengthFactorProperty() {
+        if (null == majorTickMarkLengthFactor) {
+            majorTickMarkLengthFactor = new DoublePropertyBase(_majorTickMarkLengthFactor) {
+                @Override public void set(final double FACTOR) { super.set(Helper.clamp(0d, 1d, FACTOR)); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "majorTickMarkLengthFactor"; }
+            };
+        }
+        return majorTickMarkLengthFactor;
+    }
+
+    /**
+     * Returns the factor that defines the width of the major tick mark.
+     * The value can be in the range from 0 - 1.
+     * @return the factor that defines the width of the major tick mark
+     */
+    public double getMajorTickMarkWidthFactor() { return null == majorTickMarkWidthFactor ? _majorTickMarkWidthFactor : majorTickMarkWidthFactor.get(); }
+    /**
+     * The factor defines the width of the major tick mark.
+     * It can be in the range from 0 - 1.
+     * @param FACTOR
+     */
+    public void setMajorTickMarkWidthFactor(final double FACTOR) {
+        if (null == majorTickMarkWidthFactor) {
+            _majorTickMarkWidthFactor = Helper.clamp(0d, 1d, FACTOR);
+        } else {
+            majorTickMarkWidthFactor.set(FACTOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public DoubleProperty majorTickMarkWidthFactorProperty() {
+        if (null == majorTickMarkWidthFactor) {
+            majorTickMarkWidthFactor = new DoublePropertyBase(_majorTickMarkWidthFactor) {
+                @Override public void set(final double FACTOR) { super.set(Helper.clamp(0d, 1d, FACTOR)); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "majorTickMarkWidthFactor"; }
+            };
+        }
+        return majorTickMarkWidthFactor;
+    }
+    
+    /**
      * Returns the color that will be used to colorize the medium
      * tickmarks. This color will only be used if no tickmark
      * section is defined at the position of the tickmark.
@@ -2010,6 +2088,66 @@ public class Gauge extends Control {
     }
 
     /**
+     * Returns the factor that defines the length of the medium tick mark.
+     * The value can be in the range from 0 - 1;
+     * @return the factor that defines the length of the medium tick mark
+     */
+    public double getMediumTickMarkLengthFactor() { return null == mediumTickMarkLengthFactor ? _mediumTickMarkLengthFactor : mediumTickMarkLengthFactor.get(); }
+    /**
+     * The factor defines the length of the medium tick mark.
+     * It can be in the range from 0 - 1.
+     * @param FACTOR
+     */
+    public void setMediumTickMarkLengthFactor(final double FACTOR) {
+        if (null == mediumTickMarkLengthFactor) {
+            _mediumTickMarkLengthFactor = Helper.clamp(0d, 1d, FACTOR);
+        } else {
+            mediumTickMarkLengthFactor.set(FACTOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public DoubleProperty mediumTickMarkLengthFactorProperty() {
+        if (null == mediumTickMarkLengthFactor) {
+            mediumTickMarkLengthFactor = new DoublePropertyBase(_mediumTickMarkLengthFactor) {
+                @Override public void set(final double FACTOR) { super.set(Helper.clamp(0d, 1d, FACTOR)); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "mediumTickMarkLengthFactor"; }
+            };
+        }
+        return mediumTickMarkLengthFactor;
+    }
+
+    /**
+     * Returns the factor that defines the width of the medium tick mark.
+     * The value can be in the range from 0 - 1.
+     * @return the factor that defines the width of the medium tick mark
+     */
+    public double getMediumTickMarkWidthFactor() { return null == mediumTickMarkWidthFactor ? _mediumTickMarkWidthFactor : mediumTickMarkWidthFactor.get(); }
+    /**
+     * The factor defines the width of the medium tick mark.
+     * It can be in the range from 0 - 1.
+     * @param FACTOR
+     */
+    public void setMediumTickMarkWidthFactor(final double FACTOR) {
+        if (null == mediumTickMarkWidthFactor) {
+            _mediumTickMarkWidthFactor = Helper.clamp(0d, 1d, FACTOR);
+        } else {
+            mediumTickMarkWidthFactor.set(FACTOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public DoubleProperty mediumTickMarkWidthFactorProperty() {
+        if (null == mediumTickMarkWidthFactor) {
+            mediumTickMarkWidthFactor = new DoublePropertyBase(_mediumTickMarkWidthFactor) {
+                @Override public void set(final double FACTOR) { super.set(Helper.clamp(0d, 1d, FACTOR)); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "mediumTickMarkWidthFactor"; }
+            };
+        }
+        return mediumTickMarkWidthFactor;
+    }
+    
+    /**
      * Returns the color that will be used to colorize the minor
      * tickmarks. This color will only be used if no tickmark
      * section is defined at the position of the tickmark.
@@ -2035,6 +2173,66 @@ public class Gauge extends Control {
         return minorTickMarkColor;
     }
 
+    /**
+     * Returns the factor that defines the length of the minor tick mark.
+     * The value can be in the range from 0 - 1;
+     * @return the factor that defines the length of the minor tick mark
+     */
+    public double getMinorTickMarkLengthFactor() { return null == minorTickMarkLengthFactor ? _minorTickMarkLengthFactor : minorTickMarkLengthFactor.get(); }
+    /**
+     * The factor defines the length of the minor tick mark.
+     * It can be in the range from 0 - 1.
+     * @param FACTOR
+     */
+    public void setMinorTickMarkLengthFactor(final double FACTOR) {
+        if (null == minorTickMarkLengthFactor) {
+            _minorTickMarkLengthFactor = Helper.clamp(0d, 1d, FACTOR);
+        } else {
+            minorTickMarkLengthFactor.set(FACTOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public DoubleProperty minorTickMarkLengthFactorProperty() {
+        if (null == minorTickMarkLengthFactor) {
+            minorTickMarkLengthFactor = new DoublePropertyBase(_minorTickMarkLengthFactor) {
+                @Override public void set(final double FACTOR) { super.set(Helper.clamp(0d, 1d, FACTOR)); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "minorTickMarkLengthFactor"; }
+            };
+        }
+        return minorTickMarkLengthFactor;
+    }
+
+    /**
+     * Returns the factor that defines the width of the minor tick mark.
+     * The value can be in the range from 0 - 1.
+     * @return the factor that defines the width of the minor tick mark
+     */
+    public double getMinorTickMarkWidthFactor() { return null == minorTickMarkWidthFactor ? _minorTickMarkWidthFactor : minorTickMarkWidthFactor.get(); }
+    /**
+     * The factor defines the width of the minor tick mark.
+     * It can be in the range from 0 - 1.
+     * @param FACTOR
+     */
+    public void setMinorTickMarkWidthFactor(final double FACTOR) {
+        if (null == minorTickMarkWidthFactor) {
+            _minorTickMarkWidthFactor = Helper.clamp(0d, 1d, FACTOR);
+        } else {
+            minorTickMarkWidthFactor.set(FACTOR);
+        }
+        fireUpdateEvent(REDRAW_EVENT);
+    }
+    public DoubleProperty minorTickMarkWidthFactorProperty() {
+        if (null == minorTickMarkWidthFactor) {
+            minorTickMarkWidthFactor = new DoublePropertyBase(_minorTickMarkWidthFactor) {
+                @Override public void set(final double FACTOR) { super.set(Helper.clamp(0d, 1d, FACTOR)); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "minorTickMarkWidthFactor"; }
+            };
+        }
+        return minorTickMarkWidthFactor;
+    }
+    
     /**
      * Returns the shape that will be used to visualize the major tickmark.
      * Values are LINE, DOT, TRAPEZOID, BOX, TICK_LABEL and PILL
