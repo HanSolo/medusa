@@ -197,8 +197,11 @@ public class Clock extends Control {
         getStyleClass().add("clock");
 
         init(TIME);
+        registerListeners();
     }
 
+
+    // ******************** Initialization ************************************
     private void init(final ZonedDateTime TIME) {
         time                    = new ObjectPropertyBase<ZonedDateTime>(TIME) {
             @Override public void set(final ZonedDateTime TIME) {
@@ -274,6 +277,8 @@ public class Clock extends Control {
         _animated               = false;
         animationDuration       = 10000;
     }
+
+    private void registerListeners() { disabledProperty().addListener(o -> setOpacity(isDisabled() ? 0.4 : 1)); }
 
 
     // ******************** Methods *******************************************
