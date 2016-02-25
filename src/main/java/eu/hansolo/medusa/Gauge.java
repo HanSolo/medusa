@@ -4093,6 +4093,7 @@ public class Gauge extends Control {
                 setNeedleColor(Color.web("#5a615f"));
                 setValueColor(Color.WHITE);
                 setTitleColor(Color.WHITE);
+                setSubTitleColor(Color.WHITE);
                 super.setSkin(new SimpleSkin(Gauge.this));
                 break;
             case SLIM        :

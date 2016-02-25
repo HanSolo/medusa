@@ -75,6 +75,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Rotate              needleRotate;
     private Text                valueText;
     private Text                titleText;
+    private Text                subTitleText;
     private double              angleStep;
     private String              formatString;
     private List<Section>       sections;
@@ -155,9 +156,14 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setFill(getSkinnable().getTitleColor());
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+
+        subTitleText = new Text(getSkinnable().getSubTitle());
+        subTitleText.setTextOrigin(VPos.CENTER);
+        subTitleText.setFill(getSkinnable().getSubTitleColor());
 
         // Add all nodes
-        pane = new Pane(sectionsCanvas, needle, valueText, titleText);
+        pane = new Pane(sectionsCanvas, needle, valueText, titleText, subTitleText);
 
         getChildren().setAll(pane);
     }
@@ -202,6 +208,9 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             highlightSections = getSkinnable().isHighlightSections();
             resize();
             redraw();
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
         }
     }
 
@@ -309,6 +318,12 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.setTranslateX((size - titleText.getLayoutBounds().getWidth()) * 0.5);
         titleText.setTranslateY(size * 0.5 + valueText.getFont().getSize() * 0.45);
+
+        maxWidth = size * 0.45;
+        subTitleText.setFont(Fonts.robotoMedium(fontSize));
+        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, fontSize); }
+        subTitleText.setTranslateX((size - subTitleText.getLayoutBounds().getWidth()) * 0.5);
+        subTitleText.setTranslateY(size * 0.8);
     }
     
     private void resize() {
@@ -374,6 +389,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setFill(getSkinnable().getNeedleColor());
         needle.setStroke(getSkinnable().getNeedleBorderColor());
         titleText.setFill(getSkinnable().getTitleColor());
+        subTitleText.setFill(getSkinnable().getSubTitleColor());
         valueText.setFill(getSkinnable().getValueColor());
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         titleText.setText(getSkinnable().getTitle());
