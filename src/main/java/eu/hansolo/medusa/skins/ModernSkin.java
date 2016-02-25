@@ -18,7 +18,6 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.Gauge.ButtonEvent;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.tools.Helper;
@@ -266,9 +265,6 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().animatedProperty().addListener(o -> handleEvents("ANIMATED"));
         getSkinnable().getSections().addListener((ListChangeListener<Section>) change -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().setOnButtonPressed(e -> handleButtonEvent(e));
-        getSkinnable().setOnButtonReleased(e -> handleButtonEvent(e));
-
         getSkinnable().currentValueProperty().addListener(e -> rotateNeedle(getSkinnable().getCurrentValue()));
 
         handleEvents("INTERACTIVITY");
@@ -335,17 +331,10 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     public void handleMouseEvent(final MouseEvent EVENT) {
+        if (getSkinnable().isDisabled()) return;
         final EventType TYPE = EVENT.getEventType();
         if (MouseEvent.MOUSE_PRESSED.equals(TYPE)) {
             getSkinnable().fireButtonEvent(getSkinnable().BUTTON_PRESSED_EVENT);
-        } else if (MouseEvent.MOUSE_RELEASED.equals(TYPE)) {
-            getSkinnable().fireButtonEvent(getSkinnable().BUTTON_RELEASED_EVENT);
-        }
-    }
-
-    public void handleButtonEvent(final ButtonEvent EVENT) {
-        final EventType TYPE = EVENT.getEventType();
-        if (ButtonEvent.BUTTON_PRESSED.equals(TYPE)) {
             centerKnob.setFill(new LinearGradient(0.5 * size, 0.2708333333333333 * size,
                                                   0.5 * size, 0.7291666666666666 * size,
                                                   false, CycleMethod.NO_CYCLE,
@@ -354,7 +343,8 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             valueText.setTranslateY(size * 0.501);
             subTitleText.setTranslateY(size * 0.3525);
             unitText.setTranslateY(size * 0.6675);
-        } else if (ButtonEvent.BUTTON_RELEASED.equals(TYPE)) {
+        } else if (MouseEvent.MOUSE_RELEASED.equals(TYPE)) {
+            getSkinnable().fireButtonEvent(getSkinnable().BUTTON_RELEASED_EVENT);
             centerKnob.setFill(new LinearGradient(0.5 * size, 0.2708333333333333 * size,
                                                   0.5 * size, 0.7291666666666666 * size,
                                                   false, CycleMethod.NO_CYCLE,

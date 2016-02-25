@@ -372,6 +372,7 @@ public class Gauge extends Control {
         getStyleClass().add("gauge");
 
         init();
+        registerListeners();
     }
 
 
@@ -570,6 +571,8 @@ public class Gauge extends Control {
             fireUpdateEvent(FINISHED_EVENT);
         });
     }
+
+    private void registerListeners() { disabledProperty().addListener(o -> setOpacity(isDisabled() ? 0.4 : 1)); }
 
 
     // ******************** Data related methods ******************************
