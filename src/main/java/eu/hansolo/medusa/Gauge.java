@@ -124,10 +124,6 @@ public class Gauge extends Control {
 
     // Update events
     private List<UpdateEventListener>            listenerList          = new CopyOnWriteArrayList<>();
-    private List<EventHandler<ButtonEvent>>      pressedHandlerList    = new CopyOnWriteArrayList<>();
-    private List<EventHandler<ButtonEvent>>      releasedHandlerList   = new CopyOnWriteArrayList<>();
-    private List<EventHandler<ThresholdEvent>>   exceededHandlerList   = new CopyOnWriteArrayList<>();
-    private List<EventHandler<ThresholdEvent>>   underrunHandlerList   = new CopyOnWriteArrayList<>();
 
     // Data related
     private DoubleProperty                       value;
@@ -428,9 +424,9 @@ public class Gauge extends Control {
                 if (isCheckThreshold()) {
                     double thrshld = getThreshold();
                     if (formerValue < thrshld && VALUE > thrshld) {
-                        fireThresholdEvent(EXCEEDED_EVENT);
+                        fireEvent(EXCEEDED_EVENT);
                     } else if (formerValue > thrshld && VALUE < thrshld ) {
-                        fireThresholdEvent(UNDERRUN_EVENT);
+                        fireEvent(UNDERRUN_EVENT);
                     }
                 }
                 if (VALUE < getMinMeasuredValue()) {
@@ -4193,55 +4189,28 @@ public class Gauge extends Control {
 
     // ******************** Event handling ************************************
     public void setOnUpdate(final UpdateEventListener LISTENER) { addUpdateEventListener(LISTENER); }
-    public void addUpdateEventListener(final UpdateEventListener LISTENER) { listenerList.add(LISTENER); }
-    public void removeUpdateEventListener(final UpdateEventListener LISTENER) { listenerList.remove(LISTENER); }
+    public void addUpdateEventListener(final UpdateEventListener LISTENER) { if (!listenerList.contains(LISTENER)) listenerList.add(LISTENER); }
+    public void removeUpdateEventListener(final UpdateEventListener LISTENER) { if (listenerList.contains(LISTENER)) listenerList.remove(LISTENER); }
 
     public void fireUpdateEvent(final UpdateEvent EVENT) {
         int listSize = listenerList.size();
         for (int i = 0 ; i < listSize ; i++) { listenerList.get(i).onUpdateEvent(EVENT); }
     }
 
-    
-    public void setOnButtonPressed(EventHandler<ButtonEvent> handler) { addButtonPressedHandler(handler); }
-    public void addButtonPressedHandler(EventHandler<ButtonEvent> handler) { pressedHandlerList.add(handler); }
-    public void removeButtonPressedHandler(EventHandler<ButtonEvent> handler) { pressedHandlerList.remove(handler); }
 
-    public void setOnButtonReleased(EventHandler<ButtonEvent> handler) { addButtonReleasedHandler(handler); }
-    public void addButtonReleasedHandler(EventHandler<ButtonEvent> handler) { releasedHandlerList.add(handler); }
-    public void removeButtonReleasedHandler(EventHandler<ButtonEvent> handler) { releasedHandlerList.remove(handler); }
+    public void setOnButtonPressed(final EventHandler<ButtonEvent> HANDLER) { addEventHandler(ButtonEvent.BUTTON_PRESSED, HANDLER); }
+    public void removeOnButtonPressed(final EventHandler<ButtonEvent> HANDLER) { removeEventHandler(ButtonEvent.BUTTON_PRESSED, HANDLER); }
 
-    public void fireButtonEvent(final ButtonEvent EVENT) {
-        final EventType TYPE = EVENT.getEventType();
-        int listSize;
-        if (ButtonEvent.BUTTON_PRESSED == TYPE) {
-            listSize = pressedHandlerList.size();
-            for (int i = 0 ; i < listSize ; i++ ) { pressedHandlerList.get(i).handle(EVENT); }
-        } else if (ButtonEvent.BUTTON_RELEASED == TYPE) {
-            listSize = releasedHandlerList.size();
-            for (int i = 0 ; i < listSize ; i++) { releasedHandlerList.get(i).handle(EVENT); }
-        }
-    }
+    public void setOnButtonReleased(final EventHandler<ButtonEvent> HANDLER) { addEventHandler(ButtonEvent.BUTTON_RELEASED, HANDLER); }
+    public void removeOnButtonReleased(final EventHandler<ButtonEvent> HANDLER) { removeEventHandler(ButtonEvent.BUTTON_RELEASED, HANDLER); }
 
 
-    public void setOnThresholdExceeded(EventHandler<ThresholdEvent> handler) { addThresholdExceededHandler(handler); }
-    public void addThresholdExceededHandler(EventHandler<ThresholdEvent> handler) { exceededHandlerList.add(handler); }
-    public void removeThresholdExceededHandler(EventHandler<ThresholdEvent> handler) { exceededHandlerList.remove(handler); }
+    public void setOnThresholdExceeded(final EventHandler<ThresholdEvent> HANDLER) { addEventHandler(ThresholdEvent.THRESHOLD_EXCEEDED, HANDLER); }
+    public void removeOnThresholdExceeded(final EventHandler<ThresholdEvent> HANDLER) { removeEventHandler(ThresholdEvent.THRESHOLD_EXCEEDED, HANDLER); }
 
-    public void setOnThresholdUnderrun(EventHandler<ThresholdEvent> handler) { addThresholdUnderrunHandler(handler); }
-    public void addThresholdUnderrunHandler(EventHandler<ThresholdEvent> handler) { underrunHandlerList.add(handler); }
-    public void removeThresholdUnderrunHandler(EventHandler<ThresholdEvent> handler) { underrunHandlerList.remove(handler); }
+    public void setOnThresholdUnderrun(final EventHandler<ThresholdEvent> HANDLER) { addEventHandler(ThresholdEvent.THRESHOLD_UNDERRUN, HANDLER); }
+    public void removeOnThresholdUnderrun(final EventHandler<ThresholdEvent> HANDLER) { removeEventHandler(ThresholdEvent.THRESHOLD_UNDERRUN, HANDLER); }
 
-    public void fireThresholdEvent(final ThresholdEvent EVENT) {
-        final EventType TYPE = EVENT.getEventType();
-        int listSize;
-        if (ThresholdEvent.THRESHOLD_EXCEEDED == TYPE) {
-            listSize = exceededHandlerList.size();
-            for (int i = 0 ; i < listSize ; i++) { exceededHandlerList.get(i).handle(EVENT); }
-        } else if (ThresholdEvent.THRESHOLD_UNDERRUN == TYPE) {
-            listSize = underrunHandlerList.size();
-            for (int i = 0 ; i < listSize ; i++) { underrunHandlerList.get(i).handle(EVENT); }
-        }
-    }
     
 
     // ******************** Inner Classes *************************************
