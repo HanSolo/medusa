@@ -18,6 +18,7 @@ package eu.hansolo.medusa.tools;
 
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import javafx.animation.Interpolator;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
@@ -79,10 +80,6 @@ public class ConicalGradient {
         } else {
             stops = STOPS;
         }
-
-        HashMap<Double, Color> stopMap = new LinkedHashMap<>(stops.size());
-        for (Stop stop : stops) { stopMap.put(stop.getOffset(), stop.getColor()); }
-
         sortedStops = calculate(stops, offset);
 
         // Reverse the Stops for CCW direction
@@ -101,10 +98,10 @@ public class ConicalGradient {
         final BigDecimal STEP = new BigDecimal(Double.MIN_VALUE);
         for (Stop stop : STOPS) {
             BigDecimal newOffsetBD = new BigDecimal(stop.getOffset() + OFFSET).remainder(BigDecimal.ONE);
-            if(Double.compare(newOffsetBD.doubleValue(), 0d) == 0) {
+            if (newOffsetBD.equals(BigDecimal.ZERO)) {
                 newOffsetBD = BigDecimal.ONE;
                 stops.add(new Stop(Double.MIN_VALUE, stop.getColor()));
-            } else if (stop.getOffset() + OFFSET > 1d) {
+            } else if (Double.compare((stop.getOffset() + OFFSET), 1d) > 0) {
                 newOffsetBD = newOffsetBD.subtract(STEP);
             }
             stops.add(new Stop(newOffsetBD.doubleValue(), stop.getColor()));
@@ -176,7 +173,6 @@ public class ConicalGradient {
         }
         return RASTER;
     }
-
     public Image getRoundImage(final double SIZE) {
         int   size  = (int) SIZE  <= 0 ? 100 : (int) SIZE;
         Color color = Color.TRANSPARENT;
@@ -244,6 +240,9 @@ public class ConicalGradient {
         return new ImagePattern(getImage(width, height), x, y, width, height, false);
     }
 
+    public ImagePattern getImagePattern(final Bounds BOUNDS) {
+        return getImagePattern(new Rectangle(BOUNDS.getMinX(), BOUNDS.getMinY(), BOUNDS.getWidth(), BOUNDS.getHeight()));
+    }
     public ImagePattern getImagePattern(final Rectangle BOUNDS) {
         double x      = BOUNDS.getX();
         double y      = BOUNDS.getY();
