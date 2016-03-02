@@ -1815,8 +1815,8 @@ public class Clock extends Control {
 
     // ******************** Event handling ************************************
     public void setOnUpdate(final UpdateEventListener LISTENER) { addUpdateEventListener(LISTENER); }
-    public void addUpdateEventListener(final UpdateEventListener LISTENER) { listenerList.add(LISTENER); }
-    public void removeUpdateEventListener(final UpdateEventListener LISTENER) { listenerList.remove(LISTENER); }
+    public void addUpdateEventListener(final UpdateEventListener LISTENER) { if(!listenerList.contains(LISTENER)) listenerList.add(LISTENER); }
+    public void removeUpdateEventListener(final UpdateEventListener LISTENER) { if (listenerList.contains(LISTENER)) listenerList.remove(LISTENER); }
 
     public void fireUpdateEvent(final UpdateEvent EVENT) {
         int listSize = listenerList.size();
@@ -1825,8 +1825,8 @@ public class Clock extends Control {
 
 
     public void setOnAlarm(final AlarmEventListener LISTENER) { addAlarmEventListener(LISTENER); }
-    public void addAlarmEventListener(final AlarmEventListener LISTENER) { alarmListenerList.add(LISTENER); }
-    public void removeAlarmEventListener(final AlarmEventListener LISTENER) { alarmListenerList.remove(LISTENER); }
+    public void addAlarmEventListener(final AlarmEventListener LISTENER) { if (!alarmListenerList.contains(LISTENER)) alarmListenerList.add(LISTENER); }
+    public void removeAlarmEventListener(final AlarmEventListener LISTENER) { if (alarmListenerList.contains(LISTENER)) alarmListenerList.remove(LISTENER); }
 
     public void fireAlarmEvent(final AlarmEvent EVENT) {
         int listSize = alarmListenerList.size();
@@ -1835,8 +1835,8 @@ public class Clock extends Control {
 
 
     public void setOnTimeEvent(final TimeEventListener LISTENER) { addTimeEventListener(LISTENER); }
-    public void addTimeEventListener(final TimeEventListener LISTENER) { timeEventListenerList.add(LISTENER); }
-    public void removeTimeEventListener(final TimeEventListener LISTENER) { timeEventListenerList.remove(LISTENER); }
+    public void addTimeEventListener(final TimeEventListener LISTENER) { if (!timeEventListenerList.contains(LISTENER)) timeEventListenerList.add(LISTENER); }
+    public void removeTimeEventListener(final TimeEventListener LISTENER) { if (timeEventListenerList.contains(LISTENER)) timeEventListenerList.remove(LISTENER); }
 
     public void fireTimeEvent(final TimeEvent EVENT) {
         int listSize = timeEventListenerList.size();

@@ -4218,19 +4218,19 @@ public class Gauge extends Control {
         public static final EventType<ButtonEvent> BUTTON_PRESSED  = new EventType(ANY, "BUTTON_PRESSED");
         public static final EventType<ButtonEvent> BUTTON_RELEASED = new EventType(ANY, "BUTTON_RELEASED");
 
+
         // ******************** Constructors **************************************
-        public ButtonEvent(final Object SOURCE, final EventTarget TARGET, EventType<ButtonEvent> TYPE) {
-            super(SOURCE, TARGET, TYPE);
-        }
+        public ButtonEvent(final EventType<ButtonEvent> TYPE) { super(TYPE); }
+        public ButtonEvent(final Object SOURCE, final EventTarget TARGET, EventType<ButtonEvent> TYPE) { super(SOURCE, TARGET, TYPE); }
     }
     
     public static class ThresholdEvent extends Event {
         public static final EventType<ThresholdEvent> THRESHOLD_EXCEEDED = new EventType(ANY, "THRESHOLD_EXCEEDED");
         public static final EventType<ThresholdEvent> THRESHOLD_UNDERRUN = new EventType(ANY, "THRESHOLD_UNDERRUN");
 
+
         // ******************** Constructors **************************************
-        public ThresholdEvent(final Object SOURCE, final EventTarget TARGET, EventType<ThresholdEvent> TYPE) {
-            super(SOURCE, TARGET, TYPE);
-        }
+        public ThresholdEvent(final EventType<ThresholdEvent> TYPE) { super(TYPE); }
+        public ThresholdEvent(final Object SOURCE, final EventTarget TARGET, EventType<ThresholdEvent> TYPE) { super(SOURCE, TARGET, TYPE); }
     }
 }
