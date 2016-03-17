@@ -28,6 +28,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.property.*;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -377,9 +378,8 @@ public class Gauge extends Control {
         _minValue                         = 0;
         _maxValue                         = 100;
         value                             = new DoublePropertyBase(0) {
-            @Override public void set(final double VALUE) {
-                oldValue.set(value.get());
-                super.set(VALUE);
+            @Override protected void invalidated() {
+                final double VALUE = get();
                 withinSpeedLimit = !(Instant.now().minusMillis(getAnimationDuration()).isBefore(lastCall));
                 lastCall         = Instant.now();
                 if (isAnimated() && withinSpeedLimit) {
@@ -414,6 +414,10 @@ public class Gauge extends Control {
                     currentValue.set(VALUE);
                     fireUpdateEvent(FINISHED_EVENT);
                 }
+            }
+            @Override public void set(final double VALUE) {
+                oldValue.set(get());
+                super.set(VALUE);
             }
             @Override public Object getBean() { return Gauge.this; }
             @Override public String getName() { return "value"; }
@@ -631,13 +635,16 @@ public class Gauge extends Control {
     public DoubleProperty minValueProperty() {
         if (null == minValue) {
             minValue = new DoublePropertyBase(_minValue) {
+                @Override protected void invalidated() {
+                    final double VALUE = get();
+                    setRange(getMaxValue() - VALUE);
+                    if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = VALUE;
+                    if (isStartFromZero() && _minValue < 0) Gauge.this.setValue(0);
+                    if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(VALUE, getMaxValue(), originalThreshold)); }
+                }
                 @Override public void set(final double VALUE) {
                     if (VALUE > getMaxValue()) { setMaxValue(VALUE); }
                     super.set(Helper.clamp(-Double.MAX_VALUE, getMaxValue(), VALUE).doubleValue());
-                    setRange(getMaxValue() - get());
-                    if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = get();
-                    if (isStartFromZero() && _minValue < 0) Gauge.this.setValue(0);
-                    if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(get(), getMaxValue(), originalThreshold)); }
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minValue";}
@@ -671,12 +678,15 @@ public class Gauge extends Control {
     public DoubleProperty maxValueProperty() {
         if (null == maxValue) {
             maxValue = new DoublePropertyBase(_maxValue) {
+                @Override protected void invalidated() {
+                    final double VALUE = get();
+                    setRange(VALUE - getMinValue());
+                    if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = VALUE;
+                    if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(Helper.clamp(getMinValue(), VALUE, originalThreshold)); }
+                }
                 @Override public void set(final double VALUE) {
                     if (VALUE < getMinValue()) { setMinValue(VALUE); }
                     super.set(Helper.clamp(getMinValue(), Double.MAX_VALUE, VALUE).doubleValue());
-                    setRange(get() - getMinValue());
-                    if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = get();
-                    if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(Helper.clamp(getMinValue(), get(), originalThreshold)); }
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "maxValue"; }
