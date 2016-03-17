@@ -24,6 +24,8 @@ import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.SkinType;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -55,17 +57,21 @@ import java.util.Random;
 public class Test extends Application {
     private static final Random         RND = new Random();
     private static       int            noOfNodes = 0;
-    private              Gauge          gauge;
-    private              Clock          clock;
-    private              long           lastTimerCall;
-    private              AnimationTimer timer;
+    private Gauge          gauge;
+    private Clock          clock;
+    private long           lastTimerCall;
+    private AnimationTimer timer;
+    private DoubleProperty value;
 
 
     @Override public void init() {
+        value = new SimpleDoubleProperty(0);
+
         gauge = GaugeBuilder.create()
                             .prefSize(400, 400)
                             .animated(true)
                             .build();
+        gauge.valueProperty().bind(value);
 
         clock = ClockBuilder.create()
                             //.onTimeEvent(e -> System.out.println(e.TYPE))
@@ -76,8 +82,9 @@ public class Test extends Application {
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
                 if (now > lastTimerCall + 3_000_000_000l) {
-                    double value = RND.nextDouble() * gauge.getRange() + gauge.getMinValue();
-                    gauge.setValue(value);
+                    double v = RND.nextDouble() * gauge.getRange() + gauge.getMinValue();
+                    value.set(v);
+                    //gauge.setValue(v);
                     lastTimerCall = now;
                 }
             }
