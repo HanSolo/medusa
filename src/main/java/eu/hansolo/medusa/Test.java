@@ -24,7 +24,9 @@ import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.SkinType;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -57,24 +59,31 @@ import java.util.Random;
 public class Test extends Application {
     private static final Random         RND = new Random();
     private static       int            noOfNodes = 0;
-    private Gauge          gauge;
-    private Clock          clock;
-    private long           lastTimerCall;
-    private AnimationTimer timer;
-    private DoubleProperty value;
+    private Gauge           gauge;
+    private Clock           clock;
+    private long            lastTimerCall;
+    private AnimationTimer  timer;
+    private DoubleProperty  value;
+    private BooleanProperty toggle;
 
 
     @Override public void init() {
-        value = new SimpleDoubleProperty(0);
+        value  = new SimpleDoubleProperty(0);
+        toggle = new SimpleBooleanProperty(false);
 
         gauge = GaugeBuilder.create()
                             .prefSize(400, 400)
                             .animated(true)
+                            .checkThreshold(true)
+                            .onThresholdExceeded(e -> System.out.println("threshold exceeded"))
+                            .threshold(50)
                             .build();
         gauge.valueProperty().bind(value);
+        gauge.valueVisibleProperty().bind(toggle);
 
         clock = ClockBuilder.create()
                             //.onTimeEvent(e -> System.out.println(e.TYPE))
+                            .secondsVisible(true)
                             //.running(true)
                             .build();
 
@@ -84,6 +93,10 @@ public class Test extends Application {
                 if (now > lastTimerCall + 3_000_000_000l) {
                     double v = RND.nextDouble() * gauge.getRange() + gauge.getMinValue();
                     value.set(v);
+                    toggle.set(!toggle.get());
+
+                    System.out.println(gauge.isValueVisible());
+
                     //gauge.setValue(v);
                     lastTimerCall = now;
                 }
