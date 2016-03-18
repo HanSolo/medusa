@@ -204,9 +204,7 @@ public class Clock extends Control {
     // ******************** Initialization ************************************
     private void init(final ZonedDateTime TIME) {
         time                    = new ObjectPropertyBase<ZonedDateTime>(TIME) {
-            @Override public void set(final ZonedDateTime TIME) {
-                super.set(TIME);
-
+            @Override protected void invalidated() {
                 if (!isRunning() && isAnimated()) {
                     long animationDuration = getAnimationDuration();
                     timeline.stop();
@@ -220,6 +218,7 @@ public class Clock extends Control {
                     fireUpdateEvent(FINISHED_EVENT);
                 }
             }
+            @Override public void set(final ZonedDateTime TIME) { super.set(TIME); }
             @Override public Object getBean() { return Clock.this; }
             @Override public String getName() { return "time"; }
         };
