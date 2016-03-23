@@ -45,8 +45,12 @@ import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
 
+import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.util.Currency;
+import java.util.Locale;
 import java.util.Random;
 
 
@@ -68,6 +72,13 @@ public class Test extends Application {
 
 
     @Override public void init() {
+        NumberFormat numberFormat = NumberFormat.getInstance(new Locale("da", "DK"));
+        numberFormat.setRoundingMode(RoundingMode.HALF_DOWN);
+        numberFormat.setMinimumIntegerDigits(3);
+        numberFormat.setMaximumIntegerDigits(3);
+        numberFormat.setMinimumFractionDigits(0);
+        numberFormat.setMaximumFractionDigits(0);
+
         value  = new SimpleDoubleProperty(0);
         toggle = new SimpleBooleanProperty(false);
 
@@ -77,9 +88,12 @@ public class Test extends Application {
                             .checkThreshold(true)
                             .onThresholdExceeded(e -> System.out.println("threshold exceeded"))
                             .threshold(50)
+                            .lcdVisible(true)
+                            .locale(Locale.GERMANY)
+                            .numberFormat(numberFormat)
                             .build();
         gauge.valueProperty().bind(value);
-        gauge.valueVisibleProperty().bind(toggle);
+        //gauge.valueVisibleProperty().bind(toggle);
 
         clock = ClockBuilder.create()
                             //.onTimeEvent(e -> System.out.println(e.TYPE))
@@ -93,9 +107,9 @@ public class Test extends Application {
                 if (now > lastTimerCall + 3_000_000_000l) {
                     double v = RND.nextDouble() * gauge.getRange() + gauge.getMinValue();
                     value.set(v);
-                    toggle.set(!toggle.get());
+                    //toggle.set(!toggle.get());
 
-                    System.out.println(gauge.isValueVisible());
+                    //System.out.println(gauge.isValueVisible());
 
                     //gauge.setValue(v);
                     lastTimerCall = now;
@@ -117,6 +131,7 @@ public class Test extends Application {
         //pane.setBackground(new Background(new BackgroundFill(Gauge.DARK_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
+
 
         stage.setTitle("Medusa");
         stage.setScene(scene);
