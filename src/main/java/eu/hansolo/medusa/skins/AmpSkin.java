@@ -109,7 +109,6 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Rectangle       lcd;
     private Label           lcdText;
     private double          angleStep;
-    private String          limitString;
     private String          formatString;
 
 
@@ -119,7 +118,6 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleStep        = gauge.getAngleRange() / gauge.getRange();
         oldValue         = gauge.getValue();
-        limitString      = "";
         formatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
         init();
@@ -238,7 +236,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     protected void handleEvents(final String EVENT_TYPE) {
         if ("ANGLE".equals(EVENT_TYPE)) {
             double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + getSkinnable().getMinValue();
-            lcdText.setText((limitString + String.format(Locale.US, formatString, currentValue)));
+            lcdText.setText((String.format(Locale.US, formatString, currentValue)));
             lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();

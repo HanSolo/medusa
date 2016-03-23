@@ -127,7 +127,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double                   angleStep;
     private double                   startAngle;
     private double                   angleRange;
-    private String                   limitString;
     private EventHandler<MouseEvent> mouseHandler;
     private Tooltip                  buttonTooltip;
     private Tooltip                  thresholdTooltip;
@@ -155,7 +154,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         oldValue          = gauge.getValue();
         minValue          = gauge.getMinValue();
         maxValue          = gauge.getMaxValue();
-        limitString       = "";
         formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         sections          = gauge.getSections();
         highlightSections = gauge.isHighlightSections();
@@ -427,7 +425,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         needleRotate.setAngle(targetAngle);
-        valueText.setText(limitString + String.format(Locale.US, formatString, value));
+        valueText.setText(String.format(Locale.US, formatString, value));
         if (getSkinnable().isLcdVisible()) {
             valueText.setTranslateX((0.691 * size - valueText.getLayoutBounds().getWidth()));
         } else {

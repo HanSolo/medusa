@@ -126,7 +126,6 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double                   startAngle;
     private double                   angleRange;
     private double                   angleStep;
-    private String                   limitString;
     private EventHandler<MouseEvent> mouseHandler;
     private Tooltip                  buttonTooltip;
     private Tooltip                  thresholdTooltip;
@@ -153,7 +152,6 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         oldValue          = gauge.getValue();
         minValue          = gauge.getMinValue();
         maxValue          = gauge.getMaxValue();
-        limitString       = "";
         formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         sections          = gauge.getSections();
         highlightSections = gauge.isHighlightSections();
@@ -405,7 +403,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             targetAngle = Helper.clamp(startOffsetAngle - angleRange, startOffsetAngle, targetAngle);
         }
         needleRotate.setAngle(targetAngle);
-        valueText.setText(limitString + String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(Locale.US, formatString, VALUE));
         valueText.setTranslateX(Pos.CENTER_LEFT == getSkinnable().getKnobPosition() ? width * 0.6 - valueText.getLayoutBounds().getWidth() : width * 0.9 - valueText.getLayoutBounds().getWidth());
     }
 

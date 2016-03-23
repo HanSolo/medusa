@@ -134,7 +134,6 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text                     valueText;
     private double                   startAngle;
     private double                   angleStep;
-    private String                   limitString;
     private EventHandler<MouseEvent> mouseHandler;
     private Tooltip                  buttonTooltip;
     private Tooltip                  thresholdTooltip;
@@ -158,7 +157,6 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         startAngle        = getStartAngle();
         angleStep         = ANGLE_RANGE / gauge.getRange();
         oldValue          = gauge.getValue();
-        limitString       = "";
         minValue          = gauge.getMinValue();
         maxValue          = gauge.getMaxValue();
         formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
@@ -431,7 +429,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             targetAngle = Helper.clamp(startOffsetAngle - ANGLE_RANGE, startOffsetAngle, targetAngle);
         }
         needleRotate.setAngle(targetAngle);
-        valueText.setText(limitString + String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(Locale.US, formatString, VALUE));
         resizeValueText();
     }
 
