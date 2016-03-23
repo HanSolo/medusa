@@ -76,6 +76,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text          titleText;
     private Tooltip       barTooltip;
     private String        formatString;
+    private Locale        locale;
     private List<Section> sections;
 
 
@@ -84,7 +85,8 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     public LevelSkin(Gauge gauge) {
         super(gauge);
         formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        sections     = getSkinnable().getSections();
+        locale       = gauge.getLocale();
+        sections     = gauge.getSections();
         barTooltip   = new Tooltip();
         barTooltip.setTextAlignment(TextAlignment.CENTER);
 
@@ -157,7 +159,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         fluidTop = new Ellipse();
         fluidTop.setStroke(null);
 
-        valueText = new Text(String.format(Locale.US, "%.0f%%", getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(locale, "%.0f%%", getSkinnable().getCurrentValue()));
         valueText.setVisible(getSkinnable().isValueVisible());
         valueText.setManaged(getSkinnable().isValueVisible());
         valueText.setMouseTransparent(true);
@@ -211,7 +213,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             titleText.setManaged(hasTitle);
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            StringBuilder content = new StringBuilder(String.format(Locale.US, formatString, getSkinnable().getValue()))
+            StringBuilder content = new StringBuilder(String.format(locale, formatString, getSkinnable().getValue()))
                 .append("\n(").append(valueText.getText()).append(")");
             barTooltip.setText(content.toString());
         }
@@ -253,7 +255,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         fluidUpperLeft.setControlY2(centerY + 0.06666667 * height);
         fluidUpperLeft.setY(centerY);
 
-        valueText.setText(String.format(Locale.US, "%.0f%%", factor * 100));
+        valueText.setText(String.format(locale, "%.0f%%", factor * 100));
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, (height - valueText.getLayoutBounds().getHeight()) * 0.5);
     }
 
@@ -372,6 +374,7 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        locale       = getSkinnable().getLocale();
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
 
         // Background stroke and fill

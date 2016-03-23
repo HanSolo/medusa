@@ -78,6 +78,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text                subTitleText;
     private double              angleStep;
     private String              formatString;
+    private Locale              locale;
     private List<Section>       sections;
     private boolean             highlightSections;
     private double              minValue;
@@ -90,6 +91,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleStep         = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
         formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale            = gauge.getLocale();
         sections          = gauge.getSections();
         highlightSections = gauge.isHighlightSections();
         minValue          = gauge.getMinValue();
@@ -148,7 +150,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setStrokeLineCap(StrokeLineCap.ROUND);
         needle.setStrokeLineJoin(StrokeLineJoin.BEVEL);
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
@@ -219,7 +221,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void rotateNeedle(final double VALUE) {
         double targetAngle = 180 - START_ANGLE + (VALUE - getSkinnable().getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
-        valueText.setText(String.format(Locale.US, formatString, VALUE) + getSkinnable().getUnit());
+        valueText.setText(String.format(locale, formatString, VALUE) + getSkinnable().getUnit());
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         if (valueText.getLayoutBounds().getWidth() > 0.395 * size) { resizeText(); }
     }
@@ -298,9 +300,9 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sectionsCtx.setFill(getSkinnable().getTickLabelColor());
             sectionsCtx.setTextBaseline(VPos.TOP);
             sectionsCtx.setTextAlign(TextAlignment.LEFT);
-            sectionsCtx.fillText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()), size * 0.15075377, size * 0.86180905, size * 0.3);
+            sectionsCtx.fillText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()), size * 0.15075377, size * 0.86180905, size * 0.3);
             sectionsCtx.setTextAlign(TextAlignment.RIGHT);
-            sectionsCtx.fillText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()), size * 0.84924623, size * 0.86180905, size * 0.3);
+            sectionsCtx.fillText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()), size * 0.84924623, size * 0.86180905, size * 0.3);
         }
     }
 
@@ -376,7 +378,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleRotate.setPivotY(size * 0.5);
 
             double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + getSkinnable().getMinValue();
-            valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue) + getSkinnable().getUnit());
+            valueText.setText(String.format(locale, "%." + getSkinnable().getDecimals() + "f", currentValue) + getSkinnable().getUnit());
             valueText.setVisible(getSkinnable().isValueVisible());
 
             titleText.setText(getSkinnable().getTitle());
@@ -391,6 +393,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setFill(getSkinnable().getTitleColor());
         subTitleText.setFill(getSkinnable().getSubTitleColor());
         valueText.setFill(getSkinnable().getValueColor());
+        locale       = getSkinnable().getLocale();
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         titleText.setText(getSkinnable().getTitle());
         resizeText();

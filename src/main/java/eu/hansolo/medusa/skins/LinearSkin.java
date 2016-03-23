@@ -95,6 +95,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Rectangle           lcd;
     private String              formatString;
     private String              tickLabelFormatString;
+    private Locale              locale;
     private double              minValuePosition;
     private double              maxValuePosition;
     private double              zeroPosition;
@@ -109,6 +110,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         orientation           = gauge.getOrientation();
         formatString          = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
+        locale                = gauge.getLocale();
         sections              = gauge.getSections();
         areas                 = gauge.getAreas();
 
@@ -177,7 +179,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         unitText  = new Text(getSkinnable().getUnit());
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
 
         pane = new Pane(barBorder1,
                         barBorder2,
@@ -323,10 +325,10 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 CTX.setTextBaseline(VPos.CENTER);
                 if (Orientation.VERTICAL == orientation) {
                     CTX.setTextAlign(TextAlignment.RIGHT);
-                    CTX.fillText(String.format(Locale.US, tickLabelFormatString, (maxValue -= majorTickSpace) + majorTickSpace), textPoint.getX(), textPoint.getY());
+                    CTX.fillText(String.format(locale, tickLabelFormatString, (maxValue -= majorTickSpace) + majorTickSpace), textPoint.getX(), textPoint.getY());
                 } else {
                     CTX.setTextAlign(TextAlignment.CENTER);
-                    CTX.fillText(String.format(Locale.US, tickLabelFormatString, (minValue += majorTickSpace) - majorTickSpace), textPoint.getX(), textPoint.getY());
+                    CTX.fillText(String.format(locale, tickLabelFormatString, (minValue += majorTickSpace) - majorTickSpace), textPoint.getX(), textPoint.getY());
                 }
             } else if (minorTickSpace % 2 != 0 && counter % 5 == 0) {
                 CTX.setLineWidth(size * 0.006);
@@ -391,10 +393,10 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barHighlight.setHeight(valueHeight);
 
             if (getSkinnable().isLcdVisible()) {
-                valueText.setText(String.format(Locale.US, formatString, VALUE));
+                valueText.setText(String.format(locale, formatString, VALUE));
                 valueText.setLayoutX((0.88 * width - valueText.getLayoutBounds().getWidth()));
             } else {
-                valueText.setText(String.format(Locale.US, formatString, VALUE));
+                valueText.setText(String.format(locale, formatString, VALUE));
                 valueText.setLayoutX((width - valueText.getLayoutBounds().getWidth()) * 0.5);
             }
         } else {
@@ -417,7 +419,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setWidth(valueWidth);
             barHighlight.setWidth(valueWidth);
 
-            valueText.setText(String.format(Locale.US, formatString, VALUE));
+            valueText.setText(String.format(locale, formatString, VALUE));
             valueText.setLayoutX((0.98 * width - valueText.getLayoutBounds().getWidth()));
         }
 
@@ -702,6 +704,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        locale                = getSkinnable().getLocale();
         formatString          = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
 

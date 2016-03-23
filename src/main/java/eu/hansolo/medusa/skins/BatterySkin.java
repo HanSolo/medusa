@@ -65,6 +65,7 @@ public class BatterySkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private LinearGradient  batteryPaint;
     private Text            valueText;
     private List<Section>   sections;
+    private Locale          locale;
 
 
 
@@ -72,7 +73,8 @@ public class BatterySkin extends SkinBase<Gauge> implements Skin<Gauge> {
     public BatterySkin(Gauge gauge) {
         super(gauge);
         orientation = gauge.getOrientation();
-        sections    = getSkinnable().getSections();
+        sections    = gauge.getSections();
+        locale      = gauge.getLocale();
 
         init();
         initGraphics();
@@ -107,7 +109,7 @@ public class BatterySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         battery.setFillRule(FillRule.EVEN_ODD);
         battery.setStroke(null);
 
-        valueText = new Text(String.format(Locale.US, "%.0f%%", getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(locale, "%.0f%%", getSkinnable().getCurrentValue()));
         valueText.setVisible(getSkinnable().isValueVisible());
         valueText.setManaged(getSkinnable().isValueVisible());
 
@@ -186,7 +188,7 @@ public class BatterySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
         battery.setFill(batteryPaint);
 
-        valueText.setText(String.format(Locale.US, "%.0f%%", factor * 100));
+        valueText.setText(String.format(locale, "%.0f%%", factor * 100));
         valueText.relocate((size - valueText.getLayoutBounds().getWidth()) * 0.5, (size - valueText.getLayoutBounds().getHeight()) * 0.5);
     }
 
@@ -293,6 +295,8 @@ public class BatterySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Background stroke and fill
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(1))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+
+        locale = getSkinnable().getLocale();
 
         Color barBackgroundColor = getSkinnable().getBarBackgroundColor();
         batteryBackground.setFill(Color.color(barBackgroundColor.getRed(), barBackgroundColor.getGreen(), barBackgroundColor.getBlue(), 0.3));

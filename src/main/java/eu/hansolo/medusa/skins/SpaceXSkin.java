@@ -95,6 +95,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Color           thresholdBackgroundColor;
     private              double          minValue;
     private              String          formatString;
+    private              Locale          locale;
 
 
     // ******************** Constructors **************************************
@@ -106,7 +107,8 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         minValue          = gauge.getMinValue();
         currentValueAngle = 0;
         formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-
+        locale            = gauge.getLocale();
+        
         init();
         initGraphics();
         registerListeners();
@@ -147,7 +149,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setFill(getSkinnable().getTitleColor());
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getValue()));
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
 
@@ -273,7 +275,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarThresholdInnerArc.setX(centerX + (centerX - barWidth) * Math.sin(-Math.toRadians(thresholdAngle)));
         dataBarThresholdInnerArc.setY(centerY + (centerX - barWidth) * Math.cos(-Math.toRadians(thresholdAngle)));
 
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         if (valueText.getLayoutBounds().getWidth() > 0.64 * width) Helper.adjustTextSize(valueText, width, 0.21 * width);
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
     }
@@ -378,6 +380,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        locale                   = getSkinnable().getLocale();
         formatString             = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * width))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
@@ -394,7 +397,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setText(getSkinnable().getTitle());
 
         valueText.setFill(getSkinnable().getValueColor());
-        valueText.setText(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
+        valueText.setText(String.format(locale, formatString, getSkinnable().getCurrentValue()));
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
 
         unitText.setFill(getSkinnable().getUnitColor());

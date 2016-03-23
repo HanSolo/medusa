@@ -77,6 +77,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Tooltip         barTooltip;
     private              Tooltip         thresholdTooltip;
     private              String          formatString;
+    private              Locale          locale;
 
 
 
@@ -88,6 +89,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         barTooltip       = new Tooltip();
         thresholdTooltip = new Tooltip();
         formatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale           = gauge.getLocale();
 
         if (Orientation.VERTICAL == orientation) {
             preferredWidth  = 64;
@@ -211,7 +213,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resize();
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            barTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getValue()));
+            barTooltip.setText(String.format(locale, formatString, getSkinnable().getValue()));
         }
     }
 
@@ -434,12 +436,13 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        locale = getSkinnable().getLocale();
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
         drawTickMarks(tickMarksCtx);
         drawSections(sectionsCtx);
         thresholdRect.setFill(getSkinnable().getThresholdColor());
-        thresholdTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getThreshold()));
+        thresholdTooltip.setText(String.format(locale, formatString, getSkinnable().getThreshold()));
         barRect.setFill(getSkinnable().getBarColor());
         titleText.setFill(getSkinnable().getTitleColor());
         unitText.setFill(getSkinnable().getUnitColor());

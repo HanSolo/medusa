@@ -98,6 +98,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private List<Section>   sections;
     private Tooltip         needleTooltip;
     private String          formatString;
+    private Locale          locale;
 
 
     // ******************** Constructors **************************************
@@ -112,8 +113,9 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         colorGradientEnabled = gauge.isGradientBarEnabled();
         noOfGradientStops    = gauge.getGradientBarStops().size();
         sections             = gauge.getSections();
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
+        
         init();
         initGraphics();
         registerListeners();
@@ -176,7 +178,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setStrokeWidth(1);
         needle.setStroke(getSkinnable().getBackgroundPaint());
 
-        needleTooltip = new Tooltip(String.format(Locale.US, formatString, getSkinnable().getValue()));
+        needleTooltip = new Tooltip(String.format(locale, formatString, getSkinnable().getValue()));
         needleTooltip.setTextAlignment(TextAlignment.CENTER);
         Tooltip.install(needle, needleTooltip);
 
@@ -210,7 +212,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angleStep = ANGLE_RANGE / range;
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            needleTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getValue()));
+            needleTooltip.setText(String.format(locale, formatString, getSkinnable().getValue()));
         }
     }
     
@@ -414,6 +416,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
+        locale               = getSkinnable().getLocale();
         formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();

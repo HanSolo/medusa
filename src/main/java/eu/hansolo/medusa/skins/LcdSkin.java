@@ -112,6 +112,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Group                 shadowGroup;
     private              String                valueFormatString;
     private              String                otherFormatString;
+    private              Locale                locale;
     private              List<Section>         sections;
     private              Map<Section, Color[]> sectionColorMap;
 
@@ -127,6 +128,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         backgroundTextBuilder = new StringBuilder();
         valueFormatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         otherFormatString     = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
+        locale                = gauge.getLocale();
         sections              = gauge.getSections();
         sectionColorMap       = new HashMap<>(sections.size());
         updateSectionColors();
@@ -197,11 +199,11 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         threshold.setVisible(getSkinnable().isThresholdVisible());
         threshold.setStroke(null);
         
-        backgroundText = new Text(String.format(Locale.US, valueFormatString, getSkinnable().getCurrentValue()));
+        backgroundText = new Text(String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
         backgroundText.setFill(getSkinnable().getLcdDesign().lcdBackgroundColor);
         backgroundText.setOpacity((LcdFont.LCD == getSkinnable().getLcdFont() || LcdFont.ELEKTRA == getSkinnable().getLcdFont()) ? 1 : 0);
 
-        valueText = new Text(String.format(Locale.US, valueFormatString, getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
         valueText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
 
         unitText = new Text(getSkinnable().getUnit());
@@ -219,17 +221,17 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         lowerRightText.setManaged(!getSkinnable().getSubTitle().isEmpty());
         lowerRightText.setVisible(!getSkinnable().getSubTitle().isEmpty());
 
-        upperLeftText = new Text(String.format(Locale.US, otherFormatString, getSkinnable().getMinMeasuredValue()));
+        upperLeftText = new Text(String.format(locale, otherFormatString, getSkinnable().getMinMeasuredValue()));
         upperLeftText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
         upperLeftText.setManaged(getSkinnable().isMinMeasuredValueVisible());
         upperLeftText.setVisible(getSkinnable().isMinMeasuredValueVisible());
 
-        upperRightText = new Text(String.format(Locale.US, otherFormatString, getSkinnable().getMaxMeasuredValue()));
+        upperRightText = new Text(String.format(locale, otherFormatString, getSkinnable().getMaxMeasuredValue()));
         upperRightText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
         upperRightText.setManaged(getSkinnable().isMaxMeasuredValueVisible());
         upperRightText.setVisible(getSkinnable().isMaxMeasuredValueVisible());
 
-        lowerCenterText = new Text(String.format(Locale.US, otherFormatString, getSkinnable().getOldValue()));
+        lowerCenterText = new Text(String.format(locale, otherFormatString, getSkinnable().getOldValue()));
         lowerCenterText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
         lowerCenterText.setManaged(getSkinnable().isOldValueVisible());
         lowerCenterText.setVisible(getSkinnable().isOldValueVisible());
@@ -622,6 +624,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        locale            = getSkinnable().getLocale();
         valueFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         otherFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
 
@@ -630,7 +633,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (isNoOfDigitsInvalid()) {
             valueText.setText("-E-");
         } else {
-            valueText.setText(String.format(Locale.US, valueFormatString, getSkinnable().getCurrentValue()));
+            valueText.setText(String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
         }
 
         updateBackgroundText();
@@ -654,13 +657,13 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
 
         // Update the upper left text
-        upperLeftText.setText(String.format(Locale.US, otherFormatString, getSkinnable().getMinMeasuredValue()));
+        upperLeftText.setText(String.format(locale, otherFormatString, getSkinnable().getMinMeasuredValue()));
         if (upperLeftText.getX() + upperLeftText.getLayoutBounds().getWidth() > title.getX()) {
             upperLeftText.setText("...");
         }
 
         // Update the upper right text
-        upperRightText.setText(String.format(Locale.US, otherFormatString, getSkinnable().getMaxMeasuredValue()));
+        upperRightText.setText(String.format(locale, otherFormatString, getSkinnable().getMaxMeasuredValue()));
         upperRightText.setX(width - upperRightText.getLayoutBounds().getWidth() - 0.0416666667 * height);
         if (upperRightText.getX() < title.getX() + title.getLayoutBounds().getWidth()) {
             upperRightText.setText("...");
@@ -668,7 +671,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         // Update the lower center text
-        lowerCenterText.setText(String.format(Locale.US, otherFormatString, getSkinnable().getOldValue()));
+        lowerCenterText.setText(String.format(locale, otherFormatString, getSkinnable().getOldValue()));
         lowerCenterText.setX((width - lowerCenterText.getLayoutBounds().getWidth()) * 0.5);
 
         // Update the lower right text

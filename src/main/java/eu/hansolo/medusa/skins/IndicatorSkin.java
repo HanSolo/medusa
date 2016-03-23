@@ -93,6 +93,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private List<Section> sections;
     private Tooltip       needleTooltip;
     private String        formatString;
+    private Locale        locale;
     private Color         barColor;
 
 
@@ -111,6 +112,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
         formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
         barColor             = gauge.getBarColor();
 
         init();
@@ -172,15 +174,15 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setStrokeWidth(1);
         needle.setStroke(getSkinnable().getBackgroundPaint());
 
-        needleTooltip = new Tooltip(String.format(Locale.US, formatString, getSkinnable().getValue()));
+        needleTooltip = new Tooltip(String.format(locale, formatString, getSkinnable().getValue()));
         needleTooltip.setTextAlignment(TextAlignment.CENTER);
         Tooltip.install(needle, needleTooltip);
 
-        minValueText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
+        minValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
         minValueText.setFill(getSkinnable().getTitleColor());
         minValueText.setVisible(getSkinnable().getTickLabelsVisible());
 
-        maxValueText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
+        maxValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
         maxValueText.setFill(getSkinnable().getTitleColor());
         maxValueText.setVisible(getSkinnable().getTickLabelsVisible());
 
@@ -215,7 +217,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angleStep  = angleRange / range;
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            needleTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getValue()));
+            needleTooltip.setText(String.format(locale, formatString, getSkinnable().getValue()));
             if (getSkinnable().isValueVisible()) {
                 Bounds bounds        = pane.localToScreen(pane.getBoundsInLocal());
                 double value         = getSkinnable().getValue();
@@ -362,13 +364,14 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         barColor             = getSkinnable().getBarColor();
 
+        locale               = getSkinnable().getLocale();
         formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();
         sectionsVisible      = getSkinnable().getSectionsVisible();
 
-        minValueText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
-        maxValueText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
+        minValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
+        maxValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
         resizeStaticText();
 
         barBackground.setStroke(getSkinnable().getBarBackgroundColor());

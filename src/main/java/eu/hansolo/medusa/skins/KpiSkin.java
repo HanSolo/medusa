@@ -74,6 +74,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double       range;
     private double       angleStep;
     private String       formatString;
+    private Locale       locale;
 
 
     // ******************** Constructors **************************************
@@ -86,6 +87,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         range        = gauge.getRange();
         angleStep    = angleRange / range;
         formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale       = gauge.getLocale();
 
         init();
         initGraphics();
@@ -140,16 +142,16 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText = new Text(getSkinnable().getTitle());
         titleText.setFill(getSkinnable().getTitleColor());
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
         valueText.setFill(getSkinnable().getValueColor());
 
-        minValueText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
+        minValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
         minValueText.setFill(getSkinnable().getTitleColor());
 
-        maxValueText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
+        maxValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
         maxValueText.setFill(getSkinnable().getTitleColor());
 
-        thresholdText = new Text(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
+        thresholdText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
         thresholdText.setFill(getSkinnable().getTitleColor());
         thresholdText.setVisible(Double.compare(getSkinnable().getThreshold(), getSkinnable().getMinValue()) != 0 && Double.compare(getSkinnable().getThreshold(), getSkinnable().getMaxValue()) != 0);
 
@@ -189,7 +191,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double targetAngle = (VALUE - minValue) * angleStep - needleStartAngle;
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         resizeValueText();
     }
 
@@ -328,12 +330,13 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
+        locale       = getSkinnable().getLocale();
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
 
         titleText.setText(getSkinnable().getTitle());
-        minValueText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
-        maxValueText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
-        thresholdText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
+        minValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
+        maxValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
+        thresholdText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
         resizeStaticText();
 
         barBackground.setStroke(getSkinnable().getBarColor());

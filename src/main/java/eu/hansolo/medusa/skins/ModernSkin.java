@@ -109,6 +109,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private EventHandler<MouseEvent> mouseHandler;
     private Tooltip                  buttonTooltip;
     private String                   formatString;
+    private Locale                   locale;
     private boolean                  sectionsVisible;
     private List<Section>            sections;
     private Color                    barColor;
@@ -123,6 +124,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         mouseHandler    = event -> handleMouseEvent(event);
         buttonTooltip   = new Tooltip();
         formatString    = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale          = gauge.getLocale();
         sectionsVisible = gauge.getSectionsVisible();
         sections        = gauge.getSections();
         barColor        = gauge.getBarColor();
@@ -238,7 +240,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setEffect(glow1);
         unitText.setMouseTransparent(true);
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
@@ -362,7 +364,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep          = ANGLE_RANGE / getSkinnable().getRange();
         double targetAngle = 180 - START_ANGLE + (VALUE - getSkinnable().getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         if (valueText.getLayoutBounds().getWidth() > 0.395 * size) {
             resizeText();
@@ -626,7 +628,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         Double.compare(counter, maxValue) == 0)) {
                             CTX.setFill(Color.TRANSPARENT);
                     }
-                    CTX.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
+                    CTX.fillText(String.format(locale, "%." + decimals + "f", counter), 0, 0);
                     CTX.restore();
                 }
             } else if (mediumTickMarksVisible &&
@@ -647,7 +649,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + getSkinnable().getMinValue();
 
         valueText.setFont(Fonts.latoRegular(size * 0.22));
-        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue));
+        valueText.setText(String.format(locale, "%." + getSkinnable().getDecimals() + "f", currentValue));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, size * 0.22); }
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
 
@@ -793,6 +795,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        locale       = getSkinnable().getLocale();
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         needle.setFill(getSkinnable().getNeedleColor());
         titleText.setFill(getSkinnable().getTitleColor());

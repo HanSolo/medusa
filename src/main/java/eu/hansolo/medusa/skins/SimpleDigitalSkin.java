@@ -62,22 +62,23 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private GraphicsContext backgroundCtx;
     private Canvas          barCanvas;
     private GraphicsContext barCtx;
-    private Text          valueBkgText;
-    private Text          valueText;
-    private Color         barColor;
-    private Color         valueColor;
-    private Color         unitColor;
-    private double        minValue;
-    private double        maxValue;
-    private double        range;
-    private double        angleStep;
-    private boolean       isStartFromZero;
-    private double        barWidth;
-    private String        formatString;
-    private boolean       sectionsVisible;
-    private List<Section> sections;
-    private boolean       thresholdVisible;
-    private Color         thresholdColor;
+    private Text            valueBkgText;
+    private Text            valueText;
+    private Color           barColor;
+    private Color           valueColor;
+    private Color           unitColor;
+    private double          minValue;
+    private double          maxValue;
+    private double          range;
+    private double          angleStep;
+    private boolean         isStartFromZero;
+    private double          barWidth;
+    private String          formatString;
+    private Locale          locale;
+    private boolean         sectionsVisible;
+    private List<Section>   sections;
+    private boolean         thresholdVisible;
+    private Color           thresholdColor;
 
 
     // ******************** Constructors **************************************
@@ -89,6 +90,7 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         range            = gauge.getRange();
         angleStep        = ANGLE_RANGE / range;
         formatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale           = gauge.getLocale();
         barColor         = gauge.getBarColor();
         valueColor       = gauge.getValueColor();
         unitColor        = gauge.getUnitColor();
@@ -223,7 +225,7 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 }
             }
         }
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         valueText.setLayoutX(valueBkgText.getLayoutBounds().getMaxX() - valueText.getLayoutBounds().getWidth());
     }
 
@@ -307,6 +309,7 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void redraw() {
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        locale          = getSkinnable().getLocale();
         formatString    = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         barColor        = getSkinnable().getBarColor();
         valueColor      = getSkinnable().getValueColor();

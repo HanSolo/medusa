@@ -77,6 +77,7 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text            titleText;
     private double          angleStep;
     private String          formatString;
+    private Locale          locale;
     private List<Section>   sections;
     private boolean         highlightSections;
     private boolean         sectionsVisible;
@@ -90,6 +91,7 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleStep         = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
         formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale            = gauge.getLocale();
         sections          = gauge.getSections();
         highlightSections = gauge.isHighlightSections();
         sectionsVisible   = gauge.getSectionsVisible();
@@ -151,7 +153,7 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setStroke(null);
         needle.getTransforms().setAll(needleRotate);
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
@@ -214,7 +216,7 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void rotateNeedle(final double VALUE) {
         double targetAngle = 180 - START_ANGLE + (VALUE - getSkinnable().getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
-        valueText.setText(String.format(Locale.US, formatString, VALUE) + getSkinnable().getUnit());
+        valueText.setText(String.format(locale, formatString, VALUE) + getSkinnable().getUnit());
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         if (valueText.getLayoutBounds().getWidth() > 0.395 * size) { resizeText(); }
     }
@@ -387,7 +389,7 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleRotate.setPivotY(needle.getLayoutBounds().getMaxY());
 
             double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + getSkinnable().getMinValue();
-            valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue) + getSkinnable().getUnit());
+            valueText.setText(String.format(locale, "%." + getSkinnable().getDecimals() + "f", currentValue) + getSkinnable().getUnit());
             valueText.setVisible(getSkinnable().isValueVisible());
 
             titleText.setText(getSkinnable().getTitle());
@@ -407,6 +409,7 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setFill(getSkinnable().getValueColor());
         mask.setFill(getSkinnable().getBackgroundPaint());
         knob.setFill(getSkinnable().getKnobColor());
+        locale       = getSkinnable().getLocale();
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         titleText.setText(getSkinnable().getTitle());
         resizeText();

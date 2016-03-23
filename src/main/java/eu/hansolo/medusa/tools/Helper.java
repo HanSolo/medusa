@@ -360,6 +360,7 @@ public class Helper {
         boolean       tickLabelsVisible            = GAUGE.getTickLabelsVisible();
         boolean       onlyFirstAndLastLabelVisible = GAUGE.isOnlyFirstAndLastTickLabelVisible();
         boolean       customTickLabelsEnabled      = GAUGE.getCustomTickLabelsEnabled();
+        Locale        locale                       = GAUGE.getLocale();
         List<String>  customTickLabels             = customTickLabelsEnabled ? GAUGE.getCustomTickLabels() : null;
         double        textDisplacementFactor       = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
         double        majorDotSize;
@@ -765,7 +766,7 @@ public class Helper {
                                 CTX.setFont(isNotZero ? tickMarkFont : tickMarkZeroFont);
                                 CTX.setTextAlign(TextAlignment.CENTER);
                                 CTX.setTextBaseline(VPos.CENTER);
-                                CTX.fillText(String.format(Locale.US, tickLabelFormatString, counter), 0, 0);
+                                CTX.fillText(String.format(locale, tickLabelFormatString, counter), 0, 0);
                                 CTX.restore();
                             }
                             break;
@@ -819,7 +820,7 @@ public class Helper {
                         }
                         if (customTickLabelCounter > customTickLabels.size() - 1) customTickLabelCounter = -1;
                     } else {
-                        CTX.fillText(String.format(Locale.US, tickLabelFormatString, counter), 0, 0);
+                        CTX.fillText(String.format(locale, tickLabelFormatString, counter), 0, 0);
                     }
                     CTX.restore();
                 }

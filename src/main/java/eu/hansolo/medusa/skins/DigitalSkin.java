@@ -82,6 +82,7 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private boolean         isStartFromZero;
     private double          barWidth;
     private String          formatString;
+    private Locale          locale;
     private boolean         sectionsVisible;
     private List<Section>   sections;
     private boolean         thresholdVisible;
@@ -97,6 +98,7 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         range            = gauge.getRange();
         angleStep        = ANGLE_RANGE / range;
         formatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale           = gauge.getLocale();
         barColor         = gauge.getBarColor();
         valueColor       = gauge.getValueColor();
         titleColor       = gauge.getTitleColor();
@@ -234,7 +236,7 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 }
             }
         }
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         valueText.setLayoutX(valueBkgText.getLayoutBounds().getMaxX() - valueText.getLayoutBounds().getWidth());
     }
 
@@ -436,7 +438,7 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                             backgroundCtx.setFill(Color.TRANSPARENT);
                         }
                     }
-                    backgroundCtx.fillText(String.format(Locale.US, tickLabelFormatString, counter), 0, 0);
+                    backgroundCtx.fillText(String.format(locale, tickLabelFormatString, counter), 0, 0);
                     backgroundCtx.restore();
                 }
             }
@@ -449,25 +451,6 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Resizing ******************************************
-    private void redraw() {
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-
-        formatString    = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        barColor        = getSkinnable().getBarColor();
-        valueColor      = getSkinnable().getValueColor();
-        titleColor      = getSkinnable().getTitleColor();
-        subTitleColor   = getSkinnable().getSubTitleColor();
-        unitColor       = getSkinnable().getUnitColor();
-        drawBackground();
-
-        setBar(getSkinnable().getCurrentValue());
-
-        valueBkgText.setFill(Helper.getTranslucentColorFrom(valueColor, 0.1));
-
-        valueText.setFill(valueColor);
-    }
-
     private void resize() {
         double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
@@ -495,5 +478,25 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             drawBackground();
             setBar(getSkinnable().getCurrentValue());
         }
+    }
+
+    private void redraw() {
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
+        
+        locale          = getSkinnable().getLocale();
+        formatString    = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        barColor        = getSkinnable().getBarColor();
+        valueColor      = getSkinnable().getValueColor();
+        titleColor      = getSkinnable().getTitleColor();
+        subTitleColor   = getSkinnable().getSubTitleColor();
+        unitColor       = getSkinnable().getUnitColor();
+        drawBackground();
+
+        setBar(getSkinnable().getCurrentValue());
+
+        valueBkgText.setFill(Helper.getTranslucentColorFrom(valueColor, 0.1));
+
+        valueText.setFill(valueColor);
     }
 }

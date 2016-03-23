@@ -133,6 +133,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Tooltip                  buttonTooltip;
     private Tooltip                  thresholdTooltip;
     private String                   formatString;
+    private Locale                   locale;
     private double                   minValue;
     private double                   maxValue;
     private List<Section>            sections;
@@ -156,6 +157,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         minValue          = gauge.getMinValue();
         maxValue          = gauge.getMaxValue();
         formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale            = gauge.getLocale();
         sections          = gauge.getSections();
         highlightSections = gauge.isHighlightSections();
         sectionsVisible   = gauge.getSectionsVisible();
@@ -206,7 +208,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ledCtx    = ledCanvas.getGraphicsContext2D();
         Helper.enableNode(ledCanvas, getSkinnable().isLedVisible());
 
-        thresholdTooltip = new Tooltip("Threshold\n(" + String.format(Locale.US, formatString, getSkinnable().getThreshold()) + ")");
+        thresholdTooltip = new Tooltip("Threshold\n(" + String.format(locale, formatString, getSkinnable().getThreshold()) + ")");
         thresholdTooltip.setTextAlignment(TextAlignment.CENTER);
 
         threshold = new Path();
@@ -259,7 +261,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setTextOrigin(VPos.CENTER);
         unitText.setMouseTransparent(true);
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getValue()));
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setMouseTransparent(true);
@@ -423,7 +425,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             targetAngle = Helper.clamp(startOffsetAngle - angleRange, startOffsetAngle, targetAngle);
         }
         needleRotate.setAngle(targetAngle);
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         if (getSkinnable().isLcdVisible()) {
             valueText.setTranslateX((0.675 * width - valueText.getLayoutBounds().getWidth()));
         } else {
@@ -1031,6 +1033,7 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        locale       = getSkinnable().getLocale();
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
 
@@ -1184,6 +1187,6 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         // Markers
         drawMarkers();
-        thresholdTooltip.setText("Threshold\n(" + String.format(Locale.US, formatString, getSkinnable().getThreshold()) + ")");
+        thresholdTooltip.setText("Threshold\n(" + String.format(locale, formatString, getSkinnable().getThreshold()) + ")");
     }
 }

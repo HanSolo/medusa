@@ -110,15 +110,17 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Label           lcdText;
     private double          angleStep;
     private String          formatString;
+    private Locale          locale;
 
 
     // ******************** Constructors **************************************
     public AmpSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleStep        = gauge.getAngleRange() / gauge.getRange();
-        oldValue         = gauge.getValue();
-        formatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        angleStep    = gauge.getAngleRange() / gauge.getRange();
+        oldValue     = gauge.getValue();
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale       = gauge.getLocale();
 
         init();
         initGraphics();
@@ -190,7 +192,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         lcd.setManaged(getSkinnable().isLcdVisible());
         lcd.setVisible(getSkinnable().isLcdVisible());
 
-        lcdText = new Label(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getValue()));
+        lcdText = new Label(String.format(locale, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getValue()));
         lcdText.setAlignment(Pos.CENTER_RIGHT);
         lcdText.setVisible(getSkinnable().isLcdVisible());
 
@@ -236,7 +238,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     protected void handleEvents(final String EVENT_TYPE) {
         if ("ANGLE".equals(EVENT_TYPE)) {
             double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + getSkinnable().getMinValue();
-            lcdText.setText((String.format(Locale.US, formatString, currentValue)));
+            lcdText.setText((String.format(locale, formatString, currentValue)));
             lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
@@ -366,7 +368,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 CTX.setTextAlign(TextAlignment.CENTER);
                 CTX.setTextBaseline(VPos.CENTER);
                 CTX.setFill(getSkinnable().getTickLabelColor());
-                CTX.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
+                CTX.fillText(String.format(locale, "%." + decimals + "f", counter), 0, 0);
                 CTX.restore();
             } else if (getSkinnable().getMediumTickMarksVisible() &&
                        Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0d) != 0d &&
@@ -605,6 +607,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        locale       = getSkinnable().getLocale();
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
 
         Color backgroundColor = getSkinnable().getBackgroundPaint() instanceof Color ? (Color) getSkinnable().getBackgroundPaint() : Color.WHITE;

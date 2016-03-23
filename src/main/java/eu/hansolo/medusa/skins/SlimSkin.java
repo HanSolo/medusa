@@ -66,6 +66,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private boolean       sectionsVisible;
     private List<Section> sections;
     private String        formatString;
+    private Locale        locale;
 
 
     // ******************** Constructors **************************************
@@ -80,6 +81,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
         formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
 
         init();
         initGraphics();
@@ -125,7 +127,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText = new Text(getSkinnable().getTitle());
         titleText.setFill(getSkinnable().getTitleColor());
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
         valueText.setFill(getSkinnable().getValueColor());
 
         unitText = new Text(getSkinnable().getUnit());
@@ -169,7 +171,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setLength(-VALUE * angleStep);
         }
         setBarColor(VALUE);
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         resizeValueText();
     }
     private void setBarColor(final double VALUE) {
@@ -236,6 +238,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void redraw() {
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        locale               = getSkinnable().getLocale();
         formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         colorGradientEnabled = getSkinnable().isGradientBarEnabled();
         noOfGradientStops    = getSkinnable().getGradientBarStops().size();

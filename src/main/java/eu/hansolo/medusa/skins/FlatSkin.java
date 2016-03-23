@@ -72,6 +72,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private boolean       sectionsVisible;
     private List<Section> sections;
     private String        formatString;
+    private Locale        locale;
 
 
     // ******************** Constructors **************************************
@@ -86,7 +87,8 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
         formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-
+        locale               = gauge.getLocale();
+        
         init();
         initGraphics();
         registerListeners();
@@ -134,7 +136,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setFont(Fonts.robotoLight(PREFERRED_WIDTH * 0.08));
         titleText.setFill(getSkinnable().getTitleColor());
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
         valueText.setFont(Fonts.robotoRegular(PREFERRED_WIDTH * 0.27333));
         valueText.setFill(getSkinnable().getValueColor());
 
@@ -180,7 +182,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setLength(-VALUE * angleStep);
         }
         setBarColor(VALUE);
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         resizeValueText();
     }
     private void setBarColor(final double VALUE) {
@@ -204,28 +206,6 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Resizing ******************************************
-    private void redraw() {
-        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
-        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
-        sectionsVisible      = getSkinnable().getSectionsVisible();
-
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-
-        setBarColor(getSkinnable().getCurrentValue());
-        valueText.setFill(getSkinnable().getValueColor());
-        unitText.setFill(getSkinnable().getUnitColor());
-        titleText.setFill(getSkinnable().getTitleColor());
-        separator.setStroke(getSkinnable().getBorderPaint());
-
-        titleText.setText(getSkinnable().getTitle());
-        resizeTitleText();
-
-        unitText.setText(getSkinnable().getUnit());
-        resizeUnitText();
-    }
-
     private void resizeTitleText() {
         double maxWidth = 0.56667 * size;
         double fontSize = 0.08 * size;
@@ -278,5 +258,28 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resizeValueText();
             resizeUnitText();
         }
+    }
+
+    private void redraw() {
+        locale               = getSkinnable().getLocale();
+        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
+        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
+        sectionsVisible      = getSkinnable().getSectionsVisible();
+
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
+
+        setBarColor(getSkinnable().getCurrentValue());
+        valueText.setFill(getSkinnable().getValueColor());
+        unitText.setFill(getSkinnable().getUnitColor());
+        titleText.setFill(getSkinnable().getTitleColor());
+        separator.setStroke(getSkinnable().getBorderPaint());
+
+        titleText.setText(getSkinnable().getTitle());
+        resizeTitleText();
+
+        unitText.setText(getSkinnable().getUnit());
+        resizeUnitText();
     }
 }
