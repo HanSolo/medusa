@@ -255,8 +255,10 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 SECTION_START_ANGLE = (section.getStart() - minValue) * angleStep;
             }
             final double SECTION_ANGLE_EXTEND;
-            if (section.getStop() > maxValue) {
+            if (Double.compare(section.getStop(), maxValue) > 0) {
                 SECTION_ANGLE_EXTEND = (maxValue - section.getStart()) * angleStep;
+            } else if (Double.compare(section.getStart(), minValue) < 0) {
+                SECTION_ANGLE_EXTEND = (section.getStop() - minValue) * angleStep;
             } else {
                 SECTION_ANGLE_EXTEND = (section.getStop() - section.getStart()) * angleStep;
             }

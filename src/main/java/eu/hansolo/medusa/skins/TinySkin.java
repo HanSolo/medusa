@@ -244,6 +244,8 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 double sectionAngleExtend;
                 if (Double.compare(section.getStop(), maxValue) > 0) {
                     sectionAngleExtend = (maxValue - section.getStart()) * angleStep;
+                } else if (Double.compare(section.getStart(), minValue) < 0) {
+                    sectionAngleExtend = (section.getStop() - minValue) * angleStep;
                 } else {
                     sectionAngleExtend = (section.getStop() - section.getStart()) * angleStep;
                 }

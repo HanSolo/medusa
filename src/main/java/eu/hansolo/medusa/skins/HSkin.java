@@ -483,6 +483,8 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     double areaAngleExtend;
                     if (area.getStop() > maxValue) {
                         areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - area.getStart()) * angleStep : -(maxValue - area.getStart()) * angleStep;
+                    } else if (Double.compare(area.getStart(), minValue) < 0) {
+                        areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStop() - minValue) * angleStep : -(area.getStop() - minValue) * angleStep;
                     } else {
                         areaAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (area.getStop() - area.getStart()) * angleStep : -(area.getStop() - area.getStart()) * angleStep;
                     }
@@ -517,6 +519,8 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     double sectionAngleExtend;
                     if (Double.compare(section.getStop(), maxValue) > 0) {
                         sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (maxValue - section.getStart()) * angleStep : -(maxValue - section.getStart()) * angleStep;
+                    } else if (Double.compare(section.getStart(), minValue) < 0) {
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStop() - minValue) * angleStep : -(section.getStop() - minValue) * angleStep;
                     } else {
                         sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStop() - section.getStart()) * angleStep : -(section.getStop() - section.getStart()) * angleStep;
                     }
