@@ -470,6 +470,14 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setSecondColor(Color.WHITE);
                     CONTROL.setDateColor(Color.WHITE);
                     break;
+                case MINIMAL:
+                    CONTROL.setBackgroundPaint(Color.rgb(255, 255, 255, 0.3));
+                    CONTROL.setTextColor(Color.WHITE);
+                    CONTROL.setMinuteColor(Color.rgb(59, 209, 255));
+                    CONTROL.setSecondColor(Color.rgb(255, 255, 255, 0.8));
+                    CONTROL.setSecondsVisible(true);
+                    CONTROL.setDateVisible(true);
+                    break;
             }
         } else {
             CONTROL = new Clock();
