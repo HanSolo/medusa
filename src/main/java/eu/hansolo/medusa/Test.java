@@ -96,7 +96,9 @@ public class Test extends Application {
         //gauge.valueVisibleProperty().bind(toggle);
 
         clock = ClockBuilder.create()
+                            .skinType(ClockSkinType.MINIMAL)
                             //.onTimeEvent(e -> System.out.println(e.TYPE))
+                            .discreteSeconds(false)
                             .secondsVisible(true)
                             //.running(true)
                             .build();
