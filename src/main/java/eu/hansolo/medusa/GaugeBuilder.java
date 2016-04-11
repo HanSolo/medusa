@@ -945,6 +945,19 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setSectionsVisible(true);
                     CONTROL.setSectionTextVisible(true);
                     break;
+                case BAR:
+                    Color barColor = CONTROL.getBarColor();
+                    CONTROL.setAnimated(true);
+                    CONTROL.setAnimationDuration(1000);
+                    CONTROL.setMinValue(0);
+                    CONTROL.setMaxValue(100);
+                    CONTROL.setGradientBarEnabled(true);
+                    CONTROL.setGradientBarStops(new Stop(0.0, barColor),
+                                                new Stop(0.01, barColor),
+                                                new Stop(0.75, barColor.deriveColor(-10, 1, 1, 1)),
+                                                new Stop(1.0, barColor.deriveColor(-20, 1, 1, 1)));
+                    CONTROL.setBarColor(barColor);
+                    break;
             }
         } else {
             CONTROL = new Gauge();
