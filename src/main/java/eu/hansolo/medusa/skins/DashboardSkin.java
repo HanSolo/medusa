@@ -212,7 +212,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBar.getElements().add(dataBarLineToInnerArc);
         dataBar.getElements().add(dataBarInnerArc);
         dataBar.getElements().add(new ClosePath());
-        dataBar.setFill(getSkinnable().getBarColor());
+        setBarColor(getSkinnable().getCurrentValue());
         dataBar.setStroke(getSkinnable().getBorderPaint());
         dataBar.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
 
