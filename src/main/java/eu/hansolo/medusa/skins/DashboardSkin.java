@@ -115,10 +115,11 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         otherFormatString    = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
         locale               = gauge.getLocale();
-        
         init();
         initGraphics();
         registerListeners();
+
+        setBar(gauge.getValue());
     }
 
 
