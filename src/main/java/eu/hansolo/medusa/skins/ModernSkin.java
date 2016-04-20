@@ -336,7 +336,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (getSkinnable().isDisabled()) return;
         final EventType TYPE = EVENT.getEventType();
         if (MouseEvent.MOUSE_PRESSED.equals(TYPE)) {
-            getSkinnable().fireEvent(getSkinnable().BUTTON_PRESSED_EVENT);
+            getSkinnable().fireEvent(getSkinnable().BTN_PRESSED_EVENT);
             centerKnob.setFill(new LinearGradient(0.5 * size, 0.2708333333333333 * size,
                                                   0.5 * size, 0.7291666666666666 * size,
                                                   false, CycleMethod.NO_CYCLE,
@@ -346,7 +346,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             subTitleText.setTranslateY(size * 0.3525);
             unitText.setTranslateY(size * 0.6675);
         } else if (MouseEvent.MOUSE_RELEASED.equals(TYPE)) {
-            getSkinnable().fireEvent(getSkinnable().BUTTON_RELEASED_EVENT);
+            getSkinnable().fireEvent(getSkinnable().BTN_RELEASED_EVENT);
             centerKnob.setFill(new LinearGradient(0.5 * size, 0.2708333333333333 * size,
                                                   0.5 * size, 0.7291666666666666 * size,
                                                   false, CycleMethod.NO_CYCLE,

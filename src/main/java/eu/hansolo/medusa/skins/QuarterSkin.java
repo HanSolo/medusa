@@ -21,7 +21,6 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
-import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.Needle;
 import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.TickLabelOrientation;
@@ -65,7 +64,6 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
-import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.FillRule;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -398,10 +396,10 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (getSkinnable().isDisabled()) return;
         final EventType TYPE = EVENT.getEventType();
         if (MouseEvent.MOUSE_PRESSED == TYPE) {
-            getSkinnable().fireEvent(getSkinnable().BUTTON_PRESSED_EVENT);
+            getSkinnable().fireEvent(getSkinnable().BTN_PRESSED_EVENT);
             drawKnob(true);
         } else if (MouseEvent.MOUSE_RELEASED == TYPE) {
-            getSkinnable().fireEvent(getSkinnable().BUTTON_RELEASED_EVENT);
+            getSkinnable().fireEvent(getSkinnable().BTN_RELEASED_EVENT);
             drawKnob(false);
         }
     }

@@ -43,7 +43,6 @@ import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 import javafx.util.Duration;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.Arrays;
@@ -92,24 +91,24 @@ public class Gauge extends Control {
         LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL, SIMPLE_DIGITAL, SECTION, BAR
     }
 
-    public static final  Color DARK_COLOR         = Color.rgb(36, 36, 36);
-    public static final  Color BRIGHT_COLOR       = Color.rgb(223, 223, 223);
-    private static final long  LED_BLINK_INTERVAL = 500l;
-    private static final int   MAX_NO_OF_DECIMALS = 3;
+    public static final  Color   DARK_COLOR          = Color.rgb(36, 36, 36);
+    public static final  Color   BRIGHT_COLOR        = Color.rgb(223, 223, 223);
+    private static final long    LED_BLINK_INTERVAL  = 500l;
+    private static final int     MAX_NO_OF_DECIMALS  = 3;
 
-    public final  ButtonEvent    BUTTON_PRESSED_EVENT  = new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_PRESSED);
-    public final  ButtonEvent    BUTTON_RELEASED_EVENT = new ButtonEvent(Gauge.this, null, ButtonEvent.BUTTON_RELEASED);
-    private final ThresholdEvent EXCEEDED_EVENT        = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_EXCEEDED);
-    private final ThresholdEvent UNDERRUN_EVENT        = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_UNDERRUN);
-    private final UpdateEvent    RECALC_EVENT          = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
-    private final UpdateEvent    REDRAW_EVENT          = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
-    private final UpdateEvent    RESIZE_EVENT          = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
-    private final UpdateEvent    LED_EVENT             = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED);
-    private final UpdateEvent    LCD_EVENT             = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LCD);
-    private final UpdateEvent    VISIBILITY_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
-    private final UpdateEvent    INTERACTIVITY_EVENT   = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
-    private final UpdateEvent    FINISHED_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
-    private final UpdateEvent    SECTION_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.SECTION);
+    public final  ButtonEvent    BTN_PRESSED_EVENT   = new ButtonEvent(Gauge.this, null, ButtonEvent.BTN_PRESSED);
+    public final  ButtonEvent    BTN_RELEASED_EVENT  = new ButtonEvent(Gauge.this, null, ButtonEvent.BTN_RELEASED);
+    private final ThresholdEvent EXCEEDED_EVENT      = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_EXCEEDED);
+    private final ThresholdEvent UNDERRUN_EVENT      = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_UNDERRUN);
+    private final UpdateEvent    RECALC_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
+    private final UpdateEvent    REDRAW_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
+    private final UpdateEvent    RESIZE_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
+    private final UpdateEvent    LED_EVENT           = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED);
+    private final UpdateEvent    LCD_EVENT           = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LCD);
+    private final UpdateEvent    VISIBILITY_EVENT    = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
+    private final UpdateEvent    INTERACTIVITY_EVENT = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
+    private final UpdateEvent    FINISHED_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
+    private final UpdateEvent    SECTION_EVENT       = new UpdateEvent(Gauge.this, UpdateEvent.EventType.SECTION);
 
     private static volatile Future blinkFuture;
     private static ScheduledExecutorService blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
@@ -4979,11 +4978,11 @@ public class Gauge extends Control {
     }
 
 
-    public void setOnButtonPressed(final EventHandler<ButtonEvent> HANDLER) { addEventHandler(ButtonEvent.BUTTON_PRESSED, HANDLER); }
-    public void removeOnButtonPressed(final EventHandler<ButtonEvent> HANDLER) { removeEventHandler(ButtonEvent.BUTTON_PRESSED, HANDLER); }
+    public void setOnButtonPressed(final EventHandler<ButtonEvent> HANDLER) { addEventHandler(ButtonEvent.BTN_PRESSED, HANDLER); }
+    public void removeOnButtonPressed(final EventHandler<ButtonEvent> HANDLER) { removeEventHandler(ButtonEvent.BTN_PRESSED, HANDLER); }
 
-    public void setOnButtonReleased(final EventHandler<ButtonEvent> HANDLER) { addEventHandler(ButtonEvent.BUTTON_RELEASED, HANDLER); }
-    public void removeOnButtonReleased(final EventHandler<ButtonEvent> HANDLER) { removeEventHandler(ButtonEvent.BUTTON_RELEASED, HANDLER); }
+    public void setOnButtonReleased(final EventHandler<ButtonEvent> HANDLER) { addEventHandler(ButtonEvent.BTN_RELEASED, HANDLER); }
+    public void removeOnButtonReleased(final EventHandler<ButtonEvent> HANDLER) { removeEventHandler(ButtonEvent.BTN_RELEASED, HANDLER); }
 
 
     public void setOnThresholdExceeded(final EventHandler<ThresholdEvent> HANDLER) { addEventHandler(ThresholdEvent.THRESHOLD_EXCEEDED, HANDLER); }
@@ -4995,8 +4994,8 @@ public class Gauge extends Control {
 
     // ******************** Inner Classes *************************************
     public static class ButtonEvent extends Event {
-        public static final EventType<ButtonEvent> BUTTON_PRESSED  = new EventType(ANY, "BUTTON_PRESSED");
-        public static final EventType<ButtonEvent> BUTTON_RELEASED = new EventType(ANY, "BUTTON_RELEASED");
+        public static final EventType<ButtonEvent> BTN_PRESSED  = new EventType(ANY, "BTN_PRESSED");
+        public static final EventType<ButtonEvent> BTN_RELEASED = new EventType(ANY, "BTN_RELEASED");
 
 
         // ******************** Constructors **************************************
