@@ -88,7 +88,8 @@ public class Gauge extends Control {
     public enum SkinType {
         AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
         MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL,
-        LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL, SIMPLE_DIGITAL, SECTION, BAR
+        LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL, SIMPLE_DIGITAL, SECTION,
+        BAR, WHITE
     }
 
     public static final  Color   DARK_COLOR          = Color.rgb(36, 36, 36);
@@ -802,11 +803,12 @@ public class Gauge extends Control {
     }
     public StringProperty titleProperty() {
         if (null == title) {
-            title = new StringPropertyBase(_title) {
+            title  = new StringPropertyBase(_title) {
                 @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "title"; }
             };
+            _title = null;
         }
         return title;
     }
@@ -834,11 +836,12 @@ public class Gauge extends Control {
     }
     public StringProperty subTitleProperty() {
         if (null == subTitle) {
-            subTitle = new StringPropertyBase(_subTitle) {
+            subTitle  = new StringPropertyBase(_subTitle) {
                 @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "subTitle"; }
             };
+            _subTitle = null;
         }
         return subTitle;
     }
@@ -866,11 +869,12 @@ public class Gauge extends Control {
     }
     public StringProperty unitProperty() {
         if (null == unit) {
-            unit = new StringPropertyBase(_unit) {
+            unit  = new StringPropertyBase(_unit) {
                 @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "unit"; }
             };
+            _unit = null;
         }
         return unit;
     }
@@ -1297,11 +1301,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> zeroColorProperty() {
         if (null == zeroColor) {
-            zeroColor = new ObjectPropertyBase<Color>(_zeroColor) {
+            zeroColor  = new ObjectPropertyBase<Color>(_zeroColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "zeroColor"; }
             };
+            _zeroColor = null;
         }
         return zeroColor;
     }
@@ -1507,11 +1512,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Paint> backgroundPaintProperty() {
         if (null == backgroundPaint) {
-            backgroundPaint = new ObjectPropertyBase<Paint>(_backgroundPaint) {
+            backgroundPaint  = new ObjectPropertyBase<Paint>(_backgroundPaint) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "backgroundPaint"; }
             };
+            _backgroundPaint = null;
         }
         return backgroundPaint;
     }
@@ -1538,11 +1544,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Paint> borderPaintProperty() {
         if (null == borderPaint) {
-            borderPaint = new ObjectPropertyBase<Paint>(_borderPaint) {
+            borderPaint  = new ObjectPropertyBase<Paint>(_borderPaint) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "borderPaint"; }
             };
+            _borderPaint = null;
         }
         return borderPaint;
     }
@@ -1606,11 +1613,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Paint> foregroundPaintProperty() {
         if (null == foregroundPaint) {
-            foregroundPaint = new ObjectPropertyBase<Paint>(_foregroundPaint) {
+            foregroundPaint  = new ObjectPropertyBase<Paint>(_foregroundPaint) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "foregroundPaint"; }
             };
+            _foregroundPaint = null;
         }
         return foregroundPaint;
     }
@@ -1638,11 +1646,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> knobColorProperty() {
         if (null == knobColor) {
-            knobColor = new ObjectPropertyBase<Color>(_knobColor) {
+            knobColor  = new ObjectPropertyBase<Color>(_knobColor) {
                 @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "knobColor"; }
             };
+            _knobColor = null;
         }
         return knobColor;
     }
@@ -1670,7 +1679,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<KnobType> knobTypeProperty() {
         if (null == knobType) {
-            knobType = new ObjectPropertyBase<KnobType>(_knobType) {
+            knobType  = new ObjectPropertyBase<KnobType>(_knobType) {
                 @Override protected void invalidated() {
                     if (null == get()) set(KnobType.STANDARD);
                     fireUpdateEvent(RESIZE_EVENT);
@@ -1678,6 +1687,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "knobType"; }
             };
+            _knobType = null;
         }
         return knobType;
     }
@@ -1715,7 +1725,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Pos> knobPositionProperty() {
         if (null == knobPosition) {
-            knobPosition = new ObjectPropertyBase<Pos>(_knobPosition) {
+            knobPosition  = new ObjectPropertyBase<Pos>(_knobPosition) {
                 @Override protected void invalidated() {
                     final Pos POSITION = get();
                     if (null == POSITION) {
@@ -1731,6 +1741,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "knobPosition"; }
             };
+            _knobPosition = null;
         }
         return knobPosition;
     }
@@ -2078,7 +2089,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<ScaleDirection> scaleDirectionProperty() {
         if (null == scaleDirection) {
-            scaleDirection = new ObjectPropertyBase<ScaleDirection>(_scaleDirection) {
+            scaleDirection  = new ObjectPropertyBase<ScaleDirection>(_scaleDirection) {
                 @Override protected void invalidated() {
                     if (null == get()) set(ScaleDirection.CLOCKWISE);
                     fireUpdateEvent(RECALC_EVENT);
@@ -2086,6 +2097,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "scaleDirection"; }
             };
+            _scaleDirection = null;
         }
         return scaleDirection;
     }
@@ -2115,7 +2127,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<TickLabelLocation> tickLabelLocationProperty() {
         if (null == tickLabelLocation) {
-            tickLabelLocation = new ObjectPropertyBase<TickLabelLocation>() {
+            tickLabelLocation  = new ObjectPropertyBase<TickLabelLocation>() {
                 @Override protected void invalidated() {
                     if(null == get()) set(TickLabelLocation.INSIDE);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -2123,6 +2135,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickLabelLocation"; }
             };
+            _tickLabelLocation = null;
         }
         return tickLabelLocation;
     }
@@ -2152,7 +2165,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<TickLabelOrientation> tickLabelOrientationProperty() {
         if (null == tickLabelOrientation) {
-            tickLabelOrientation = new ObjectPropertyBase<TickLabelOrientation>(_tickLabelOrientation) {
+            tickLabelOrientation  = new ObjectPropertyBase<TickLabelOrientation>(_tickLabelOrientation) {
                 @Override protected void invalidated() {
                     if(null == get()) set(TickLabelOrientation.HORIZONTAL);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -2160,6 +2173,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickLabelOrientation"; }
             };
+            _tickLabelOrientation = null;
         }
         return tickLabelOrientation;
     }
@@ -2187,11 +2201,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> tickLabelColorProperty() {
         if (null == tickLabelColor) {
-            tickLabelColor = new ObjectPropertyBase<Color>(_tickLabelColor) {
+            tickLabelColor  = new ObjectPropertyBase<Color>(_tickLabelColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickLabelColor"; }
             };
+            _tickLabelColor = null;
         }
         return tickLabelColor;
     }
@@ -2221,11 +2236,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> tickMarkColorProperty() {
         if (null == tickMarkColor) {
-            tickMarkColor = new ObjectPropertyBase<Color>(_tickMarkColor) {
+            tickMarkColor  = new ObjectPropertyBase<Color>(_tickMarkColor) {
                 @Override protected void invalidated() { fireUpdateEvent( REDRAW_EVENT ); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickMarkColor"; }
             };
+            _tickMarkColor = null;
         }
         return tickMarkColor;
     }
@@ -2255,11 +2271,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> majorTickMarkColorProperty() {
         if (null == majorTickMarkColor) {
-            majorTickMarkColor = new ObjectPropertyBase<Color>(_majorTickMarkColor) {
+            majorTickMarkColor  = new ObjectPropertyBase<Color>(_majorTickMarkColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "majorTickMarkColor"; }
             };
+            _majorTickMarkColor = null;
         }
         return majorTickMarkColor;
     }
@@ -2361,11 +2378,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> mediumTickMarkColorProperty() {
         if (null == mediumTickMarkColor) {
-            mediumTickMarkColor = new ObjectPropertyBase<Color>(_mediumTickMarkColor) {
+            mediumTickMarkColor  = new ObjectPropertyBase<Color>(_mediumTickMarkColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "mediumTickMarkColor"; }
             };
+            _mediumTickMarkColor = null;
         }
         return mediumTickMarkColor;
     }
@@ -2467,11 +2485,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> minorTickMarkColorProperty() {
         if (null == minorTickMarkColor) {
-            minorTickMarkColor = new ObjectPropertyBase<Color>(_minorTickMarkColor) {
+            minorTickMarkColor  = new ObjectPropertyBase<Color>(_minorTickMarkColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minorTickMarkColor"; }
             };
+            _minorTickMarkColor = null;
         }
         return minorTickMarkColor;
     }
@@ -2571,7 +2590,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<TickMarkType> majorTickMarkTypeProperty() {
         if (null == majorTickMarkType) {
-            majorTickMarkType = new ObjectPropertyBase<TickMarkType>(_majorTickMarkType) {
+            majorTickMarkType  = new ObjectPropertyBase<TickMarkType>(_majorTickMarkType) {
                 @Override protected void invalidated() {
                     if (null == get()) set(TickMarkType.LINE);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -2579,6 +2598,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "majorTickMarkType"; }
             };
+            _majorTickMarkType = null;
         }
         return majorTickMarkType;
     }
@@ -2606,7 +2626,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<TickMarkType> mediumTickMarkTypeProperty() {
         if (null == mediumTickMarkType) {
-            mediumTickMarkType = new ObjectPropertyBase<TickMarkType>(_mediumTickMarkType) {
+            mediumTickMarkType  = new ObjectPropertyBase<TickMarkType>(_mediumTickMarkType) {
                 @Override protected void invalidated() {
                     if (null == get()) set(TickMarkType.LINE);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -2614,6 +2634,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "mediumTickMarkType"; }
             };
+            _mediumTickMarkType = null;
         }
         return mediumTickMarkType;
     }
@@ -2641,7 +2662,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<TickMarkType> minorTickMarkTypeProperty() {
         if (null == minorTickMarkType) {
-            minorTickMarkType = new ObjectPropertyBase<TickMarkType>(_minorTickMarkType) {
+            minorTickMarkType  = new ObjectPropertyBase<TickMarkType>(_minorTickMarkType) {
                 @Override protected void invalidated() {
                     if (null == get()) set(TickMarkType.LINE);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -2649,6 +2670,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minorTickMarkType"; }
             };
+            _minorTickMarkType = null;
         }
         return minorTickMarkType;
     }
@@ -2664,7 +2686,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Locale> localeProperty() {
         if (null == locale) {
-            locale = new ObjectPropertyBase<Locale>(_locale) {
+            locale  = new ObjectPropertyBase<Locale>(_locale) {
                 @Override protected void invalidated() {
                     if (null == get()) set(Locale.US);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -2672,6 +2694,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "locale"; }
             };
+            _locale = null;
         }
         return locale;
     }
@@ -2699,7 +2722,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<NumberFormat> numberFormatProperty() {
         if (null == numberFormat) {
-            numberFormat = new ObjectPropertyBase<NumberFormat>(_numberFormat) {
+            numberFormat  = new ObjectPropertyBase<NumberFormat>(_numberFormat) {
                 @Override protected void invalidated() {
                     if (null == get()) set(NumberFormat.getInstance(getLocale()));
                     fireUpdateEvent(RESIZE_EVENT);
@@ -2707,6 +2730,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "numberFormat"; }
             };
+            _numberFormat = null;
         }
         return numberFormat;
     }
@@ -2818,7 +2842,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<NeedleType> needleTypeProperty() {
         if (null == needleType) {
-            needleType = new ObjectPropertyBase<NeedleType>(_needleType) {
+            needleType  = new ObjectPropertyBase<NeedleType>(_needleType) {
                 @Override protected void invalidated() {
                     if (null == get()) set(NeedleType.STANDARD);
                     fireUpdateEvent(RESIZE_EVENT);
@@ -2826,6 +2850,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "needleType"; }
             };
+            _needleType = null;
         }
         return needleType;
     }
@@ -2855,7 +2880,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<NeedleShape> needleShapeProperty() {
         if (null == needleShape) {
-            needleShape = new ObjectPropertyBase<NeedleShape>(_needleShape) {
+            needleShape  = new ObjectPropertyBase<NeedleShape>(_needleShape) {
                 @Override protected void invalidated() {
                     if (null == get()) set(NeedleShape.ANGLED);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -2863,6 +2888,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "needleShape"; }
             };
+            _needleShape = null;
         }
         return needleShape;
     }
@@ -2890,7 +2916,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<NeedleSize> needleSizeProperty() {
         if (null == needleSize) {
-            needleSize = new ObjectPropertyBase<NeedleSize>(_needleSize) {
+            needleSize  = new ObjectPropertyBase<NeedleSize>(_needleSize) {
                 @Override protected void invalidated() {
                     if(null == get()) set(NeedleSize.STANDARD);
                     fireUpdateEvent(RESIZE_EVENT);
@@ -2898,6 +2924,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "needleSize"; }
             };
+            _needleSize = null;
         }
         return needleSize;
     }
@@ -2938,11 +2965,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<NeedleBehavior> needleBehaviorProperty() {
         if (null == needleBehavior) {
-            needleBehavior = new ObjectPropertyBase<NeedleBehavior>(_needleBehavior) {
+            needleBehavior  = new ObjectPropertyBase<NeedleBehavior>(_needleBehavior) {
                 @Override protected void invalidated() { if(null == get()) set(NeedleBehavior.STANDARD); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "needleBehavior"; }
             };
+            _needleBehavior = null;
         }
         return needleBehavior;
     }
@@ -2970,11 +2998,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> needleColorProperty() {
         if (null == needleColor) {
-            needleColor = new ObjectPropertyBase<Color>(_needleColor) {
+            needleColor  = new ObjectPropertyBase<Color>(_needleColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "needleColor"; }
             };
+            _needleColor = null;
         }
         return needleColor;
     }
@@ -3000,7 +3029,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> needleBorderColorProperty() {
         if (null == needleBorderColor) {
-            needleBorderColor = new ObjectPropertyBase<Color>(_needleBorderColor) {
+            needleBorderColor  = new ObjectPropertyBase<Color>(_needleBorderColor) {
                 @Override protected void invalidated() {
                     if (null == get()) set(Color.TRANSPARENT);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -3008,6 +3037,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "needleBorderColor"; }
             };
+            _needleBorderColor = null;
         }
         return needleBorderColor;
     }
@@ -3035,11 +3065,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> barColorProperty() {
         if (null == barColor) {
-            barColor = new ObjectPropertyBase<Color>(_barColor) {
+            barColor  = new ObjectPropertyBase<Color>(_barColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "barColor"; }
             };
+            _barColor = null;
         }
         return barColor;
     }
@@ -3065,7 +3096,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> barBorderColorProperty() {
         if (null == barBorderColor) {
-            barBorderColor = new ObjectPropertyBase<Color>(_barBorderColor) {
+            barBorderColor  = new ObjectPropertyBase<Color>(_barBorderColor) {
                 @Override protected void invalidated() {
                     if(null == get()) set(Color.TRANSPARENT);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -3073,6 +3104,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "barBorderColor"; }
             };
+            _barBorderColor = null;
         }
         return barBorderColor;
     }
@@ -3100,11 +3132,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> barBackgroundColorProperty() {
         if (null == barBackgroundColor) {
-            barBackgroundColor = new ObjectPropertyBase<Color>(_barBackgroundColor) {
+            barBackgroundColor  = new ObjectPropertyBase<Color>(_barBackgroundColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "barBackgroundColor"; }
             };
+            _barBackgroundColor = null;
         }
         return barBackgroundColor;
     }
@@ -3148,7 +3181,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<LcdDesign> lcdDesignProperty() {
         if (null == lcdDesign) {
-            lcdDesign = new ObjectPropertyBase<LcdDesign>(_lcdDesign) {
+            lcdDesign  = new ObjectPropertyBase<LcdDesign>(_lcdDesign) {
                 @Override protected void invalidated() {
                     if(null == get()) set(LcdDesign.STANDARD);
                     fireUpdateEvent(LCD_EVENT);
@@ -3156,6 +3189,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "lcdDesign"; }
             };
+            _lcdDesign = null;
         }
         return lcdDesign;
     }
@@ -3185,7 +3219,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<LcdFont> lcdFontProperty() {
         if (null == lcdFont) {
-            lcdFont = new ObjectPropertyBase<LcdFont>(_lcdFont) {
+            lcdFont  = new ObjectPropertyBase<LcdFont>(_lcdFont) {
                 @Override protected void invalidated() {
                     if(null == get()) set(LcdFont.DIGITAL_BOLD);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -3193,6 +3227,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "lcdFont"; }
             };
+            _lcdFont = null;
         }
         return lcdFont;
     }
@@ -3220,7 +3255,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> ledColorProperty() {
         if (null == ledColor) {
-            ledColor = new ObjectPropertyBase<Color>(_ledColor) {
+            ledColor  = new ObjectPropertyBase<Color>(_ledColor) {
                 @Override protected void invalidated() {
                     if (null == get()) set(Color.RED);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -3228,6 +3263,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "ledColor"; }
             };
+            _ledColor = null;
         }
         return ledColor;
     }
@@ -3257,7 +3293,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<LedType> ledTypeProperty() {
         if (null == ledType) {
-            ledType = new ObjectPropertyBase<LedType>(_ledType) {
+            ledType  = new ObjectPropertyBase<LedType>(_ledType) {
                 @Override protected void invalidated() {
                     if(null == get()) set(LedType.STANDARD);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -3265,6 +3301,7 @@ public class Gauge extends Control {
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "ledType"; }
             };
+            _ledType = null;
         }
         return ledType;
     }
@@ -3292,11 +3329,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> titleColorProperty() {
         if (null == titleColor) {
-            titleColor = new ObjectPropertyBase<Color>(_titleColor) {
+            titleColor  = new ObjectPropertyBase<Color>(_titleColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "titleColor"; }
             };
+            _titleColor = null;
         }
         return titleColor;
     }
@@ -3324,11 +3362,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> subTitleColorProperty() {
         if (null == subTitleColor) {
-            subTitleColor = new ObjectPropertyBase<Color>(_subTitleColor) {
+            subTitleColor  = new ObjectPropertyBase<Color>(_subTitleColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "subTitleColor"; }
             };
+            _subTitleColor = null;
         }
         return subTitleColor;
     }
@@ -3356,11 +3395,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> unitColorProperty() {
         if (null == unitColor) {
-            unitColor = new ObjectPropertyBase<Color>(_unitColor) {
+            unitColor  = new ObjectPropertyBase<Color>(_unitColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "unitColor"; }
             };
+            _unitColor = null;
         }
         return unitColor;
     }
@@ -3388,11 +3428,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> valueColorProperty() {
         if (null == valueColor) {
-            valueColor = new ObjectPropertyBase<Color>() {
+            valueColor  = new ObjectPropertyBase<Color>() {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "valueColor"; }
             };
+            _valueColor = null;
         }
         return valueColor;
     }
@@ -3420,11 +3461,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> thresholdColorProperty() {
         if (null == thresholdColor) {
-            thresholdColor = new ObjectPropertyBase<Color>() {
+            thresholdColor  = new ObjectPropertyBase<Color>() {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "thresholdColor"; }
             };
+            _thresholdColor = null;
         }
         return thresholdColor;
     }
@@ -4367,11 +4409,12 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Orientation> orientationProperty() {
         if (null == orientation) {
-            orientation = new ObjectPropertyBase<Orientation>(_orientation) {
+            orientation  = new ObjectPropertyBase<Orientation>(_orientation) {
                 @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "orientation"; }
             };
+            _orientation = null;
         }
         return orientation;
     }
@@ -4636,11 +4679,12 @@ public class Gauge extends Control {
     }
     public StringProperty buttonTooltipTextProperty() {
         if (null == buttonTooltipText) {
-            buttonTooltipText = new StringPropertyBase(_buttonTooltipText) {
+            buttonTooltipText  = new StringPropertyBase(_buttonTooltipText) {
                 @Override protected  void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "buttonTooltipText"; }
             };
+            _buttonTooltipText = null;
         }
         return buttonTooltipText;
     }
@@ -4762,6 +4806,7 @@ public class Gauge extends Control {
             case SIMPLE_DIGITAL: return new SimpleDigitalSkin(Gauge.this);
             case SECTION       : return new SectionSkin(Gauge.this);
             case BAR           : return new BarSkin(Gauge.this);
+            case WHITE         : return new WhiteSkin(Gauge.this);
             case GAUGE         :
             default            : return new GaugeSkin(Gauge.this);
         }
@@ -4958,6 +5003,16 @@ public class Gauge extends Control {
                                     new Stop(0.01, barColor),
                                     new Stop(0.75, barColor.deriveColor(-10, 1, 1, 1)),
                                     new Stop(1.0, barColor.deriveColor(-20, 1, 1, 1)));
+                break;
+            case WHITE:
+                setAnimated(true);
+                setAnimationDuration(1000);
+                setAngleRange(360);
+                setMinValue(0);
+                setMaxValue(100);
+                setBarColor(Color.WHITE);
+                setValueColor(Color.WHITE);
+                setUnitColor(Color.WHITE);
                 break;
             case GAUGE:
             default:

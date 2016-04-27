@@ -326,11 +326,12 @@ public class Clock extends Control {
     }
     public StringProperty titleProperty() {
         if (null == title) {
-            title = new StringPropertyBase(_title) {
+            title  = new StringPropertyBase(_title) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "title"; }
             };
+            _title = null;
         }
         return title;
     }
@@ -356,11 +357,12 @@ public class Clock extends Control {
     }
     public StringProperty textProperty() {
         if (null == text) {
-            text = new StringPropertyBase(_text) {
+            text  = new StringPropertyBase(_text) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "text"; }
             };
+            _text = null;
         }
         return text; 
     }
@@ -977,11 +979,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Paint> backgroundPaintProperty() {
         if (null == backgroundPaint) {
-            backgroundPaint = new ObjectPropertyBase<Paint>(_backgroundPaint) {
+            backgroundPaint  = new ObjectPropertyBase<Paint>(_backgroundPaint) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "backgroundPaint"; }
             };
+            _backgroundPaint = null;
         }
         return backgroundPaint;
     }
@@ -1007,11 +1010,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Paint> borderPaintProperty() {
         if (null == borderPaint) {
-            borderPaint = new ObjectPropertyBase<Paint>(_borderPaint) {
+            borderPaint  = new ObjectPropertyBase<Paint>(_borderPaint) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "borderPaint"; }
             };
+            _borderPaint = null;
         }
         return borderPaint;
     }
@@ -1071,11 +1075,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Paint> foregroundPaintProperty() {
         if (null == foregroundPaint) {
-            foregroundPaint = new ObjectPropertyBase<Paint>(_foregroundPaint) {
+            foregroundPaint  = new ObjectPropertyBase<Paint>(_foregroundPaint) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "foregroundPaint"; }
             };
+            _foregroundPaint = null;
         }
         return foregroundPaint;
     }
@@ -1099,11 +1104,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Color> titleColorProperty() {
         if (null == titleColor) {
-            titleColor = new ObjectPropertyBase<Color>(_titleColor) {
+            titleColor  = new ObjectPropertyBase<Color>(_titleColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "titleColor"; }
             };
+            _titleColor = null;
         }
         return titleColor;
     }
@@ -1127,11 +1133,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Color> textColorProperty() {
         if (null == textColor) {
-            textColor = new ObjectPropertyBase<Color>(_textColor) {
+            textColor  = new ObjectPropertyBase<Color>(_textColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "textColor"; }
             };
+            _textColor = null;
         }
         return textColor;
     }
@@ -1155,11 +1162,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Color> dateColorProperty() {
         if (null == dateColor) {
-            dateColor = new ObjectPropertyBase<Color>(_dateColor) {
+            dateColor  = new ObjectPropertyBase<Color>(_dateColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "dateColor"; }
             };
+            _dateColor = null;
         }
         return dateColor;
     }
@@ -1183,11 +1191,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Color> hourTickMarkColorProperty() {
         if (null == hourTickMarkColor) {
-            hourTickMarkColor = new ObjectPropertyBase<Color>(_hourTickMarkColor) {
+            hourTickMarkColor  = new ObjectPropertyBase<Color>(_hourTickMarkColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "hourTickMarkColor"; }
             };
+            _hourTickMarkColor = null;
         }
         return hourTickMarkColor;
     }
@@ -1211,11 +1220,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Color> minuteTickMarkColorProperty() {
         if (null == minuteTickMarkColor) {
-            minuteTickMarkColor = new ObjectPropertyBase<Color>(_minuteTickMarkColor) {
+            minuteTickMarkColor  = new ObjectPropertyBase<Color>(_minuteTickMarkColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "minuteTickMarkColor"; }
             };
+            _minuteTickMarkColor = null;
         }
         return minuteTickMarkColor;
     }
@@ -1239,11 +1249,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Color> tickLabelColorProperty() {
         if (null == tickLabelColor) {
-            tickLabelColor = new ObjectPropertyBase<Color>(_tickLabelColor) {
+            tickLabelColor  = new ObjectPropertyBase<Color>(_tickLabelColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "tickLabelColor"; }
             };
+            _tickLabelColor = null;
         }
         return tickLabelColor;
     }
@@ -1267,11 +1278,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Color> alarmColorProperty() {
         if (null == alarmColor) {
-            alarmColor = new ObjectPropertyBase<Color>(_alarmColor) {
+            alarmColor  = new ObjectPropertyBase<Color>(_alarmColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "alarmColor"; }
             };
+            _alarmColor = null;
         }
         return alarmColor;
     }
@@ -1379,11 +1391,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Color> hourColorProperty() {
         if (null == hourColor) {
-            hourColor = new ObjectPropertyBase<Color>(_hourColor) {
+            hourColor  = new ObjectPropertyBase<Color>(_hourColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "hourColor"; }
             };
+            _hourColor = null;
         }
         return hourColor;
     }
@@ -1407,11 +1420,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Color> minuteColorProperty() {
         if (null == minuteColor) {
-            minuteColor = new ObjectPropertyBase<Color>(_minuteColor) {
+            minuteColor  = new ObjectPropertyBase<Color>(_minuteColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "minuteColor"; }
             };
+            _minuteColor = null;
         }
         return minuteColor;
     }
@@ -1435,11 +1449,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Color> secondColorProperty() {
         if (null == secondColor) {
-            secondColor = new ObjectPropertyBase<Color>(_secondColor) {
+            secondColor  = new ObjectPropertyBase<Color>(_secondColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "secondColor"; }
             };
+            _secondColor = null;
         }
         return secondColor;
     }
@@ -1463,11 +1478,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Color> knobColorProperty() {
         if (null == knobColor) {
-            knobColor = new ObjectPropertyBase<Color>(_knobColor) {
+            knobColor  = new ObjectPropertyBase<Color>(_knobColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "knobColor"; }
             };
+            _knobColor = null;
         }
         return knobColor;
     }
@@ -1493,11 +1509,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<LcdDesign> lcdDesignProperty() {
         if (null == lcdDesign) {
-            lcdDesign = new ObjectPropertyBase<LcdDesign>(_lcdDesign) {
+            lcdDesign  = new ObjectPropertyBase<LcdDesign>(_lcdDesign) {
                 @Override protected void invalidated() { fireUpdateEvent(LCD_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "lcdDesign"; }
             };
+            _lcdDesign = null;
         }
         return lcdDesign;
     }
@@ -1675,11 +1692,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<LcdFont> lcdFontProperty() {
         if (null == lcdFont) {
-            lcdFont = new ObjectPropertyBase<LcdFont>(_lcdFont) {
+            lcdFont  = new ObjectPropertyBase<LcdFont>(_lcdFont) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "lcdFont"; }
             };
+            _lcdFont = null;
         }
         return lcdFont;
     }
@@ -1705,11 +1723,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<Locale> localeProperty() {
         if (null == locale) {
-            locale = new ObjectPropertyBase<Locale>(_locale) {
+            locale  = new ObjectPropertyBase<Locale>(_locale) {
                 @Override protected void invalidated() { fireUpdateEvent(RECALC_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "locale"; }
             };
+            _locale = null;
         }
         return locale;
     }
@@ -1739,11 +1758,12 @@ public class Clock extends Control {
     }
     public ObjectProperty<TickLabelLocation> tickLabelLocationProperty() {
         if (null == tickLabelLocation) {
-            tickLabelLocation = new ObjectPropertyBase<TickLabelLocation>(_tickLabelLocation) {
+            tickLabelLocation  = new ObjectPropertyBase<TickLabelLocation>(_tickLabelLocation) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "tickLabelLocation"; }
             };
+            _tickLabelLocation = null;
         }
         return tickLabelLocation;
     }
