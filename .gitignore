@@ -11,3 +11,4 @@ taskArtifacts.bin
 otherResources
 ._*
 .gradle
+.DS_Store
