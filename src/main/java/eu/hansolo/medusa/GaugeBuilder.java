@@ -958,6 +958,16 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                                                 new Stop(1.0, barColor.deriveColor(-20, 1, 1, 1)));
                     CONTROL.setBarColor(barColor);
                     break;
+                case WHITE:
+                    CONTROL.setAnimated(true);
+                    CONTROL.setAnimationDuration(1000);
+                    CONTROL.setAngleRange(360);
+                    CONTROL.setMinValue(0);
+                    CONTROL.setMaxValue(100);
+                    CONTROL.setBarColor(Color.WHITE);
+                    CONTROL.setValueColor(Color.WHITE);
+                    CONTROL.setUnitColor(Color.WHITE);
+                    break;
             }
         } else {
             CONTROL = new Gauge();
