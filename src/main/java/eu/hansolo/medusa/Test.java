@@ -91,6 +91,8 @@ public class Test extends Application {
                             .lcdVisible(true)
                             .locale(Locale.GERMANY)
                             .numberFormat(numberFormat)
+                            //.interactive(true)
+                            //.onButtonPressed(o -> System.out.println("Button pressed"))
                             .build();
         gauge.valueProperty().bind(value);
         //gauge.valueVisibleProperty().bind(toggle);
