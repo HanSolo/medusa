@@ -61,9 +61,9 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 11.12.15.
  */
 public class Gauge extends Control {
-    public enum NeedleType {BIG, FAT, STANDARD, SCIENTIFIC, AVIONIC, VARIOMETER}
+    public enum NeedleType { BIG, FAT, STANDARD, SCIENTIFIC, AVIONIC, VARIOMETER }
 
-    public enum NeedleShape {ANGLED, ROUND, FLAT}
+    public enum NeedleShape { ANGLED, ROUND, FLAT }
 
     public enum NeedleSize {
         THIN(0.015),
@@ -77,13 +77,13 @@ public class Gauge extends Control {
         }
     }
 
-    public enum NeedleBehavior {STANDARD, OPTIMIZED}
+    public enum NeedleBehavior { STANDARD, OPTIMIZED }
 
-    public enum KnobType {STANDARD, PLAIN, METAL, FLAT}
+    public enum KnobType { STANDARD, PLAIN, METAL, FLAT }
 
-    public enum LedType {STANDARD, FLAT}
+    public enum LedType { STANDARD, FLAT }
 
-    public enum ScaleDirection {CLOCKWISE, COUNTER_CLOCKWISE, LEFT_TO_RIGHT, RIGHT_TO_LEFT, BOTTOM_TO_TOP, TOP_TO_BOTTOM}
+    public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE, LEFT_TO_RIGHT, RIGHT_TO_LEFT, BOTTOM_TO_TOP, TOP_TO_BOTTOM }
 
     public enum SkinType {
         AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
@@ -97,10 +97,10 @@ public class Gauge extends Control {
     private static final long    LED_BLINK_INTERVAL  = 500l;
     private static final int     MAX_NO_OF_DECIMALS  = 3;
 
-    public final  ButtonEvent    BTN_PRESSED_EVENT   = new ButtonEvent(Gauge.this, null, ButtonEvent.BTN_PRESSED);
-    public final  ButtonEvent    BTN_RELEASED_EVENT  = new ButtonEvent(Gauge.this, null, ButtonEvent.BTN_RELEASED);
-    private final ThresholdEvent EXCEEDED_EVENT      = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_EXCEEDED);
-    private final ThresholdEvent UNDERRUN_EVENT      = new ThresholdEvent(Gauge.this, null, ThresholdEvent.THRESHOLD_UNDERRUN);
+    public final  ButtonEvent    BTN_PRESSED_EVENT   = new ButtonEvent(ButtonEvent.BTN_PRESSED);
+    public final  ButtonEvent    BTN_RELEASED_EVENT  = new ButtonEvent(ButtonEvent.BTN_RELEASED);
+    private final ThresholdEvent EXCEEDED_EVENT      = new ThresholdEvent(ThresholdEvent.THRESHOLD_EXCEEDED);
+    private final ThresholdEvent UNDERRUN_EVENT      = new ThresholdEvent(ThresholdEvent.THRESHOLD_UNDERRUN);
     private final UpdateEvent    RECALC_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
     private final UpdateEvent    REDRAW_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
     private final UpdateEvent    RESIZE_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
@@ -111,9 +111,9 @@ public class Gauge extends Control {
     private final UpdateEvent    FINISHED_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
     private final UpdateEvent    SECTION_EVENT       = new UpdateEvent(Gauge.this, UpdateEvent.EventType.SECTION);
 
-    private static volatile Future blinkFuture;
+    private static volatile Future          blinkFuture;
     private static ScheduledExecutorService blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
-    private static volatile Callable<Void> blinkTask;
+    private static volatile Callable<Void>  blinkTask;
 
     // Update events
     private List<UpdateEventListener> listenerList = new CopyOnWriteArrayList<>();
