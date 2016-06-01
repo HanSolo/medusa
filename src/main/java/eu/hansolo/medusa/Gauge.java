@@ -2127,7 +2127,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<TickLabelLocation> tickLabelLocationProperty() {
         if (null == tickLabelLocation) {
-            tickLabelLocation  = new ObjectPropertyBase<TickLabelLocation>() {
+            tickLabelLocation  = new ObjectPropertyBase<TickLabelLocation>(_tickLabelLocation) {
                 @Override protected void invalidated() {
                     if(null == get()) set(TickLabelLocation.INSIDE);
                     fireUpdateEvent(REDRAW_EVENT);
@@ -3428,7 +3428,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> valueColorProperty() {
         if (null == valueColor) {
-            valueColor  = new ObjectPropertyBase<Color>() {
+            valueColor  = new ObjectPropertyBase<Color>(_valueColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "valueColor"; }
@@ -3461,7 +3461,7 @@ public class Gauge extends Control {
     }
     public ObjectProperty<Color> thresholdColorProperty() {
         if (null == thresholdColor) {
-            thresholdColor  = new ObjectPropertyBase<Color>() {
+            thresholdColor  = new ObjectPropertyBase<Color>(_thresholdColor) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "thresholdColor"; }
