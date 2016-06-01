@@ -262,10 +262,6 @@ public class ConicalGradient {
         return normalizeStops(0, STOPS);
     }
     private List<Stop> normalizeStops(final double OFFSET, final List<Stop> STOPS) {
-        if (STOPS.isEmpty()) {
-            STOPS.add(new Stop(0, Color.TRANSPARENT));
-            STOPS.add(new Stop(1, Color.TRANSPARENT));
-        }
         double offset = Helper.clamp(0d, 1d, OFFSET);
         List<Stop> stops;
         if (null == STOPS || STOPS.isEmpty()) {
