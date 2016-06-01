@@ -69,69 +69,32 @@ public class ConicalGradient {
         this(CENTER_X, CENTER_Y, OFFSET, DIRECTION, Arrays.asList(STOPS));
     }
     public ConicalGradient(final double CENTER_X, final double CENTER_Y, final double OFFSET, final ScaleDirection DIRECTION, final List<Stop> STOPS) {
-        double offset  = Helper.clamp(0d, 1d, OFFSET);
         centerX        = CENTER_X;
         centerY        = CENTER_Y;
         scaleDirection = DIRECTION;
-        List<Stop> stops;
-        if (null == STOPS || STOPS.isEmpty()) {
-            stops = new ArrayList<>();
-            stops.add(new Stop(0.0, Color.TRANSPARENT));
-            stops.add(new Stop(1.0, Color.TRANSPARENT));
-        } else {
-            stops = STOPS;
-        }
-        sortedStops = calculate(stops, offset);
-
-        // Reverse the Stops for CCW direction
-        if (ScaleDirection.COUNTER_CLOCKWISE == scaleDirection) {
-            List<Stop> sortedStops3 = new ArrayList<>();
-            Collections.reverse(sortedStops);
-            for (Stop stop : sortedStops) { sortedStops3.add(new Stop(1d - stop.getOffset(), stop.getColor())); }
-            sortedStops = sortedStops3;
-        }
+        sortedStops    = normalizeStops(OFFSET, STOPS);
     }
 
 
     // ******************** Methods *******************************************
-    private List<Stop> calculate(final List<Stop> STOPS, final double OFFSET) {
-        List<Stop> stops = new ArrayList<>(STOPS.size());
-        final BigDecimal STEP = new BigDecimal(Double.MIN_VALUE);
-        for (Stop stop : STOPS) {
-            BigDecimal newOffsetBD = new BigDecimal(stop.getOffset() + OFFSET).remainder(BigDecimal.ONE);
-            if (newOffsetBD.equals(BigDecimal.ZERO)) {
-                newOffsetBD = BigDecimal.ONE;
-                stops.add(new Stop(Double.MIN_VALUE, stop.getColor()));
-            } else if (Double.compare((stop.getOffset() + OFFSET), 1d) > 0) {
-                newOffsetBD = newOffsetBD.subtract(STEP);
-            }
-            stops.add(new Stop(newOffsetBD.doubleValue(), stop.getColor()));
-        }
-
-        HashMap<Double, Color> stopMap = new LinkedHashMap<>(stops.size());
-        for (Stop stop : stops) { stopMap.put(stop.getOffset(), stop.getColor()); }
-
-        List<Stop>        sortedStops     = new ArrayList<>(stops.size());
-        SortedSet<Double> sortedFractions = new TreeSet<>(stopMap.keySet());
-        if (sortedFractions.last() < 1) {
-            stopMap.put(1.0, stopMap.get(sortedFractions.first()));
-            sortedFractions.add(1.0);
-        }
-        if (sortedFractions.first() > 0) {
-            stopMap.put(0.0, stopMap.get(sortedFractions.last()));
-            sortedFractions.add(0.0);
-        }
-        for (double fraction : sortedFractions) { sortedStops.add(new Stop(fraction, stopMap.get(fraction))); }
-
-        return sortedStops;
-    }
-
     public void recalculateWithAngle(final double ANGLE) {
         double angle = ANGLE % 360d;
         sortedStops = calculate(sortedStops, ANGLE_FACTOR * angle);
     }
 
     public List<Stop> getStops() { return sortedStops; }
+    public void setStops(final Stop... STOPS) {
+        setStops(Arrays.asList(STOPS));
+    }
+    public void setStops(final double OFFSET, final Stop... STOPS) {
+        setStops(OFFSET, Arrays.asList(STOPS));
+    }
+    public void setStops(final List<Stop> STOPS) {
+        setStops(0 ,STOPS);
+    }
+    public void setStops(final double OFFSET, final List<Stop> STOPS) {
+        sortedStops = normalizeStops(OFFSET, STOPS);
+    }
 
     public double[] getCenter() { return new double[]{ centerX, centerY }; }
     public Point2D getCenterPoint() { return new Point2D(centerX, centerY); }
@@ -252,5 +215,68 @@ public class ConicalGradient {
         centerX       = width * 0.5;
         centerY       = height * 0.5;
         return new ImagePattern(getImage(width, height), x, y, width, height, false);
+    }
+
+    private List<Stop> calculate(final List<Stop> STOPS, final double OFFSET) {
+        List<Stop> stops = new ArrayList<>(STOPS.size());
+        final BigDecimal STEP = new BigDecimal(Double.MIN_VALUE);
+        for (Stop stop : STOPS) {
+            BigDecimal newOffsetBD = new BigDecimal(stop.getOffset() + OFFSET).remainder(BigDecimal.ONE);
+            if (newOffsetBD.equals(BigDecimal.ZERO)) {
+                newOffsetBD = BigDecimal.ONE;
+                stops.add(new Stop(Double.MIN_VALUE, stop.getColor()));
+            } else if (Double.compare((stop.getOffset() + OFFSET), 1d) > 0) {
+                newOffsetBD = newOffsetBD.subtract(STEP);
+            }
+            stops.add(new Stop(newOffsetBD.doubleValue(), stop.getColor()));
+        }
+
+        HashMap<Double, Color> stopMap = new LinkedHashMap<>(stops.size());
+        for (Stop stop : stops) { stopMap.put(stop.getOffset(), stop.getColor()); }
+
+        List<Stop>        sortedStops     = new ArrayList<>(stops.size());
+        SortedSet<Double> sortedFractions = new TreeSet<>(stopMap.keySet());
+        if (sortedFractions.last() < 1) {
+            stopMap.put(1.0, stopMap.get(sortedFractions.first()));
+            sortedFractions.add(1.0);
+        }
+        if (sortedFractions.first() > 0) {
+            stopMap.put(0.0, stopMap.get(sortedFractions.last()));
+            sortedFractions.add(0.0);
+        }
+        for (double fraction : sortedFractions) { sortedStops.add(new Stop(fraction, stopMap.get(fraction))); }
+
+        return sortedStops;
+    }
+
+    private List<Stop> normalizeStops(final Stop... STOPS) {
+        return normalizeStops(0, Arrays.asList(STOPS));
+    }
+    private List<Stop> normalizeStops(final double OFFSET, final Stop... STOPS) {
+        return normalizeStops(OFFSET, Arrays.asList(STOPS));
+    }
+    private List<Stop> normalizeStops(final List<Stop> STOPS) {
+        return normalizeStops(0, STOPS);
+    }
+    private List<Stop> normalizeStops(final double OFFSET, final List<Stop> STOPS) {
+        double offset = Helper.clamp(0d, 1d, OFFSET);
+        List<Stop> stops;
+        if (null == STOPS || STOPS.isEmpty()) {
+            stops = new ArrayList<>();
+            stops.add(new Stop(0.0, Color.TRANSPARENT));
+            stops.add(new Stop(1.0, Color.TRANSPARENT));
+        } else {
+            stops = STOPS;
+        }
+        List<Stop> sortedStops = calculate(stops, offset);
+
+        // Reverse the Stops for CCW direction
+        if (ScaleDirection.COUNTER_CLOCKWISE == scaleDirection) {
+            List<Stop> sortedStops3 = new ArrayList<>();
+            Collections.reverse(sortedStops);
+            for (Stop stop : sortedStops) { sortedStops3.add(new Stop(1d - stop.getOffset(), stop.getColor())); }
+            sortedStops = sortedStops3;
+        }
+        return sortedStops;
     }
 }
