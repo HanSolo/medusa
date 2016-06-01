@@ -52,11 +52,14 @@ public class ConicalGradient {
 
 
     // ******************** Constructors **************************************
+    public ConicalGradient() {
+        this(0, 0, 0, ScaleDirection.CLOCKWISE, Arrays.asList(new Stop[]{}));
+    }
     public ConicalGradient(final Stop... STOPS) {
-        this(0, 0, ScaleDirection.CLOCKWISE, Arrays.asList(STOPS));
+        this(0, 0, 0, ScaleDirection.CLOCKWISE, Arrays.asList(STOPS));
     }
     public ConicalGradient(final List<Stop> STOPS) {
-        this(0, 0, ScaleDirection.CLOCKWISE, STOPS);
+        this(0, 0, 0, ScaleDirection.CLOCKWISE, STOPS);
     }
     public ConicalGradient(final double CENTER_X, final double CENTER_Y, final Stop... STOPS) { this(CENTER_X, CENTER_Y, ScaleDirection.CLOCKWISE, STOPS); }
     public ConicalGradient(final double CENTER_X, final double CENTER_Y, final ScaleDirection DIRECTION, final Stop... STOPS) {
@@ -259,6 +262,10 @@ public class ConicalGradient {
         return normalizeStops(0, STOPS);
     }
     private List<Stop> normalizeStops(final double OFFSET, final List<Stop> STOPS) {
+        if (STOPS.isEmpty()) {
+            STOPS.add(new Stop(0, Color.TRANSPARENT));
+            STOPS.add(new Stop(1, Color.TRANSPARENT));
+        }
         double offset = Helper.clamp(0d, 1d, OFFSET);
         List<Stop> stops;
         if (null == STOPS || STOPS.isEmpty()) {
