@@ -57,6 +57,9 @@ public class FGauge extends Region {
 
 
     // ******************** Constructors **************************************
+    public FGauge() {
+        this(new Gauge(), GaugeDesign.BLACK_METAL, GaugeBackground.BEIGE);
+    }
     public FGauge(final Gauge GAUGE, final GaugeDesign DESIGN) {
         this(GAUGE, DESIGN, GaugeBackground.DARK_GRAY);
     }
