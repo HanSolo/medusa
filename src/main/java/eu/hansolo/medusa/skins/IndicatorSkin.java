@@ -219,14 +219,14 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             needleTooltip.setText(String.format(locale, formatString, getSkinnable().getValue()));
             if (getSkinnable().isValueVisible()) {
-                Bounds bounds        = pane.localToScreen(pane.getBoundsInLocal());
-                double value         = getSkinnable().getValue();
-                double xFactor       = value > getSkinnable().getRange() * 0.8 ? 0.0 : 0.25;
-                double tooltipAngle  = value * angleStep;
-                double sinValue      = Math.sin(Math.toRadians(180 + angleRange * 0.5 - tooltipAngle));
-                double cosValue      = Math.cos(Math.toRadians(180 + angleRange * 0.5 - tooltipAngle));
-                double needleTipX    = bounds.getMinX() + width * 0.5 + height * sinValue;
-                double needleTipY    = bounds.getMinY() + height * 0.72 + height * cosValue;
+                Bounds bounds       = pane.localToScreen(pane.getBoundsInLocal());
+                double value        = getSkinnable().getValue();
+                double xFactor      = value > getSkinnable().getRange() * 0.8 ? 0.0 : 0.25;
+                double tooltipAngle = value * angleStep;
+                double sinValue     = Math.sin(Math.toRadians(180 + angleRange * 0.5 - tooltipAngle));
+                double cosValue     = Math.cos(Math.toRadians(180 + angleRange * 0.5 - tooltipAngle));
+                double needleTipX   = bounds.getMinX() + bounds.getWidth() * 0.5 + bounds.getHeight() * sinValue;
+                double needleTipY   = bounds.getMinY() + bounds.getHeight() * 0.72 + bounds.getHeight() * cosValue;
                 needleTooltip.show(needle, needleTipX, needleTipY);
                 needleTooltip.setAnchorX(needleTooltip.getX() - needleTooltip.getWidth() * xFactor);
             }
