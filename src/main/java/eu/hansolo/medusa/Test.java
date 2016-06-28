@@ -83,6 +83,7 @@ public class Test extends Application {
         toggle = new SimpleBooleanProperty(false);
 
         gauge = GaugeBuilder.create()
+                            //.skinType(SkinType.INDICATOR)
                             .prefSize(400, 400)
                             .animated(true)
                             .checkThreshold(true)
@@ -93,6 +94,7 @@ public class Test extends Application {
                             .numberFormat(numberFormat)
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
+                            //.title("Title")
                             .build();
         gauge.valueProperty().bind(value);
         //gauge.valueVisibleProperty().bind(toggle);

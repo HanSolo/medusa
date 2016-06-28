@@ -81,6 +81,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Rotate        needleRotate;
     private Text          minValueText;
     private Text          maxValueText;
+    private Text          titleText;
     private Pane          pane;
     private double        angleRange;
     private double        minValue;
@@ -186,7 +187,10 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxValueText.setFill(getSkinnable().getTitleColor());
         maxValueText.setVisible(getSkinnable().getTickLabelsVisible());
 
-        pane = new Pane(barBackground, bar, needle, minValueText, maxValueText);
+        titleText = new Text(getSkinnable().getTitle());
+        titleText.setFill(getSkinnable().getTitleColor());
+
+        pane = new Pane(barBackground, bar, needle, minValueText, maxValueText, titleText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -279,6 +283,11 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxValueText.setFont(Fonts.latoRegular(fontSize));
         if (maxValueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(maxValueText, maxWidth, fontSize); }
         maxValueText.relocate(width * 0.71527778, height * 0.885);
+
+        maxWidth = width * 0.9;
+        titleText.setFont(Fonts.latoRegular(fontSize));
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
+        titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, height * 0.95);
     }
 
     private void resize() {
@@ -383,5 +392,6 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         minValueText.setFill(getSkinnable().getTitleColor());
         maxValueText.setFill(getSkinnable().getTitleColor());
+        titleText.setFill(getSkinnable().getTitleColor());
     }
 }
