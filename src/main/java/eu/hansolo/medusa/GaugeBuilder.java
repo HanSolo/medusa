@@ -968,6 +968,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setValueColor(Color.WHITE);
                     CONTROL.setUnitColor(Color.WHITE);
                     break;
+                case CHARGE:
+                    CONTROL.setMinValue(0);
+                    CONTROL.setMaxValue(1.0);
+                    CONTROL.setAnimated(true);
+                    break;
             }
         } else {
             CONTROL = new Gauge();

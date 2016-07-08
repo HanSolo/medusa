@@ -83,7 +83,7 @@ public class Test extends Application {
         toggle = new SimpleBooleanProperty(false);
 
         gauge = GaugeBuilder.create()
-                            //.skinType(SkinType.INDICATOR)
+                            .skinType(SkinType.CHARGE)
                             .prefSize(400, 400)
                             .animated(true)
                             .checkThreshold(true)

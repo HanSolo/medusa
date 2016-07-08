@@ -89,7 +89,7 @@ public class Gauge extends Control {
         AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
         MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL,
         LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL, SIMPLE_DIGITAL, SECTION,
-        BAR, WHITE
+        BAR, WHITE, CHARGE
     }
 
     public static final  Color   DARK_COLOR          = Color.rgb(36, 36, 36);
@@ -4807,6 +4807,7 @@ public class Gauge extends Control {
             case SECTION       : return new SectionSkin(Gauge.this);
             case BAR           : return new BarSkin(Gauge.this);
             case WHITE         : return new WhiteSkin(Gauge.this);
+            case CHARGE        : return new ChargeSkin(Gauge.this);
             case GAUGE         :
             default            : return new GaugeSkin(Gauge.this);
         }
@@ -4978,11 +4979,14 @@ public class Gauge extends Control {
                 setBarColor(DARK_COLOR);
                 setBarEffectEnabled(true);
                 super.setSkin(new LinearSkin(Gauge.this));
+                break;
             case DIGITAL:
                 setBarColor(DARK_COLOR);
+                super.setSkin(new DigitalSkin(Gauge.this));
                 break;
             case SIMPLE_DIGITAL:
                 setBarColor(DARK_COLOR);
+                super.setSkin(new SimpleDigitalSkin(Gauge.this));
                 break;
             case SECTION:
                 setBackgroundPaint(Gauge.DARK_COLOR);
@@ -4991,6 +4995,7 @@ public class Gauge extends Control {
                 setKnobColor(Color.rgb(82, 82, 84));
                 setSectionsVisible(true);
                 setSectionTextVisible(true);
+                super.setSkin(new SectionSkin(Gauge.this));
                 break;
             case BAR:
                 Color barColor = getBarColor();
@@ -5003,6 +5008,7 @@ public class Gauge extends Control {
                                     new Stop(0.01, barColor),
                                     new Stop(0.75, barColor.deriveColor(-10, 1, 1, 1)),
                                     new Stop(1.0, barColor.deriveColor(-20, 1, 1, 1)));
+                super.setSkin(new BarSkin(Gauge.this));
                 break;
             case WHITE:
                 setAnimated(true);
@@ -5013,6 +5019,13 @@ public class Gauge extends Control {
                 setBarColor(Color.WHITE);
                 setValueColor(Color.WHITE);
                 setUnitColor(Color.WHITE);
+                super.setSkin(new WhiteSkin(Gauge.this));
+                break;
+            case CHARGE:
+                setAnimated(true);
+                setMinValue(0.0);
+                setMaxValue(1.0);
+                super.setSkin(new ChargeSkin(Gauge.this));
                 break;
             case GAUGE:
             default:
