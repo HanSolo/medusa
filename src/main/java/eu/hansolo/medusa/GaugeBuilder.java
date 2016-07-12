@@ -1032,6 +1032,13 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             CONTROL.setForegroundBaseColor(((ObjectProperty<Color>) properties.get("foregroundBaseColor")).get());
         }
 
+        if (properties.keySet().contains("minValue")) {
+            CONTROL.setMinValue(((DoubleProperty) properties.get("minValue")).get());
+        }
+        if (properties.keySet().contains("maxValue")) {
+            CONTROL.setMaxValue(((DoubleProperty) properties.get("maxValue")).get());
+        }
+
         for (String key : properties.keySet()) {
             if ("prefSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
@@ -1071,10 +1078,6 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             } else if("styleClass".equals(key)) {
                 CONTROL.getStyleClass().setAll("gauge");
                 CONTROL.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
-            } else if("minValue".equals(key)) {
-                CONTROL.setMinValue(((DoubleProperty) properties.get(key)).get());
-            } else if("maxValue".equals(key)) {
-                CONTROL.setMaxValue(((DoubleProperty) properties.get(key)).get());
             } else if ("autoScale".equals(key)) {
                 CONTROL.setAutoScale(((BooleanProperty) properties.get(key)).get());
             } else if("value".equals(key)) {
