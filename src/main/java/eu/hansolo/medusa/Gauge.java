@@ -647,6 +647,7 @@ public class Gauge extends Control {
             if (isStartFromZero() && _minValue < 0) setValue(0);
             if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(_minValue, getMaxValue(), originalThreshold)); }
             fireUpdateEvent(RECALC_EVENT);
+            Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
         } else {
             minValue.set(VALUE);
         }
@@ -662,6 +663,7 @@ public class Gauge extends Control {
                     if (isStartFromZero() && _minValue < 0) Gauge.this.setValue(0);
                     if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(VALUE, getMaxValue(), originalThreshold)); }
                     fireUpdateEvent(RECALC_EVENT);
+                    Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minValue";}
@@ -690,6 +692,7 @@ public class Gauge extends Control {
             if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = _maxValue;
             if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(Helper.clamp(getMinValue(), _maxValue, originalThreshold)); }
             fireUpdateEvent(RECALC_EVENT);
+            Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
         } else {
             maxValue.set(VALUE);
         }
@@ -704,6 +707,7 @@ public class Gauge extends Control {
                     if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = VALUE;
                     if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(Helper.clamp(getMinValue(), VALUE, originalThreshold)); }
                     fireUpdateEvent(RECALC_EVENT);
+                    Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "maxValue"; }
