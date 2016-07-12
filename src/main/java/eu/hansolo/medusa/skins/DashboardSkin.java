@@ -257,8 +257,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             redraw();
         } else if ("VISBILITY".equals(EVENT_TYPE)) {
             boolean isTitleVisible = !getSkinnable().getTitle().isEmpty();
-            unitText.setVisible(isTitleVisible);
-            unitText.setManaged(isTitleVisible);
+            titleText.setVisible(isTitleVisible);
+            titleText.setManaged(isTitleVisible);
             boolean isUnitVisible = !getSkinnable().getUnit().isEmpty();
             unitText.setVisible(isUnitVisible);
             unitText.setManaged(isUnitVisible);
@@ -463,5 +463,4 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdText.relocate(centerX - (thresholdText.getLayoutBounds().getWidth() * 0.5) + thresholdTextRadius * Math.sin(-Math.toRadians(thresholdAngle)),
                                centerX - (thresholdText.getLayoutBounds().getWidth() * 0.5) + thresholdTextRadius * Math.cos(-Math.toRadians(thresholdAngle)));
     }
-
 }
