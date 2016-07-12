@@ -535,6 +535,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B sectionsAlwaysVisible(final boolean VISIBLE) {
+        properties.put("sectionsAlwaysVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B sectionTextVisible(final boolean VISIBLE) {
         properties.put("sectionTextVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
@@ -1210,6 +1215,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setThresholdVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionsVisible".equals(key)) {
                 CONTROL.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("sectionsAlwaysVisible".equals(key)) {
+                CONTROL.setSectionsAlwaysVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionTextVisible".equals(key)) {
                 CONTROL.setSectionTextVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionIconsVisible".equals(key)) {

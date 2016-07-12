@@ -27,6 +27,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.NamedArg;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -283,6 +284,8 @@ public class Gauge extends Control {
     private BooleanProperty                      thresholdVisible;
     private boolean                              _sectionsVisible;
     private BooleanProperty                      sectionsVisible;
+    private boolean                              _sectionsAlwaysVisible;
+    private BooleanProperty                      sectionsAlwaysVisible;
     private boolean                              _sectionTextVisible;
     private BooleanProperty                      sectionTextVisible;
     private boolean                              _sectionIconsVisible;
@@ -519,6 +522,7 @@ public class Gauge extends Control {
         _innerShadowEnabled                 = false;
         _thresholdVisible                   = false;
         _sectionsVisible                    = false;
+        _sectionsAlwaysVisible              = false;
         _sectionTextVisible                 = false;
         _sectionIconsVisible                = false;
         _highlightSections                  = false;
@@ -1420,7 +1424,7 @@ public class Gauge extends Control {
     }
     public BooleanProperty maxMeasuredValueVisibleProperty() {
         if (null == maxMeasuredValueVisible) {
-            maxMeasuredValueVisible = new BooleanPropertyBase() {
+            maxMeasuredValueVisible = new BooleanPropertyBase(_maxMeasuredValueVisible) {
                 @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "maxMeasuredValueVisible"; }
@@ -2016,7 +2020,7 @@ public class Gauge extends Control {
     }
     public BooleanProperty shadowsEnabledProperty() {
         if (null == shadowsEnabled) {
-            shadowsEnabled = new BooleanPropertyBase() {
+            shadowsEnabled = new BooleanPropertyBase(_shadowsEnabled) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "shadowsEnabled"; }
@@ -3573,7 +3577,7 @@ public class Gauge extends Control {
     }
     public BooleanProperty innerShadowEnabledProperty() {
         if (null == innerShadowEnabled) {
-            innerShadowEnabled = new BooleanPropertyBase() {
+            innerShadowEnabled = new BooleanPropertyBase(_innerShadowEnabled) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "innerShadowEnabled"; }
@@ -3633,13 +3637,43 @@ public class Gauge extends Control {
     }
     public BooleanProperty sectionsVisibleProperty() {
         if (null == sectionsVisible) {
-            sectionsVisible = new BooleanPropertyBase() {
+            sectionsVisible = new BooleanPropertyBase(_sectionsVisible) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "sectionsVisible"; }
             };
         }
         return sectionsVisible;
+    }
+
+    /**
+     * Returns true if the sections in the IndicatorSkin
+     * will always be visible
+     * @return
+     */
+    public boolean getSectionsAlwaysVisible() { return null == sectionsAlwaysVisible ? _sectionsAlwaysVisible : sectionsAlwaysVisible.get(); }
+    /**
+     * Defines if the sections will always be visible.
+     * This is currently only used in the IndicatorSkin
+     * @param VISIBLE
+     */
+    public void setSectionsAlwaysVisible(final boolean VISIBLE) {
+        if (null == sectionsAlwaysVisible) {
+            _sectionsAlwaysVisible = VISIBLE;
+            fireUpdateEvent(REDRAW_EVENT);
+        } else {
+            sectionsAlwaysVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty sectionsAlwaysVisibleProperty() {
+        if (null == sectionsAlwaysVisible) {
+            sectionsAlwaysVisible = new BooleanPropertyBase(_sectionsAlwaysVisible) {
+                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "sectionsAlwaysVisible"; }
+            };
+        }
+        return sectionsAlwaysVisible;
     }
 
     /**
