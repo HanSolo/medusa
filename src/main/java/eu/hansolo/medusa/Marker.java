@@ -54,6 +54,7 @@ public class Marker implements Comparable<Marker>{
     private MarkerType                 _markerType;
     private ObjectProperty<MarkerType> markerType;
     private double                     checkedValue;
+    private String                     styleClass;
 
 
     // ******************** Constructors **************************************
@@ -61,32 +62,36 @@ public class Marker implements Comparable<Marker>{
      *
      */
     public Marker() {
-        this(0, "", DEFAULT_MARKER_COLOR, MarkerType.STANDARD);
+        this(0, "", DEFAULT_MARKER_COLOR, MarkerType.STANDARD, "");
     }
     public Marker(final double VALUE, final String TEXT) {
-        this(VALUE, TEXT, DEFAULT_MARKER_COLOR, MarkerType.STANDARD);
+        this(VALUE, TEXT, DEFAULT_MARKER_COLOR, MarkerType.STANDARD, "");
     }
     public Marker(final double VALUE, final Color COLOR) {
-        this(VALUE, "", COLOR, MarkerType.STANDARD);
+        this(VALUE, "", COLOR, MarkerType.STANDARD, "");
     }
     public Marker(final double VALUE, final MarkerType TYPE) {
-        this(VALUE, "", DEFAULT_MARKER_COLOR, TYPE);
+        this(VALUE, "", DEFAULT_MARKER_COLOR, TYPE, "");
     }
     public Marker(final double VALUE, final Color COLOR, final MarkerType TYPE) {
-        this(VALUE, "", COLOR, TYPE);
+        this(VALUE, "", COLOR, TYPE, "");
     }
     public Marker(final double VALUE, final String TEXT, final MarkerType TYPE) {
-        this(VALUE, TEXT, DEFAULT_MARKER_COLOR, TYPE);
+        this(VALUE, TEXT, DEFAULT_MARKER_COLOR, TYPE, "");
     }
     public Marker(final double VALUE, final String TEXT, final Color COLOR) {
-        this(VALUE, TEXT, COLOR, MarkerType.STANDARD);
+        this(VALUE, TEXT, COLOR, MarkerType.STANDARD, "");
     }
     public Marker(final double VALUE, final String TEXT, final Color COLOR, final MarkerType TYPE) {
+        this(VALUE, TEXT, COLOR, TYPE, "");
+    }
+    public Marker(final double VALUE, final String TEXT, final Color COLOR, final MarkerType TYPE, final String STYLE_CLASS) {
         _value       = VALUE;
         _text        = TEXT;
         _color       = COLOR;
         _markerType  = null == TYPE ? MarkerType.STANDARD : TYPE;
         checkedValue = -Double.MAX_VALUE;
+        styleClass   = STYLE_CLASS;
     }
 
 
@@ -190,6 +195,19 @@ public class Marker implements Comparable<Marker>{
         }
         return markerType;
     }
+
+    /**
+     * Returns the style class that can be used to colorize the marker.
+     * This is not implemented in the current available skins.
+     * @return the style class that can be used to colorize the marker
+     */
+    public String getStyleClass() { return styleClass; }
+    /**
+     * Defines the style class that can be used to colorize the marker.
+     * This is not implemented in the current available marker.
+     * @param STYLE_CLASS
+     */
+    public void setStyleClass(final String STYLE_CLASS) { styleClass = STYLE_CLASS; }
     
     public boolean equals(final Marker MARKER) {
         return (Double.compare(MARKER.getValue(), getValue()) == 0 &&

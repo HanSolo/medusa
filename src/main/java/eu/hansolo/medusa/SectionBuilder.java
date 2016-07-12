@@ -82,6 +82,11 @@ public class SectionBuilder<B extends SectionBuilder<B>> {
         return (B)this;
     }
 
+    public final B styleClass(final String STYLE_CLASS) {
+        properties.put("styleClass", new SimpleStringProperty(STYLE_CLASS));
+        return (B)this;
+    }
+
     public final B onSectionEntered(final EventHandler<SectionEvent> HANDLER) {
         properties.put("onSectionEntered", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
@@ -113,6 +118,8 @@ public class SectionBuilder<B extends SectionBuilder<B>> {
                 SECTION.setOnSectionEntered(((ObjectProperty<EventHandler>) properties.get(key)).get());
             } else if ("onSectionLeft".equals(key)) {
                 SECTION.setOnSectionLeft(((ObjectProperty<EventHandler>) properties.get(key)).get());
+            } else if ("styleClass".equals(key)) {
+                SECTION.setStyleClass(((StringProperty) properties.get(key)).get());
             }
         }
         return SECTION;

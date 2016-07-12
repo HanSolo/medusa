@@ -51,6 +51,7 @@ public class Section implements Comparable<Section> {
     private Color                 _textColor;
     private ObjectProperty<Color> textColor;
     private double                checkedValue;
+    private String                styleClass;
 
 
     // ******************** Constructors **************************************
@@ -61,30 +62,33 @@ public class Section implements Comparable<Section> {
      * value enters or leaves the defined region.
      */
     public Section() {
-        this(-1, -1, "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT);
+        this(-1, -1, "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, "");
     }
     public Section(final double START, final double STOP) {
-        this(START, STOP, "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT);
+        this(START, STOP, "", null, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, "");
     }
     public Section(final double START, final double STOP, final Color COLOR) {
-        this(START, STOP, "", null, COLOR, COLOR, Color.TRANSPARENT);
+        this(START, STOP, "", null, COLOR, COLOR, Color.TRANSPARENT, "");
     }
     public Section(final double START, final double STOP, final Color COLOR, final Color HIGHLIGHT_COLOR) {
-        this(START, STOP, "", null, COLOR, HIGHLIGHT_COLOR, Color.TRANSPARENT);
+        this(START, STOP, "", null, COLOR, HIGHLIGHT_COLOR, Color.TRANSPARENT, "");
     }
     public Section(final double START, final double STOP, final Image ICON, final Color COLOR) {
-        this(START, STOP, "", ICON, COLOR, COLOR, Color.WHITE);
+        this(START, STOP, "", ICON, COLOR, COLOR, Color.WHITE, "");
     }
     public Section(final double START, final double STOP, final String TEXT, final Color COLOR) {
-        this(START, STOP, TEXT, null, COLOR, COLOR, Color.WHITE);
+        this(START, STOP, TEXT, null, COLOR, COLOR, Color.WHITE, "");
     }
     public Section(final double START, final double STOP, final String TEXT, final Color COLOR, final Color TEXT_COLOR) {
-        this(START, STOP, TEXT, null, COLOR, COLOR, TEXT_COLOR);
+        this(START, STOP, TEXT, null, COLOR, COLOR, TEXT_COLOR, "");
     }
     public Section(final double START, final double STOP, final String TEXT, final Image ICON, final Color COLOR, final Color TEXT_COLOR) {
-        this(START, STOP, TEXT, ICON, COLOR, COLOR, TEXT_COLOR);
+        this(START, STOP, TEXT, ICON, COLOR, COLOR, TEXT_COLOR, "");
     }
     public Section(final double START, final double STOP, final String TEXT, final Image ICON, final Color COLOR, final Color HIGHLIGHT_COLOR, final Color TEXT_COLOR) {
+        this(START, STOP, TEXT, ICON, COLOR, HIGHLIGHT_COLOR, TEXT_COLOR, "");
+    }
+    public Section(final double START, final double STOP, final String TEXT, final Image ICON, final Color COLOR, final Color HIGHLIGHT_COLOR, final Color TEXT_COLOR, final String STYLE_CLASS) {
         _start          = START;
         _stop           = STOP;
         _text           = TEXT;
@@ -93,6 +97,7 @@ public class Section implements Comparable<Section> {
         _highlightColor = HIGHLIGHT_COLOR;
         _textColor      = TEXT_COLOR;
         checkedValue    = -Double.MAX_VALUE;
+        styleClass      = STYLE_CLASS;
     }
 
 
@@ -248,6 +253,19 @@ public class Section implements Comparable<Section> {
         if (null == textColor) { textColor = new SimpleObjectProperty<>(Section.this, "textColor", _textColor); }
         return textColor;
     }
+
+    /**
+     * Returns the style class that can be used to colorize the section.
+     * This is not implemented in the current available skins.
+     * @return the style class that can be used to colorize the section
+     */
+    public String getStyleClass() { return styleClass; }
+    /**
+     * Defines the style class that can be used to colorize the section.
+     * This is not implemented in the current available skins.
+     * @param STYLE_CLASS
+     */
+    public void setStyleClass(final String STYLE_CLASS) { styleClass = STYLE_CLASS; }
 
     /**
      * Returns true if the given value is within the range between
