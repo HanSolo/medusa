@@ -584,7 +584,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 barBorder2.setStroke(barBorderColor);
 
                 bar.setWidth(0.14286 * width);
-                bar.setTranslateX((width - bar.getWidth()) * 0.5);
+                bar.setTranslateX(pane.getLayoutX() + (width - bar.getWidth()) * 0.5);
                 bar.setTranslateY(getSkinnable().isStartFromZero() ? zeroPosition : minValuePosition);
 
                 barHighlight.setWidth(bar.getWidth());
@@ -624,7 +624,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
                 barBackground.setWidth(0.9 * width);
                 barBackground.setHeight(0.14286 * height);
-                barBackground.relocate(pane.getLayoutX() + (width - barBackground.getWidth()) * 0.5, pane.getLayoutY() + (height - barBackground.getHeight()) * 0.5);
+                barBackground.relocate((width - barBackground.getWidth()) * 0.5, (height - barBackground.getHeight()) * 0.5);
                 barBackground.setStroke(null);
                 barBackground.setFill(new LinearGradient(barBackground.getLayoutBounds().getMinX(), 0,
                                                          barBackground.getLayoutBounds().getMaxX(), 0,
