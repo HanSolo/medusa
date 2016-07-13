@@ -160,26 +160,26 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         ledCanvas = new Canvas();
         led       = ledCanvas.getGraphicsContext2D();
+        Helper.enableNode(ledCanvas, getSkinnable().isLedVisible());
 
         lcd = new Rectangle(0.3 * preferredWidth, 0.014 * preferredHeight);
         lcd.setArcWidth(0.0125 * preferredHeight);
         lcd.setArcHeight(0.0125 * preferredHeight);
         lcd.relocate((preferredWidth - lcd.getWidth()) * 0.5, 0.44 * preferredHeight);
-        lcd.setManaged(getSkinnable().isLcdVisible());
-        lcd.setVisible(getSkinnable().isLcdVisible());
+        Helper.enableNode(lcd, getSkinnable().isLcdVisible());
 
         bar = new Rectangle();
         bar.setStroke(null);
 
         barHighlight = new Rectangle();
         barHighlight.setStroke(null);
-        boolean barEffectEnabled = getSkinnable().isBarEffectEnabled();
-        barHighlight.setVisible(barEffectEnabled);
-        barHighlight.setManaged(barEffectEnabled);
+        Helper.enableNode(barHighlight, getSkinnable().isBarEffectEnabled());
 
         titleText = new Text(getSkinnable().getTitle());
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         unitText  = new Text(getSkinnable().getUnit());
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
         Helper.enableNode(valueText, getSkinnable().isValueVisible());
