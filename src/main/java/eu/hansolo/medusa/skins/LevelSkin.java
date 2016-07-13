@@ -160,15 +160,11 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         fluidTop.setStroke(null);
 
         valueText = new Text(String.format(locale, "%.0f%%", getSkinnable().getCurrentValue()));
-        valueText.setVisible(getSkinnable().isValueVisible());
-        valueText.setManaged(getSkinnable().isValueVisible());
         valueText.setMouseTransparent(true);
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         titleText = new Text(getSkinnable().getTitle());
-        if (getSkinnable().getTitle().isEmpty()) {
-            titleText.setVisible(false);
-            titleText.setManaged(false);
-        }
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         // Add all nodes
         pane = new Pane(tubeBottom, fluidBody, fluidTop, tube, tubeTop, valueText, titleText);
@@ -206,11 +202,8 @@ public class LevelSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resize();
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            valueText.setVisible(getSkinnable().isValueVisible());
-            valueText.setManaged(getSkinnable().isValueVisible());
-            boolean hasTitle = !getSkinnable().getTitle().isEmpty();
-            titleText.setVisible(hasTitle);
-            titleText.setManaged(hasTitle);
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
+            Helper.enableNode(titleText, !getSkinnable().getUnit().isEmpty());
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             StringBuilder content = new StringBuilder(String.format(locale, formatString, getSkinnable().getValue()))

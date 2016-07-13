@@ -240,16 +240,19 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setMouseTransparent(true);
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         unitText = new Text(getSkinnable().getUnit());
         unitText.setMouseTransparent(true);
         unitText.setTextOrigin(VPos.CENTER);
         unitText.setMouseTransparent(true);
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setMouseTransparent(true);
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         // Set initial value
         double targetAngle = 180 - startAngle + (getSkinnable().getCurrentValue() - minValue) * angleStep;

@@ -136,10 +136,12 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueBkgText = new Text();
         valueBkgText.setStroke(null);
         valueBkgText.setFill(Helper.getTranslucentColorFrom(valueColor, 0.1));
+        Helper.enableNode(valueBkgText, getSkinnable().isValueVisible());
 
         valueText = new Text();
         valueText.setStroke(null);
         valueText.setFill(valueColor);
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         pane = new Pane(backgroundCanvas, barCanvas, valueBkgText, valueText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
@@ -172,6 +174,8 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("SECTIONS".equals(EVENT_TYPE)) {
             sections         = getSkinnable().getSections();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(valueBkgText, getSkinnable().isValueVisible());
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
             sectionsVisible  = getSkinnable().getSectionsVisible();
             thresholdVisible = getSkinnable().isThresholdVisible();
         }

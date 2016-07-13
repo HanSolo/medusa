@@ -157,10 +157,12 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setFill(getSkinnable().getTitleColor());
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         // Add all nodes
         pane = new Pane(ring, sectionsCanvas, mask, knob, needle, valueText, titleText);
@@ -195,8 +197,6 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (highlightSections) {
                 drawSections();
             }
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             minValue  = getSkinnable().getMinValue();
             maxValue  = getSkinnable().getMaxValue();
@@ -208,6 +208,9 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             highlightSections = getSkinnable().isHighlightSections();
             resize();
             redraw();
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
         }
     }
 

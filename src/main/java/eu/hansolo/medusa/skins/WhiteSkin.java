@@ -117,6 +117,7 @@ public class WhiteSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setTextOrigin(VPos.CENTER);
         valueText.relocate(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.46875);
         valueText.setEffect(textShadow);
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         unitText  = new Text(getSkinnable().getUnit());
         unitText.setFill(Color.WHITE);
@@ -124,6 +125,7 @@ public class WhiteSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setTextOrigin(VPos.CENTER);
         unitText.relocate(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.65625);
         unitText.setEffect(textShadow);
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         backgroundRing = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5,
                                  PREFERRED_WIDTH * 0.43125, PREFERRED_HEIGHT * 0.43125,
@@ -177,6 +179,9 @@ public class WhiteSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             range     = getSkinnable().getRange();
             angleStep = ANGLE_RANGE / range;
             redraw();
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
         }
     }
 

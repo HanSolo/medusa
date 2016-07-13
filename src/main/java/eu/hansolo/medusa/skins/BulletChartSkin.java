@@ -133,9 +133,11 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         unitText = new Text(getSkinnable().getUnit());
         unitText.setTextOrigin(VPos.CENTER);
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         tickMarkCanvas    = new Canvas(0.79699248 * preferredWidth, 0.08333333 * preferredHeight);
 
@@ -184,20 +186,8 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            if (getSkinnable().getTitle().isEmpty()) {
-                titleText.setVisible(false);
-                titleText.setManaged(false);
-            } else {
-                titleText.setManaged(true);
-                titleText.setVisible(true);
-            }
-            if (getSkinnable().getUnit().isEmpty()) {
-                unitText.setVisible(false);
-                unitText.setManaged(false);
-            } else {
-                unitText.setManaged(true);
-                unitText.setVisible(true);
-            }
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
             redraw();
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             resize();

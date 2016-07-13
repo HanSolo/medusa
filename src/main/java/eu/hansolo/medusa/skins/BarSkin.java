@@ -130,14 +130,17 @@ public class BarSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText = new Text(getSkinnable().getTitle());
         titleText.setFont(Fonts.robotoLight(PREFERRED_WIDTH * 0.5));
         titleText.setFill(getSkinnable().getTitleColor());
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
         valueText.setFont(Fonts.robotoRegular(PREFERRED_WIDTH * 0.27333));
         valueText.setFill(getSkinnable().getValueColor());
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         unitText = new Text(getSkinnable().getUnit());
         unitText.setFont(Fonts.robotoLight(PREFERRED_WIDTH * 0.08));
         unitText.setFill(getSkinnable().getUnitColor());
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         pane = new Pane(circle, arc, fakeDot, dot, titleText, valueText, unitText);
 

@@ -154,6 +154,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
@@ -163,6 +164,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         subTitleText = new Text(getSkinnable().getSubTitle());
         subTitleText.setTextOrigin(VPos.CENTER);
         subTitleText.setFill(getSkinnable().getSubTitleColor());
+        Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
 
         // Add all nodes
         pane = new Pane(sectionsCanvas, needle, valueText, titleText, subTitleText);
@@ -197,8 +199,6 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (highlightSections) {
                 drawSections();
             }
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             minValue  = getSkinnable().getMinValue();
             maxValue  = getSkinnable().getMaxValue();
@@ -211,6 +211,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resize();
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
             Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
         }

@@ -191,13 +191,11 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         crystalOverlay = new ImageView(crystalImage);
         crystalOverlay.setClip(crystalClip);
         boolean crystalEnabled = getSkinnable().isLcdCrystalEnabled();
-        crystalOverlay.setManaged(crystalEnabled);
-        crystalOverlay.setVisible(crystalEnabled);
+        Helper.enableNode(crystalOverlay, crystalEnabled);
 
         threshold = new Path();
-        threshold.setManaged(getSkinnable().isThresholdVisible());
-        threshold.setVisible(getSkinnable().isThresholdVisible());
         threshold.setStroke(null);
+        Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
         
         backgroundText = new Text(String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
         backgroundText.setFill(getSkinnable().getLcdDesign().lcdBackgroundColor);
@@ -208,33 +206,27 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         unitText = new Text(getSkinnable().getUnit());
         unitText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        unitText.setManaged(!getSkinnable().getUnit().isEmpty());
-        unitText.setVisible(!getSkinnable().getUnit().isEmpty());
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         title = new Text(getSkinnable().getTitle());
         title.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        title.setManaged(!getSkinnable().getTitle().isEmpty());
-        title.setVisible(!getSkinnable().getTitle().isEmpty());
+        Helper.enableNode(title, !getSkinnable().getTitle().isEmpty());
 
         lowerRightText = new Text(getSkinnable().getSubTitle());
         lowerRightText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        lowerRightText.setManaged(!getSkinnable().getSubTitle().isEmpty());
-        lowerRightText.setVisible(!getSkinnable().getSubTitle().isEmpty());
+        Helper.enableNode(lowerRightText, !getSkinnable().getSubTitle().isEmpty());
 
         upperLeftText = new Text(String.format(locale, otherFormatString, getSkinnable().getMinMeasuredValue()));
         upperLeftText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        upperLeftText.setManaged(getSkinnable().isMinMeasuredValueVisible());
-        upperLeftText.setVisible(getSkinnable().isMinMeasuredValueVisible());
+        Helper.enableNode(upperLeftText, getSkinnable().isMinMeasuredValueVisible());
 
         upperRightText = new Text(String.format(locale, otherFormatString, getSkinnable().getMaxMeasuredValue()));
         upperRightText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        upperRightText.setManaged(getSkinnable().isMaxMeasuredValueVisible());
-        upperRightText.setVisible(getSkinnable().isMaxMeasuredValueVisible());
+        Helper.enableNode(upperRightText, getSkinnable().isMaxMeasuredValueVisible());
 
         lowerCenterText = new Text(String.format(locale, otherFormatString, getSkinnable().getOldValue()));
         lowerCenterText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        lowerCenterText.setManaged(getSkinnable().isOldValueVisible());
-        lowerCenterText.setVisible(getSkinnable().isOldValueVisible());
+        Helper.enableNode(lowerCenterText, getSkinnable().isOldValueVisible());
 
         shadowGroup = new Group();
         shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? FOREGROUND_SHADOW : null);
@@ -274,18 +266,12 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("LCD".equals(EVENT_TYPE)) {
             updateLcdDesign(height);
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            crystalOverlay.setManaged(getSkinnable().isLcdCrystalEnabled());
-            crystalOverlay.setVisible(getSkinnable().isLcdCrystalEnabled());
-            unitText.setManaged(!getSkinnable().getUnit().isEmpty());
-            unitText.setVisible(!getSkinnable().getUnit().isEmpty());
-            upperLeftText.setManaged(getSkinnable().isMinMeasuredValueVisible());
-            upperLeftText.setVisible(getSkinnable().isMinMeasuredValueVisible());
-            upperRightText.setManaged(getSkinnable().isMaxMeasuredValueVisible());
-            upperRightText.setVisible(getSkinnable().isMaxMeasuredValueVisible());
-            lowerRightText.setManaged(!getSkinnable().getSubTitle().isEmpty());
-            lowerRightText.setVisible(!getSkinnable().getSubTitle().isEmpty());
-            lowerCenterText.setManaged(getSkinnable().isOldValueVisible());
-            lowerCenterText.setVisible(getSkinnable().isOldValueVisible());
+            Helper.enableNode(crystalOverlay, getSkinnable().isLcdCrystalEnabled());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(upperLeftText, getSkinnable().isMinMeasuredValueVisible());
+            Helper.enableNode(upperRightText, getSkinnable().isMaxMeasuredValueVisible());
+            Helper.enableNode(lowerRightText, !getSkinnable().getSubTitle().isEmpty());
+            Helper.enableNode(lowerCenterText, getSkinnable().isOldValueVisible());
             resize();
             redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {

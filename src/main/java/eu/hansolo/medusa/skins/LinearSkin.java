@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
@@ -180,6 +181,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText  = new Text(getSkinnable().getUnit());
 
         valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         pane = new Pane(barBorder1,
                         barBorder2,
@@ -218,30 +220,12 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            boolean ledVisible = getSkinnable().isLedVisible();
-            ledCanvas.setManaged(ledVisible);
-            ledCanvas.setVisible(ledVisible);
-
-            boolean titleVisible = !getSkinnable().getTitle().isEmpty();
-            titleText.setVisible(titleVisible);
-            titleText.setManaged(titleVisible);
-
-            boolean unitVisible = !getSkinnable().getUnit().isEmpty();
-            unitText.setVisible(unitVisible);
-            unitText.setManaged(unitVisible);
-
-            boolean valueVisible = getSkinnable().isValueVisible();
-            valueText.setManaged(valueVisible);
-            valueText.setVisible(valueVisible);
-
-            boolean lcdVisible = getSkinnable().isLcdVisible() && getSkinnable().isValueVisible();
-            lcd.setManaged(lcdVisible);
-            lcd.setVisible(lcdVisible);
-
-            boolean barEffectEnabled = getSkinnable().isBarEffectEnabled();
-            barHighlight.setVisible(barEffectEnabled);
-            barHighlight.setManaged(barEffectEnabled);
-
+            Helper.enableNode(ledCanvas, getSkinnable().isLedVisible());
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
+            Helper.enableNode(lcd, (getSkinnable().isLcdVisible() && getSkinnable().isValueVisible()));
+            Helper.enableNode(barHighlight, getSkinnable().isBarEffectEnabled());
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }

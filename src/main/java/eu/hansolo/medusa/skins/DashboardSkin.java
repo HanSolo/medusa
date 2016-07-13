@@ -147,26 +147,17 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText = new Text(getSkinnable().getUnit());
         unitText.setTextOrigin(VPos.CENTER);
         unitText.setFill(getSkinnable().getUnitColor());
-
-        boolean isUnitVisible = !getSkinnable().getUnit().isEmpty();
-        unitText.setVisible(isUnitVisible);
-        unitText.setManaged(isUnitVisible);
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setFill(getSkinnable().getTitleColor());
-
-        boolean isTitleVisible = !getSkinnable().getTitle().isEmpty();
-        unitText.setVisible(isTitleVisible);
-        unitText.setManaged(isTitleVisible);
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
-
-        boolean isValueVisible = getSkinnable().isValueVisible();
-        valueText.setVisible(isValueVisible);
-        valueText.setManaged(isValueVisible);
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         minValue = getSkinnable().getMinValue();
         minText  = new Text(String.format(locale, otherFormatString, minValue));
@@ -178,10 +169,8 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxText.setFill(getSkinnable().getValueColor());
 
         boolean tickLabelsVisible = getSkinnable().getTickLabelsVisible();
-        minText.setVisible(tickLabelsVisible);
-        minText.setManaged(tickLabelsVisible);
-        maxText.setVisible(tickLabelsVisible);
-        maxText.setManaged(tickLabelsVisible);
+        Helper.enableNode(minText, tickLabelsVisible);
+        Helper.enableNode(maxText, tickLabelsVisible);
 
         innerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.3), 30d, 0d, 0d, 10d);
 
@@ -219,12 +208,10 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         threshold = new Line();
         threshold.setStrokeLineCap(StrokeLineCap.BUTT);
-        threshold.setVisible(getSkinnable().isThresholdVisible());
-        threshold.setManaged(getSkinnable().isThresholdVisible());
+        Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
 
         thresholdText = new Text(String.format(locale, formatString, getSkinnable().getThreshold()));
-        thresholdText.setVisible(getSkinnable().isThresholdVisible());
-        thresholdText.setManaged(getSkinnable().isThresholdVisible());
+        Helper.enableNode(thresholdText, getSkinnable().isThresholdVisible());
 
         pane = new Pane(unitText, titleText, valueText, minText, maxText, barBackground, dataBar, threshold, thresholdText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
@@ -256,26 +243,15 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resize();
             redraw();
         } else if ("VISBILITY".equals(EVENT_TYPE)) {
-            boolean isTitleVisible = !getSkinnable().getTitle().isEmpty();
-            titleText.setVisible(isTitleVisible);
-            titleText.setManaged(isTitleVisible);
-            boolean isUnitVisible = !getSkinnable().getUnit().isEmpty();
-            unitText.setVisible(isUnitVisible);
-            unitText.setManaged(isUnitVisible);
-            boolean isValueVisible = getSkinnable().isValueVisible();
-            valueText.setVisible(isValueVisible);
-            valueText.setManaged(isValueVisible);
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
             boolean tickLabelsVisible = getSkinnable().getTickLabelsVisible();
-            minText.setVisible(tickLabelsVisible);
-            minText.setManaged(tickLabelsVisible);
-            maxText.setVisible(tickLabelsVisible);
-            maxText.setManaged(tickLabelsVisible);
-            boolean isThresholdVisible = getSkinnable().isThresholdVisible();
-            threshold.setVisible(isThresholdVisible);
-            threshold.setManaged(isThresholdVisible);
-            thresholdText.setVisible(isThresholdVisible);
-            thresholdText.setManaged(isThresholdVisible);
-
+            Helper.enableNode(minText, tickLabelsVisible);
+            Helper.enableNode(maxText, tickLabelsVisible);
+            boolean thresholdVisible = getSkinnable().isThresholdVisible();
+            Helper.enableNode(threshold, thresholdVisible);
+            Helper.enableNode(thresholdText, thresholdVisible);
             redraw();
         }
     }

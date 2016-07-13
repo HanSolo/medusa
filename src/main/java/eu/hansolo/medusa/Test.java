@@ -30,6 +30,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -82,6 +83,7 @@ public class Test extends Application {
         value  = new SimpleDoubleProperty(0);
         toggle = new SimpleBooleanProperty(false);
 
+        /*
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.CHARGE)
                             .prefSize(400, 400)
@@ -96,7 +98,21 @@ public class Test extends Application {
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
                             //.title("Title")
                             .build();
-        gauge.valueProperty().bind(value);
+        */
+
+        gauge = GaugeBuilder.create()
+                            .skinType(SkinType.LINEAR)
+                            .orientation(Orientation.VERTICAL)
+                            .prefHeight(600)
+                            .valueVisible(false)
+                            .value(40)
+                            .decimals(0)
+                            .build();
+
+
+        //gauge.valueProperty().bind(value);
+
+
         //gauge.valueVisibleProperty().bind(toggle);
 
         clock = ClockBuilder.create()

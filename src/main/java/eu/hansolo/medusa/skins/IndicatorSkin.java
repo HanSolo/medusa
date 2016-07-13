@@ -191,14 +191,15 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         minValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
         minValueText.setFill(getSkinnable().getTitleColor());
-        minValueText.setVisible(getSkinnable().getTickLabelsVisible());
+        Helper.enableNode(minValueText, getSkinnable().getTickLabelsVisible());
 
         maxValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
         maxValueText.setFill(getSkinnable().getTitleColor());
-        maxValueText.setVisible(getSkinnable().getTickLabelsVisible());
+        Helper.enableNode(maxValueText, getSkinnable().getTickLabelsVisible());
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setFill(getSkinnable().getTitleColor());
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         if (!sections.isEmpty() && sectionsVisible && !sectionsAlwaysVisible) {
             barTooltip = new Tooltip();
@@ -258,6 +259,8 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     break;
                 }
             }
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
         }
     }
 

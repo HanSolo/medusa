@@ -150,6 +150,7 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText = new Text();
         valueText.setStroke(null);
         valueText.setFill(valueColor);
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         pane = new Pane(backgroundCanvas, barCanvas, valueBkgText, valueText);
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
