@@ -17,10 +17,6 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Clock.ClockSkinType;
-import eu.hansolo.medusa.Gauge.KnobType;
-import eu.hansolo.medusa.Gauge.NeedleShape;
-import eu.hansolo.medusa.Gauge.NeedleSize;
-import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.SkinType;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -30,27 +26,18 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
-import javafx.scene.layout.StackPane;
-import javafx.scene.Scene;
 
 import java.math.RoundingMode;
 import java.text.NumberFormat;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
-import java.util.Currency;
 import java.util.Locale;
 import java.util.Random;
 
@@ -83,9 +70,9 @@ public class Test extends Application {
         value  = new SimpleDoubleProperty(0);
         toggle = new SimpleBooleanProperty(false);
 
-        /*
+
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.CHARGE)
+                            .skinType(SkinType.GAUGE)
                             .prefSize(400, 400)
                             .animated(true)
                             .checkThreshold(true)
@@ -98,19 +85,8 @@ public class Test extends Application {
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
                             //.title("Title")
                             .build();
-        */
 
-        gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LINEAR)
-                            .orientation(Orientation.VERTICAL)
-                            .prefHeight(600)
-                            .valueVisible(false)
-                            .value(40)
-                            .decimals(0)
-                            .build();
-
-
-        //gauge.valueProperty().bind(value);
+        gauge.valueProperty().bind(value);
 
 
         //gauge.valueVisibleProperty().bind(toggle);
