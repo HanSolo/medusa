@@ -22,6 +22,7 @@ import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
@@ -206,6 +207,8 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
         getSkinnable().currentValueProperty().addListener(e -> setBar(getSkinnable().getCurrentValue()));
+
+        pane.widthProperty().addListener((o, ov, nv) -> { if (ov.intValue() == 0 && nv.intValue() > 0) Platform.runLater(() -> { resize(); redraw(); }); });
     }
 
 
@@ -555,6 +558,9 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 pane.setMaxSize(width, height);
                 pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
 
+                width  = pane.getLayoutBounds().getWidth();
+                height = pane.getLayoutBounds().getHeight();
+
                 barBackground.setWidth(0.14286 * width);
                 barBackground.setHeight( 0.67143 * height);
                 barBackground.relocate((width - barBackground.getWidth()) * 0.5, (height - barBackground.getHeight()) * 0.5);
@@ -621,6 +627,9 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
                 pane.setMaxSize(width, height);
                 pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+
+                width  = pane.getLayoutBounds().getWidth();
+                height = pane.getLayoutBounds().getHeight();
 
                 barBackground.setWidth(0.9 * width);
                 barBackground.setHeight(0.14286 * height);
