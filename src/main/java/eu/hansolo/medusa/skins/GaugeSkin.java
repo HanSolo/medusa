@@ -260,7 +260,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setMouseTransparent(true);
         unitText.setTextOrigin(VPos.CENTER);
         unitText.setMouseTransparent(true);
-        Helper.enableNode(valueText, !getSkinnable().getUnit().isEmpty());
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
         valueText.setMouseTransparent(true);
