@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -127,7 +128,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void initGraphics() {
-        Orientation orientation = getSkinnable().getOrientation();
+        orientation = getSkinnable().getOrientation();
 
         aspectRatio = preferredHeight / preferredWidth;
 
@@ -175,6 +176,8 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
 
         getSkinnable().currentValueProperty().addListener(o -> updateBar());
+
+        pane.widthProperty().addListener((o, ov, nv) -> { if (ov.intValue() == 0 && nv.intValue() > 0) Platform.runLater(() -> { resize(); redraw(); }); });
     }
 
 
@@ -338,15 +341,6 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void adjustTextSize(final Text TEXT, final double MAX_WIDTH, final double DECREMENT_FACTOR) {
-        double decrement = 0d;
-        double size      = width < height ? width : height;
-        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && TEXT.getFont().getSize() > 0) {
-            TEXT.setFont(Fonts.robotoMedium(size * (DECREMENT_FACTOR - decrement)));
-            decrement += 0.01;
-        }
-    }
-
     private void resize() {
         width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
@@ -361,6 +355,9 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             pane.setMaxSize(width, height);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+
+            width  = pane.getLayoutBounds().getWidth();
+            height = pane.getLayoutBounds().getHeight();
 
             tickMarkCanvas.setWidth(0.39 * width);
             tickMarkCanvas.setHeight(height);
@@ -382,11 +379,11 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             double maxTextWidth = width;
             titleText.setFont(Fonts.robotoRegular(0.24 * width));
-            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { adjustTextSize(titleText, maxTextWidth, 0.3); }
+            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(titleText, maxTextWidth, 0.24 * width); }
             titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.03 * width);
 
             unitText.setFont(Fonts.robotoRegular(0.15 * width));
-            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { adjustTextSize(unitText, maxTextWidth, 0.2); }
+            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(unitText, maxTextWidth, 0.15 * width); }
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.35 * width);
         } else {
             height   = width * aspectRatio;
@@ -394,6 +391,9 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             pane.setMaxSize(width, height);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+
+            width  = pane.getLayoutBounds().getWidth();
+            height = pane.getLayoutBounds().getHeight();
 
             tickMarkCanvas.setWidth(width);
             tickMarkCanvas.setHeight(0.29166667 * height);
@@ -415,11 +415,11 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             double maxTextWidth = 0.20300752 * width;
             titleText.setFont(Fonts.robotoMedium(0.24 * height));
-            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { adjustTextSize(titleText, maxTextWidth, 0.3); }
+            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(titleText, maxTextWidth, 0.24 * width); }
             titleText.relocate(0.17593985 * width - (titleText.getLayoutBounds().getWidth()), 0.075 * height);
 
             unitText.setFont(Fonts.robotoRegular(0.15 * height));
-            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { adjustTextSize(unitText, maxTextWidth, 0.2); }
+            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(unitText, maxTextWidth, 0.15 * width); }
             unitText.relocate(0.17593985 * width - (unitText.getLayoutBounds().getWidth()), 0.4 * height);
         }
         redraw();
