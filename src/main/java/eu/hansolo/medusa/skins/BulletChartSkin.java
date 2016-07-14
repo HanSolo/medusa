@@ -177,7 +177,8 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         getSkinnable().currentValueProperty().addListener(o -> updateBar());
 
-        pane.widthProperty().addListener((o, ov, nv) -> { if (ov.intValue() == 0 && nv.intValue() > 0) Platform.runLater(() -> { resize(); redraw(); }); });
+        pane.widthProperty().addListener(o -> { resize(); redraw(); });
+        pane.heightProperty().addListener(o -> { resize(); redraw(); });
     }
 
 

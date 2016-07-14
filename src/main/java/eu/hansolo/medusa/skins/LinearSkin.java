@@ -208,7 +208,8 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
         getSkinnable().currentValueProperty().addListener(e -> setBar(getSkinnable().getCurrentValue()));
 
-        pane.widthProperty().addListener((o, ov, nv) -> { if (ov.intValue() == 0 && nv.intValue() > 0) Platform.runLater(() -> { resize(); redraw(); }); });
+        pane.widthProperty().addListener(o -> { resize(); redraw(); });
+        pane.heightProperty().addListener(o -> { resize(); redraw(); });
     }
 
 
