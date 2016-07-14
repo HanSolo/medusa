@@ -590,7 +590,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 barBorder2.setStroke(barBorderColor);
 
                 bar.setWidth(0.14286 * width);
-                bar.setTranslateX(pane.getLayoutX() + (width - bar.getWidth()) * 0.5);
+                bar.setTranslateX((width - bar.getWidth()) * 0.5);
                 bar.setTranslateY(getSkinnable().isStartFromZero() ? zeroPosition : minValuePosition);
 
                 barHighlight.setWidth(bar.getWidth());
