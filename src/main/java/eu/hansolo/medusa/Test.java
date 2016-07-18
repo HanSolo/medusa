@@ -18,18 +18,26 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Clock.ClockSkinType;
 import eu.hansolo.medusa.Gauge.SkinType;
+import eu.hansolo.medusa.Section.SectionEvent;
+import eu.hansolo.medusa.events.UpdateEvent;
+import eu.hansolo.medusa.events.UpdateEvent.EventType;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -70,10 +78,11 @@ public class Test extends Application {
         value  = new SimpleDoubleProperty(0);
         toggle = new SimpleBooleanProperty(false);
 
-
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.GAUGE)
                             .prefSize(400, 400)
+                            .minValue(0)
+                            .maxValue(150)
                             .animated(true)
                             .checkThreshold(true)
                             .onThresholdExceeded(e -> System.out.println("threshold exceeded"))
@@ -84,10 +93,14 @@ public class Test extends Application {
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
                             //.title("Title")
+                            .sections(new Section(20, 40, Color.RED))
+                            .sectionsVisible(true)
+                            .autoScale(false)
                             .build();
 
         gauge.valueProperty().bind(value);
 
+        gauge.getSections().forEach(section -> section.setOnSectionUpdate(sectionEvent -> gauge.fireUpdateEvent(new UpdateEvent(Test.this, EventType.REDRAW))));
 
         //gauge.valueVisibleProperty().bind(toggle);
 
@@ -142,11 +155,15 @@ public class Test extends Application {
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
         timer.start();
+
+        gauge.getSections().get(0).setStart(10);
+        gauge.getSections().get(0).setStop(90);
     }
 
     @Override public void stop() {
         System.exit(0);
     }
+
 
 
     // ******************** Misc **********************************************
