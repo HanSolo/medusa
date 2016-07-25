@@ -101,7 +101,7 @@ public class Gauge extends Control {
         AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
         MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL,
         LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL, SIMPLE_DIGITAL, SECTION,
-        BAR, WHITE, CHARGE
+        BAR, WHITE, CHARGE, SIMPLE_SECTION
     }
 
     public static final  Color   DARK_COLOR          = Color.rgb(36, 36, 36);
@@ -4857,6 +4857,7 @@ public class Gauge extends Control {
             case BAR           : return new BarSkin(Gauge.this);
             case WHITE         : return new WhiteSkin(Gauge.this);
             case CHARGE        : return new ChargeSkin(Gauge.this);
+            case SIMPLE_SECTION: return new SimpleSectionSkin(Gauge.this);
             case GAUGE         :
             default            : return new GaugeSkin(Gauge.this);
         }
@@ -5075,6 +5076,17 @@ public class Gauge extends Control {
                 setMinValue(0.0);
                 setMaxValue(1.0);
                 super.setSkin(new ChargeSkin(Gauge.this));
+                break;
+            case SIMPLE_SECTION:
+                setAnimated(true);
+                setStartAngle(150);
+                setAngleRange(300);
+                setSectionsVisible(true);
+                setBarBackgroundColor(Color.rgb(150, 150, 150, 0.25));
+                setBarColor(Color.rgb(69, 106, 207));
+                setTitleColor(Color.rgb(90, 90, 90));
+                setUnitColor(Color.rgb(90, 90, 90));
+                setValueColor(Color.rgb(90, 90, 90));
                 break;
             case GAUGE:
             default:

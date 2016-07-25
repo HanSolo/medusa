@@ -978,6 +978,17 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setMaxValue(1.0);
                     CONTROL.setAnimated(true);
                     break;
+                case SIMPLE_SECTION:
+                    CONTROL.setAnimated(true);
+                    CONTROL.setStartAngle(150);
+                    CONTROL.setAngleRange(300);
+                    CONTROL.setSectionsVisible(true);
+                    CONTROL.setBarBackgroundColor(Color.rgb(150, 150, 150, 0.25));
+                    CONTROL.setBarColor(Color.rgb(69, 106, 207));
+                    CONTROL.setTitleColor(Color.rgb(90, 90, 90));
+                    CONTROL.setUnitColor(Color.rgb(90, 90, 90));
+                    CONTROL.setValueColor(Color.rgb(90, 90, 90));
+                    break;
             }
         } else {
             CONTROL = new Gauge();

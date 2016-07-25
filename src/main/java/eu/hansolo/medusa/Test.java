@@ -79,23 +79,28 @@ public class Test extends Application {
         toggle = new SimpleBooleanProperty(false);
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.GAUGE)
-                            .prefSize(400, 400)
+                            .skinType(SkinType.SIMPLE_SECTION)
+                            .prefSize(250, 250)
                             .minValue(0)
-                            .maxValue(150)
+                            .maxValue(100)
                             .animated(true)
-                            .checkThreshold(true)
-                            .onThresholdExceeded(e -> System.out.println("threshold exceeded"))
-                            .threshold(50)
-                            .lcdVisible(true)
-                            .locale(Locale.GERMANY)
-                            .numberFormat(numberFormat)
+                            //.checkThreshold(true)
+                            //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
+                            //.threshold(50)
+                            //.lcdVisible(true)
+                            //.locale(Locale.GERMANY)
+                            //.numberFormat(numberFormat)
+                            .title("Title")
+                            .unit("°C")
+                            .subTitle("SubTitle")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
                             //.title("Title")
-                            .sections(new Section(20, 40, Color.RED))
+                            .sections(new Section(0, 33, Color.RED),
+                                      new Section(33, 66, Color.YELLOW),
+                                      new Section(66, 100, Color.LIME))
                             .sectionsVisible(true)
-                            .autoScale(false)
+                            //.autoScale(false)
                             .build();
 
         gauge.valueProperty().bind(value);
@@ -156,8 +161,8 @@ public class Test extends Application {
 
         timer.start();
 
-        gauge.getSections().get(0).setStart(10);
-        gauge.getSections().get(0).setStop(90);
+        //gauge.getSections().get(0).setStart(10);
+        //gauge.getSections().get(0).setStop(90);
     }
 
     @Override public void stop() {
