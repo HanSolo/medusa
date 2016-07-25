@@ -153,6 +153,7 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void registerListeners() {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
+        getSkinnable().decimalsProperty().addListener(o -> handleEvents("DECIMALS"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
         getSkinnable().currentValueProperty().addListener(o -> setBar(getSkinnable().getCurrentValue()));
     }
@@ -172,12 +173,14 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angleStep = ANGLE_RANGE / range;
             redraw();
         } else if ("SECTIONS".equals(EVENT_TYPE)) {
-            sections         = getSkinnable().getSections();
+            sections = getSkinnable().getSections();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(valueBkgText, getSkinnable().isValueVisible());
             Helper.enableNode(valueText, getSkinnable().isValueVisible());
             sectionsVisible  = getSkinnable().getSectionsVisible();
             thresholdVisible = getSkinnable().isThresholdVisible();
+        } else if ("DECIMALS".equals(EVENT_TYPE)) {
+            formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         }
     }
 
@@ -313,11 +316,10 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void redraw() {
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        locale          = getSkinnable().getLocale();
-        formatString    = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        barColor        = getSkinnable().getBarColor();
-        valueColor      = getSkinnable().getValueColor();
-        unitColor       = getSkinnable().getUnitColor();
+        locale     = getSkinnable().getLocale();
+        barColor   = getSkinnable().getBarColor();
+        valueColor = getSkinnable().getValueColor();
+        unitColor  = getSkinnable().getUnitColor();
         drawBackground();
 
         setBar(getSkinnable().getCurrentValue());
