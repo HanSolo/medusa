@@ -215,6 +215,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Methods *******************************************
     protected void handleEvents(final String EVENT_TYPE) {
+        System.out.println(EVENT_TYPE);
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
             redraw();
@@ -773,6 +774,13 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
             drawLed();
         }
+
+        // Tickmarks, Sections and Areas
+        ticksAndSectionsCanvas.setCache(false);
+        ticksAndSections.clearRect(0, 0, ticksAndSectionsCanvas.getWidth(), ticksAndSectionsCanvas.getHeight());
+        drawTickMarks(ticksAndSections);
+        ticksAndSectionsCanvas.setCache(true);
+        ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
         // LCD
         LcdDesign lcdDesign = getSkinnable().getLcdDesign();
