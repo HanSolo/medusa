@@ -215,7 +215,6 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Methods *******************************************
     protected void handleEvents(final String EVENT_TYPE) {
-        System.out.println(EVENT_TYPE);
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
             redraw();
