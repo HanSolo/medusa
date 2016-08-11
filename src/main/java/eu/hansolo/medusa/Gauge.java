@@ -5087,6 +5087,7 @@ public class Gauge extends Control {
                 setTitleColor(Color.rgb(90, 90, 90));
                 setUnitColor(Color.rgb(90, 90, 90));
                 setValueColor(Color.rgb(90, 90, 90));
+                super.setSkin(new SimpleSectionSkin(Gauge.this));
                 break;
             case GAUGE:
             default:
