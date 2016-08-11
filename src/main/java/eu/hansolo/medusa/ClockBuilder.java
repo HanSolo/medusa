@@ -478,6 +478,11 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setSecondsVisible(true);
                     CONTROL.setDateVisible(true);
                     break;
+                case DIGITAL:
+                    CONTROL.setTextVisible(true);
+                    CONTROL.setDateVisible(true);
+                    CONTROL.setSecondsVisible(true);
+                    break;
             }
         } else {
             CONTROL = new Clock();

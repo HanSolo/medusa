@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM, MINIMAL }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM, MINIMAL, DIGITAL }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -1973,6 +1973,7 @@ public class Clock extends Control {
             case ROUND_LCD: return new RoundLcdClockSkin(Clock.this);
             case SLIM     : return new SlimClockSkin(Clock.this);
             case MINIMAL  : return new MinimalClockSkin(Clock.this);
+            case DIGITAL  : return new DigitalClockSkin(Clock.this);
             case CLOCK    :
             default       : return new ClockSkin(Clock.this);
         }
@@ -2031,13 +2032,16 @@ public class Clock extends Control {
                 setDiscreteMinutes(true);
                 setSecondColor(Color.rgb(167, 0, 0));
                 setSecondsVisible(true);
+                super.setSkin(new DBClockSkin(Clock.this));
                 break;
             case FAT:
                 setDiscreteMinutes(true);
+                super.setSkin(new FatClockSkin(Clock.this));
                 break;
             case ROUND_LCD:
                 setTextVisible(true);
                 setDateVisible(true);
+                super.setSkin(new RoundLcdClockSkin(Clock.this));
                 break;
             case SLIM:
                 setSecondsVisible(true);
@@ -2046,6 +2050,7 @@ public class Clock extends Control {
                 setMinuteColor(Color.rgb(0,191,255));
                 setSecondColor(Color.WHITE);
                 setDateColor(Color.WHITE);
+                super.setSkin(new SlimClockSkin(Clock.this));
             case MINIMAL:
                 setBackgroundPaint(Color.rgb(255, 255, 255, 0.3));
                 setMinuteColor(Color.rgb(59, 209, 255));
@@ -2053,6 +2058,13 @@ public class Clock extends Control {
                 setSecondColor(Color.rgb(255, 255, 255, 0.8));
                 setSecondsVisible(true);
                 setDateVisible(true);
+                super.setSkin(new MinimalClockSkin(Clock.this));
+                break;
+            case DIGITAL:
+                setTextVisible(true);
+                setDateVisible(true);
+                setSecondsVisible(true);
+                super.setSkin(new DigitalClockSkin(Clock.this));
                 break;
             case CLOCK:
             default:
