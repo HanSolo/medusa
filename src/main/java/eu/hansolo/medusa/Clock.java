@@ -38,6 +38,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -65,6 +66,7 @@ public class Clock extends Control {
     public  static final int                  LONG_INTERVAL    = 1000;
     public  static final Color                DARK_COLOR       = Color.rgb(36, 36, 36);
     public  static final Color                BRIGHT_COLOR     = Color.rgb(223, 223, 223);
+    private        final UpdateEvent          RESIZE_EVENT     = new UpdateEvent(Clock.this, EventType.RESIZE);
     private        final UpdateEvent          REDRAW_EVENT     = new UpdateEvent(Clock.this, EventType.REDRAW);
     private        final UpdateEvent          VISIBILITY_EVENT = new UpdateEvent(Clock.this, EventType.VISIBILITY);
     private        final UpdateEvent          LCD_EVENT        = new UpdateEvent(Clock.this, EventType.LCD);
@@ -180,6 +182,10 @@ public class Clock extends Control {
     private boolean                           _animated;
     private BooleanProperty                   animated;
     private long                              animationDuration;
+    private boolean                           _customFontEnabled;
+    private BooleanProperty                   customFontEnabled;
+    private Font                              _customFont;
+    private ObjectProperty<Font>              customFont;
 
 
     // ******************** Constructors **************************************
@@ -278,6 +284,8 @@ public class Clock extends Control {
         _tickLabelLocation      = TickLabelLocation.INSIDE;
         _animated               = false;
         animationDuration       = 10000;
+        _customFontEnabled      = false;
+        _customFont             = Fonts.robotoRegular(12);
     }
 
     private void registerListeners() { disabledProperty().addListener(o -> setOpacity(isDisabled() ? 0.4 : 1)); }
@@ -1813,6 +1821,69 @@ public class Clock extends Control {
     public void setAnimationDuration(final long ANIMATION_DURATION) { animationDuration = Helper.clamp(10l, 20000l, ANIMATION_DURATION); }
 
     /**
+     * Returns true if the control uses the given customFont to
+     * render all text elements.
+     * @return true if the control uses the given customFont
+     */
+    public boolean isCustomFontEnabled() { return null == customFontEnabled ? _customFontEnabled : customFontEnabled.get(); }
+    /**
+     * Defines if the control should use the given customFont
+     * to render all text elements
+     * @param ENABLED
+     */
+    public void setCustomFontEnabled(final boolean ENABLED) {
+        if (null == customFontEnabled) {
+            _customFontEnabled = ENABLED;
+            fireUpdateEvent(RESIZE_EVENT);
+        } else {
+            customFontEnabled.set(ENABLED);
+        }
+    }
+    public BooleanProperty customFontEnabledProperty() {
+        if (null == customFontEnabled) {
+            customFontEnabled = new BooleanPropertyBase(_customFontEnabled) {
+                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
+                @Override public Object getBean() { return Clock.this; }
+                @Override public String getName() { return "customFontEnabled"; }
+            };
+        }
+        return customFontEnabled;
+    }
+
+    /**
+     * Returns the given custom Font that can be used to render
+     * all text elements. To enable the custom font one has to set
+     * customFontEnabled = true
+     * @return the given custom Font
+     */
+    public Font getCustomFont() { return null == customFont ? _customFont : customFont.get(); }
+    /**
+     * Defines the custom font that can be used to render all
+     * text elements. To enable the custom font one has to set
+     * customFontEnabled = true
+     * @param FONT
+     */
+    public void setCustomFont(final Font FONT) {
+        if (null == customFont) {
+            _customFont = FONT;
+            fireUpdateEvent(RESIZE_EVENT);
+        } else {
+            customFont.set(FONT);
+        }
+    }
+    public ObjectProperty<Font> customFontProperty() {
+        if (null == customFont) {
+            customFont = new ObjectPropertyBase<Font>() {
+                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
+                @Override public Object getBean() { return Clock.this; }
+                @Override public String getName() { return "customFont"; }
+            };
+            _customFont = null;
+        }
+        return customFont;
+    }
+
+    /**
      * Calling this method will check the current time against all Alarm
      * objects in alarms. The Alarm object will fire events in case the
      * time is after the alarm time.
@@ -1924,7 +1995,7 @@ public class Clock extends Control {
     // ******************** Scheduled tasks ***********************************
     private synchronized static void enableTickExecutorService() {
         if (null == periodicTickExecutorService) {
-            periodicTickExecutorService = new ScheduledThreadPoolExecutor(1, getThreadFactory("ClockTick", false));
+            periodicTickExecutorService = new ScheduledThreadPoolExecutor(1, getThreadFactory("ClockTick", true));
         }
     }
     private synchronized void scheduleTickTask() {

@@ -53,6 +53,7 @@ import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 import java.text.NumberFormat;
@@ -359,6 +360,10 @@ public class Gauge extends Control {
     private StringProperty                       buttonTooltipText;
     private boolean                              _keepAspect;
     private BooleanProperty                      keepAspect;
+    private boolean                              _customFontEnabled;
+    private BooleanProperty                      customFontEnabled;
+    private Font                                 _customFont;
+    private ObjectProperty<Font>                 customFont;
 
     // others
     private double   originalMinValue;
@@ -565,6 +570,8 @@ public class Gauge extends Control {
         _interactive                        = false;
         _buttonTooltipText                  = "";
         _keepAspect                         = true;
+        _customFontEnabled                  = false;
+        _customFont                         = Fonts.robotoRegular(12);
 
         originalMinValue                    = -Double.MAX_VALUE;
         originalMaxValue                    = Double.MAX_VALUE;
@@ -4763,6 +4770,69 @@ public class Gauge extends Control {
     public BooleanProperty keepAspectProperty() {
         if (null == keepAspect) { keepAspect = new SimpleBooleanProperty(Gauge.this, "keepAspect", _keepAspect); }
         return keepAspect;
+    }
+
+    /**
+     * Returns true if the control uses the given customFont to
+     * render all text elements.
+     * @return true if the control uses the given customFont
+     */
+    public boolean isCustomFontEnabled() { return null == customFontEnabled ? _customFontEnabled : customFontEnabled.get(); }
+    /**
+     * Defines if the control should use the given customFont
+     * to render all text elements
+     * @param ENABLED
+     */
+    public void setCustomFontEnabled(final boolean ENABLED) {
+        if (null == customFontEnabled) {
+            _customFontEnabled = ENABLED;
+            fireUpdateEvent(RESIZE_EVENT);
+        } else {
+            customFontEnabled.set(ENABLED);
+        }
+    }
+    public BooleanProperty customFontEnabledProperty() {
+        if (null == customFontEnabled) {
+            customFontEnabled = new BooleanPropertyBase(_customFontEnabled) {
+                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "customFontEnabled"; }
+            };
+        }
+        return customFontEnabled;
+    }
+
+    /**
+     * Returns the given custom Font that can be used to render
+     * all text elements. To enable the custom font one has to set
+     * customFontEnabled = true
+     * @return the given custom Font
+     */
+    public Font getCustomFont() { return null == customFont ? _customFont : customFont.get(); }
+    /**
+     * Defines the custom font that can be used to render all
+     * text elements. To enable the custom font one has to set
+     * customFontEnabled = true
+     * @param FONT
+     */
+    public void setCustomFont(final Font FONT) {
+        if (null == customFont) {
+            _customFont = FONT;
+            fireUpdateEvent(RESIZE_EVENT);
+        } else {
+            customFont.set(FONT);
+        }
+    }
+    public ObjectProperty<Font> customFontProperty() {
+        if (null == customFont) {
+            customFont = new ObjectPropertyBase<Font>() {
+                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "customFont"; }
+            };
+            _customFont = null;
+        }
+        return customFont;
     }
 
     /**

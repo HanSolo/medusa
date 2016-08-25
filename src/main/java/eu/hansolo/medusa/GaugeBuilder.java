@@ -47,6 +47,7 @@ import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
+import javafx.scene.text.Font;
 
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -690,6 +691,16 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B customFontEnabled(final boolean ENABLED) {
+        properties.put("customFontEnabled", new SimpleBooleanProperty(ENABLED));
+        return (B)this;
+    }
+
+    public final B customFont(final Font FONT) {
+        properties.put("customFont", new SimpleObjectProperty(FONT));
+        return (B)this;
+    }
+
     public final B onValueChanged(final InvalidationListener LISTENER) {
         properties.put("onValueChanged", new SimpleObjectProperty<>(LISTENER));
         return (B)this;
@@ -1314,6 +1325,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setKeepAspect(((BooleanProperty) properties.get(key)).get());
             } else if ("threshold".equals(key)) {
                 CONTROL.setThreshold(((DoubleProperty) properties.get(key)).get());
+            } else if ("customFontEnabled".equals(key)) {
+                CONTROL.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
+            } else if ("customFont".equals(key)) {
+                CONTROL.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
             }
         }
 
