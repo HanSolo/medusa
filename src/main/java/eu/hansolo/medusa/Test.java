@@ -18,36 +18,29 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Clock.ClockSkinType;
 import eu.hansolo.medusa.Gauge.SkinType;
-import eu.hansolo.medusa.Section.SectionEvent;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEvent.EventType;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Random;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
-
-import java.math.RoundingMode;
-import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.Random;
 
 
 
@@ -59,6 +52,7 @@ import java.util.Random;
 public class Test extends Application {
     private static final Random         RND = new Random();
     private static       int            noOfNodes = 0;
+	private FGauge			fgauge;
     private Gauge           gauge;
     private Clock           clock;
     private long            lastTimerCall;
@@ -101,7 +95,14 @@ public class Test extends Application {
                                       new Section(66, 100, Color.LIME))
                             .sectionsVisible(true)
                             //.autoScale(false)
+							//.valueColor(Color.WHITE)
                             .build();
+
+		fgauge = FGaugeBuilder.create()
+							  .gauge(gauge)
+							  .gaugeDesign(GaugeDesign.TILTED_BLACK)
+							  .foregroundVisible(true)
+							  .build();
 
         gauge.valueProperty().bind(value);
 
@@ -110,7 +111,7 @@ public class Test extends Application {
         //gauge.valueVisibleProperty().bind(toggle);
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.MINIMAL)
+                            .skinType(ClockSkinType.YOTA2)
                             //.onTimeEvent(e -> System.out.println(e.TYPE))
                             .discreteSeconds(false)
                             .secondsVisible(true)
@@ -135,16 +136,18 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(gauge);
+        StackPane pane = new StackPane(fgauge);
+//        StackPane pane = new StackPane(gauge);
+//        StackPane pane = new StackPane(clock);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
                                                      new Stop(0.0, Color.rgb(38, 38, 38)),
                                                      new Stop(1.0, Color.rgb(15, 15, 15)));
-        //pane.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
-        //pane.setBackground(new Background(new BackgroundFill(Color.rgb(39,44,50), CornerRadii.EMPTY, Insets.EMPTY)));
-        //pane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-        //pane.setBackground(new Background(new BackgroundFill(Gauge.DARK_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
+//        pane.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
+//        pane.setBackground(new Background(new BackgroundFill(Color.rgb(39,44,50), CornerRadii.EMPTY, Insets.EMPTY)));
+//        pane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+//        pane.setBackground(new Background(new BackgroundFill(Gauge.DARK_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
 

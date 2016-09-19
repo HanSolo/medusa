@@ -317,6 +317,11 @@ public enum GaugeDesign {
         @Override public Border getBorder(final double SIZE) {
             return Border.EMPTY;
         }
+    },
+    OFF(0) {
+        @Override public Border getBorder(final double SIZE) {
+            return Border.EMPTY;
+        }
     };
 
     public enum GaugeBackground {
