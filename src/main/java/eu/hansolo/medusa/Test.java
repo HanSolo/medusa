@@ -111,11 +111,14 @@ public class Test extends Application {
         //gauge.valueVisibleProperty().bind(toggle);
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.YOTA2)
+                            .skinType(ClockSkinType.TEXT)
                             //.onTimeEvent(e -> System.out.println(e.TYPE))
-                            .discreteSeconds(false)
+                            //.discreteSeconds(false)
+                            .locale(Locale.GERMANY)
                             .secondsVisible(true)
-                            //.running(true)
+                            .dateVisible(true)
+                            .customFont(Fonts.latoLight(10))
+                            .running(true)
                             .build();
 
         lastTimerCall = System.nanoTime();
