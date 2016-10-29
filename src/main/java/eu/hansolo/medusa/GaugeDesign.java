@@ -39,6 +39,9 @@ import javafx.scene.paint.Stop;
  * Created by hansolo on 18.12.15.
  */
 public enum GaugeDesign {
+    NONE(0) {
+        @Override public Border getBorder(final double SIZE) { return Border.EMPTY; }
+    },
     METAL(0.08333333) {
         @Override public Border getBorder(final double SIZE) {
             double fromX = 0;

@@ -162,6 +162,11 @@ public class FGauge extends Region {
                                                         background.getLayoutBounds().getMaxX(), background.getLayoutBounds().getMaxY()));
 
             switch(gaugeDesign) {
+                case NONE:
+                    frame.setVisible(false);
+                    foreground.setVisible(false);
+                    background.setVisible(false);
+                    break;
                 case ENZO:
                     background.setFill(Color.rgb(240, 240, 240));
                     innerShadow.setRadius(0.07407407 * size);
@@ -172,6 +177,9 @@ public class FGauge extends Region {
                     foreground.setStroke(null);
                     break;
                 default:
+                    frame.setVisible(true);
+                    foreground.setVisible(true);
+                    background.setVisible(true);
                     innerShadow.setColor(Color.rgb(0, 0, 0, 0.65));
                     innerShadow.setRadius(0.08 * size);
                     innerShadow.setOffsetX(0);
