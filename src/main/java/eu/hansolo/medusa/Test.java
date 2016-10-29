@@ -57,14 +57,15 @@ import java.util.Random;
  * Time: 06:31
  */
 public class Test extends Application {
-    private static final Random         RND = new Random();
-    private static       int            noOfNodes = 0;
-    private Gauge           gauge;
-    private Clock           clock;
-    private long            lastTimerCall;
-    private AnimationTimer  timer;
-    private DoubleProperty  value;
-    private BooleanProperty toggle;
+    private static final Random          RND       = new Random();
+    private static       int             noOfNodes = 0;
+    private              FGauge          fgauge;
+    private              Gauge           gauge;
+    private              Clock           clock;
+    private              long            lastTimerCall;
+    private              AnimationTimer  timer;
+    private              DoubleProperty  value;
+    private              BooleanProperty toggle;
 
 
     @Override public void init() {
@@ -77,6 +78,10 @@ public class Test extends Application {
 
         value  = new SimpleDoubleProperty(0);
         toggle = new SimpleBooleanProperty(false);
+
+        fgauge = FGaugeBuilder.create()
+                              .gaugeDesign(GaugeDesign.TILTED_GRAY)
+                              .build();
 
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.SIMPLE_SECTION)
@@ -138,7 +143,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(clock);
+        StackPane pane = new StackPane(fgauge);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
