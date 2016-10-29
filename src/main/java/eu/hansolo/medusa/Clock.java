@@ -1041,7 +1041,7 @@ public class Clock extends Control {
      */
     public void setBorderWidth(final double WIDTH) {
         if (null == borderWidth) {
-            _borderWidth = Helper.clamp(0d, 50d, WIDTH);
+            _borderWidth = Helper.clamp(0.0, 50.0, WIDTH);
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             borderWidth.set(WIDTH);
@@ -1052,7 +1052,7 @@ public class Clock extends Control {
             borderWidth = new DoublePropertyBase(_borderWidth) {
                 @Override protected void invalidated() {
                     final double WIDTH = get();
-                    if (WIDTH < 0 || WIDTH > 50) set(Helper.clamp(0d, 50d, WIDTH));
+                    if (WIDTH < 0 || WIDTH > 50) set(Helper.clamp(0.0, 50.0, WIDTH));
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Clock.this; }
@@ -1818,7 +1818,7 @@ public class Clock extends Control {
      * clamped in the range of 10ms - 10s.
      * @param ANIMATION_DURATION
      */
-    public void setAnimationDuration(final long ANIMATION_DURATION) { animationDuration = Helper.clamp(10l, 20000l, ANIMATION_DURATION); }
+    public void setAnimationDuration(final long ANIMATION_DURATION) { animationDuration = Helper.clamp(10, 20000, ANIMATION_DURATION); }
 
     /**
      * Returns true if the control uses the given customFont to

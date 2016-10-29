@@ -59,7 +59,7 @@ public class GradientLookup {
     public Color getColorAt(final double POSITION_OF_COLOR) {
         if (stops.isEmpty()) return Color.BLACK;
 
-        final double POSITION = Helper.clamp(0d, 1d, POSITION_OF_COLOR);
+        final double POSITION = Helper.clamp(0.0, 1.0, POSITION_OF_COLOR);
         final Color COLOR;
         if (stops.size() == 1) {
             final Map<Double, Color> ONE_ENTRY = (Map<Double, Color>) stops.entrySet().iterator().next();
@@ -97,10 +97,10 @@ public class GradientLookup {
         final double DELTA_BLUE    = (UPPER_BOUND.getColor().getBlue()    - LOWER_BOUND.getColor().getBlue())    * POS;
         final double DELTA_OPACITY = (UPPER_BOUND.getColor().getOpacity() - LOWER_BOUND.getColor().getOpacity()) * POS;
 
-        double red     = Helper.clamp(0d, 1d, (LOWER_BOUND.getColor().getRed()     + DELTA_RED));
-        double green   = Helper.clamp(0d, 1d, (LOWER_BOUND.getColor().getGreen()   + DELTA_GREEN));
-        double blue    = Helper.clamp(0d, 1d, (LOWER_BOUND.getColor().getBlue()    + DELTA_BLUE));
-        double opacity = Helper.clamp(0d, 1d, (LOWER_BOUND.getColor().getOpacity() + DELTA_OPACITY));
+        double red     = Helper.clamp(0.0, 1.0, (LOWER_BOUND.getColor().getRed()     + DELTA_RED));
+        double green   = Helper.clamp(0.0, 1.0, (LOWER_BOUND.getColor().getGreen()   + DELTA_GREEN));
+        double blue    = Helper.clamp(0.0, 1.0, (LOWER_BOUND.getColor().getBlue()    + DELTA_BLUE));
+        double opacity = Helper.clamp(0.0, 1.0, (LOWER_BOUND.getColor().getOpacity() + DELTA_OPACITY));
 
         return Color.color(red, green, blue, opacity);
     }

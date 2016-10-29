@@ -408,15 +408,15 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             outerMediumPointX = centerX + size * 0.4 * sinValue;
             outerMediumPointY = centerY + size * 0.4 * cosValue;
 
-            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw major tick mark
                 if (majorTickMarksVisible) {
                     CTX.setStroke(counter < CURRENT_VALUE ? highlightColor : tickMarkColor);
                     CTX.strokeLine(innerPointX, innerPointY, outerPointX, outerPointY);
                 }
             } else if (mediumTickMarksVisible &&
-                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0d) != 0d &&
-                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0d) == 0d) {
+                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0.0) != 0.0 &&
+                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0.0) == 0.0) {
                 // Draw medium tick mark
                 CTX.setStroke(counter < CURRENT_VALUE ? highlightColor : tickMarkColor);
                 CTX.strokeLine(innerMediumPointX, innerMediumPointY, outerMediumPointX, outerMediumPointY);
@@ -588,7 +588,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             // Set the general tickmark color
             CTX.setStroke(tickMarkColor);
 
-            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw major tick mark
                 if (majorTickMarksVisible) {
                     CTX.setFill(majorTickMarkColor);
@@ -612,8 +612,8 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     CTX.restore();
                 }
             } else if (mediumTickMarksVisible &&
-                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0d) != 0d &&
-                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0d) == 0d) {
+                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0.0) != 0.0 &&
+                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0.0) == 0.0) {
                 // Draw medium tick mark
                 CTX.setFill(mediumTickMarkColor);
                 CTX.setStroke(mediumTickMarkColor);

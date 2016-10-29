@@ -105,7 +105,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     public IndicatorSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleRange            = Helper.clamp(90d, 180d, gauge.getAngleRange());
+        angleRange            = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
         startAngle            = getStartAngle();
         oldValue              = gauge.getValue();
         minValue              = gauge.getMinValue();
@@ -231,7 +231,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            angleRange = Helper.clamp(90d, 180d, getSkinnable().getAngleRange());
+            angleRange = Helper.clamp(90.0, 180.0, getSkinnable().getAngleRange());
             startAngle = getStartAngle();
             minValue   = getSkinnable().getMinValue();
             range      = getSkinnable().getRange();

@@ -77,6 +77,22 @@ public class Helper {
         return VALUE;
     }
 
+    public static final int clamp(final int MIN, final int MAX, final int VALUE) {
+        if (VALUE < MIN) return MIN;
+        if (VALUE > MAX) return MAX;
+        return VALUE;
+    }
+    public static final long clamp(final long MIN, final long MAX, final long VALUE) {
+        if (VALUE < MIN) return MIN;
+        if (VALUE > MAX) return MAX;
+        return VALUE;
+    }
+    public static final double clamp(final double MIN, final double MAX, final double VALUE) {
+        if (Double.compare(VALUE, MIN) < 0) return MIN;
+        if (Double.compare(VALUE, MAX) > 0) return MAX;
+        return VALUE;
+    }
+
     public static final double[] calcAutoScale(final double MIN_VALUE, final double MAX_VALUE) {
         double maxNoOfMajorTicks = 10;
         double maxNoOfMinorTicks = 10;
@@ -310,7 +326,7 @@ public class Helper {
     }
 
     public static Color getTranslucentColorFrom(final Color COLOR, final double FACTOR) {
-        return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), Helper.clamp(0d, 1d, FACTOR));
+        return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), Helper.clamp(0.0, 1.0, FACTOR));
     }
 
     public static void drawRadialTickMarks(final Gauge GAUGE, final GraphicsContext CTX,
@@ -702,9 +718,9 @@ public class Helper {
             CTX.setFill(tickMarkColor);
             CTX.setLineCap(StrokeLineCap.BUTT);
 
-            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw major tick mark
-                isNotZero = Double.compare(0d, counter) != 0;
+                isNotZero = Double.compare(0.0, counter) != 0;
                 TickMarkType tickMarkType = null;
                 if (majorTickMarksVisible) {
                     tickMarkType = majorTickMarkType;
@@ -825,8 +841,8 @@ public class Helper {
                     CTX.restore();
                 }
             } else if (mediumTickMarksVisible &&
-                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0d) != 0d &&
-                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0d) == 0d) {
+                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0.0) != 0.0 &&
+                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0.0) == 0.0) {
                 // Draw medium tick mark
                 CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, mediumTickMarkColor) : mediumTickMarkColor);
                 CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, mediumTickMarkColor) : mediumTickMarkColor);
@@ -872,7 +888,7 @@ public class Helper {
                         }
                         break;
                 }
-            } else if (minorTickMarksVisible && Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0d) == 0) {
+            } else if (minorTickMarksVisible && Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw minor tick mark
                 if (TickMarkType.TICK_LABEL != majorTickMarkType) {
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
@@ -932,7 +948,7 @@ public class Helper {
         if (Double.compare(WIDTH, 0) <= 0 || Double.compare(HEIGHT, 0) <= 0) return null;
         int                 width                   = (int) WIDTH;
         int                 height                  = (int) HEIGHT;
-        double              alphaVariationInPercent = Helper.clamp(0d, 100d, ALPHA_VARIATION_IN_PERCENT);
+        double              alphaVariationInPercent = Helper.clamp(0.0, 100.0, ALPHA_VARIATION_IN_PERCENT);
         final WritableImage IMAGE                   = new WritableImage(width, height);
         final PixelWriter   PIXEL_WRITER            = IMAGE.getPixelWriter();
         final Random        BW_RND                  = new Random();
@@ -942,7 +958,7 @@ public class Helper {
         for (int y = 0 ; y < height ; y++) {
             for (int x = 0 ; x < width ; x++) {
                 final Color  NOISE_COLOR = BW_RND.nextBoolean() == true ? BRIGHT_COLOR : DARK_COLOR;
-                final double NOISE_ALPHA = Helper.clamp(0d, 1d, ALPHA_START + ALPHA_RND.nextDouble() * ALPHA_VARIATION);
+                final double NOISE_ALPHA = Helper.clamp(0.0, 1.0, ALPHA_START + ALPHA_RND.nextDouble() * ALPHA_VARIATION);
                 PIXEL_WRITER.setColor(x, y, Color.color(NOISE_COLOR.getRed(), NOISE_COLOR.getGreen(), NOISE_COLOR.getBlue(), NOISE_ALPHA));
             }
         }
@@ -960,7 +976,7 @@ public class Helper {
         double            wh                = TickLabelLocation.INSIDE == tickLabelLocation ? WH_INSIDE * SIZE : WH_OUTSIDE * SIZE;
         double            offset            = 90;
         int               listSize          = SECTIONS.size();
-        double            angleStep         = 360d / 60d;
+        double            angleStep         = 360.0 / 60.0;
         boolean           highlightSections = CLOCK.isHighlightSections();
         for (int i = 0 ; i < listSize ; i++) {
             TimeSection section   = SECTIONS.get(i);
@@ -970,11 +986,11 @@ public class Helper {
             boolean     isStopAM  = stop.get(ChronoField.AMPM_OF_DAY) == 0;
             boolean     draw      = isAM ? (isStartAM || isStopAM) :(!isStartAM || !isStopAM);
             if (draw) {
-                double sectionStartAngle = (start.getHour() % 12 * 5d + start.getMinute() / 12d + start.getSecond() / 300d) * angleStep + 180;
-                double sectionAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5d + (stop.getMinute() - start.getMinute()) / 12d + (stop.getSecond() - start.getSecond()) / 300d) * angleStep;
+                double sectionStartAngle = (start.getHour() % 12 * 5.0 + start.getMinute() / 12.0 + start.getSecond() / 300.0) * angleStep + 180;
+                double sectionAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5.0 + (stop.getMinute() - start.getMinute()) / 12.0 + (stop.getSecond() - start.getSecond()) / 300.0) * angleStep;
                 //TODO: Add an indicator to the section like -1 or similar
                 // check if start was already yesterday
-                if (start.getHour() > stop.getHour()) { sectionAngleExtend = (360d - Math.abs(sectionAngleExtend)); }
+                if (start.getHour() > stop.getHour()) { sectionAngleExtend = (360.0 - Math.abs(sectionAngleExtend)); }
                 CTX.save();
                 if (highlightSections) {
                     CTX.setStroke(section.contains(time.toLocalTime()) ? section.getHighlightColor() : section.getColor());
@@ -998,7 +1014,7 @@ public class Helper {
         double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? XY_OUTSIDE * SIZE : XY_INSIDE * SIZE;
         double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? WH_OUTSIDE * SIZE : WH_INSIDE * SIZE;
         double            offset            = 90;
-        double            angleStep         = 360d / 60d;
+        double            angleStep         = 360.0 / 60.0;
         int               listSize          = AREAS.size();
         boolean           highlightAreas    = CLOCK.isHighlightAreas();
         for (int i = 0; i < listSize ; i++) {
@@ -1009,11 +1025,11 @@ public class Helper {
             boolean     isStopAM  = stop.get(ChronoField.AMPM_OF_DAY) == 0;
             boolean     draw      = isAM ? (isStartAM || isStopAM) :(!isStartAM || !isStopAM);
             if (draw) {
-                double areaStartAngle  = (start.getHour() % 12 * 5d + start.getMinute() / 12d + start.getSecond() / 300d) * angleStep + 180;;
-                double areaAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5d + (stop.getMinute() - start.getMinute()) / 12d + (stop.getSecond() - start.getSecond()) / 300d) * angleStep;
+                double areaStartAngle  = (start.getHour() % 12 * 5.0 + start.getMinute() / 12.0 + start.getSecond() / 300.0) * angleStep + 180;;
+                double areaAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5.0 + (stop.getMinute() - start.getMinute()) / 12.0 + (stop.getSecond() - start.getSecond()) / 300.0) * angleStep;
                 //TODO: Add an indicator to the area like -1 or similar
                 // check if start was already yesterday
-                if (start.getHour() > stop.getHour()) { areaAngleExtend = (360d - Math.abs(areaAngleExtend)); }
+                if (start.getHour() > stop.getHour()) { areaAngleExtend = (360.0 - Math.abs(areaAngleExtend)); }
                 CTX.save();
                 if (highlightAreas) {
                     CTX.setFill(area.contains(time.toLocalTime()) ? area.getHighlightColor() : area.getColor());
@@ -1030,11 +1046,11 @@ public class Helper {
         if (CLOCK.isAlarmsVisible()) {
             double alarmSize = ALARM_MARKER_SIZE * SIZE;
             double center    = SIZE * 0.5;
-            double angleStep = 360d / 60d;
+            double angleStep = 360.0 / 60.0;
             for (Map.Entry<Alarm, Circle> entry : ALARM_MAP.entrySet()) {
                 Alarm         alarm      = entry.getKey();
                 ZonedDateTime alarmTime  = alarm.getTime();
-                double        alarmAngle = (alarmTime.getMinute() + alarmTime.getSecond() / 60d) * angleStep + 180;
+                double        alarmAngle = (alarmTime.getMinute() + alarmTime.getSecond() / 60.0) * angleStep + 180;
                 double        sinValue   = Math.sin(Math.toRadians((-alarmAngle)));
                 double        cosValue   = Math.cos(Math.toRadians((-alarmAngle)));
                 Color         alarmColor = alarm.isArmed() ? alarm.getColor() : INACTIVE_ALARM_COLOR;

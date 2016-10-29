@@ -579,7 +579,7 @@ public class Gauge extends Control {
         lastCall                            = Instant.now();
         timeline                            = new Timeline();
         timeline.setOnFinished(e -> {
-            if (isReturnToZero() && Double.compare(currentValue.get(), 0d) != 0d) {
+            if (isReturnToZero() && Double.compare(currentValue.get(), 0.0) != 0.0) {
                 final KeyValue KEY_VALUE2 = new KeyValue(value, 0, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
                 final KeyFrame KEY_FRAME2 = new KeyFrame(Duration.millis((long) (0.8 * getAnimationDuration())), KEY_VALUE2);
                 timeline.getKeyFrames().setAll(KEY_FRAME2);
@@ -659,7 +659,7 @@ public class Gauge extends Control {
     public void setMinValue(final double VALUE) {
         if (null == minValue) {
             if (VALUE > getMaxValue()) { setMaxValue(VALUE); }
-            _minValue = Helper.clamp(-Double.MAX_VALUE, getMaxValue(), VALUE).doubleValue();
+            _minValue = Helper.clamp(-Double.MAX_VALUE, getMaxValue(), VALUE);
             setRange(getMaxValue() - _minValue);
             if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = _minValue;
             if (isStartFromZero() && _minValue < 0) setValue(0);
@@ -705,7 +705,7 @@ public class Gauge extends Control {
     public void setMaxValue(final double VALUE) {
         if (null == maxValue) {
             if (VALUE < getMinValue()) { setMinValue(VALUE); }
-            _maxValue = Helper.clamp(getMinValue(), Double.MAX_VALUE, VALUE).doubleValue();
+            _maxValue = Helper.clamp(getMinValue(), Double.MAX_VALUE, VALUE);
             setRange(_maxValue - getMinValue());
             if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = _maxValue;
             if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(Helper.clamp(getMinValue(), _maxValue, originalThreshold)); }
@@ -785,7 +785,7 @@ public class Gauge extends Control {
     public void setThreshold(final double THRESHOLD) {
         originalThreshold = THRESHOLD;
         if (null == threshold) {
-            _threshold = Helper.clamp(getMinValue(), getMaxValue(), THRESHOLD).doubleValue();
+            _threshold = Helper.clamp(getMinValue(), getMaxValue(), THRESHOLD);
             fireUpdateEvent(RESIZE_EVENT);
         } else {
             threshold.set(THRESHOLD);
@@ -796,7 +796,7 @@ public class Gauge extends Control {
             threshold = new DoublePropertyBase(_threshold) {
                 @Override protected void invalidated() {
                     final double THRESHOLD = get();
-                    if (THRESHOLD < getMinValue() || THRESHOLD > getMaxValue()) set(Helper.clamp(getMinValue(), getMaxValue(), THRESHOLD).doubleValue());
+                    if (THRESHOLD < getMinValue() || THRESHOLD > getMaxValue()) set(Helper.clamp(getMinValue(), getMaxValue(), THRESHOLD));
                     fireUpdateEvent(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -1284,7 +1284,7 @@ public class Gauge extends Control {
      */
     public void setReturnToZero(final boolean IS_TRUE) {
         if (null == returnToZero) {
-            _returnToZero = Double.compare(getMinValue(), 0d) <= 0 ? IS_TRUE : false;
+            _returnToZero = Double.compare(getMinValue(), 0.0) <= 0 ? IS_TRUE : false;
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             returnToZero.set(IS_TRUE);
@@ -1294,7 +1294,7 @@ public class Gauge extends Control {
         if (null == returnToZero) {
             returnToZero = new BooleanPropertyBase(_returnToZero) {
                 @Override protected void invalidated() {
-                    if (Double.compare(getMaxValue(), 0d) > 0) set(false);
+                    if (Double.compare(getMaxValue(), 0.0) > 0) set(false);
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -1595,7 +1595,7 @@ public class Gauge extends Control {
      */
     public void setBorderWidth(final double WIDTH) {
         if (null == borderWidth) {
-            _borderWidth = Helper.clamp(0d, 50d, WIDTH);
+            _borderWidth = Helper.clamp(0.0, 50.0, WIDTH);
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             borderWidth.set(WIDTH);
@@ -1606,7 +1606,7 @@ public class Gauge extends Control {
             borderWidth = new DoublePropertyBase(_borderWidth) {
                 @Override protected void invalidated() {
                     final double WIDTH = get();
-                    if (WIDTH < 0 || WIDTH > 50) set(Helper.clamp(0d, 50d, WIDTH));
+                    if (WIDTH < 0 || WIDTH > 50) set(Helper.clamp(0.0, 50.0, WIDTH));
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -1850,7 +1850,7 @@ public class Gauge extends Control {
      *
      * @param ANIMATION_DURATION
      */
-    public void setAnimationDuration(final long ANIMATION_DURATION) { animationDuration = Helper.clamp(10l, 10000l, ANIMATION_DURATION); }
+    public void setAnimationDuration(final long ANIMATION_DURATION) { animationDuration = Helper.clamp(10, 10000, ANIMATION_DURATION); }
 
     /**
      * Returns the angle in degree that defines the start of the scale with
@@ -1875,7 +1875,7 @@ public class Gauge extends Control {
      */
     public void setStartAngle(final double ANGLE) {
         if (null == startAngle) {
-            _startAngle = Helper.clamp(0d, 360d, ANGLE);
+            _startAngle = Helper.clamp(0.0, 360.0, ANGLE);
             fireUpdateEvent(RECALC_EVENT);
         } else {
             startAngle.set(ANGLE);
@@ -1886,7 +1886,7 @@ public class Gauge extends Control {
             startAngle = new DoublePropertyBase(_startAngle) {
                 @Override protected void invalidated() {
                     final double ANGLE = get();
-                    if (ANGLE < 0 || ANGLE > 360 ) set(Helper.clamp(0d, 360d, ANGLE));
+                    if (ANGLE < 0 || ANGLE > 360 ) set(Helper.clamp(0.0, 360.0, ANGLE));
                     fireUpdateEvent(RECALC_EVENT);
                 }
                 @Override public Object getBean() { return this; }
@@ -1914,7 +1914,7 @@ public class Gauge extends Control {
      * @param RANGE
      */
     public void setAngleRange(final double RANGE) {
-        double tmpAngleRange = Helper.clamp(0d, 360d, RANGE);
+        double tmpAngleRange = Helper.clamp(0.0, 360.0, RANGE);
         if (null == angleRange) {
             _angleRange = tmpAngleRange;
             setAngleStep(tmpAngleRange / getRange());
@@ -1928,7 +1928,7 @@ public class Gauge extends Control {
             angleRange = new DoublePropertyBase(_angleRange) {
                 @Override protected void invalidated() {
                     final double ANGLE_RANGE = get();
-                    if (ANGLE_RANGE < 0 || ANGLE_RANGE > 360) set(Helper.clamp(0d, 360d, ANGLE_RANGE));
+                    if (ANGLE_RANGE < 0 || ANGLE_RANGE > 360) set(Helper.clamp(0.0, 360.0, ANGLE_RANGE));
                     setAngleStep(get() / getRange());
                     fireUpdateEvent(RECALC_EVENT);
                 }
@@ -2322,7 +2322,7 @@ public class Gauge extends Control {
      */
     public void setMajorTickMarkLengthFactor(final double FACTOR) {
         if (null == majorTickMarkLengthFactor) {
-            _majorTickMarkLengthFactor = Helper.clamp(0d, 1d, FACTOR);
+            _majorTickMarkLengthFactor = Helper.clamp(0.0, 1.0, FACTOR);
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             majorTickMarkLengthFactor.set(FACTOR);
@@ -2333,7 +2333,7 @@ public class Gauge extends Control {
             majorTickMarkLengthFactor = new DoublePropertyBase(_majorTickMarkLengthFactor) {
                 @Override protected void invalidated() {
                     final double VALUE = get();
-                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0d, 1d, VALUE));
+                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -2358,7 +2358,7 @@ public class Gauge extends Control {
      */
     public void setMajorTickMarkWidthFactor(final double FACTOR) {
         if (null == majorTickMarkWidthFactor) {
-            _majorTickMarkWidthFactor = Helper.clamp(0d, 1d, FACTOR);
+            _majorTickMarkWidthFactor = Helper.clamp(0.0, 1.0, FACTOR);
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             majorTickMarkWidthFactor.set(FACTOR);
@@ -2369,7 +2369,7 @@ public class Gauge extends Control {
             majorTickMarkWidthFactor = new DoublePropertyBase(_majorTickMarkWidthFactor) {
                 @Override protected void invalidated() {
                     final double VALUE = get();
-                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0d, 1d, VALUE));
+                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -2429,7 +2429,7 @@ public class Gauge extends Control {
      */
     public void setMediumTickMarkLengthFactor(final double FACTOR) {
         if (null == mediumTickMarkLengthFactor) {
-            _mediumTickMarkLengthFactor = Helper.clamp(0d, 1d, FACTOR);
+            _mediumTickMarkLengthFactor = Helper.clamp(0.0, 1.0, FACTOR);
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             mediumTickMarkLengthFactor.set(FACTOR);
@@ -2440,7 +2440,7 @@ public class Gauge extends Control {
             mediumTickMarkLengthFactor = new DoublePropertyBase(_mediumTickMarkLengthFactor) {
                 @Override protected void invalidated() {
                     final double VALUE = get();
-                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0d, 1d, VALUE));
+                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -2465,7 +2465,7 @@ public class Gauge extends Control {
      */
     public void setMediumTickMarkWidthFactor(final double FACTOR) {
         if (null == mediumTickMarkWidthFactor) {
-            _mediumTickMarkWidthFactor = Helper.clamp(0d, 1d, FACTOR);
+            _mediumTickMarkWidthFactor = Helper.clamp(0.0, 1.0, FACTOR);
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             mediumTickMarkWidthFactor.set(FACTOR);
@@ -2476,7 +2476,7 @@ public class Gauge extends Control {
             mediumTickMarkWidthFactor = new DoublePropertyBase(_mediumTickMarkWidthFactor) {
                 @Override protected void invalidated() {
                     final double VALUE = get();
-                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0d, 1d, VALUE));
+                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -2536,7 +2536,7 @@ public class Gauge extends Control {
      */
     public void setMinorTickMarkLengthFactor(final double FACTOR) {
         if (null == minorTickMarkLengthFactor) {
-            _minorTickMarkLengthFactor = Helper.clamp(0d, 1d, FACTOR);
+            _minorTickMarkLengthFactor = Helper.clamp(0.0, 1.0, FACTOR);
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             minorTickMarkLengthFactor.set(FACTOR);
@@ -2547,7 +2547,7 @@ public class Gauge extends Control {
             minorTickMarkLengthFactor = new DoublePropertyBase(_minorTickMarkLengthFactor) {
                 @Override protected void invalidated() {
                     final double VALUE = get();
-                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0d, 1d, VALUE));
+                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -2572,7 +2572,7 @@ public class Gauge extends Control {
      */
     public void setMinorTickMarkWidthFactor(final double FACTOR) {
         if (null == minorTickMarkWidthFactor) {
-            _minorTickMarkWidthFactor = Helper.clamp(0d, 1d, FACTOR);
+            _minorTickMarkWidthFactor = Helper.clamp(0.0, 1.0, FACTOR);
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             minorTickMarkWidthFactor.set(FACTOR);
@@ -2583,7 +2583,7 @@ public class Gauge extends Control {
             minorTickMarkWidthFactor = new DoublePropertyBase(_minorTickMarkWidthFactor) {
                 @Override protected void invalidated() {
                     final double VALUE = get();
-                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0d, 1d, VALUE));
+                    if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -4657,7 +4657,7 @@ public class Gauge extends Control {
      */
     public void setCustomTickLabelFontSize(final double SIZE) {
         if (null == customTickLabelFontSize) {
-            _customTickLabelFontSize = Helper.clamp(0d, 72d, SIZE);
+            _customTickLabelFontSize = Helper.clamp(0.0, 72.0, SIZE);
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             customTickLabelFontSize.set(SIZE);
@@ -4668,7 +4668,7 @@ public class Gauge extends Control {
             customTickLabelFontSize = new DoublePropertyBase(_customTickLabelFontSize) {
                 @Override protected void invalidated() {
                     final double SIZE = get();
-                    if (SIZE < 0 || SIZE > 72) set(Helper.clamp(0d, 72d, SIZE));
+                    if (SIZE < 0 || SIZE > 72) set(Helper.clamp(0.0, 72.0, SIZE));
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }

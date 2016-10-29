@@ -309,7 +309,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             cosValue    = Math.cos(Math.toRadians(angle + startAngle));
             dotCenterX  = centerX + size * 0.3125 * sinValue;
             dotCenterY  = centerY + size * 0.3125 * cosValue;
-            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 if ((Double.compare(counter, minValue) == 0 || Double.compare(counter, maxValue) == 0)) {
                     sectionCtx.setFill(Color.TRANSPARENT);
                 } else {

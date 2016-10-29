@@ -275,7 +275,7 @@ public class BarSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double rotate  = angle  < -360 ? angle  + 360 : 0;
 
         arc.setRotate(-rotate);
-        arc.setLength(Helper.clamp(-360d, 0d, angle));
+        arc.setLength(Helper.clamp(-360.0, 0.0, angle));
 
         dot.setRotate(-angle);
         dot.setVisible(angle   < -345 ? true : false);

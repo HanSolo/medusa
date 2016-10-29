@@ -396,8 +396,8 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             backgroundCtx.setFill(tickMarkColor);
             backgroundCtx.setLineCap(StrokeLineCap.BUTT);
 
-            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
-                isNotZero = Double.compare(0d, counter) != 0;
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
+                isNotZero = Double.compare(0.0, counter) != 0;
                 if (majorTickMarksVisible) {
                     backgroundCtx.setFill(majorTickMarkColor);
                     backgroundCtx.setStroke(majorTickMarkColor);

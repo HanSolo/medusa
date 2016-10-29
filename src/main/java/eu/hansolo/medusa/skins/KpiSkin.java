@@ -81,7 +81,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     public KpiSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleRange   = Helper.clamp(90d, 180d, gauge.getAngleRange());
+        angleRange   = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
         oldValue     = gauge.getValue();
         minValue     = gauge.getMinValue();
         range        = gauge.getRange();
@@ -180,7 +180,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            angleRange = Helper.clamp(90d, 180d, getSkinnable().getAngleRange());
+            angleRange = Helper.clamp(90.0, 180.0, getSkinnable().getAngleRange());
             minValue   = getSkinnable().getMinValue();
             range      = getSkinnable().getRange();
             angleStep  = angleRange / range;

@@ -183,7 +183,7 @@ public class FGauge extends Region {
                     break;
             }
 
-            gauge.setPrefSize(size * (1d - gaugeDesign.FRAME_FACTOR * 2d), size * (1d - gaugeDesign.FRAME_FACTOR * 2d));
+            gauge.setPrefSize(size * (1.0 - gaugeDesign.FRAME_FACTOR * 2.0), size * (1.0 - gaugeDesign.FRAME_FACTOR * 2.0));
             gauge.relocate(gaugeDesign.FRAME_FACTOR * size, gaugeDesign.FRAME_FACTOR * size);
 
             foreground.setCenterX(size * 0.5);

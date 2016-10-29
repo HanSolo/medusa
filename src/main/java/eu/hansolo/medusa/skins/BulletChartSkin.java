@@ -220,7 +220,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         List<Section> tickLabelSections        = getSkinnable().getTickLabelSections();
         Color         majorTickMarkColor       = getSkinnable().getTickMarkColor();
         Color         tickLabelColor           = getSkinnable().getTickLabelColor();
-        boolean       smallRange               = Double.compare(getSkinnable().getRange(), 10d) <= 0;
+        boolean       smallRange               = Double.compare(getSkinnable().getRange(), 10.0) <= 0;
         double        minValue                 = getSkinnable().getMinValue();
         double        maxValue                 = getSkinnable().getMaxValue();
         double        tmpStepSize              = smallRange ? stepSize / 10 : stepSize;
@@ -254,7 +254,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             // Set the general tickmark color
             CTX.setStroke(getSkinnable().getTickMarkColor());
-            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw major tick mark
                 if (getSkinnable().getMajorTickMarksVisible()) {
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);

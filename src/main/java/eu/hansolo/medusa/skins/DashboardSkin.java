@@ -172,7 +172,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         Helper.enableNode(minText, tickLabelsVisible);
         Helper.enableNode(maxText, tickLabelsVisible);
 
-        innerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.3), 30d, 0d, 0d, 10d);
+        innerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.3), 30.0, 0.0, 0.0, 10.0);
 
         barBackgroundStart          = new MoveTo(0, 0.675 * PREFERRED_HEIGHT);
         barBackgroundOuterArc       = new ArcTo(0.675 * PREFERRED_HEIGHT, 0.675 * PREFERRED_HEIGHT, 0, PREFERRED_WIDTH, 0.675 * PREFERRED_HEIGHT, true, true);
@@ -259,7 +259,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Private Methods ***********************************
     private void setBar(final double VALUE) {
-        currentValueAngle = Helper.clamp(90d, 270d, (VALUE - minValue) * angleStep + 90d);
+        currentValueAngle = Helper.clamp(90.0, 270.0, (VALUE - minValue) * angleStep + 90.0);
         dataBarOuterArc.setX(centerX + (0.675 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
         dataBarOuterArc.setY(centerX + (0.675 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
         dataBarLineToInnerArc.setX(centerX + (0.3 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
@@ -345,7 +345,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barBackgroundInnerArc.setX(0.27778 * width);
             barBackgroundInnerArc.setY(0.675 * height);
 
-            currentValueAngle = Helper.clamp(90d, 270d, (getSkinnable().getCurrentValue() - minValue) * angleStep + 90d);
+            currentValueAngle = Helper.clamp(90.0, 270.0, (getSkinnable().getCurrentValue() - minValue) * angleStep + 90.0);
             dataBarStart.setX(0);
             dataBarStart.setY(0.675 * height);
             dataBarOuterArc.setRadiusX(0.675 * height);
@@ -360,10 +360,10 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             dataBarInnerArc.setY(0.675 * height);
 
             threshold.setStroke(getSkinnable().getThresholdColor());
-            threshold.setStrokeWidth(Helper.clamp(1d, 2d, 0.00675676 * height));
+            threshold.setStrokeWidth(Helper.clamp(1.0, 2.0, 0.00675676 * height));
             double thresholdInnerRadius = 0.3 * height;
             double thresholdOuterRadius = 0.675 * height;
-            double thresholdAngle       = Helper.clamp(90d, 270d, (getSkinnable().getThreshold() - minValue) * angleStep + 90d);
+            double thresholdAngle       = Helper.clamp(90.0, 270.0, (getSkinnable().getThreshold() - minValue) * angleStep + 90.0);
             threshold.setStartX(centerX + thresholdInnerRadius * Math.sin(-Math.toRadians(thresholdAngle)));
             threshold.setStartY(centerX + thresholdInnerRadius * Math.cos(-Math.toRadians(thresholdAngle)));
             threshold.setEndX(centerX + thresholdOuterRadius * Math.sin(-Math.toRadians(thresholdAngle)));
@@ -397,7 +397,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         threshold.setStroke(getSkinnable().getThresholdColor());
         double thresholdInnerRadius = 0.3 * height;
         double thresholdOuterRadius = 0.675 * height;
-        double thresholdAngle       = Helper.clamp(90d, 270d, (getSkinnable().getThreshold() - minValue) * angleStep + 90d);
+        double thresholdAngle       = Helper.clamp(90.0, 270.0, (getSkinnable().getThreshold() - minValue) * angleStep + 90.0);
         threshold.setStartX(centerX + thresholdInnerRadius * Math.sin(-Math.toRadians(thresholdAngle)));
         threshold.setStartY(centerX + thresholdInnerRadius * Math.cos(-Math.toRadians(thresholdAngle)));
         threshold.setEndX(centerX + thresholdOuterRadius * Math.sin(-Math.toRadians(thresholdAngle)));
@@ -430,7 +430,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setText(getSkinnable().getUnit());
         unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.5 * height);
 
-        double thresholdAngle      = Helper.clamp(90d, 270d, (getSkinnable().getThreshold() - minValue) * angleStep + 90d);
+        double thresholdAngle      = Helper.clamp(90.0, 270.0, (getSkinnable().getThreshold() - minValue) * angleStep + 90.0);
         double thresholdTextRadius = 0.26 * height;
         thresholdText.setFill(getSkinnable().getValueColor());
         thresholdText.setText(String.format(locale, formatString, getSkinnable().getThreshold()));

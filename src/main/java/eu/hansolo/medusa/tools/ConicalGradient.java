@@ -44,7 +44,7 @@ import java.util.TreeSet;
  * Created by hansolo on 21.12.15.
  */
 public class ConicalGradient {
-    private static final double ANGLE_FACTOR = 1d / 360d;
+    private static final double ANGLE_FACTOR = 1.0 / 360.0;
     private double              centerX;
     private double              centerY;
     private List<Stop>          sortedStops;
@@ -81,7 +81,7 @@ public class ConicalGradient {
 
     // ******************** Methods *******************************************
     public void recalculateWithAngle(final double ANGLE) {
-        double angle = ANGLE % 360d;
+        double angle = ANGLE % 360.0;
         sortedStops = calculate(sortedStops, ANGLE_FACTOR * angle);
     }
 
@@ -108,8 +108,8 @@ public class ConicalGradient {
         Color color  = Color.TRANSPARENT;
         final WritableImage RASTER       = new WritableImage(width, height);
         final PixelWriter   PIXEL_WRITER = RASTER.getPixelWriter();
-        if (Double.compare(0d, centerX) == 0) centerX = width * 0.5;
-        if (Double.compare(0d, centerY) == 0) centerY = height * 0.5;
+        if (Double.compare(0.0, centerX) == 0) centerX = width * 0.5;
+        if (Double.compare(0.0, centerY) == 0) centerY = height * 0.5;
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -130,8 +130,8 @@ public class ConicalGradient {
                 }
 
                 for (int i = 0; i < (sortedStops.size() - 1); i++) {
-                    if (angle >= (sortedStops.get(i).getOffset() * 360d) && angle < (sortedStops.get(i + 1).getOffset() * 360d)) {
-                        double fraction = (angle - sortedStops.get(i).getOffset() * 360d) / ((sortedStops.get(i + 1).getOffset() - sortedStops.get(i).getOffset()) * 360d);
+                    if (angle >= (sortedStops.get(i).getOffset() * 360.0) && angle < (sortedStops.get(i + 1).getOffset() * 360.0)) {
+                        double fraction = (angle - sortedStops.get(i).getOffset() * 360.0) / ((sortedStops.get(i + 1).getOffset() - sortedStops.get(i).getOffset()) * 360.0);
                         color = (Color) Interpolator.LINEAR.interpolate(sortedStops.get(i).getColor(), sortedStops.get(i + 1).getColor(), fraction);
                     }
                 }
@@ -145,8 +145,8 @@ public class ConicalGradient {
         Color color = Color.TRANSPARENT;
         final WritableImage RASTER       = new WritableImage(size, size);
         final PixelWriter   PIXEL_WRITER = RASTER.getPixelWriter();
-        if (Double.compare(0d, centerX) == 0) centerX = size * 0.5;
-        if (Double.compare(0d, centerY) == 0) centerY = size * 0.5;
+        if (Double.compare(0.0, centerX) == 0) centerX = size * 0.5;
+        if (Double.compare(0.0, centerY) == 0) centerY = size * 0.5;
         double radius = size * 0.5;
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
@@ -228,7 +228,7 @@ public class ConicalGradient {
             if (newOffsetBD.equals(BigDecimal.ZERO)) {
                 newOffsetBD = BigDecimal.ONE;
                 stops.add(new Stop(Double.MIN_VALUE, stop.getColor()));
-            } else if (Double.compare((stop.getOffset() + OFFSET), 1d) > 0) {
+            } else if (Double.compare((stop.getOffset() + OFFSET), 1.0) > 0) {
                 newOffsetBD = newOffsetBD.subtract(STEP);
             }
             stops.add(new Stop(newOffsetBD.doubleValue(), stop.getColor()));
@@ -262,7 +262,7 @@ public class ConicalGradient {
         return normalizeStops(0, STOPS);
     }
     private List<Stop> normalizeStops(final double OFFSET, final List<Stop> STOPS) {
-        double offset = Helper.clamp(0d, 1d, OFFSET);
+        double offset = Helper.clamp(0.0, 1.0, OFFSET);
         List<Stop> stops;
         if (null == STOPS || STOPS.isEmpty()) {
             stops = new ArrayList<>();
@@ -277,7 +277,7 @@ public class ConicalGradient {
         if (ScaleDirection.COUNTER_CLOCKWISE == scaleDirection) {
             List<Stop> sortedStops3 = new ArrayList<>();
             Collections.reverse(sortedStops);
-            for (Stop stop : sortedStops) { sortedStops3.add(new Stop(1d - stop.getOffset(), stop.getColor())); }
+            for (Stop stop : sortedStops) { sortedStops3.add(new Stop(1.0 - stop.getOffset(), stop.getColor())); }
             sortedStops = sortedStops3;
         }
         return sortedStops;
