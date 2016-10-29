@@ -80,8 +80,9 @@ public class Test extends Application {
         toggle = new SimpleBooleanProperty(false);
 
         fgauge = FGaugeBuilder.create()
-                              .gaugeDesign(GaugeDesign.TILTED_GRAY)
+                              .gaugeDesign(GaugeDesign.NONE)
                               .build();
+
 
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.SIMPLE_SECTION)
@@ -143,7 +144,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(gauge);
+        StackPane pane = new StackPane(fgauge);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
