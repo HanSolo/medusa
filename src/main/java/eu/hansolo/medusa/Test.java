@@ -85,7 +85,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.SIMPLE_SECTION)
+                            //.skinType(SkinType.SIMPLE_SECTION)
                             .prefSize(250, 250)
                             .minValue(0)
                             .maxValue(100)
@@ -144,7 +144,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(fgauge);
+        StackPane pane = new StackPane(clock);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
