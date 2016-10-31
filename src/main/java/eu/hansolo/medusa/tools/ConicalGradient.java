@@ -247,14 +247,16 @@ public class ConicalGradient {
         List<Stop> stops = new ArrayList<>(STOPS.size());
         final BigDecimal STEP = new BigDecimal(Double.MIN_VALUE);
         for (Stop stop : STOPS) {
-            BigDecimal newOffsetBD = new BigDecimal(stop.getOffset() + OFFSET).remainder(BigDecimal.ONE);
+            double     offset      = stop.getOffset();
+            Color      color       = stop.getColor();
+            BigDecimal newOffsetBD = new BigDecimal(offset + OFFSET).remainder(BigDecimal.ONE);
             if (newOffsetBD.equals(BigDecimal.ZERO)) {
                 newOffsetBD = BigDecimal.ONE;
-                stops.add(new Stop(Double.MIN_VALUE, stop.getColor()));
-            } else if (Double.compare((stop.getOffset() + OFFSET), 1.0) > 0) {
+                stops.add(new Stop(Double.MIN_VALUE, color));
+            } else if (Double.compare((offset + OFFSET), 1.0) > 0) {
                 newOffsetBD = newOffsetBD.subtract(STEP);
             }
-            stops.add(new Stop(newOffsetBD.doubleValue(), stop.getColor()));
+            stops.add(new Stop(newOffsetBD.doubleValue(), color));
         }
 
         HashMap<Double, Color> stopMap = new LinkedHashMap<>(stops.size());
