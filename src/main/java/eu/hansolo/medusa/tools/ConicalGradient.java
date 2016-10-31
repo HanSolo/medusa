@@ -49,6 +49,8 @@ public class ConicalGradient {
     private double              centerY;
     private List<Stop>          sortedStops;
     private ScaleDirection      scaleDirection;
+    private WritableImage       rectRaster;
+    private WritableImage       roundRaster;
 
 
     // ******************** Constructors **************************************
@@ -82,7 +84,9 @@ public class ConicalGradient {
     // ******************** Methods *******************************************
     public void recalculateWithAngle(final double ANGLE) {
         double angle = ANGLE % 360.0;
-        sortedStops = calculate(sortedStops, ANGLE_FACTOR * angle);
+        sortedStops  = calculate(sortedStops, ANGLE_FACTOR * angle);
+        rectRaster   = null;
+        roundRaster  = null;
     }
 
     public List<Stop> getStops() { return sortedStops; }
@@ -97,75 +101,69 @@ public class ConicalGradient {
     }
     public void setStops(final double OFFSET, final List<Stop> STOPS) {
         sortedStops = normalizeStops(OFFSET, STOPS);
+        rectRaster  = null;
+        roundRaster = null;
     }
 
     public double[] getCenter() { return new double[]{ centerX, centerY }; }
     public Point2D getCenterPoint() { return new Point2D(centerX, centerY); }
 
     public Image getImage(final double WIDTH, final double HEIGHT) {
-        int   width  = (int) WIDTH  <= 0 ? 100 : (int) WIDTH;
-        int   height = (int) HEIGHT <= 0 ? 100 : (int) HEIGHT;
-        Color color  = Color.TRANSPARENT;
-        final WritableImage RASTER       = new WritableImage(width, height);
-        final PixelWriter   PIXEL_WRITER = RASTER.getPixelWriter();
+        int width  = (int) WIDTH  <= 0 ? 100 : (int) WIDTH;
+        int height = (int) HEIGHT <= 0 ? 100 : (int) HEIGHT;
+
+        if (rectRaster != null && width == rectRaster.getWidth() && height == rectRaster.getHeight()) return rectRaster;
+
+        Color color = Color.TRANSPARENT;
+        rectRaster  = new WritableImage(width, height);
+        final PixelWriter PIXEL_WRITER = rectRaster.getPixelWriter();
         if (Double.compare(0.0, centerX) == 0) centerX = width * 0.5;
         if (Double.compare(0.0, centerY) == 0) centerY = height * 0.5;
 
+        int calculatedStopsLength = sortedStops.size() - 1;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                double dx = x - centerX;
-                double dy = y - centerY;
+                double dx       = x - centerX;
+                double dy       = y - centerY;
                 double distance = Math.sqrt((dx * dx) + (dy * dy));
                 distance = Double.compare(distance, 0) == 0 ? 1 : distance;
 
-                double angle = Math.abs(Math.toDegrees(Math.acos(dx / distance)));
-                if (dx >= 0 && dy <= 0) {
-                    angle = 90.0 - angle;   // Upper Right Quadrant
-                } else if (dx >= 0 && dy >= 0) {
-                    angle += 90.0;          // Lower Right Quadrant
-                } else if (dx <= 0 && dy >= 0) {
-                    angle += 90.0;          // Lower Left Quadrant
-                } else if (dx <= 0 && dy <= 0) {
-                    angle = 450.0 - angle;  // Upper Left Qudrant
-                }
+                double angle = adjustAngle(dx, dy, Math.abs(Math.toDegrees(Math.acos(dx / distance))));
 
-                for (int i = 0; i < (sortedStops.size() - 1); i++) {
-                    if (angle >= (sortedStops.get(i).getOffset() * 360.0) && angle < (sortedStops.get(i + 1).getOffset() * 360.0)) {
-                        double fraction = (angle - sortedStops.get(i).getOffset() * 360.0) / ((sortedStops.get(i + 1).getOffset() - sortedStops.get(i).getOffset()) * 360.0);
+                for (int i = 0; i < calculatedStopsLength; i++) {
+                    double offsetI      = (sortedStops.get(i).getOffset() * 360.0);
+                    double offsetIPlus1 = (sortedStops.get(i + 1).getOffset() * 360.0);
+                    if (Double.compare(angle, offsetI) >= 0 &&
+                        Double.compare(angle, offsetIPlus1) < 0) {
+                        double fraction = (angle - offsetI) / (offsetIPlus1 - offsetI);
                         color = (Color) Interpolator.LINEAR.interpolate(sortedStops.get(i).getColor(), sortedStops.get(i + 1).getColor(), fraction);
                     }
                 }
                 PIXEL_WRITER.setColor(x, y, color);
             }
         }
-        return RASTER;
+        return rectRaster;
     }
     public Image getRoundImage(final double SIZE) {
-        int   size  = (int) SIZE  <= 0 ? 100 : (int) SIZE;
+        int size  = (int) SIZE  <= 0 ? 100 : (int) SIZE;
+
+        if (roundRaster != null && size == roundRaster.getWidth()) return roundRaster;
+
         Color color = Color.TRANSPARENT;
-        final WritableImage RASTER       = new WritableImage(size, size);
-        final PixelWriter   PIXEL_WRITER = RASTER.getPixelWriter();
+        roundRaster = new WritableImage(size, size);
+        final PixelWriter   PIXEL_WRITER = roundRaster.getPixelWriter();
         if (Double.compare(0.0, centerX) == 0) centerX = size * 0.5;
         if (Double.compare(0.0, centerY) == 0) centerY = size * 0.5;
-        double radius = size * 0.5;
+        double radius                = size * 0.5;
+        int    calculatedStopsLength = sortedStops.size() - 1;
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
-                double dx = x - centerX;
-                double dy = y - centerY;
+                double dx       = x - centerX;
+                double dy       = y - centerY;
                 double distance = Math.sqrt((dx * dx) + (dy * dy));
                 distance = Double.compare(distance, 0) == 0 ? 1 : distance;
 
-                double angle = Math.abs(Math.toDegrees(Math.acos(dx / distance)));
-
-                if (dx >= 0 && dy <= 0) {
-                    angle = 90.0 - angle;
-                } else if (dx >= 0 && dy >= 0) {
-                    angle += 90.0;
-                } else if (dx <= 0 && dy >= 0) {
-                    angle += 90.0;
-                } else if (dx <= 0 && dy <= 0) {
-                    angle = 450.0 - angle;
-                }
+                double angle         = adjustAngle(dx, dy, Math.abs(Math.toDegrees(Math.acos(dx / distance))));
                 double radiusMinus05 = radius - 0.25;
                 double radiusMinus10 = radius - 0.5;
                 double radiusMinus15 = radius - 1.0;
@@ -174,7 +172,7 @@ public class ConicalGradient {
                 if (distance > radius) {
                     color = Color.TRANSPARENT;
                 } else {
-                    for (int i = 0; i < (sortedStops.size() - 1); i++) {
+                    for (int i = 0; i < calculatedStopsLength; i++) {
                         if (angle >= (sortedStops.get(i).getOffset() * 360) && angle < (sortedStops.get(i + 1).getOffset() * 360)) {
                             double fraction = (angle - sortedStops.get(i).getOffset() * 360) / ((sortedStops.get(i + 1).getOffset() - sortedStops.get(i).getOffset()) * 360);
                             color = (Color) Interpolator.LINEAR.interpolate(sortedStops.get(i).getColor(), sortedStops.get(i + 1).getColor(), fraction);
@@ -194,7 +192,7 @@ public class ConicalGradient {
                 PIXEL_WRITER.setColor(x, y, color);
             }
         }
-        return RASTER;
+        return roundRaster;
     }
 
     public ImagePattern apply(final Shape SHAPE) {
@@ -218,6 +216,31 @@ public class ConicalGradient {
         centerX       = width * 0.5;
         centerY       = height * 0.5;
         return new ImagePattern(getImage(width, height), x, y, width, height, false);
+    }
+
+    private double adjustAngle(final double DX, final double DY, double angle) {
+        if (Double.compare(DX, 0) >= 0 && Double.compare(DY, 0) <= 0) {
+            angle = 90.0 - angle;   // Upper Right Quadrant
+        } else if (Double.compare(DX, 0) >= 0 && Double.compare(DY, 0) >= 0) {
+            angle += 90.0;          // Lower Right Quadrant
+        } else if (Double.compare(DX, 0) <= 0 && Double.compare(DY, 0) >= 0) {
+            angle += 90.0;          // Lower Left Quadrant
+        } else if (Double.compare(DX, 0) <= 0 && Double.compare(DY, 0) <= 0) {
+            angle = 450.0 - angle;  // Upper Left Qudrant
+        }
+
+        /*
+        if (DX >= 0 && DY <= 0) {
+            angle = 90.0 - angle;   // Upper Right Quadrant
+        } else if (DX >= 0 && DY >= 0) {
+            angle += 90.0;          // Lower Right Quadrant
+        } else if (DX <= 0 && DY >= 0) {
+            angle += 90.0;          // Lower Left Quadrant
+        } else if (DX <= 0 && DY <= 0) {
+            angle = 450.0 - angle;  // Upper Left Qudrant
+        }
+        */
+        return angle;
     }
 
     private List<Stop> calculate(final List<Stop> STOPS, final double OFFSET) {
