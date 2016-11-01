@@ -44,12 +44,15 @@ public class MovingAverage {
 
 
     // ******************** Methods *******************************************
-    public void addValue(final Data DATA) {
+    public void addData(final Data DATA) {
         sum += DATA.getValue();
         window.add(DATA);
         if (window.size() > numberPeriod) {
             sum -= window.remove().getValue();
         }
+    }
+    public void addValue(final double VALUE) {
+        addData(new Data(VALUE));
     }
 
     public Queue<Data> getWindow() { return new LinkedList<>(window); }
