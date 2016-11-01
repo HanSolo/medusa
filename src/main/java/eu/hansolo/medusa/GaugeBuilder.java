@@ -121,6 +121,16 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B averagingEnabled(final boolean ENABLED) {
+        properties.put("averagingEnabled", new SimpleBooleanProperty(ENABLED));
+        return (B)this;
+    }
+
+    public final B averagingPeriod(final int PERIOD) {
+        properties.put("averagingPeriod", new SimpleIntegerProperty(PERIOD));
+        return (B)this;
+    }
+
     public final B foregroundBaseColor(final Color COLOR) {
         properties.put("foregroundBaseColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -1119,6 +1129,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setSubTitle(((StringProperty) properties.get(key)).get());
             } else if("unit".equals(key)) {
                 CONTROL.setUnit(((StringProperty) properties.get(key)).get());
+            } else if("averagingEnabled".equals(key)) {
+                CONTROL.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
+            } else if("averagingPeriod".equals(key)) {
+                CONTROL.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
             } else if("startFromZero".equals(key)) {
                 CONTROL.setStartFromZero(((BooleanProperty) properties.get(key)).get());
             } else if("returnToZero".equals(key)) {

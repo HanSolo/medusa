@@ -22,6 +22,7 @@ import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.GradientLookup;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.MarkerComparator;
+import eu.hansolo.medusa.tools.MovingAverage;
 import eu.hansolo.medusa.tools.SectionComparator;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -150,6 +151,11 @@ public class Gauge extends Control {
     private StringProperty                       subTitle;
     private String                               _unit;
     private StringProperty                       unit;
+    private boolean                              _averagingEnabled;
+    private BooleanProperty                      averagingEnabled;
+    private int                                  _averagingPeriod;
+    private IntegerProperty                      averagingPeriod;
+    private MovingAverage                        movingAverage;
     private ObservableList<Section>              sections;
     private ObservableList<Section>              areas;
     private ObservableList<Section>              tickMarkSections;
@@ -462,6 +468,9 @@ public class Gauge extends Control {
         _title                              = "";
         _subTitle                           = "";
         _unit                               = "";
+        _averagingEnabled                   = false;
+        _averagingPeriod                    = 10;
+        movingAverage                       = new MovingAverage(_averagingPeriod);
         sections                            = FXCollections.observableArrayList();
         areas                               = FXCollections.observableArrayList();
         tickMarkSections                    = FXCollections.observableArrayList();
@@ -904,6 +913,82 @@ public class Gauge extends Control {
         }
         return unit;
     }
+
+    /**
+     * Returns true if the averaging functionality is enabled.
+     * @return true if the averaging functionality is enabled
+     */
+    public boolean isAveragingEnabled() { return null == averagingEnabled ? _averagingEnabled : averagingEnabled.get(); }
+    /**
+     * Defines if the averaging functionality will be enabled.
+     */
+    public void setAveragingEnabled(final boolean ENABLED) {
+        if (null == averagingEnabled) {
+            _averagingEnabled = ENABLED;
+            fireUpdateEvent(VISIBILITY_EVENT);
+        } else {
+            averagingEnabled.set(ENABLED);
+        }
+    }
+    public BooleanProperty averagingEnabledProperty() {
+        if (null == averagingEnabled) {
+            averagingEnabled = new BooleanPropertyBase(_averagingEnabled) {
+                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "averagingEnabled"; }
+            };
+        }
+        return averagingEnabled;
+    }
+
+    /**
+     * Returns the number of values that should be used for
+     * the averaging of values. The value must be in the
+     * range of 1 - 1000.
+     * @return the number of values used for averaging
+     */
+    public int getAveragingPeriod() { return null == averagingPeriod ? _averagingPeriod : averagingPeriod.get(); }
+    /**
+     * Defines the number values that should be used for
+     * the averaging of values. The value must be in the
+     * range of 1 - 1000.
+     * @param PERIOD
+     */
+    public void setAveragingPeriod(final int PERIOD) {
+        if (null == averagingPeriod) {
+            _averagingPeriod = PERIOD;
+            movingAverage    = new MovingAverage(PERIOD);
+            fireUpdateEvent(REDRAW_EVENT);
+        } else {
+            averagingPeriod.set(PERIOD);
+        }
+    }
+    public IntegerProperty averagingPeriodProperty() {
+        if (null == averagingPeriod) {
+            averagingPeriod = new IntegerPropertyBase(_averagingPeriod) {
+                @Override protected void invalidated() {
+                    movingAverage = new MovingAverage(get());
+                    fireUpdateEvent(REDRAW_EVENT);
+                }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "averagingPeriod"; }
+            };
+        }
+        return averagingPeriod;
+    }
+
+    /**
+     * Returns the moving average over the number of values
+     * defined by averagingPeriod.
+     * @return the moving the average over the number of values defined by averagingPeriod
+     */
+    public double getAverage() { return movingAverage.getAverage(); }
+    /**
+     * Returns the moving average over the given duration.
+     * @param DURATION
+     * @return the moving average over the given duration
+     */
+    public double getTimeBasedAverageOf(final java.time.Duration DURATION) { return movingAverage.getTimeBasedAverageOf(DURATION); }
 
     /**
      * Returns an observable list of Section objects. The sections
