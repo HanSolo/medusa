@@ -292,6 +292,8 @@ public class Gauge extends Control {
     private ObjectProperty<Color>                valueColor;
     private Color                                _thresholdColor;
     private ObjectProperty<Color>                thresholdColor;
+    private Color                                _averageColor;
+    private ObjectProperty<Color>                averageColor;
     private boolean                              _checkSectionsForValue;
     private BooleanProperty                      checkSectionsForValue;
     private boolean                              _checkAreasForValue;
@@ -302,6 +304,8 @@ public class Gauge extends Control {
     private BooleanProperty                      innerShadowEnabled;
     private boolean                              _thresholdVisible;
     private BooleanProperty                      thresholdVisible;
+    private boolean                              _averageVisible;
+    private BooleanProperty                      averageVisible;
     private boolean                              _sectionsVisible;
     private BooleanProperty                      sectionsVisible;
     private boolean                              _sectionsAlwaysVisible;
@@ -544,11 +548,13 @@ public class Gauge extends Control {
         _unitColor                          = DARK_COLOR;
         _valueColor                         = DARK_COLOR;
         _thresholdColor                     = Color.CRIMSON;
+        _averageColor                       = Color.MAGENTA;
         _checkSectionsForValue              = false;
         _checkAreasForValue                 = false;
         _checkThreshold                     = false;
         _innerShadowEnabled                 = false;
         _thresholdVisible                   = false;
+        _averageVisible                     = false;
         _sectionsVisible                    = false;
         _sectionsAlwaysVisible              = false;
         _sectionTextVisible                 = false;
@@ -928,7 +934,7 @@ public class Gauge extends Control {
     public void setAveragingEnabled(final boolean ENABLED) {
         if (null == averagingEnabled) {
             _averagingEnabled = ENABLED;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireUpdateEvent(REDRAW_EVENT);
         } else {
             averagingEnabled.set(ENABLED);
         }
@@ -936,7 +942,7 @@ public class Gauge extends Control {
     public BooleanProperty averagingEnabledProperty() {
         if (null == averagingEnabled) {
             averagingEnabled = new BooleanPropertyBase(_averagingEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "averagingEnabled"; }
             };
@@ -3588,6 +3594,39 @@ public class Gauge extends Control {
     }
 
     /**
+     * Returns the color that will be used to colorize the average
+     * indicator of the gauge.
+     *
+     * @return the color that will be used to colorize the average indicator
+     */
+    public Color getAverageColor() { return null == averageColor ? _averageColor : averageColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the average
+     * indicator of the gauge.
+     *
+     * @param COLOR
+     */
+    public void setAverageColor(final Color COLOR) {
+        if (null == averageColor) {
+            _averageColor = COLOR;
+            fireUpdateEvent(REDRAW_EVENT);
+        } else {
+            averageColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> averageColorProperty() {
+        if (null == averageColor) {
+            averageColor  = new ObjectPropertyBase<Color>(_averageColor) {
+                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "averageColor"; }
+            };
+            _averageColor = null;
+        }
+        return averageColor;
+    }
+    
+    /**
      * Returns true if the value of the gauge should be checked against
      * all sections (if sections not empty). If a value enters a section
      * or leaves a section it will fire an event. The check will be performed
@@ -3726,6 +3765,36 @@ public class Gauge extends Control {
             };
         }
         return thresholdVisible;
+    }
+
+    /**
+     * Returns true if the average indicator should be drawn.
+     *
+     * @return true if the average indicator should be drawn
+     */
+    public boolean isAverageVisible() { return null == averageVisible ? _averageVisible : averageVisible.get(); }
+    /**
+     * Defines if the average indicator should be drawn
+     *
+     * @param VISIBLE
+     */
+    public void setAverageVisible(final boolean VISIBLE) {
+        if (null == averageVisible) {
+            _averageVisible = VISIBLE;
+            fireUpdateEvent(VISIBILITY_EVENT);
+        } else {
+            averageVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty averageVisibleProperty() {
+        if (null == averageVisible) {
+            averageVisible = new BooleanPropertyBase() {
+                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "averageVisible"; }
+            };
+        }
+        return averageVisible;
     }
 
     /**

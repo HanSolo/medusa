@@ -516,6 +516,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public B averageColor(final Color COLOR) {
+        properties.put("averageColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B checkSectionsForValue(final boolean CHECK) {
         properties.put("checkSectionsForValue", new SimpleBooleanProperty(CHECK));
         return (B)this;
@@ -538,6 +543,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B thresholdVisible(final boolean VISIBLE) {
         properties.put("thresholdVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B averageVisible(final boolean VISIBLE) {
+        properties.put("averageVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
     }
 
@@ -1249,6 +1259,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("thresholdVisible".equals(key)) {
                 CONTROL.setThresholdVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("averageVisible".equals(key)) {
+                CONTROL.setAverageVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionsVisible".equals(key)) {
                 CONTROL.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionsAlwaysVisible".equals(key)) {
@@ -1289,6 +1301,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("thresholdColor".equals(key)) {
                 CONTROL.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("averageColor".equals(key)) {
+                CONTROL.setAverageColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("tickLabelsVisible".equals(key)) {
                 CONTROL.setTickLabelsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("onlyFirstAndLastTickLabelVisible".equals(key)) {
