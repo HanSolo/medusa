@@ -108,6 +108,7 @@ public class Test extends Application {
                             .sectionsVisible(true)
                             //.autoScale(false)
                             .averagingEnabled(true)
+                            .averageVisible(true)
                             .build();
 
         // Calling bind() directly sets a value to gauge
