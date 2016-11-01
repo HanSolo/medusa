@@ -46,6 +46,7 @@ import javafx.stage.Stage;
 
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.time.Duration;
 import java.util.Locale;
 import java.util.Random;
 
@@ -85,14 +86,13 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            //.skinType(SkinType.SIMPLE_SECTION)
-                            .prefSize(250, 250)
+                            .skinType(SkinType.LCD)
+                            //.prefSize(250, 250)
                             //.minValue(0)
                             //.maxValue(100)
                             .animated(true)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
-                            //.threshold(50)
                             //.lcdVisible(true)
                             //.locale(Locale.GERMANY)
                             //.numberFormat(numberFormat)

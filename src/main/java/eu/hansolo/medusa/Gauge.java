@@ -441,7 +441,6 @@ public class Gauge extends Control {
                     fireUpdateEvent(FINISHED_EVENT);
                 }
                 if (isAveragingEnabled()) { movingAverage.addData(new Data(VALUE)); }
-                oldValue.set(get());
             }
             @Override public Object getBean() { return Gauge.this; }
             @Override public String getName() { return "value"; }
@@ -607,7 +606,10 @@ public class Gauge extends Control {
         });
     }
 
-    private void registerListeners() { disabledProperty().addListener(o -> setOpacity(isDisabled() ? 0.4 : 1)); }
+    private void registerListeners() {
+        disabledProperty().addListener(o -> setOpacity(isDisabled() ? 0.4 : 1));
+        valueProperty().addListener((o, ov, nv) -> oldValue.set(ov.doubleValue()));
+    }
 
 
     // ******************** Data related methods ******************************
@@ -986,6 +988,11 @@ public class Gauge extends Control {
         return averagingPeriod;
     }
 
+    /**
+     * Returns the current list of Data objects that will
+     * be used to calculate the moving average.
+     * @return the current list of Data objects used for the moving average
+     */
     public Queue<Data> getAveragingWindow() { return movingAverage.getWindow(); }
 
     /**
