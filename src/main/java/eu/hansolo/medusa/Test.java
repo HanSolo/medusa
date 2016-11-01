@@ -106,8 +106,8 @@ public class Test extends Application {
                                       new Section(66, 100, Color.LIME))
                             .sectionsVisible(true)
                             //.autoScale(false)
-                            .averagingEnabled(true)
-                            .averageVisible(true)
+                            //.averagingEnabled(true)
+                            //.averageVisible(true)
                             .build();
 
         // Calling bind() directly sets a value to gauge
