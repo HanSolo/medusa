@@ -19,6 +19,7 @@ package eu.hansolo.medusa;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.skins.*;
+import eu.hansolo.medusa.tools.Data;
 import eu.hansolo.medusa.tools.GradientLookup;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.MarkerComparator;
@@ -434,6 +435,7 @@ public class Gauge extends Control {
                     currentValue.set(VALUE);
                     fireUpdateEvent(FINISHED_EVENT);
                 }
+                if (isAveragingEnabled()) { movingAverage.addData(new Data(VALUE)); }
                 oldValue.set(get());
             }
             @Override public Object getBean() { return Gauge.this; }
