@@ -46,6 +46,7 @@ import javafx.stage.Stage;
 
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.time.Duration;
 import java.util.Locale;
 import java.util.Random;
 
@@ -106,8 +107,8 @@ public class Test extends Application {
                                       new Section(66, 100, Color.LIME))
                             .sectionsVisible(true)
                             //.autoScale(false)
-                            //.averagingEnabled(true)
-                            //.averageVisible(true)
+                            .averagingEnabled(true)
+                            .averageVisible(true)
                             .build();
 
         // Calling bind() directly sets a value to gauge
