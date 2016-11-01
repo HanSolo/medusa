@@ -988,6 +988,11 @@ public class Gauge extends Control {
         return averagingPeriod;
     }
 
+    /**
+     * Returns the current list of Data objects that will
+     * be used to calculate the moving average.
+     * @return the current list of Data objects used for the moving average
+     */
     public Queue<Data> getAveragingWindow() { return movingAverage.getWindow(); }
 
     /**
