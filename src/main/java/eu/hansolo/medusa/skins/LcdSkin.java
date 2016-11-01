@@ -649,7 +649,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
             title.setY(height * 0.18);
 
-            // Info Text
+            // Lower Right Text
             lowerRightText.setFont(smallFont);
             lowerRightText.setTextOrigin(VPos.BASELINE);
             lowerRightText.setTextAlignment(TextAlignment.RIGHT);
@@ -670,7 +670,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             upperRightText.setTextAlignment(TextAlignment.RIGHT);
             upperRightText.setY(height * 0.18);
 
-            // Former value
+            // Lower Center Text
             lowerCenterText.setFont(smallFont);
             lowerCenterText.setTextOrigin(VPos.BASELINE);
             lowerCenterText.setTextAlignment(TextAlignment.CENTER);
