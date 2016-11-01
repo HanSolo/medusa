@@ -87,8 +87,8 @@ public class Test extends Application {
         gauge = GaugeBuilder.create()
                             //.skinType(SkinType.SIMPLE_SECTION)
                             .prefSize(250, 250)
-                            .minValue(0)
-                            .maxValue(100)
+                            //.minValue(0)
+                            //.maxValue(100)
                             .animated(true)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
@@ -107,8 +107,10 @@ public class Test extends Application {
                                       new Section(66, 100, Color.LIME))
                             .sectionsVisible(true)
                             //.autoScale(false)
+                            .averagingEnabled(true)
                             .build();
 
+        // Calling bind() directly sets a value to gauge
         gauge.valueProperty().bind(value);
 
         gauge.getSections().forEach(section -> section.setOnSectionUpdate(sectionEvent -> gauge.fireUpdateEvent(new UpdateEvent(Test.this, EventType.REDRAW))));
@@ -132,6 +134,11 @@ public class Test extends Application {
                 if (now > lastTimerCall + 3_000_000_000l) {
                     double v = RND.nextDouble() * gauge.getRange() + gauge.getMinValue();
                     value.set(v);
+
+                    //gauge.setValue(v);
+
+                    System.out.println("MovingAverage over " + gauge.getAveragingWindow().size() + " values: " + gauge.getAverage() + "  last value = " + v);
+
                     //toggle.set(!toggle.get());
 
                     //System.out.println(gauge.isValueVisible());
@@ -144,7 +151,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(clock);
+        StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,

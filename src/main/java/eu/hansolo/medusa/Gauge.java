@@ -64,6 +64,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
@@ -978,6 +979,8 @@ public class Gauge extends Control {
         }
         return averagingPeriod;
     }
+
+    public Queue<Data> getAveragingWindow() { return movingAverage.getWindow(); }
 
     /**
      * Returns the moving average over the number of values
