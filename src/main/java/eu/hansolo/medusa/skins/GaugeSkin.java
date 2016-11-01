@@ -111,6 +111,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private GraphicsContext          ledCtx;
     private Pane                     markerPane;
     private Path                     threshold;
+    private Path                     average;
     private Rectangle                lcd;
     private Path                     needle;
     private Rotate                   needleRotate;
@@ -168,31 +169,23 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         mouseHandler      = event -> handleMouseEvent(event);
         updateMarkers();
 
-        init();
         initGraphics();
         registerListeners();
     }
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
+        // Set initial size
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() < 0 && getSkinnable().getPrefHeight() < 0) {
+            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
+                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+            } else {
                 getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
-        if (Double.compare(getSkinnable().getMinWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMinHeight(), 0.0) <= 0) {
-            getSkinnable().setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
-        }
-
-        if (Double.compare(getSkinnable().getMaxWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMaxHeight(), 0.0) <= 0) {
-            getSkinnable().setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
-        }
-    }
-
-    private void initGraphics() {
         backgroundInnerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(10, 10, 10, 0.45), 8, 0.0, 8.0, 0.0);
 
         sectionsAndAreasCanvas = new Canvas();
@@ -212,6 +205,9 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         threshold = new Path();
         Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
         Tooltip.install(threshold, thresholdTooltip);
+
+        average = new Path();
+        Helper.enableNode(average, getSkinnable().isAverageVisible());
 
         markerPane = new Pane();
 
@@ -307,6 +303,13 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Methods *******************************************
+    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
+
     protected void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
@@ -341,6 +344,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             Helper.enableNode(lcd, getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
             Helper.enableNode(knobCanvas, getSkinnable().isKnobVisible());
             Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
+            Helper.enableNode(average, getSkinnable().isAverageVisible());
             Helper.enableNode(sectionsAndAreasCanvas, areasVisible | sectionsVisible);
             boolean markersVisible = getSkinnable().getMarkersVisible();
             for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
@@ -436,6 +440,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else {
             valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         }
+
+        if (getSkinnable().isAverageVisible()) drawAverage();
     }
 
     private void drawGradientBar() {
@@ -573,7 +579,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void drawMarkers() {
         markerPane.getChildren().setAll(markerMap.values());
-        markerPane.getChildren().add(threshold);
+        markerPane.getChildren().addAll(average, threshold);
         TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
         double         markerSize     = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0125 * size : 0.015 * size;
         double         pathHalf       = markerSize * 0.3;
@@ -723,6 +729,47 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             threshold.setFill(getSkinnable().getThresholdColor());
             threshold.setStroke(getSkinnable().getTickMarkColor());
         }
+    }
+
+    private void drawAverage() {
+        double centerX = size * 0.5;
+        double centerY = size * 0.5;
+        // Draw average
+        average.getElements().clear();
+        double averageAngle;
+        if (ScaleDirection.CLOCKWISE == scaleDirection) {
+            averageAngle = startAngle - (getSkinnable().getAverage() - minValue) * angleStep;
+        } else {
+            averageAngle = startAngle + (getSkinnable().getAverage() - minValue) * angleStep;
+        }
+        double averageSize = Helper.clamp(3.0, 3.5, 0.01 * size);
+        double sinValue      = Math.sin(Math.toRadians(averageAngle));
+        double cosValue      = Math.cos(Math.toRadians(averageAngle));
+        switch (tickLabelLocation) {
+            case OUTSIDE:
+                average.getElements().add(new MoveTo(centerX + size * 0.38 * sinValue, centerY + size * 0.38 * cosValue));
+                sinValue = Math.sin(Math.toRadians(averageAngle - averageSize));
+                cosValue = Math.cos(Math.toRadians(averageAngle - averageSize));
+                average.getElements().add(new LineTo(centerX + size * 0.34 * sinValue, centerY + size * 0.34 * cosValue));
+                sinValue = Math.sin(Math.toRadians(averageAngle + averageSize));
+                cosValue = Math.cos(Math.toRadians(averageAngle + averageSize));
+                average.getElements().add(new LineTo(centerX + size * 0.34 * sinValue, centerY + size * 0.34 * cosValue));
+                average.getElements().add(new ClosePath());
+                break;
+            case INSIDE:
+            default:
+                average.getElements().add(new MoveTo(centerX + size * 0.465 * sinValue, centerY + size * 0.465 * cosValue));
+                sinValue = Math.sin(Math.toRadians(averageAngle - averageSize));
+                cosValue = Math.cos(Math.toRadians(averageAngle - averageSize));
+                average.getElements().add(new LineTo(centerX + size * 0.425 * sinValue, centerY + size * 0.425 * cosValue));
+                sinValue = Math.sin(Math.toRadians(averageAngle + averageSize));
+                cosValue = Math.cos(Math.toRadians(averageAngle + averageSize));
+                average.getElements().add(new LineTo(centerX + size * 0.425 * sinValue, centerY + size * 0.425 * cosValue));
+                average.getElements().add(new ClosePath());
+                break;
+        }
+        average.setFill(getSkinnable().getAverageColor());
+        average.setStroke(getSkinnable().getTickMarkColor());
     }
 
     private void updateMarkers() {

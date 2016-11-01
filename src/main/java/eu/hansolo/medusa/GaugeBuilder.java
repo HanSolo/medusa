@@ -121,6 +121,16 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B averagingEnabled(final boolean ENABLED) {
+        properties.put("averagingEnabled", new SimpleBooleanProperty(ENABLED));
+        return (B)this;
+    }
+
+    public final B averagingPeriod(final int PERIOD) {
+        properties.put("averagingPeriod", new SimpleIntegerProperty(PERIOD));
+        return (B)this;
+    }
+
     public final B foregroundBaseColor(final Color COLOR) {
         properties.put("foregroundBaseColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -506,6 +516,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public B averageColor(final Color COLOR) {
+        properties.put("averageColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B checkSectionsForValue(final boolean CHECK) {
         properties.put("checkSectionsForValue", new SimpleBooleanProperty(CHECK));
         return (B)this;
@@ -528,6 +543,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B thresholdVisible(final boolean VISIBLE) {
         properties.put("thresholdVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B averageVisible(final boolean VISIBLE) {
+        properties.put("averageVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
     }
 
@@ -1119,6 +1139,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setSubTitle(((StringProperty) properties.get(key)).get());
             } else if("unit".equals(key)) {
                 CONTROL.setUnit(((StringProperty) properties.get(key)).get());
+            } else if("averagingEnabled".equals(key)) {
+                CONTROL.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
+            } else if("averagingPeriod".equals(key)) {
+                CONTROL.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
             } else if("startFromZero".equals(key)) {
                 CONTROL.setStartFromZero(((BooleanProperty) properties.get(key)).get());
             } else if("returnToZero".equals(key)) {
@@ -1235,6 +1259,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("thresholdVisible".equals(key)) {
                 CONTROL.setThresholdVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("averageVisible".equals(key)) {
+                CONTROL.setAverageVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionsVisible".equals(key)) {
                 CONTROL.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionsAlwaysVisible".equals(key)) {
@@ -1275,6 +1301,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("thresholdColor".equals(key)) {
                 CONTROL.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("averageColor".equals(key)) {
+                CONTROL.setAverageColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("tickLabelsVisible".equals(key)) {
                 CONTROL.setTickLabelsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("onlyFirstAndLastTickLabelVisible".equals(key)) {

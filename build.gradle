@@ -43,6 +43,7 @@ jar {
                 'Bundle-Name': project.name,
                 'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://www.eclipse.org/legal/eplfaq.php',
                 'Bundle-Description': description,
+                'Bundle-SymbolicName': 'eu.hansolo.medusa',
                 'Export-Package': 'eu.hansolo.medusa,eu.hansolo.medusa.tools,eu.hansolo.medusa.skins,eu.hansolo.medusa.events'
         )
     }

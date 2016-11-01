@@ -19,9 +19,11 @@ package eu.hansolo.medusa;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.skins.*;
+import eu.hansolo.medusa.tools.Data;
 import eu.hansolo.medusa.tools.GradientLookup;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.MarkerComparator;
+import eu.hansolo.medusa.tools.MovingAverage;
 import eu.hansolo.medusa.tools.SectionComparator;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -62,6 +64,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
@@ -150,6 +153,11 @@ public class Gauge extends Control {
     private StringProperty                       subTitle;
     private String                               _unit;
     private StringProperty                       unit;
+    private boolean                              _averagingEnabled;
+    private BooleanProperty                      averagingEnabled;
+    private int                                  _averagingPeriod;
+    private IntegerProperty                      averagingPeriod;
+    private MovingAverage                        movingAverage;
     private ObservableList<Section>              sections;
     private ObservableList<Section>              areas;
     private ObservableList<Section>              tickMarkSections;
@@ -284,6 +292,8 @@ public class Gauge extends Control {
     private ObjectProperty<Color>                valueColor;
     private Color                                _thresholdColor;
     private ObjectProperty<Color>                thresholdColor;
+    private Color                                _averageColor;
+    private ObjectProperty<Color>                averageColor;
     private boolean                              _checkSectionsForValue;
     private BooleanProperty                      checkSectionsForValue;
     private boolean                              _checkAreasForValue;
@@ -294,6 +304,8 @@ public class Gauge extends Control {
     private BooleanProperty                      innerShadowEnabled;
     private boolean                              _thresholdVisible;
     private BooleanProperty                      thresholdVisible;
+    private boolean                              _averageVisible;
+    private BooleanProperty                      averageVisible;
     private boolean                              _sectionsVisible;
     private BooleanProperty                      sectionsVisible;
     private boolean                              _sectionsAlwaysVisible;
@@ -428,6 +440,7 @@ public class Gauge extends Control {
                     currentValue.set(VALUE);
                     fireUpdateEvent(FINISHED_EVENT);
                 }
+                if (isAveragingEnabled()) { movingAverage.addData(new Data(VALUE)); }
                 oldValue.set(get());
             }
             @Override public Object getBean() { return Gauge.this; }
@@ -462,6 +475,9 @@ public class Gauge extends Control {
         _title                              = "";
         _subTitle                           = "";
         _unit                               = "";
+        _averagingEnabled                   = false;
+        _averagingPeriod                    = 10;
+        movingAverage                       = new MovingAverage(_averagingPeriod);
         sections                            = FXCollections.observableArrayList();
         areas                               = FXCollections.observableArrayList();
         tickMarkSections                    = FXCollections.observableArrayList();
@@ -532,11 +548,13 @@ public class Gauge extends Control {
         _unitColor                          = DARK_COLOR;
         _valueColor                         = DARK_COLOR;
         _thresholdColor                     = Color.CRIMSON;
+        _averageColor                       = Color.MAGENTA;
         _checkSectionsForValue              = false;
         _checkAreasForValue                 = false;
         _checkThreshold                     = false;
         _innerShadowEnabled                 = false;
         _thresholdVisible                   = false;
+        _averageVisible                     = false;
         _sectionsVisible                    = false;
         _sectionsAlwaysVisible              = false;
         _sectionTextVisible                 = false;
@@ -904,6 +922,84 @@ public class Gauge extends Control {
         }
         return unit;
     }
+
+    /**
+     * Returns true if the averaging functionality is enabled.
+     * @return true if the averaging functionality is enabled
+     */
+    public boolean isAveragingEnabled() { return null == averagingEnabled ? _averagingEnabled : averagingEnabled.get(); }
+    /**
+     * Defines if the averaging functionality will be enabled.
+     */
+    public void setAveragingEnabled(final boolean ENABLED) {
+        if (null == averagingEnabled) {
+            _averagingEnabled = ENABLED;
+            fireUpdateEvent(REDRAW_EVENT);
+        } else {
+            averagingEnabled.set(ENABLED);
+        }
+    }
+    public BooleanProperty averagingEnabledProperty() {
+        if (null == averagingEnabled) {
+            averagingEnabled = new BooleanPropertyBase(_averagingEnabled) {
+                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "averagingEnabled"; }
+            };
+        }
+        return averagingEnabled;
+    }
+
+    /**
+     * Returns the number of values that should be used for
+     * the averaging of values. The value must be in the
+     * range of 1 - 1000.
+     * @return the number of values used for averaging
+     */
+    public int getAveragingPeriod() { return null == averagingPeriod ? _averagingPeriod : averagingPeriod.get(); }
+    /**
+     * Defines the number values that should be used for
+     * the averaging of values. The value must be in the
+     * range of 1 - 1000.
+     * @param PERIOD
+     */
+    public void setAveragingPeriod(final int PERIOD) {
+        if (null == averagingPeriod) {
+            _averagingPeriod = PERIOD;
+            movingAverage    = new MovingAverage(PERIOD);
+            fireUpdateEvent(REDRAW_EVENT);
+        } else {
+            averagingPeriod.set(PERIOD);
+        }
+    }
+    public IntegerProperty averagingPeriodProperty() {
+        if (null == averagingPeriod) {
+            averagingPeriod = new IntegerPropertyBase(_averagingPeriod) {
+                @Override protected void invalidated() {
+                    movingAverage = new MovingAverage(get());
+                    fireUpdateEvent(REDRAW_EVENT);
+                }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "averagingPeriod"; }
+            };
+        }
+        return averagingPeriod;
+    }
+
+    public Queue<Data> getAveragingWindow() { return movingAverage.getWindow(); }
+
+    /**
+     * Returns the moving average over the number of values
+     * defined by averagingPeriod.
+     * @return the moving the average over the number of values defined by averagingPeriod
+     */
+    public double getAverage() { return movingAverage.getAverage(); }
+    /**
+     * Returns the moving average over the given duration.
+     * @param DURATION
+     * @return the moving average over the given duration
+     */
+    public double getTimeBasedAverageOf(final java.time.Duration DURATION) { return movingAverage.getTimeBasedAverageOf(DURATION); }
 
     /**
      * Returns an observable list of Section objects. The sections
@@ -3498,6 +3594,39 @@ public class Gauge extends Control {
     }
 
     /**
+     * Returns the color that will be used to colorize the average
+     * indicator of the gauge.
+     *
+     * @return the color that will be used to colorize the average indicator
+     */
+    public Color getAverageColor() { return null == averageColor ? _averageColor : averageColor.get(); }
+    /**
+     * Defines the color that will be used to colorize the average
+     * indicator of the gauge.
+     *
+     * @param COLOR
+     */
+    public void setAverageColor(final Color COLOR) {
+        if (null == averageColor) {
+            _averageColor = COLOR;
+            fireUpdateEvent(REDRAW_EVENT);
+        } else {
+            averageColor.set(COLOR);
+        }
+    }
+    public ObjectProperty<Color> averageColorProperty() {
+        if (null == averageColor) {
+            averageColor  = new ObjectPropertyBase<Color>(_averageColor) {
+                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "averageColor"; }
+            };
+            _averageColor = null;
+        }
+        return averageColor;
+    }
+    
+    /**
      * Returns true if the value of the gauge should be checked against
      * all sections (if sections not empty). If a value enters a section
      * or leaves a section it will fire an event. The check will be performed
@@ -3636,6 +3765,36 @@ public class Gauge extends Control {
             };
         }
         return thresholdVisible;
+    }
+
+    /**
+     * Returns true if the average indicator should be drawn.
+     *
+     * @return true if the average indicator should be drawn
+     */
+    public boolean isAverageVisible() { return null == averageVisible ? _averageVisible : averageVisible.get(); }
+    /**
+     * Defines if the average indicator should be drawn
+     *
+     * @param VISIBLE
+     */
+    public void setAverageVisible(final boolean VISIBLE) {
+        if (null == averageVisible) {
+            _averageVisible = VISIBLE;
+            fireUpdateEvent(VISIBILITY_EVENT);
+        } else {
+            averageVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty averageVisibleProperty() {
+        if (null == averageVisible) {
+            averageVisible = new BooleanPropertyBase() {
+                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "averageVisible"; }
+            };
+        }
+        return averageVisible;
     }
 
     /**
