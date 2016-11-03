@@ -64,11 +64,12 @@ public class MovingAverage {
 
     public double getTimeBasedAverageOf(final Duration DURATION) {
         assert !DURATION.isNegative() : "Time period must be positive";
-        double average = window.stream()
-                               .filter(v -> v.getTimestamp().isAfter(Instant.now().minus(DURATION)))
-                               .mapToDouble(Data::getValue)
-                               .average()
-                               .getAsDouble();
+        Instant now     = Instant.now();
+        double  average = window.stream()
+                                .filter(v -> v.getTimestamp().isAfter(now.minus(DURATION)))
+                                .mapToDouble(Data::getValue)
+                                .average()
+                                .getAsDouble();
         return average;
     }
 
