@@ -66,6 +66,11 @@ public class MarkerBuilder<B extends MarkerBuilder<B>> {
         return (B)this;
     }
 
+    public final B styleClass(final String STYLE_CLASS) {
+        properties.put("styleClass", new SimpleStringProperty(STYLE_CLASS));
+        return (B)this;
+    }
+
     public final B onMarkerPressed(final EventHandler<Marker.MarkerEvent> HANDLER) {
         properties.put("onMarkerPressed", new SimpleObjectProperty<>(HANDLER));
         return (B)this;
@@ -105,6 +110,8 @@ public class MarkerBuilder<B extends MarkerBuilder<B>> {
                 MARKER.setOnMarkerExceeded(((ObjectProperty<EventHandler>) properties.get(key)).get());
             } else if ("onMarkerUnderrun".equals(key)) {
                 MARKER.setOnMarkerUnderrun(((ObjectProperty<EventHandler>) properties.get(key)).get());
+            } else if ("styleClass".equals(key)) {
+                MARKER.setStyleClass(((StringProperty) properties.get(key)).get());
             }
         }
         return MARKER;

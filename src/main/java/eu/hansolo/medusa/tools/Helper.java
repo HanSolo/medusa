@@ -16,19 +16,23 @@
 
 package eu.hansolo.medusa.tools;
 
+import eu.hansolo.medusa.Alarm;
 import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
+import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TickMarkType;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TimeSection;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -38,6 +42,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -45,8 +50,13 @@ import javafx.scene.text.TextAlignment;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
@@ -56,10 +66,30 @@ import java.util.concurrent.ThreadFactory;
  * Created by hansolo on 11.12.15.
  */
 public class Helper {
+    public static final double MAX_TICK_MARK_LENGTH = 0.125;
+    public static final double MAX_TICK_MARK_WIDTH  = 0.02;
+    public static final Color  INACTIVE_ALARM_COLOR = Color.rgb(90, 90, 90, 0.5);
+
 
     public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
         if (VALUE.doubleValue() < MIN.doubleValue()) return MIN;
         if (VALUE.doubleValue() > MAX.doubleValue()) return MAX;
+        return VALUE;
+    }
+
+    public static final int clamp(final int MIN, final int MAX, final int VALUE) {
+        if (VALUE < MIN) return MIN;
+        if (VALUE > MAX) return MAX;
+        return VALUE;
+    }
+    public static final long clamp(final long MIN, final long MAX, final long VALUE) {
+        if (VALUE < MIN) return MIN;
+        if (VALUE > MAX) return MAX;
+        return VALUE;
+    }
+    public static final double clamp(final double MIN, final double MAX, final double VALUE) {
+        if (Double.compare(VALUE, MIN) < 0) return MIN;
+        if (Double.compare(VALUE, MAX) > 0) return MAX;
         return VALUE;
     }
 
@@ -154,6 +184,24 @@ public class Helper {
         }
     }
 
+    public static DateTimeFormatter getDateFormat(final Locale LOCALE) {
+        if (Locale.US == LOCALE) {
+            return DateTimeFormatter.ofPattern("MM/dd/YYYY");
+        } else if (Locale.CHINA == LOCALE) {
+            return DateTimeFormatter.ofPattern("YYYY.MM.dd");
+        } else {
+            return DateTimeFormatter.ofPattern("dd.MM.YYYY");
+        }
+    }
+    public static DateTimeFormatter getLocalizedDateFormat(final Locale LOCALE) {
+        return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(LOCALE);
+    }
+
+    public static void enableNode(final Node NODE, final boolean ENABLE) {
+        NODE.setManaged(ENABLE);
+        NODE.setVisible(ENABLE);
+    }
+
     public static final String colorToCss(final Color COLOR) {
         return COLOR.toString().replace("0x", "#");
     }
@@ -233,12 +281,21 @@ public class Helper {
         return PATTERN;
     }
 
-    public static void drawTriangle(final GraphicsContext CTX,
+    public static void drawTrapezoid(final GraphicsContext CTX,
                               final double PI1X, final double PI1Y, final double PI2X, final double PI2Y,
                               final double PO1X, final double PO1Y, final double PO2X, final double PO2Y) {
         CTX.beginPath();
         CTX.moveTo(PI2X, PI2Y);
         CTX.lineTo(PI1X, PI1Y);
+        CTX.lineTo(PO1X, PO1Y);
+        CTX.lineTo(PO2X, PO2Y);
+        CTX.closePath();
+        CTX.fill();
+    }
+    public static void drawTriangle(final GraphicsContext CTX,
+                                    final double PIX, final double PIY, final double PO1X, final double PO1Y, final double PO2X, final double PO2Y) {
+        CTX.beginPath();
+        CTX.moveTo(PIX, PIY);
         CTX.lineTo(PO1X, PO1Y);
         CTX.lineTo(PO2X, PO2Y);
         CTX.closePath();
@@ -270,8 +327,14 @@ public class Helper {
         return DISTANCE_TO_BLACK < DISTANCE_TO_WHITE;
     }
 
-    public static void drawRadialTickMarks(final Gauge GAUGE, final GraphicsContext CTX, final double MIN_VALUE, final double MAX_VALUE,
-                                           final double START_ANGLE, final double ANGLE_RANGE, final double ANGLE_STEP, final double CENTER_X, final double CENTER_Y, final double SIZE) {
+    public static Color getTranslucentColorFrom(final Color COLOR, final double FACTOR) {
+        return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), Helper.clamp(0.0, 1.0, FACTOR));
+    }
+
+    public static void drawRadialTickMarks(final Gauge GAUGE, final GraphicsContext CTX,
+                                           final double MIN_VALUE, final double MAX_VALUE,
+                                           final double START_ANGLE, final double ANGLE_RANGE, final double ANGLE_STEP,
+                                           final double CENTER_X, final double CENTER_Y, final double SIZE) {
         double               sinValue;
         double               cosValue;
         double               centerX               = CENTER_X;
@@ -295,6 +358,12 @@ public class Helper {
         Color         majorTickMarkColor           = GAUGE.getMajorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : GAUGE.getMajorTickMarkColor();
         Color         mediumTickMarkColor          = GAUGE.getMediumTickMarkColor().equals(tickMarkColor) ? tickMarkColor : GAUGE.getMediumTickMarkColor();
         Color         minorTickMarkColor           = GAUGE.getMinorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : GAUGE.getMinorTickMarkColor();
+        double        majorTickMarkLengthFactor    = GAUGE.getMajorTickMarkLengthFactor();
+        double        majorTickMarkWidthFactor     = GAUGE.getMajorTickMarkWidthFactor();
+        double        mediumTickMarkLengthFactor   = GAUGE.getMediumTickMarkLengthFactor();
+        double        mediumTickMarkWidthFactor    = GAUGE.getMediumTickMarkWidthFactor();
+        double        minorTickMarkLengthFactor    = GAUGE.getMinorTickMarkLengthFactor();
+        double        minorTickMarkWidthFactor     = GAUGE.getMinorTickMarkWidthFactor();
         Color         tickLabelColor               = GAUGE.getTickLabelColor();
         Color         zeroColor                    = GAUGE.getZeroColor();
         boolean       isNotZero                    = true;
@@ -309,6 +378,7 @@ public class Helper {
         boolean       tickLabelsVisible            = GAUGE.getTickLabelsVisible();
         boolean       onlyFirstAndLastLabelVisible = GAUGE.isOnlyFirstAndLastTickLabelVisible();
         boolean       customTickLabelsEnabled      = GAUGE.getCustomTickLabelsEnabled();
+        Locale        locale                       = GAUGE.getLocale();
         List<String>  customTickLabels             = customTickLabelsEnabled ? GAUGE.getCustomTickLabels() : null;
         double        textDisplacementFactor       = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
         double        majorDotSize;
@@ -373,47 +443,109 @@ public class Helper {
         double tickLabelTickMarkX;
         double tickLabelTickMarkY;
 
-        double triangleMajorInnerAngle1;
-        double triangleMajorInnerAngle2;
-        double triangleMajorOuterAngle1;
-        double triangleMajorOuterAngle2;
-        double triangleMajorInnerPoint1X;
-        double triangleMajorInnerPoint1Y;
-        double triangleMajorInnerPoint2X;
-        double triangleMajorInnerPoint2Y;
-        double triangleMajorOuterPoint1X;
-        double triangleMajorOuterPoint1Y;
-        double triangleMajorOuterPoint2X;
-        double triangleMajorOuterPoint2Y;
+        double trapezoidMajorInnerAngle1;
+        double trapezoidMajorInnerAngle2;
+        double trapezoidMajorOuterAngle1;
+        double trapezoidMajorOuterAngle2;
+        double trapezoidMajorInnerPoint1X;
+        double trapezoidMajorInnerPoint1Y;
+        double trapezoidMajorInnerPoint2X;
+        double trapezoidMajorInnerPoint2Y;
+        double trapezoidMajorOuterPoint1X;
+        double trapezoidMajorOuterPoint1Y;
+        double trapezoidMajorOuterPoint2X;
+        double trapezoidMajorOuterPoint2Y;
 
-        double triangleMediumInnerAngle1;
-        double triangleMediumInnerAngle2;
-        double triangleMediumOuterAngle1;
-        double triangleMediumOuterAngle2;
-        double triangleMediumInnerPoint1X;
-        double triangleMediumInnerPoint1Y;
-        double triangleMediumInnerPoint2X;
-        double triangleMediumInnerPoint2Y;
-        double triangleMediumOuterPoint1X;
-        double triangleMediumOuterPoint1Y;
-        double triangleMediumOuterPoint2X;
-        double triangleMediumOuterPoint2Y;
+        double trapezoidMediumInnerAngle1;
+        double trapezoidMediumInnerAngle2;
+        double trapezoidMediumOuterAngle1;
+        double trapezoidMediumOuterAngle2;
+        double trapezoidMediumInnerPoint1X;
+        double trapezoidMediumInnerPoint1Y;
+        double trapezoidMediumInnerPoint2X;
+        double trapezoidMediumInnerPoint2Y;
+        double trapezoidMediumOuterPoint1X;
+        double trapezoidMediumOuterPoint1Y;
+        double trapezoidMediumOuterPoint2X;
+        double trapezoidMediumOuterPoint2Y;
 
-        double triangleMinorInnerAngle1;
-        double triangleMinorInnerAngle2;
-        double triangleMinorOuterAngle1;
-        double triangleMinorOuterAngle2;
-        double triangleMinorInnerPoint1X;
-        double triangleMinorInnerPoint1Y;
-        double triangleMinorInnerPoint2X;
-        double triangleMinorInnerPoint2Y;
-        double triangleMinorOuterPoint1X;
-        double triangleMinorOuterPoint1Y;
-        double triangleMinorOuterPoint2X;
-        double triangleMinorOuterPoint2Y;
+        double trapezoidMinorInnerAngle1;
+        double trapezoidMinorInnerAngle2;
+        double trapezoidMinorOuterAngle1;
+        double trapezoidMinorOuterAngle2;
+        double trapezoidMinorInnerPoint1X;
+        double trapezoidMinorInnerPoint1Y;
+        double trapezoidMinorInnerPoint2X;
+        double trapezoidMinorInnerPoint2Y;
+        double trapezoidMinorOuterPoint1X;
+        double trapezoidMinorOuterPoint1Y;
+        double trapezoidMinorOuterPoint2X;
+        double trapezoidMinorOuterPoint2Y;
+
+        double triangleMajorInnerPointX;
+        double triangleMajorInnerPointY;
+        double triangleMajorOuterPointX;
+        double triangleMajorOuterPointY;
+
+        double triangleMediumInnerPointX;
+        double triangleMediumInnerPointY;
+        double triangleMediumOuterPointX;
+        double triangleMediumOuterPointY;
+
+        double triangleMinorInnerPointX;
+        double triangleMinorInnerPointY;
+        double triangleMinorOuterPointX;
+        double triangleMinorOuterPointY;
+
+        ScaleDirection scaleDirection = GAUGE.getScaleDirection();
+
+        // Draw tickmark ring
+        if (GAUGE.isTickMarkRingVisible()) {
+            SkinType skinType     = GAUGE.getSkinType();
+            double   xy           = TickLabelLocation.INSIDE == tickLabelLocation ? SIZE * 0.026 : SIZE * 0.14;
+            double   wh           = TickLabelLocation.INSIDE == tickLabelLocation ? SIZE * 0.948 : SIZE * 0.72;
+            double   offset       = -90 + START_ANGLE;
+            double   horVerOffset = SIZE * 0.055555555;
+            CTX.setLineWidth(SIZE * 0.004);
+            CTX.setLineCap(StrokeLineCap.SQUARE);
+            CTX.save();
+            CTX.setStroke(tickMarkColor);
+            switch(skinType) {
+                case HORIZONTAL: CTX.strokeArc(xy + horVerOffset, xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+                case VERTICAL  : CTX.strokeArc(xy, xy + horVerOffset, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+                default        : CTX.strokeArc(xy, xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+            }
+
+            CTX.restore();
+            if (tickMarkSections.size() > 0) {
+                int    listSize = tickMarkSections.size();
+                double sectionStartAngle;
+                for (int i = 0; i < listSize; i++) {
+                    Section section = tickMarkSections.get(i);
+                    if (Double.compare(section.getStart(), MIN_VALUE) < 0 && Double.compare(section.getStop(), MAX_VALUE) < 0) {
+                        sectionStartAngle = 0;
+                    } else {
+                        sectionStartAngle = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStart() - MIN_VALUE) * ANGLE_STEP : -(section.getStart() - MIN_VALUE) * ANGLE_STEP;
+                    }
+                    double sectionAngleExtend;
+                    if (Double.compare(section.getStop(), MAX_VALUE) > 0) {
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (MAX_VALUE - section.getStart()) * ANGLE_STEP : -(MAX_VALUE - section.getStart()) * ANGLE_STEP;
+                    } else {
+                        sectionAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? (section.getStop() - section.getStart()) * ANGLE_STEP : -(section.getStop() - section.getStart()) * ANGLE_STEP;
+                    }
+                    CTX.save();
+                    CTX.setStroke(section.getColor());
+                    switch(skinType) {
+                        case HORIZONTAL: CTX.strokeArc(xy + horVerOffset, xy, wh, wh, offset - sectionStartAngle, -sectionAngleExtend, ArcType.OPEN); break;
+                        case VERTICAL  : CTX.strokeArc(xy, xy + horVerOffset, wh, wh, offset - sectionStartAngle, -sectionAngleExtend, ArcType.OPEN); break;
+                        default        : CTX.strokeArc(xy, xy, wh, wh, offset - sectionStartAngle, -sectionAngleExtend, ArcType.OPEN); break;
+                    }
+                    CTX.restore();
+                }
+            }
+        }
 
         // Main loop
-        ScaleDirection scaleDirection = GAUGE.getScaleDirection();
         BigDecimal     tmpStepBD      = new BigDecimal(tmpAngleStep);
         tmpStepBD                     = tmpStepBD.setScale(3, BigDecimal.ROUND_HALF_UP);
         double tmpStep                = tmpStepBD.doubleValue();
@@ -425,131 +557,161 @@ public class Helper {
 
             switch(tickLabelLocation) {
                 case OUTSIDE:
-                    innerPointX                = centerX + SIZE * 0.3585 * sinValue;
-                    innerPointY                = centerY + SIZE * 0.3585 * cosValue;
-                    innerMediumPointX          = centerX + SIZE * 0.3585 * sinValue;
-                    innerMediumPointY          = centerY + SIZE * 0.3585 * cosValue;
-                    innerMinorPointX           = centerX + SIZE * 0.3585 * sinValue;
-                    innerMinorPointY           = centerY + SIZE * 0.3585 * cosValue;
-                    outerPointX                = centerX + SIZE * 0.4105 * sinValue;
-                    outerPointY                = centerY + SIZE * 0.4105 * cosValue;
-                    outerMediumPointX          = centerX + SIZE * 0.4045 * sinValue;
-                    outerMediumPointY          = centerY + SIZE * 0.4045 * cosValue;
-                    outerMinorPointX           = centerX + SIZE * 0.3975 * sinValue;
-                    outerMinorPointY           = centerY + SIZE * 0.3975 * cosValue;
-                    textPointX                 = centerX + SIZE * orthTextFactor * sinValue;
-                    textPointY                 = centerY + SIZE * orthTextFactor * cosValue;
-                    dotCenterX                 = centerX + SIZE * 0.3685 * sinValue;
-                    dotCenterY                 = centerY + SIZE * 0.3685 * cosValue;
-                    dotMediumCenterX           = centerX + SIZE * 0.365375 * sinValue;
-                    dotMediumCenterY           = centerY + SIZE * 0.365375 * cosValue;
-                    dotMinorCenterX            = centerX + SIZE * 0.36225 * sinValue;
-                    dotMinorCenterY            = centerY + SIZE * 0.36225 * cosValue;
-                    tickLabelTickMarkX         = centerX + SIZE * 0.3805 * sinValue;
-                    tickLabelTickMarkY         = centerY + SIZE * 0.3805 * cosValue;
+                    innerPointX                 = centerX + SIZE * 0.3585 * sinValue;
+                    innerPointY                 = centerY + SIZE * 0.3585 * cosValue;
+                    innerMediumPointX           = innerPointX;
+                    innerMediumPointY           = innerPointY;
+                    innerMinorPointX            = innerPointX;
+                    innerMinorPointY            = innerPointY;
+                    outerPointX                 = centerX + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * majorTickMarkLengthFactor) * sinValue;
+                    outerPointY                 = centerY + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * majorTickMarkLengthFactor) * cosValue;
+                    outerMediumPointX           = centerX + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * mediumTickMarkLengthFactor) * sinValue;
+                    outerMediumPointY           = centerY + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * mediumTickMarkLengthFactor) * cosValue;
+                    outerMinorPointX            = centerX + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * minorTickMarkLengthFactor) * sinValue;
+                    outerMinorPointY            = centerY + SIZE * (0.3585 + MAX_TICK_MARK_LENGTH * minorTickMarkLengthFactor) * cosValue;
+                    textPointX                  = centerX + SIZE * orthTextFactor * sinValue;
+                    textPointY                  = centerY + SIZE * orthTextFactor * cosValue;
+                    dotCenterX                  = centerX + SIZE * 0.3685 * sinValue;
+                    dotCenterY                  = centerY + SIZE * 0.3685 * cosValue;
+                    dotMediumCenterX            = centerX + SIZE * 0.365375 * sinValue;
+                    dotMediumCenterY            = centerY + SIZE * 0.365375 * cosValue;
+                    dotMinorCenterX             = centerX + SIZE * 0.36225 * sinValue;
+                    dotMinorCenterY             = centerY + SIZE * 0.36225 * cosValue;
+                    tickLabelTickMarkX          = centerX + SIZE * 0.3805 * sinValue;
+                    tickLabelTickMarkY          = centerY + SIZE * 0.3805 * cosValue;
 
-                    triangleMajorInnerAngle1   = Math.toRadians(angle - 1.2 + START_ANGLE);
-                    triangleMajorInnerAngle2   = Math.toRadians(angle + 1.2 + START_ANGLE);
-                    triangleMajorOuterAngle1   = Math.toRadians(angle - 0.8 + START_ANGLE);
-                    triangleMajorOuterAngle2   = Math.toRadians(angle + 0.8 + START_ANGLE);
-                    triangleMajorInnerPoint1X  = centerX + SIZE * 0.3585 * Math.sin(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint1Y  = centerY + SIZE * 0.3585 * Math.cos(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint2X  = centerX + SIZE * 0.3585 * Math.sin(triangleMajorInnerAngle2);
-                    triangleMajorInnerPoint2Y  = centerY + SIZE * 0.3585 * Math.cos(triangleMajorInnerAngle2);
-                    triangleMajorOuterPoint1X  = centerX + SIZE * 0.4105 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint1Y  = centerY + SIZE * 0.4105 * Math.cos(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint2X  = centerX + SIZE * 0.4105 * Math.sin(triangleMajorOuterAngle2);
-                    triangleMajorOuterPoint2Y  = centerY + SIZE * 0.4105 * Math.cos(triangleMajorOuterAngle2);
+                    trapezoidMajorInnerAngle1   = Math.toRadians(angle - 1.2 + START_ANGLE);
+                    trapezoidMajorInnerAngle2   = Math.toRadians(angle + 1.2 + START_ANGLE);
+                    trapezoidMajorOuterAngle1   = Math.toRadians(angle - 0.8 + START_ANGLE);
+                    trapezoidMajorOuterAngle2   = Math.toRadians(angle + 0.8 + START_ANGLE);
+                    trapezoidMajorInnerPoint1X  = centerX + SIZE * 0.3585 * Math.sin(trapezoidMajorInnerAngle1);
+                    trapezoidMajorInnerPoint1Y  = centerY + SIZE * 0.3585 * Math.cos(trapezoidMajorInnerAngle1);
+                    trapezoidMajorInnerPoint2X  = centerX + SIZE * 0.3585 * Math.sin(trapezoidMajorInnerAngle2);
+                    trapezoidMajorInnerPoint2Y  = centerY + SIZE * 0.3585 * Math.cos(trapezoidMajorInnerAngle2);
+                    trapezoidMajorOuterPoint1X  = centerX + SIZE * 0.4105 * Math.sin(trapezoidMajorOuterAngle1);
+                    trapezoidMajorOuterPoint1Y  = centerY + SIZE * 0.4105 * Math.cos(trapezoidMajorOuterAngle1);
+                    trapezoidMajorOuterPoint2X  = centerX + SIZE * 0.4105 * Math.sin(trapezoidMajorOuterAngle2);
+                    trapezoidMajorOuterPoint2Y  = centerY + SIZE * 0.4105 * Math.cos(trapezoidMajorOuterAngle2);
 
-                    triangleMediumInnerAngle1  = Math.toRadians(angle - 1.0 + START_ANGLE);
-                    triangleMediumInnerAngle2  = Math.toRadians(angle + 1.0 + START_ANGLE);
-                    triangleMediumOuterAngle1  = Math.toRadians(angle - 0.7 + START_ANGLE);
-                    triangleMediumOuterAngle2  = Math.toRadians(angle + 0.7 + START_ANGLE);
-                    triangleMediumInnerPoint1X = centerX + SIZE * 0.3585 * Math.sin(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint1Y = centerY + SIZE * 0.3585 * Math.cos(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint2X = centerX + SIZE * 0.3585 * Math.sin(triangleMediumInnerAngle2);
-                    triangleMediumInnerPoint2Y = centerY + SIZE * 0.3585 * Math.cos(triangleMediumInnerAngle2);
-                    triangleMediumOuterPoint1X = centerX + SIZE * 0.3985 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMediumOuterPoint1Y = centerY + SIZE * 0.3985 * Math.cos(triangleMediumOuterAngle1);
-                    triangleMediumOuterPoint2X = centerX + SIZE * 0.3985 * Math.sin(triangleMediumOuterAngle2);
-                    triangleMediumOuterPoint2Y = centerY + SIZE * 0.3985 * Math.cos(triangleMediumOuterAngle2);
+                    trapezoidMediumInnerAngle1  = Math.toRadians(angle - 1.0 + START_ANGLE);
+                    trapezoidMediumInnerAngle2  = Math.toRadians(angle + 1.0 + START_ANGLE);
+                    trapezoidMediumOuterAngle1  = Math.toRadians(angle - 0.7 + START_ANGLE);
+                    trapezoidMediumOuterAngle2  = Math.toRadians(angle + 0.7 + START_ANGLE);
+                    trapezoidMediumInnerPoint1X = centerX + SIZE * 0.3585 * Math.sin(trapezoidMediumInnerAngle1);
+                    trapezoidMediumInnerPoint1Y = centerY + SIZE * 0.3585 * Math.cos(trapezoidMediumInnerAngle1);
+                    trapezoidMediumInnerPoint2X = centerX + SIZE * 0.3585 * Math.sin(trapezoidMediumInnerAngle2);
+                    trapezoidMediumInnerPoint2Y = centerY + SIZE * 0.3585 * Math.cos(trapezoidMediumInnerAngle2);
+                    trapezoidMediumOuterPoint1X = centerX + SIZE * 0.3985 * Math.sin(trapezoidMajorOuterAngle1);
+                    trapezoidMediumOuterPoint1Y = centerY + SIZE * 0.3985 * Math.cos(trapezoidMediumOuterAngle1);
+                    trapezoidMediumOuterPoint2X = centerX + SIZE * 0.3985 * Math.sin(trapezoidMediumOuterAngle2);
+                    trapezoidMediumOuterPoint2Y = centerY + SIZE * 0.3985 * Math.cos(trapezoidMediumOuterAngle2);
 
-                    triangleMinorInnerAngle1   = Math.toRadians(angle - 0.8 + START_ANGLE);
-                    triangleMinorInnerAngle2   = Math.toRadians(angle + 0.8 + START_ANGLE);
-                    triangleMinorOuterAngle1   = Math.toRadians(angle - 0.6 + START_ANGLE);
-                    triangleMinorOuterAngle2   = Math.toRadians(angle + 0.6 + START_ANGLE);
-                    triangleMinorInnerPoint1X  = centerX + SIZE * 0.3585 * Math.sin(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint1Y  = centerY + SIZE * 0.3585 * Math.cos(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint2X  = centerX + SIZE * 0.3585 * Math.sin(triangleMinorInnerAngle2);
-                    triangleMinorInnerPoint2Y  = centerY + SIZE * 0.3585 * Math.cos(triangleMinorInnerAngle2);
-                    triangleMinorOuterPoint1X  = centerX + SIZE * 0.3975 * Math.sin(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint1Y  = centerY + SIZE * 0.3975 * Math.cos(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint2X  = centerX + SIZE * 0.3975 * Math.sin(triangleMinorOuterAngle2);
-                    triangleMinorOuterPoint2Y  = centerY + SIZE * 0.3975 * Math.cos(triangleMinorOuterAngle2);
+                    trapezoidMinorInnerAngle1   = Math.toRadians(angle - 0.8 + START_ANGLE);
+                    trapezoidMinorInnerAngle2   = Math.toRadians(angle + 0.8 + START_ANGLE);
+                    trapezoidMinorOuterAngle1   = Math.toRadians(angle - 0.6 + START_ANGLE);
+                    trapezoidMinorOuterAngle2   = Math.toRadians(angle + 0.6 + START_ANGLE);
+                    trapezoidMinorInnerPoint1X  = centerX + SIZE * 0.3585 * Math.sin(trapezoidMinorInnerAngle1);
+                    trapezoidMinorInnerPoint1Y  = centerY + SIZE * 0.3585 * Math.cos(trapezoidMinorInnerAngle1);
+                    trapezoidMinorInnerPoint2X  = centerX + SIZE * 0.3585 * Math.sin(trapezoidMinorInnerAngle2);
+                    trapezoidMinorInnerPoint2Y  = centerY + SIZE * 0.3585 * Math.cos(trapezoidMinorInnerAngle2);
+                    trapezoidMinorOuterPoint1X  = centerX + SIZE * 0.3975 * Math.sin(trapezoidMinorOuterAngle1);
+                    trapezoidMinorOuterPoint1Y  = centerY + SIZE * 0.3975 * Math.cos(trapezoidMinorOuterAngle1);
+                    trapezoidMinorOuterPoint2X  = centerX + SIZE * 0.3975 * Math.sin(trapezoidMinorOuterAngle2);
+                    trapezoidMinorOuterPoint2Y  = centerY + SIZE * 0.3975 * Math.cos(trapezoidMinorOuterAngle2);
+
+                    triangleMajorInnerPointX    = centerX + SIZE * 0.3585 * sinValue;
+                    triangleMajorInnerPointY    = centerY + SIZE * 0.3585 * cosValue;
+                    triangleMajorOuterPointX    = centerX + SIZE * 0.4105 * sinValue;
+                    triangleMajorOuterPointY    = centerX + SIZE * 0.4105 * cosValue;
+
+                    triangleMediumInnerPointX   = triangleMajorInnerPointX;
+                    triangleMediumInnerPointY   = triangleMajorInnerPointY;
+                    triangleMediumOuterPointX   = centerX + SIZE * 0.4045 * sinValue;
+                    triangleMediumOuterPointY   = centerX + SIZE * 0.4045 * cosValue;
+
+                    triangleMinorInnerPointX    = triangleMajorInnerPointX;
+                    triangleMinorInnerPointY    = triangleMajorInnerPointY;
+                    triangleMinorOuterPointX    = centerX + SIZE * 0.3975 * sinValue;
+                    triangleMinorOuterPointY    = centerX + SIZE * 0.3975 * cosValue;
                     break;
                 case INSIDE:
                 default:
-                    innerPointX                = centerX + SIZE * 0.423 * sinValue;
-                    innerPointY                = centerY + SIZE * 0.423 * cosValue;
-                    innerMediumPointX          = centerX + SIZE * 0.43 * sinValue;
-                    innerMediumPointY          = centerY + SIZE * 0.43 * cosValue;
-                    innerMinorPointX           = centerX + SIZE * 0.436 * sinValue;
-                    innerMinorPointY           = centerY + SIZE * 0.436 * cosValue;
-                    outerPointX                = centerX + SIZE * 0.475 * sinValue;
-                    outerPointY                = centerY + SIZE * 0.475 * cosValue;
-                    outerMediumPointX          = centerX + SIZE * 0.475 * sinValue;
-                    outerMediumPointY          = centerY + SIZE * 0.475 * cosValue;
-                    outerMinorPointX           = centerX + SIZE * 0.475 * sinValue;
-                    outerMinorPointY           = centerY + SIZE * 0.475 * cosValue;
-                    textPointX                 = centerX + SIZE * orthTextFactor * sinValue;
-                    textPointY                 = centerY + SIZE * orthTextFactor * cosValue;
-                    dotCenterX                 = centerX + SIZE * 0.4625 * sinValue;
-                    dotCenterY                 = centerY + SIZE * 0.4625 * cosValue;
-                    dotMediumCenterX           = centerX + SIZE * 0.465625 * sinValue;
-                    dotMediumCenterY           = centerY + SIZE * 0.465625 * cosValue;
-                    dotMinorCenterX            = centerX + SIZE * 0.46875 * sinValue;
-                    dotMinorCenterY            = centerY + SIZE * 0.46875 * cosValue;
-                    tickLabelTickMarkX         = centerX + SIZE * 0.445 * sinValue;
-                    tickLabelTickMarkY         = centerY + SIZE * 0.445 * cosValue;
+                    innerPointX                 = centerX + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * majorTickMarkLengthFactor) * sinValue;
+                    innerPointY                 = centerY + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * majorTickMarkLengthFactor) * cosValue;
+                    innerMediumPointX           = centerX + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * mediumTickMarkLengthFactor) * sinValue;
+                    innerMediumPointY           = centerY + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * mediumTickMarkLengthFactor) * cosValue;
+                    innerMinorPointX            = centerX + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * minorTickMarkLengthFactor) * sinValue;
+                    innerMinorPointY            = centerY + SIZE * (0.475 - MAX_TICK_MARK_LENGTH * minorTickMarkLengthFactor) * cosValue;
+                    outerPointX                 = centerX + SIZE * 0.475 * sinValue;
+                    outerPointY                 = centerY + SIZE * 0.475 * cosValue;
+                    outerMediumPointX           = outerPointX;
+                    outerMediumPointY           = outerPointY;
+                    outerMinorPointX            = outerPointX;
+                    outerMinorPointY            = outerPointY;
+                    textPointX                  = centerX + SIZE * orthTextFactor * sinValue;
+                    textPointY                  = centerY + SIZE * orthTextFactor * cosValue;
+                    dotCenterX                  = centerX + SIZE * 0.4625 * sinValue;
+                    dotCenterY                  = centerY + SIZE * 0.4625 * cosValue;
+                    dotMediumCenterX            = centerX + SIZE * 0.465625 * sinValue;
+                    dotMediumCenterY            = centerY + SIZE * 0.465625 * cosValue;
+                    dotMinorCenterX             = centerX + SIZE * 0.46875 * sinValue;
+                    dotMinorCenterY             = centerY + SIZE * 0.46875 * cosValue;
+                    tickLabelTickMarkX          = centerX + SIZE * 0.445 * sinValue;
+                    tickLabelTickMarkY          = centerY + SIZE * 0.445 * cosValue;
 
-                    triangleMajorInnerAngle1   = Math.toRadians(angle - 0.8 + START_ANGLE);
-                    triangleMajorInnerAngle2   = Math.toRadians(angle + 0.8 + START_ANGLE);
-                    triangleMajorOuterAngle1   = Math.toRadians(angle - 1.2 + START_ANGLE);
-                    triangleMajorOuterAngle2   = Math.toRadians(angle + 1.2 + START_ANGLE);
-                    triangleMajorInnerPoint1X  = centerX + SIZE * 0.423 * Math.sin(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint1Y  = centerY + SIZE * 0.423 * Math.cos(triangleMajorInnerAngle1);
-                    triangleMajorInnerPoint2X  = centerX + SIZE * 0.423 * Math.sin(triangleMajorInnerAngle2);
-                    triangleMajorInnerPoint2Y  = centerY + SIZE * 0.423 * Math.cos(triangleMajorInnerAngle2);
-                    triangleMajorOuterPoint1X  = centerX + SIZE * 0.475 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint1Y  = centerY + SIZE * 0.475 * Math.cos(triangleMajorOuterAngle1);
-                    triangleMajorOuterPoint2X  = centerX + SIZE * 0.475 * Math.sin(triangleMajorOuterAngle2);
-                    triangleMajorOuterPoint2Y  = centerY + SIZE * 0.475 * Math.cos(triangleMajorOuterAngle2);
+                    trapezoidMajorInnerAngle1   = Math.toRadians(angle - 0.8 + START_ANGLE);
+                    trapezoidMajorInnerAngle2   = Math.toRadians(angle + 0.8 + START_ANGLE);
+                    trapezoidMajorOuterAngle1   = Math.toRadians(angle - 1.2 + START_ANGLE);
+                    trapezoidMajorOuterAngle2   = Math.toRadians(angle + 1.2 + START_ANGLE);
+                    trapezoidMajorInnerPoint1X  = centerX + SIZE * 0.423 * Math.sin(trapezoidMajorInnerAngle1);
+                    trapezoidMajorInnerPoint1Y  = centerY + SIZE * 0.423 * Math.cos(trapezoidMajorInnerAngle1);
+                    trapezoidMajorInnerPoint2X  = centerX + SIZE * 0.423 * Math.sin(trapezoidMajorInnerAngle2);
+                    trapezoidMajorInnerPoint2Y  = centerY + SIZE * 0.423 * Math.cos(trapezoidMajorInnerAngle2);
+                    trapezoidMajorOuterPoint1X  = centerX + SIZE * 0.475 * Math.sin(trapezoidMajorOuterAngle1);
+                    trapezoidMajorOuterPoint1Y  = centerY + SIZE * 0.475 * Math.cos(trapezoidMajorOuterAngle1);
+                    trapezoidMajorOuterPoint2X  = centerX + SIZE * 0.475 * Math.sin(trapezoidMajorOuterAngle2);
+                    trapezoidMajorOuterPoint2Y  = centerY + SIZE * 0.475 * Math.cos(trapezoidMajorOuterAngle2);
 
-                    triangleMediumInnerAngle1  = Math.toRadians(angle - 0.7 + START_ANGLE);
-                    triangleMediumInnerAngle2  = Math.toRadians(angle + 0.7 + START_ANGLE);
-                    triangleMediumOuterAngle1  = Math.toRadians(angle - 1.0 + START_ANGLE);
-                    triangleMediumOuterAngle2  = Math.toRadians(angle + 1.0 + START_ANGLE);
-                    triangleMediumInnerPoint1X = centerX + SIZE * 0.435 * Math.sin(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint1Y = centerY + SIZE * 0.435 * Math.cos(triangleMediumInnerAngle1);
-                    triangleMediumInnerPoint2X = centerX + SIZE * 0.435 * Math.sin(triangleMediumInnerAngle2);
-                    triangleMediumInnerPoint2Y = centerY + SIZE * 0.435 * Math.cos(triangleMediumInnerAngle2);
-                    triangleMediumOuterPoint1X = centerX + SIZE * 0.475 * Math.sin(triangleMajorOuterAngle1);
-                    triangleMediumOuterPoint1Y = centerY + SIZE * 0.475 * Math.cos(triangleMediumOuterAngle1);
-                    triangleMediumOuterPoint2X = centerX + SIZE * 0.475 * Math.sin(triangleMediumOuterAngle2);
-                    triangleMediumOuterPoint2Y = centerY + SIZE * 0.475 * Math.cos(triangleMediumOuterAngle2);
+                    trapezoidMediumInnerAngle1  = Math.toRadians(angle - 0.7 + START_ANGLE);
+                    trapezoidMediumInnerAngle2  = Math.toRadians(angle + 0.7 + START_ANGLE);
+                    trapezoidMediumOuterAngle1  = Math.toRadians(angle - 1.0 + START_ANGLE);
+                    trapezoidMediumOuterAngle2  = Math.toRadians(angle + 1.0 + START_ANGLE);
+                    trapezoidMediumInnerPoint1X = centerX + SIZE * 0.435 * Math.sin(trapezoidMediumInnerAngle1);
+                    trapezoidMediumInnerPoint1Y = centerY + SIZE * 0.435 * Math.cos(trapezoidMediumInnerAngle1);
+                    trapezoidMediumInnerPoint2X = centerX + SIZE * 0.435 * Math.sin(trapezoidMediumInnerAngle2);
+                    trapezoidMediumInnerPoint2Y = centerY + SIZE * 0.435 * Math.cos(trapezoidMediumInnerAngle2);
+                    trapezoidMediumOuterPoint1X = centerX + SIZE * 0.475 * Math.sin(trapezoidMajorOuterAngle1);
+                    trapezoidMediumOuterPoint1Y = centerY + SIZE * 0.475 * Math.cos(trapezoidMediumOuterAngle1);
+                    trapezoidMediumOuterPoint2X = centerX + SIZE * 0.475 * Math.sin(trapezoidMediumOuterAngle2);
+                    trapezoidMediumOuterPoint2Y = centerY + SIZE * 0.475 * Math.cos(trapezoidMediumOuterAngle2);
 
-                    triangleMinorInnerAngle1   = Math.toRadians(angle - 0.6 + START_ANGLE);
-                    triangleMinorInnerAngle2   = Math.toRadians(angle + 0.6 + START_ANGLE);
-                    triangleMinorOuterAngle1   = Math.toRadians(angle - 0.8 + START_ANGLE);
-                    triangleMinorOuterAngle2   = Math.toRadians(angle + 0.8 + START_ANGLE);
-                    triangleMinorInnerPoint1X  = centerX + SIZE * 0.440 * Math.sin(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint1Y  = centerY + SIZE * 0.440 * Math.cos(triangleMinorInnerAngle1);
-                    triangleMinorInnerPoint2X  = centerX + SIZE * 0.440 * Math.sin(triangleMinorInnerAngle2);
-                    triangleMinorInnerPoint2Y  = centerY + SIZE * 0.440 * Math.cos(triangleMinorInnerAngle2);
-                    triangleMinorOuterPoint1X  = centerX + SIZE * 0.475 * Math.sin(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint1Y  = centerY + SIZE * 0.475 * Math.cos(triangleMinorOuterAngle1);
-                    triangleMinorOuterPoint2X  = centerX + SIZE * 0.475 * Math.sin(triangleMinorOuterAngle2);
-                    triangleMinorOuterPoint2Y  = centerY + SIZE * 0.475 * Math.cos(triangleMinorOuterAngle2);
+                    trapezoidMinorInnerAngle1   = Math.toRadians(angle - 0.6 + START_ANGLE);
+                    trapezoidMinorInnerAngle2   = Math.toRadians(angle + 0.6 + START_ANGLE);
+                    trapezoidMinorOuterAngle1   = Math.toRadians(angle - 0.8 + START_ANGLE);
+                    trapezoidMinorOuterAngle2   = Math.toRadians(angle + 0.8 + START_ANGLE);
+                    trapezoidMinorInnerPoint1X  = centerX + SIZE * 0.440 * Math.sin(trapezoidMinorInnerAngle1);
+                    trapezoidMinorInnerPoint1Y  = centerY + SIZE * 0.440 * Math.cos(trapezoidMinorInnerAngle1);
+                    trapezoidMinorInnerPoint2X  = centerX + SIZE * 0.440 * Math.sin(trapezoidMinorInnerAngle2);
+                    trapezoidMinorInnerPoint2Y  = centerY + SIZE * 0.440 * Math.cos(trapezoidMinorInnerAngle2);
+                    trapezoidMinorOuterPoint1X  = centerX + SIZE * 0.475 * Math.sin(trapezoidMinorOuterAngle1);
+                    trapezoidMinorOuterPoint1Y  = centerY + SIZE * 0.475 * Math.cos(trapezoidMinorOuterAngle1);
+                    trapezoidMinorOuterPoint2X  = centerX + SIZE * 0.475 * Math.sin(trapezoidMinorOuterAngle2);
+                    trapezoidMinorOuterPoint2Y  = centerY + SIZE * 0.475 * Math.cos(trapezoidMinorOuterAngle2);
+
+                    triangleMajorInnerPointX    = centerX + SIZE * 0.423 * sinValue;
+                    triangleMajorInnerPointY    = centerX + SIZE * 0.423 * cosValue;
+                    triangleMajorOuterPointX    = centerX + SIZE * 0.475 * sinValue;
+                    triangleMajorOuterPointY    = centerX + SIZE * 0.475 * cosValue;
+
+                    triangleMediumInnerPointX   = centerX + SIZE * 0.43 * sinValue;
+                    triangleMediumInnerPointY   = centerX + SIZE * 0.43 * cosValue;
+                    triangleMediumOuterPointX   = triangleMajorOuterPointX;
+                    triangleMediumOuterPointY   = triangleMajorOuterPointY;
+
+                    triangleMinorInnerPointX    = centerX + SIZE * 0.436 * sinValue;
+                    triangleMinorInnerPointY    = centerX + SIZE * 0.436 * cosValue;
+                    triangleMinorOuterPointX    = triangleMajorOuterPointX;
+                    triangleMinorOuterPointY    = triangleMajorOuterPointY;
                     break;
             }
 
@@ -558,21 +720,21 @@ public class Helper {
             CTX.setFill(tickMarkColor);
             CTX.setLineCap(StrokeLineCap.BUTT);
 
-            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw major tick mark
-                isNotZero = Double.compare(0d, counter) != 0;
+                isNotZero = Double.compare(0.0, counter) != 0;
                 TickMarkType tickMarkType = null;
                 if (majorTickMarksVisible) {
                     tickMarkType = majorTickMarkType;
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
                     CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
-                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.016 : 0.0055));
+                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.016 : MAX_TICK_MARK_WIDTH * majorTickMarkWidthFactor));
                     CTX.setLineCap(TickMarkType.PILL == tickMarkType ? StrokeLineCap.ROUND : StrokeLineCap.BUTT);
                 } else if (minorTickMarksVisible) {
                     tickMarkType = minorTickMarkType;
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
-                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.007 : 0.00225));
+                    CTX.setLineWidth(SIZE * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.007 : MAX_TICK_MARK_WIDTH * minorTickMarkWidthFactor));
                     CTX.setLineCap(TickMarkType.PILL == tickMarkType ? StrokeLineCap.ROUND : StrokeLineCap.BUTT);
                 }
                 if (fullRange && !isNotZero) {
@@ -581,13 +743,28 @@ public class Helper {
                 }
                 if (null != tickMarkType) {
                     switch (tickMarkType) {
+                        case TRAPEZOID:
+                            if (majorTickMarksVisible) {
+                                Helper.drawTrapezoid(CTX, trapezoidMajorInnerPoint1X, trapezoidMajorInnerPoint1Y, trapezoidMajorInnerPoint2X, trapezoidMajorInnerPoint2Y,
+                                                    trapezoidMajorOuterPoint1X, trapezoidMajorOuterPoint1Y, trapezoidMajorOuterPoint2X, trapezoidMajorOuterPoint2Y);
+                            } else if (minorTickMarksVisible) {
+                                Helper.drawTrapezoid(CTX, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y,
+                                                    trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
+                            }
+                            break;
                         case TRIANGLE:
                             if (majorTickMarksVisible) {
-                                Helper.drawTriangle(CTX, triangleMajorInnerPoint1X, triangleMajorInnerPoint1Y, triangleMajorInnerPoint2X, triangleMajorInnerPoint2Y,
-                                                    triangleMajorOuterPoint1X, triangleMajorOuterPoint1Y, triangleMajorOuterPoint2X, triangleMajorOuterPoint2Y);
+                                if (TickLabelLocation.INSIDE == tickLabelLocation) {
+                                    Helper.drawTriangle(CTX, triangleMajorInnerPointX, triangleMajorInnerPointY, trapezoidMajorOuterPoint1X, trapezoidMajorOuterPoint1Y, trapezoidMajorOuterPoint2X, trapezoidMajorOuterPoint2Y);
+                                } else {
+                                    Helper.drawTriangle(CTX, triangleMajorOuterPointX, triangleMajorOuterPointY, trapezoidMajorInnerPoint1X, trapezoidMajorInnerPoint1Y, trapezoidMajorInnerPoint2X, trapezoidMajorInnerPoint2Y);
+                                }
                             } else if (minorTickMarksVisible) {
-                                Helper.drawTriangle(CTX, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
-                                                    triangleMinorOuterPoint1X, triangleMinorOuterPoint1Y, triangleMinorOuterPoint2X, triangleMinorOuterPoint2Y);
+                                if (TickLabelLocation.INSIDE == tickLabelLocation) {
+                                    Helper.drawTriangle(CTX, triangleMinorInnerPointX, triangleMinorInnerPointY, trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
+                                } else {
+                                    Helper.drawTriangle(CTX, triangleMinorOuterPointX, triangleMinorOuterPointY, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y);
+                                }
                             }
                             break;
                         case DOT:
@@ -607,7 +784,7 @@ public class Helper {
                                 CTX.setFont(isNotZero ? tickMarkFont : tickMarkZeroFont);
                                 CTX.setTextAlign(TextAlignment.CENTER);
                                 CTX.setTextBaseline(VPos.CENTER);
-                                CTX.fillText(String.format(Locale.US, tickLabelFormatString, counter), 0, 0);
+                                CTX.fillText(String.format(locale, tickLabelFormatString, counter), 0, 0);
                                 CTX.restore();
                             }
                             break;
@@ -661,20 +838,27 @@ public class Helper {
                         }
                         if (customTickLabelCounter > customTickLabels.size() - 1) customTickLabelCounter = -1;
                     } else {
-                        CTX.fillText(String.format(Locale.US, tickLabelFormatString, counter), 0, 0);
+                        CTX.fillText(String.format(locale, tickLabelFormatString, counter), 0, 0);
                     }
                     CTX.restore();
                 }
             } else if (mediumTickMarksVisible &&
-                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0d) != 0d &&
-                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0d) == 0d) {
+                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0.0) != 0.0 &&
+                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0.0) == 0.0) {
                 // Draw medium tick mark
                 CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, mediumTickMarkColor) : mediumTickMarkColor);
                 CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, mediumTickMarkColor) : mediumTickMarkColor);
                 switch(mediumTickMarkType) {
+                    case TRAPEZOID:
+                        Helper.drawTrapezoid(CTX, trapezoidMediumInnerPoint1X, trapezoidMediumInnerPoint1Y, trapezoidMediumInnerPoint2X, trapezoidMediumInnerPoint2Y,
+                                            trapezoidMediumOuterPoint1X, trapezoidMediumOuterPoint1Y, trapezoidMediumOuterPoint2X, trapezoidMediumOuterPoint2Y);
+                        break;
                     case TRIANGLE:
-                        Helper.drawTriangle(CTX, triangleMediumInnerPoint1X, triangleMediumInnerPoint1Y, triangleMediumInnerPoint2X, triangleMediumInnerPoint2Y,
-                                            triangleMediumOuterPoint1X, triangleMediumOuterPoint1Y, triangleMediumOuterPoint2X, triangleMediumOuterPoint2Y);
+                        if (TickLabelLocation.INSIDE == tickLabelLocation) {
+                            Helper.drawTriangle(CTX, triangleMediumInnerPointX, triangleMediumInnerPointY, trapezoidMediumOuterPoint1X, trapezoidMediumOuterPoint1Y, trapezoidMediumOuterPoint2X, trapezoidMediumOuterPoint2Y);
+                        } else {
+                            Helper.drawTriangle(CTX, triangleMediumOuterPointX, triangleMediumOuterPointY, trapezoidMediumInnerPoint1X, trapezoidMediumInnerPoint1Y, trapezoidMediumInnerPoint2X, trapezoidMediumInnerPoint2Y);
+                        }
                         break;
                     case DOT:
                         Helper.drawDot(CTX, dotMediumCenterX - mediumHalfDotSize, dotMediumCenterY - mediumHalfDotSize, mediumDotSize);
@@ -698,7 +882,7 @@ public class Helper {
                         break;
                     case LINE:
                     default:
-                        CTX.setLineWidth(SIZE * 0.0035);
+                        CTX.setLineWidth(SIZE * MAX_TICK_MARK_WIDTH * mediumTickMarkWidthFactor);
                         if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
                             Helper.drawLine(CTX, innerPointX, innerPointY, outerMediumPointX, outerMediumPointY);
                         } else {
@@ -706,15 +890,22 @@ public class Helper {
                         }
                         break;
                 }
-            } else if (minorTickMarksVisible && Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0d) == 0) {
+            } else if (minorTickMarksVisible && Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw minor tick mark
                 if (TickMarkType.TICK_LABEL != majorTickMarkType) {
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     switch (minorTickMarkType) {
+                        case TRAPEZOID:
+                            Helper.drawTrapezoid(CTX, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y,
+                                                trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
+                            break;
                         case TRIANGLE:
-                            Helper.drawTriangle(CTX, triangleMinorInnerPoint1X, triangleMinorInnerPoint1Y, triangleMinorInnerPoint2X, triangleMinorInnerPoint2Y,
-                                                triangleMinorOuterPoint1X, triangleMinorOuterPoint1Y, triangleMinorOuterPoint2X, triangleMinorOuterPoint2Y);
+                            if (TickLabelLocation.INSIDE == tickLabelLocation) {
+                                Helper.drawTriangle(CTX, triangleMinorInnerPointX, triangleMinorInnerPointY, trapezoidMinorOuterPoint1X, trapezoidMinorOuterPoint1Y, trapezoidMinorOuterPoint2X, trapezoidMinorOuterPoint2Y);
+                            } else {
+                                Helper.drawTriangle(CTX, triangleMinorOuterPointX, triangleMinorOuterPointY, trapezoidMinorInnerPoint1X, trapezoidMinorInnerPoint1Y, trapezoidMinorInnerPoint2X, trapezoidMinorInnerPoint2Y);
+                            }
                             break;
                         case DOT:
                             Helper.drawDot(CTX, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
@@ -738,7 +929,7 @@ public class Helper {
                             break;
                         case LINE:
                         default:
-                            CTX.setLineWidth(SIZE * 0.00225);
+                            CTX.setLineWidth(SIZE * MAX_TICK_MARK_WIDTH * minorTickMarkWidthFactor);
                             if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
                                 Helper.drawLine(CTX, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
                             } else {
@@ -759,7 +950,7 @@ public class Helper {
         if (Double.compare(WIDTH, 0) <= 0 || Double.compare(HEIGHT, 0) <= 0) return null;
         int                 width                   = (int) WIDTH;
         int                 height                  = (int) HEIGHT;
-        double              alphaVariationInPercent = Helper.clamp(0d, 100d, ALPHA_VARIATION_IN_PERCENT);
+        double              alphaVariationInPercent = Helper.clamp(0.0, 100.0, ALPHA_VARIATION_IN_PERCENT);
         final WritableImage IMAGE                   = new WritableImage(width, height);
         final PixelWriter   PIXEL_WRITER            = IMAGE.getPixelWriter();
         final Random        BW_RND                  = new Random();
@@ -769,7 +960,7 @@ public class Helper {
         for (int y = 0 ; y < height ; y++) {
             for (int x = 0 ; x < width ; x++) {
                 final Color  NOISE_COLOR = BW_RND.nextBoolean() == true ? BRIGHT_COLOR : DARK_COLOR;
-                final double NOISE_ALPHA = Helper.clamp(0d, 1d, ALPHA_START + ALPHA_RND.nextDouble() * ALPHA_VARIATION);
+                final double NOISE_ALPHA = Helper.clamp(0.0, 1.0, ALPHA_START + ALPHA_RND.nextDouble() * ALPHA_VARIATION);
                 PIXEL_WRITER.setColor(x, y, Color.color(NOISE_COLOR.getRed(), NOISE_COLOR.getGreen(), NOISE_COLOR.getBlue(), NOISE_ALPHA));
             }
         }
@@ -781,24 +972,38 @@ public class Helper {
                                         final double LINE_WIDTH) {
         if (SECTIONS.isEmpty()) return;
         TickLabelLocation tickLabelLocation = CLOCK.getTickLabelLocation();
+        ZonedDateTime     time              = CLOCK.getTime();
+        boolean           isAM              = time.get(ChronoField.AMPM_OF_DAY) == 0;
         double            xy                = TickLabelLocation.INSIDE == tickLabelLocation ? XY_INSIDE * SIZE : XY_OUTSIDE * SIZE;
         double            wh                = TickLabelLocation.INSIDE == tickLabelLocation ? WH_INSIDE * SIZE : WH_OUTSIDE * SIZE;
         double            offset            = 90;
         int               listSize          = SECTIONS.size();
-        double            angleStep         = 360d / 60d;
+        double            angleStep         = 360.0 / 60.0;
+        boolean           highlightSections = CLOCK.isHighlightSections();
         for (int i = 0 ; i < listSize ; i++) {
-            TimeSection section           = SECTIONS.get(i);
-            LocalTime   start             = section.getStart();
-            LocalTime   stop              = section.getStop();
-            double      sectionStartAngle = (start.getHour() % 12 * 5d + start.getMinute() / 12d + start.getSecond() / 300d) * angleStep + 180;
-            double      sectionAngleExtend;
-            sectionAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5d + (stop.getMinute() - start.getMinute()) / 12d + (stop.getSecond() - start.getSecond()) / 300d) * angleStep;
-            CTX.save();
-            CTX.setStroke(section.getColor());
-            CTX.setLineWidth(SIZE * LINE_WIDTH);
-            CTX.setLineCap(StrokeLineCap.BUTT);
-            CTX.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
-            CTX.restore();
+            TimeSection section   = SECTIONS.get(i);
+            LocalTime   start     = section.getStart();
+            LocalTime   stop      = section.getStop();
+            boolean     isStartAM = start.get(ChronoField.AMPM_OF_DAY) == 0;
+            boolean     isStopAM  = stop.get(ChronoField.AMPM_OF_DAY) == 0;
+            boolean     draw      = isAM ? (isStartAM || isStopAM) :(!isStartAM || !isStopAM);
+            if (draw) {
+                double sectionStartAngle = (start.getHour() % 12 * 5.0 + start.getMinute() / 12.0 + start.getSecond() / 300.0) * angleStep + 180;
+                double sectionAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5.0 + (stop.getMinute() - start.getMinute()) / 12.0 + (stop.getSecond() - start.getSecond()) / 300.0) * angleStep;
+                //TODO: Add an indicator to the section like -1 or similar
+                // check if start was already yesterday
+                if (start.getHour() > stop.getHour()) { sectionAngleExtend = (360.0 - Math.abs(sectionAngleExtend)); }
+                CTX.save();
+                if (highlightSections) {
+                    CTX.setStroke(section.contains(time.toLocalTime()) ? section.getHighlightColor() : section.getColor());
+                } else {
+                    CTX.setStroke(section.getColor());
+                }
+                CTX.setLineWidth(SIZE * LINE_WIDTH);
+                CTX.setLineCap(StrokeLineCap.BUTT);
+                CTX.strokeArc(xy, xy, wh, wh, -(offset + sectionStartAngle), -sectionAngleExtend, ArcType.OPEN);
+                CTX.restore();
+            }
         }
     }
 
@@ -806,22 +1011,80 @@ public class Helper {
                                      final double XY_INSIDE, final double XY_OUTSIDE, final double WH_INSIDE, final double WH_OUTSIDE) {
         if (AREAS.isEmpty()) return;
         TickLabelLocation tickLabelLocation = CLOCK.getTickLabelLocation();
+        ZonedDateTime     time              = CLOCK.getTime();
+        boolean           isAM              = time.get(ChronoField.AMPM_OF_DAY) == 0;
         double            xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? XY_OUTSIDE * SIZE : XY_INSIDE * SIZE;
         double            wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? WH_OUTSIDE * SIZE : WH_INSIDE * SIZE;
         double            offset            = 90;
-        double            angleStep         = 360d / 60d;
-        int listSize = AREAS.size();
+        double            angleStep         = 360.0 / 60.0;
+        int               listSize          = AREAS.size();
+        boolean           highlightAreas    = CLOCK.isHighlightAreas();
         for (int i = 0; i < listSize ; i++) {
-            TimeSection area           = AREAS.get(i);
-            LocalTime   start          = area.getStart();
-            LocalTime   stop           = area.getStop();
-            double      areaStartAngle = (start.getHour() % 12 * 5d + start.getMinute() / 12d + start.getSecond() / 300d) * angleStep + 180;
-            double      areaAngleExtend;
-            areaAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5d + (stop.getMinute() - start.getMinute()) / 12d + (stop.getSecond() - start.getSecond()) / 300d) * angleStep;
-            CTX.save();
-            CTX.setFill(area.getColor());
-            CTX.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), - areaAngleExtend, ArcType.ROUND);
-            CTX.restore();
+            TimeSection area      = AREAS.get(i);
+            LocalTime   start     = area.getStart();
+            LocalTime   stop      = area.getStop();
+            boolean     isStartAM = start.get(ChronoField.AMPM_OF_DAY) == 0;
+            boolean     isStopAM  = stop.get(ChronoField.AMPM_OF_DAY) == 0;
+            boolean     draw      = isAM ? (isStartAM || isStopAM) :(!isStartAM || !isStopAM);
+            if (draw) {
+                double areaStartAngle  = (start.getHour() % 12 * 5.0 + start.getMinute() / 12.0 + start.getSecond() / 300.0) * angleStep + 180;;
+                double areaAngleExtend = ((stop.getHour() - start.getHour()) % 12 * 5.0 + (stop.getMinute() - start.getMinute()) / 12.0 + (stop.getSecond() - start.getSecond()) / 300.0) * angleStep;
+                //TODO: Add an indicator to the area like -1 or similar
+                // check if start was already yesterday
+                if (start.getHour() > stop.getHour()) { areaAngleExtend = (360.0 - Math.abs(areaAngleExtend)); }
+                CTX.save();
+                if (highlightAreas) {
+                    CTX.setFill(area.contains(time.toLocalTime()) ? area.getHighlightColor() : area.getColor());
+                } else {
+                    CTX.setFill(area.getColor());
+                }
+                CTX.fillArc(xy, xy, wh, wh, -(offset + areaStartAngle), -areaAngleExtend, ArcType.ROUND);
+                CTX.restore();
+            }
+        }
+    }
+
+    public static void drawAlarms(final Clock CLOCK, final double SIZE, final double ALARM_MARKER_SIZE, final double ALARM_MARKER_RADIUS, final Map<Alarm, Circle> ALARM_MAP, final DateTimeFormatter DATE_TIME_FORMATTER, final ZonedDateTime TIME) {
+        if (CLOCK.isAlarmsVisible()) {
+            double alarmSize = ALARM_MARKER_SIZE * SIZE;
+            double center    = SIZE * 0.5;
+            double angleStep = 360.0 / 60.0;
+            for (Map.Entry<Alarm, Circle> entry : ALARM_MAP.entrySet()) {
+                Alarm         alarm      = entry.getKey();
+                ZonedDateTime alarmTime  = alarm.getTime();
+                double        alarmAngle = (alarmTime.getMinute() + alarmTime.getSecond() / 60.0) * angleStep + 180;
+                double        sinValue   = Math.sin(Math.toRadians((-alarmAngle)));
+                double        cosValue   = Math.cos(Math.toRadians((-alarmAngle)));
+                Color         alarmColor = alarm.isArmed() ? alarm.getColor() : INACTIVE_ALARM_COLOR;
+                Circle        dot        = entry.getValue();
+                dot.setRadius(alarmSize);
+                dot.setCenterX(center + SIZE * ALARM_MARKER_RADIUS * sinValue);
+                dot.setCenterY(center + SIZE * ALARM_MARKER_RADIUS * cosValue);
+                dot.setFill(alarmColor);
+                dot.setStroke(alarmColor.darker());
+                dot.setPickOnBounds(false);
+                dot.setOnMousePressed(e -> alarm.fireAlarmMarkerEvent(alarm.ALARM_MARKER_PRESSED_EVENT));
+                dot.setOnMouseReleased(e -> alarm.fireAlarmMarkerEvent(alarm.ALARM_MARKER_RELEASED_EVENT));
+                if (alarmTime.getDayOfMonth() == TIME.getDayOfMonth() &&
+                    alarmTime.getMonthValue() == TIME.getMonthValue() &&
+                    alarmTime.getYear() == TIME.getYear() &&
+                    alarmTime.getHour() == TIME.getHour() &&
+                    alarmTime.getMinute() >= TIME.getMinute()) {
+                    dot.setManaged(true);
+                    dot.setVisible(true);
+                } else {
+                    dot.setManaged(false);
+                    dot.setVisible(false);
+                }
+                Tooltip alarmTooltip;
+                if (alarm.getText().isEmpty()) {
+                    alarmTooltip = new Tooltip(DATE_TIME_FORMATTER.format(alarm.getTime()));
+                } else {
+                    alarmTooltip = new Tooltip(new StringBuilder(alarm.getText()).append("\n").append(DATE_TIME_FORMATTER.format(alarm.getTime())).toString());
+                }
+                alarmTooltip.setTextAlignment(TextAlignment.CENTER);
+                Tooltip.install(dot, alarmTooltip);
+            }
         }
     }
 }

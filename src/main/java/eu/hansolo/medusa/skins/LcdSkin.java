@@ -51,6 +51,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.ClosePath;
+import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -92,6 +93,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              InnerShadow           mainInnerShadow0;
     private              InnerShadow           mainInnerShadow1;
     private              Path                  threshold;
+    private              Path                  average;
     private              Text                  valueText;
     private              Text                  backgroundText;
     private              Text                  unitText;
@@ -116,6 +118,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Group                 shadowGroup;
     private              String                valueFormatString;
     private              String                otherFormatString;
+    private              Locale                locale;
     private              List<Section>         sections;
     private              Map<Section, Color[]> sectionColorMap;
 
@@ -131,6 +134,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         backgroundTextBuilder = new StringBuilder();
         valueFormatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         otherFormatString     = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
+        locale                = gauge.getLocale();
         sections              = gauge.getSections();
         sectionColorMap       = new HashMap<>(sections.size());
         updateSectionColors();
@@ -139,14 +143,15 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         FOREGROUND_SHADOW.setColor(Color.rgb(0, 0, 0, 0.5));
         FOREGROUND_SHADOW.setBlurType(BlurType.TWO_PASS_BOX);
         FOREGROUND_SHADOW.setRadius(2);
-        init();
+
         initGraphics();
         registerListeners();
     }
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
+        // Set initial size
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
             if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
@@ -156,20 +161,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         }
 
-        if (Double.compare(getSkinnable().getMinWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMinHeight(), 0.0) <= 0) {
-            getSkinnable().setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
-        }
-
-        if (Double.compare(getSkinnable().getMaxWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMaxHeight(), 0.0) <= 0) {
-            getSkinnable().setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
-        }
-
-        if (getSkinnable().getPrefWidth() != PREFERRED_WIDTH || getSkinnable().getPrefHeight() != PREFERRED_HEIGHT) {
-            aspectRatio = getSkinnable().getPrefHeight() / getSkinnable().getPrefWidth();
-        }
-    }
-
-    private void initGraphics() {
         mainInnerShadow0 = new InnerShadow();
         mainInnerShadow0.setOffsetX(0.0);
         mainInnerShadow0.setOffsetY(0.0);
@@ -193,54 +184,51 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         crystalOverlay = new ImageView(crystalImage);
         crystalOverlay.setClip(crystalClip);
         boolean crystalEnabled = getSkinnable().isLcdCrystalEnabled();
-        crystalOverlay.setManaged(crystalEnabled);
-        crystalOverlay.setVisible(crystalEnabled);
+        Helper.enableNode(crystalOverlay, crystalEnabled);
 
         threshold = new Path();
-        threshold.setManaged(getSkinnable().isThresholdVisible());
-        threshold.setVisible(getSkinnable().isThresholdVisible());
         threshold.setStroke(null);
-        
-        backgroundText = new Text(String.format(Locale.US, valueFormatString, getSkinnable().getCurrentValue()));
+        Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
+
+        average = new Path();
+        average.setStroke(null);
+        Helper.enableNode(average, getSkinnable().isAverageVisible());
+
+        backgroundText = new Text(String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
         backgroundText.setFill(getSkinnable().getLcdDesign().lcdBackgroundColor);
         backgroundText.setOpacity((LcdFont.LCD == getSkinnable().getLcdFont() || LcdFont.ELEKTRA == getSkinnable().getLcdFont()) ? 1 : 0);
 
-        valueText = new Text(String.format(Locale.US, valueFormatString, getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
         valueText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
 
         unitText = new Text(getSkinnable().getUnit());
         unitText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        unitText.setManaged(!getSkinnable().getUnit().isEmpty());
-        unitText.setVisible(!getSkinnable().getUnit().isEmpty());
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         title = new Text(getSkinnable().getTitle());
         title.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        title.setManaged(!getSkinnable().getTitle().isEmpty());
-        title.setVisible(!getSkinnable().getTitle().isEmpty());
+        Helper.enableNode(title, !getSkinnable().getTitle().isEmpty());
 
         lowerRightText = new Text(getSkinnable().getSubTitle());
         lowerRightText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        lowerRightText.setManaged(!getSkinnable().getSubTitle().isEmpty());
-        lowerRightText.setVisible(!getSkinnable().getSubTitle().isEmpty());
+        Helper.enableNode(lowerRightText, !getSkinnable().getSubTitle().isEmpty());
 
-        upperLeftText = new Text(String.format(Locale.US, otherFormatString, getSkinnable().getMinMeasuredValue()));
+        upperLeftText = new Text(String.format(locale, otherFormatString, getSkinnable().getMinMeasuredValue()));
         upperLeftText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        upperLeftText.setManaged(getSkinnable().isMinMeasuredValueVisible());
-        upperLeftText.setVisible(getSkinnable().isMinMeasuredValueVisible());
+        Helper.enableNode(upperLeftText, getSkinnable().isMinMeasuredValueVisible());
 
-        upperRightText = new Text(String.format(Locale.US, otherFormatString, getSkinnable().getMaxMeasuredValue()));
+        upperRightText = new Text(String.format(locale, otherFormatString, getSkinnable().getMaxMeasuredValue()));
         upperRightText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        upperRightText.setManaged(getSkinnable().isMaxMeasuredValueVisible());
-        upperRightText.setVisible(getSkinnable().isMaxMeasuredValueVisible());
+        Helper.enableNode(upperRightText, getSkinnable().isMaxMeasuredValueVisible());
 
-        lowerCenterText = new Text(String.format(Locale.US, otherFormatString, getSkinnable().getOldValue()));
+        lowerCenterText = new Text(String.format(locale, otherFormatString, getSkinnable().getOldValue()));
         lowerCenterText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        lowerCenterText.setManaged(getSkinnable().isOldValueVisible());
-        lowerCenterText.setVisible(getSkinnable().isOldValueVisible());
+        Helper.enableNode(lowerCenterText, getSkinnable().isOldValueVisible());
 
         shadowGroup = new Group();
         shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? FOREGROUND_SHADOW : null);
         shadowGroup.getChildren().setAll(threshold,
+                                         average,
                                          valueText,
                                          unitText,
                                          title,
@@ -249,11 +237,8 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                          upperRightText,
                                          lowerCenterText);
 
-        pane = new Pane();
+        pane = new Pane(crystalOverlay, backgroundText, shadowGroup);
         pane.setEffect(getSkinnable().isShadowsEnabled() ? mainInnerShadow1 : null);
-        pane.getChildren().setAll(crystalOverlay,
-                                  backgroundText,
-                                  shadowGroup);
         getChildren().setAll(pane);
     }
 
@@ -274,6 +259,13 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Methods *******************************************
+    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
+
     protected void handleEvents(final String EVENT_TYPE) {
         if ("REDRAW".equals(EVENT_TYPE)) {
             pane.setEffect(getSkinnable().isShadowsEnabled() ? mainInnerShadow1 : null);
@@ -287,18 +279,13 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("LCD".equals(EVENT_TYPE)) {
             updateLcdDesign(height);
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            crystalOverlay.setManaged(getSkinnable().isLcdCrystalEnabled());
-            crystalOverlay.setVisible(getSkinnable().isLcdCrystalEnabled());
-            unitText.setManaged(!getSkinnable().getUnit().isEmpty());
-            unitText.setVisible(!getSkinnable().getUnit().isEmpty());
-            upperLeftText.setManaged(getSkinnable().isMinMeasuredValueVisible());
-            upperLeftText.setVisible(getSkinnable().isMinMeasuredValueVisible());
-            upperRightText.setManaged(getSkinnable().isMaxMeasuredValueVisible());
-            upperRightText.setVisible(getSkinnable().isMaxMeasuredValueVisible());
-            lowerRightText.setManaged(!getSkinnable().getSubTitle().isEmpty());
-            lowerRightText.setVisible(!getSkinnable().getSubTitle().isEmpty());
-            lowerCenterText.setManaged(getSkinnable().isOldValueVisible());
-            lowerCenterText.setVisible(getSkinnable().isOldValueVisible());
+            Helper.enableNode(crystalOverlay, getSkinnable().isLcdCrystalEnabled());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(upperLeftText, getSkinnable().isMinMeasuredValueVisible());
+            Helper.enableNode(upperRightText, getSkinnable().isMaxMeasuredValueVisible());
+            Helper.enableNode(lowerRightText, !getSkinnable().getSubTitle().isEmpty());
+            Helper.enableNode(lowerCenterText, getSkinnable().isOldValueVisible());
+            Helper.enableNode(average, getSkinnable().isAverageVisible());
             resize();
             redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
@@ -333,7 +320,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         }
 
-
         lcdPaint = new LinearGradient(0, 1, 0, HEIGHT - 1,
                                       false, CycleMethod.NO_CYCLE,
                                       new Stop(0, lcdColors[0]),
@@ -342,7 +328,21 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                       new Stop(0.5, lcdColors[3]),
                                       new Stop(1.0, lcdColors[4]));
         if (lcdDesign.name().startsWith("FLAT")) {
-            lcdFramePaint = Color.WHITE;
+            lcdFramePaint = getSkinnable().getBorderPaint();
+
+            lcdPaint      = getSkinnable().getBackgroundPaint();
+
+            Color lcdForegroundColor = (Color) getSkinnable().getForegroundPaint();
+            backgroundText.setFill(Color.color(lcdForegroundColor.getRed(), lcdForegroundColor.getGreen(), lcdForegroundColor.getBlue(), 0.1));
+            valueText.setFill(lcdForegroundColor);
+            upperLeftText.setFill(lcdForegroundColor);
+            title.setFill(lcdForegroundColor);
+            upperRightText.setFill(lcdForegroundColor);
+            unitText.setFill(lcdForegroundColor);
+            lowerRightText.setFill(lcdForegroundColor);
+            lowerCenterText.setFill(lcdForegroundColor);
+            threshold.setFill(lcdForegroundColor);
+            average.setFill(lcdForegroundColor);
         } else {
             lcdFramePaint = new LinearGradient(0, 0.02083333 * height, 0, HEIGHT - 0.02083333 * HEIGHT,
                                                false, CycleMethod.NO_CYCLE,
@@ -350,20 +350,29 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                new Stop(0.015, Color.rgb(77, 77, 77)),
                                                new Stop(0.985, Color.rgb(77, 77, 77)),
                                                new Stop(1.0, Color.rgb(221, 221, 221)));
+
+            lcdPaint = new LinearGradient(0, 1, 0, HEIGHT - 1,
+                                          false, CycleMethod.NO_CYCLE,
+                                          new Stop(0, lcdColors[0]),
+                                          new Stop(0.03, lcdColors[1]),
+                                          new Stop(0.5, lcdColors[2]),
+                                          new Stop(0.5, lcdColors[3]),
+                                          new Stop(1.0, lcdColors[4]));
+
+            backgroundText.setFill(lcdDesign.lcdBackgroundColor);
+            valueText.setFill(lcdDesign.lcdForegroundColor);
+            upperLeftText.setFill(lcdDesign.lcdForegroundColor);
+            title.setFill(lcdDesign.lcdForegroundColor);
+            upperRightText.setFill(lcdDesign.lcdForegroundColor);
+            unitText.setFill(lcdDesign.lcdForegroundColor);
+            lowerRightText.setFill(lcdDesign.lcdForegroundColor);
+            lowerCenterText.setFill(lcdDesign.lcdForegroundColor);
+            threshold.setFill(lcdDesign.lcdForegroundColor);
+            average.setFill(lcdDesign.lcdForegroundColor);
         }
 
         pane.setBackground(new Background(new BackgroundFill(lcdPaint, new CornerRadii(0.10416667 * HEIGHT), Insets.EMPTY)));
         pane.setBorder(new Border(new BorderStroke(lcdFramePaint, BorderStrokeStyle.SOLID, new CornerRadii(0.05 * HEIGHT), new BorderWidths(0.02083333 * HEIGHT))));
-
-        backgroundText.setFill(lcdDesign.lcdBackgroundColor);
-        valueText.setFill(lcdDesign.lcdForegroundColor);
-        upperLeftText.setFill(lcdDesign.lcdForegroundColor);
-        title.setFill(lcdDesign.lcdForegroundColor);
-        upperRightText.setFill(lcdDesign.lcdForegroundColor);
-        unitText.setFill(lcdDesign.lcdForegroundColor);
-        lowerRightText.setFill(lcdDesign.lcdForegroundColor);
-        lowerCenterText.setFill(lcdDesign.lcdForegroundColor);
-        threshold.setFill(lcdDesign.lcdForegroundColor);
     }
 
     private void updateSectionColors() {
@@ -540,7 +549,73 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             threshold.getElements().add(new LineTo(0, tSize));
             threshold.getElements().add(new LineTo(tSize, tSize));
             threshold.getElements().add(new ClosePath());
-            threshold.relocate(0.027961994662429348 * width, 0.75 * height - 2);
+            threshold.relocate(0.027961994662429348 * width, 0.75 * height);
+
+            double aSize = 0.12 * height;
+            average.getElements().clear();
+            average.getElements().add(new MoveTo(0.5 * aSize, 0.0));
+            average.getElements().add(new CubicCurveTo(0.22727272727272727 * aSize, 0.0,
+                                                       0.022727272727272728 * aSize, 0.22727272727272727 * aSize,
+                                                       0.022727272727272728 * aSize, 0.5 * aSize));
+            average.getElements().add(new CubicCurveTo(0.022727272727272728 * aSize, 0.6136363636363636 * aSize,
+                                                       0.045454545454545456 * aSize, 0.7045454545454546 * aSize,
+                                                       0.11363636363636363 * aSize, 0.7954545454545454 * aSize));
+            average.getElements().add(new CubicCurveTo(0.11363636363636363 * aSize, 0.7954545454545454 * aSize,
+                                                       0.0, 0.8863636363636364 * aSize,
+                                                       0.0, 0.8863636363636364 * aSize));
+            average.getElements().add(new LineTo(0.09090909090909091 * aSize, 0.9772727272727273 * aSize));
+            average.getElements().add(new CubicCurveTo(0.09090909090909091 * aSize, 0.9772727272727273 * aSize,
+                                                       0.18181818181818182 * aSize, 0.8863636363636364 * aSize,
+                                                       0.18181818181818182 * aSize, 0.8863636363636364 * aSize));
+            average.getElements().add(new CubicCurveTo(0.2727272727272727 * aSize, 0.9545454545454546 * aSize,
+                                                       0.38636363636363635 * aSize, aSize,
+                                                       0.5 * aSize, aSize));
+            average.getElements().add(new CubicCurveTo(0.7727272727272727 * aSize, aSize,
+                                                       0.9772727272727273 * aSize, 0.7727272727272727 * aSize,
+                                                       0.9772727272727273 * aSize, 0.5 * aSize));
+            average.getElements().add(new CubicCurveTo(0.9772727272727273 * aSize, 0.38636363636363635 * aSize,
+                                                       0.9545454545454546 * aSize, 0.29545454545454547 * aSize,
+                                                       0.8863636363636364 * aSize, 0.20454545454545456 * aSize));
+            average.getElements().add(new CubicCurveTo(0.8863636363636364 * aSize, 0.20454545454545456 * aSize,
+                                                       aSize, 0.09090909090909091 * aSize,
+                                                       aSize, 0.09090909090909091 * aSize));
+            average.getElements().add(new LineTo(0.9090909090909091 * aSize, 0.0));
+            average.getElements().add(new CubicCurveTo(0.9090909090909091 * aSize, 0.0,
+                                                       0.7954545454545454 * aSize, 0.09090909090909091 * aSize,
+                                                       0.7954545454545454 * aSize, 0.09090909090909091 * aSize));
+            average.getElements().add(new CubicCurveTo(0.7045454545454546 * aSize, 0.045454545454545456 * aSize,
+                                                       0.6136363636363636 * aSize, 0.0,
+                                                       0.5 * aSize, 0.0));
+            average.getElements().add(new ClosePath());
+            average.getElements().add(new MoveTo(0.7954545454545454 * aSize, 0.29545454545454547 * aSize));
+            average.getElements().add(new CubicCurveTo(0.8181818181818182 * aSize, 0.36363636363636365 * aSize,
+                                                       0.8409090909090909 * aSize, 0.4318181818181818 * aSize,
+                                                       0.8409090909090909 * aSize, 0.5 * aSize));
+            average.getElements().add(new CubicCurveTo(0.8409090909090909 * aSize, 0.7045454545454546 * aSize,
+                                                       0.7045454545454546 * aSize, 0.8863636363636364 * aSize,
+                                                       0.5 * aSize, 0.8863636363636364 * aSize));
+            average.getElements().add(new CubicCurveTo(0.4090909090909091 * aSize, 0.8863636363636364 * aSize,
+                                                       0.3409090909090909 * aSize, 0.8636363636363636 * aSize,
+                                                       0.2727272727272727 * aSize, 0.7954545454545454 * aSize));
+            average.getElements().add(new CubicCurveTo(0.2727272727272727 * aSize, 0.7954545454545454 * aSize,
+                                                       0.7954545454545454 * aSize, 0.29545454545454547 * aSize,
+                                                       0.7954545454545454 * aSize, 0.29545454545454547 * aSize));
+            average.getElements().add(new ClosePath());
+            average.getElements().add(new MoveTo(0.5 * aSize, 0.11363636363636363 * aSize));
+            average.getElements().add(new CubicCurveTo(0.5909090909090909 * aSize, 0.11363636363636363 * aSize,
+                                                       0.6590909090909091 * aSize, 0.13636363636363635 * aSize,
+                                                       0.7045454545454546 * aSize, 0.18181818181818182 * aSize));
+            average.getElements().add(new CubicCurveTo(0.7045454545454546 * aSize, 0.18181818181818182 * aSize,
+                                                       0.20454545454545456 * aSize, 0.6818181818181818 * aSize,
+                                                       0.20454545454545456 * aSize, 0.6818181818181818 * aSize));
+            average.getElements().add(new CubicCurveTo(0.18181818181818182 * aSize, 0.6363636363636364 * aSize,
+                                                       0.1590909090909091 * aSize, 0.5681818181818182 * aSize,
+                                                       0.1590909090909091 * aSize, 0.5 * aSize));
+            average.getElements().add(new CubicCurveTo(0.1590909090909091 * aSize, 0.29545454545454547 * aSize,
+                                                       0.29545454545454547 * aSize, 0.11363636363636363 * aSize,
+                                                       0.5 * aSize, 0.11363636363636363 * aSize));
+            average.getElements().add(new ClosePath());
+            average.relocate(0.32 * width, 0.82 * height);
 
             updateFonts();
 
@@ -584,60 +659,46 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             title.setTextAlignment(TextAlignment.CENTER);
             title.setText(getSkinnable().getTitle());
             title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
-            title.setY(pane.getLayoutBounds().getMinY() + title.getLayoutBounds().getHeight() - 0.04 * height + 4);
+            title.setY(height * 0.18);
 
-            // Info Text
+            // Lower Right Text
             lowerRightText.setFont(smallFont);
             lowerRightText.setTextOrigin(VPos.BASELINE);
             lowerRightText.setTextAlignment(TextAlignment.RIGHT);
             lowerRightText.setText(getSkinnable().getSubTitle());
             lowerRightText.setX(pane.getLayoutBounds().getMinX() + (pane.getLayoutBounds().getWidth() - lowerRightText.getLayoutBounds().getWidth()) * 0.5);
-            lowerRightText.setY(pane.getLayoutBounds().getMinY() + height - 4 - 0.0416666667 * height);
+            lowerRightText.setY(height * 0.94);
 
             // Min measured value
             upperLeftText.setFont(smallFont);
             upperLeftText.setTextOrigin(VPos.BASELINE);
             upperLeftText.setTextAlignment(TextAlignment.RIGHT);
             upperLeftText.setX(pane.getLayoutBounds().getMinX() + 0.0416666667 * height);
-            upperLeftText.setY(pane.getLayoutBounds().getMinY() + upperLeftText.getLayoutBounds().getHeight() - 0.04 * height + 4);
+            upperLeftText.setY(height * 0.18);
 
             // Max measured value
             upperRightText.setFont(smallFont);
             upperRightText.setTextOrigin(VPos.BASELINE);
             upperRightText.setTextAlignment(TextAlignment.RIGHT);
-            upperRightText.setY(pane.getLayoutBounds().getMinY() + upperRightText.getLayoutBounds().getHeight() - 0.04 * height + 4);
+            upperRightText.setY(height * 0.18);
 
-            // Former value
+            // Lower Center Text
             lowerCenterText.setFont(smallFont);
             lowerCenterText.setTextOrigin(VPos.BASELINE);
             lowerCenterText.setTextAlignment(TextAlignment.CENTER);
             lowerCenterText.setX((width - lowerCenterText.getLayoutBounds().getWidth()) * 0.5);
-            lowerCenterText.setY(pane.getLayoutBounds().getMinY() + height - 4 - 0.0416666667 * height);
+            lowerCenterText.setY(height * 0.94);
         }
     }
 
     private void redraw() {
+        locale            = getSkinnable().getLocale();
         valueFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         otherFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
 
-        LcdDesign lcdDesign = getSkinnable().getLcdDesign();
-        backgroundText.setFill(lcdDesign.lcdBackgroundColor);
-        valueText.setFill(lcdDesign.lcdForegroundColor);
-        upperLeftText.setFill(lcdDesign.lcdForegroundColor);
-        title.setFill(lcdDesign.lcdForegroundColor);
-        upperRightText.setFill(lcdDesign.lcdForegroundColor);
-        unitText.setFill(lcdDesign.lcdForegroundColor);
-        lowerRightText.setFill(lcdDesign.lcdForegroundColor);
-        lowerCenterText.setFill(lcdDesign.lcdForegroundColor);
-        threshold.setFill(lcdDesign.lcdForegroundColor);
-
         threshold.setVisible(Double.compare(getSkinnable().getCurrentValue(), getSkinnable().getThreshold()) >= 0);
 
-        if (isNoOfDigitsInvalid()) {
-            valueText.setText("-E-");
-        } else {
-            valueText.setText(String.format(Locale.US, valueFormatString, getSkinnable().getCurrentValue()));
-        }
+        valueText.setText(isNoOfDigitsInvalid() ? "-E-" : String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
 
         updateBackgroundText();
 
@@ -660,13 +721,13 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
 
         // Update the upper left text
-        upperLeftText.setText(String.format(Locale.US, otherFormatString, getSkinnable().getMinMeasuredValue()));
+        upperLeftText.setText(String.format(locale, otherFormatString, getSkinnable().getMinMeasuredValue()));
         if (upperLeftText.getX() + upperLeftText.getLayoutBounds().getWidth() > title.getX()) {
             upperLeftText.setText("...");
         }
 
         // Update the upper right text
-        upperRightText.setText(String.format(Locale.US, otherFormatString, getSkinnable().getMaxMeasuredValue()));
+        upperRightText.setText(String.format(locale, otherFormatString, getSkinnable().getMaxMeasuredValue()));
         upperRightText.setX(width - upperRightText.getLayoutBounds().getWidth() - 0.0416666667 * height);
         if (upperRightText.getX() < title.getX() + title.getLayoutBounds().getWidth()) {
             upperRightText.setText("...");
@@ -674,13 +735,20 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         // Update the lower center text
-        lowerCenterText.setText(String.format(Locale.US, otherFormatString, getSkinnable().getOldValue()));
+        if (getSkinnable().isAverageVisible()) {
+            lowerCenterText.setText(String.format(locale, otherFormatString, getSkinnable().getAverage()));
+        } else {
+            lowerCenterText.setText(String.format(locale, otherFormatString, getSkinnable().getOldValue()));
+        }
         lowerCenterText.setX((width - lowerCenterText.getLayoutBounds().getWidth()) * 0.5);
+        lowerCenterText.setY(0.94 * height);
+
+        average.relocate(lowerCenterText.getX() - 0.2 * height, 0.82 * height);
 
         // Update the lower right text
         lowerRightText.setText(getSkinnable().getSubTitle());
         lowerRightText.setX(width - lowerRightText.getLayoutBounds().getWidth() - 0.0416666667 * height);
-        lowerRightText.setY(pane.getLayoutBounds().getMinY() + height - 3 - 0.0416666667 * height);
+        lowerRightText.setY(height * 0.94);
         if (lowerRightText.getX() < lowerCenterText.getX() + lowerCenterText.getLayoutBounds().getWidth()) {
             lowerRightText.setText("...");
             lowerRightText.setX(width - lowerRightText.getLayoutBounds().getWidth() - 0.0416666667 * height);

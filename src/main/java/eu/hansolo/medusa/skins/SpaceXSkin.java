@@ -99,6 +99,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Color           thresholdBackgroundColor;
     private              double          minValue;
     private              String          formatString;
+    private              Locale          locale;
 
 
     // ******************** Constructors **************************************
@@ -110,15 +111,16 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         minValue          = gauge.getMinValue();
         currentValueAngle = 0;
         formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale            = gauge.getLocale();
 
-        init();
         initGraphics();
         registerListeners();
     }
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
+        // Set initial size
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
             if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
@@ -128,16 +130,6 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         }
 
-        if (Double.compare(getSkinnable().getMinWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMinHeight(), 0.0) <= 0) {
-            getSkinnable().setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
-        }
-
-        if (Double.compare(getSkinnable().getMaxWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMaxHeight(), 0.0) <= 0) {
-            getSkinnable().setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
-        }
-    }
-
-    private void initGraphics() {
         barColor                 = getSkinnable().getBarColor();
         thresholdColor           = getSkinnable().getThresholdColor();
         barBackgroundColor       = getSkinnable().getBarBackgroundColor();
@@ -146,14 +138,17 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText = new Text(getSkinnable().getUnit());
         unitText.setTextOrigin(VPos.CENTER);
         unitText.setFill(getSkinnable().getUnitColor());
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setFill(getSkinnable().getTitleColor());
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getValue()));
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         barBackgroundStart          = new MoveTo();
         barBackgroundOuterArc       = new ArcTo(0.675 * PREFERRED_HEIGHT, 0.675 * PREFERRED_HEIGHT, 0, PREFERRED_WIDTH, 0.675 * PREFERRED_HEIGHT, true, true);
@@ -215,16 +210,15 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarThreshold.setFill(thresholdColor);
         dataBarThreshold.setStroke(getSkinnable().getBorderPaint());
 
-        pane = new Pane();
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane = new Pane(titleText,
+                        valueText,
+                        unitText,
+                        barBackground,
+                        thresholdBar,
+                        dataBar,
+                        dataBarThreshold);
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
-        pane.getChildren().setAll(titleText,
-                                  valueText,
-                                  unitText,
-                                  barBackground,
-                                  thresholdBar,
-                                  dataBar,
-                                  dataBarThreshold);
 
         getChildren().setAll(pane);
     }
@@ -248,9 +242,17 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Methods *******************************************
+    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
+
     protected void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
+            redraw();
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
@@ -259,6 +261,10 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             minValue  = getSkinnable().getMinValue();
             resize();
             redraw();
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
         }
     }
 
@@ -287,34 +293,9 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarThresholdInnerArc.setX(centerX + (centerX - barWidth) * Math.sin(-Math.toRadians(thresholdAngle)));
         dataBarThresholdInnerArc.setY(centerY + (centerX - barWidth) * Math.cos(-Math.toRadians(thresholdAngle)));
 
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         if (valueText.getLayoutBounds().getWidth() > 0.64 * width) Helper.adjustTextSize(valueText, width, 0.21 * width);
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
-    }
-
-    private void redraw() {
-        formatString             = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
-        barColor                 = getSkinnable().getBarColor();
-        thresholdColor           = getSkinnable().getThresholdColor();
-        barBackgroundColor       = getSkinnable().getBarBackgroundColor();
-        thresholdBackgroundColor = Color.color(thresholdColor.getRed(), thresholdColor.getGreen(), thresholdColor.getBlue(), 0.25);
-        barBackground.setFill(barBackgroundColor);
-        thresholdBar.setFill(thresholdBackgroundColor);
-        dataBar.setFill(barColor);
-        dataBarThreshold.setFill(thresholdColor);
-
-        titleText.setFill(getSkinnable().getTitleColor());
-        titleText.setText(getSkinnable().getTitle());
-
-        valueText.setFill(getSkinnable().getValueColor());
-        valueText.setText(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
-        valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
-
-        unitText.setFill(getSkinnable().getUnitColor());
-        unitText.setText(getSkinnable().getUnit());
-        unitText.relocate((width - unitText.getLayoutBounds().getWidth()), 0.79 * height);
     }
 
     private void resize() {
@@ -414,5 +395,31 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             dataBarThresholdInnerArc.setX(centerX + (centerX - barWidth) * Math.sin(-Math.toRadians(thresholdAngle)));
             dataBarThresholdInnerArc.setY(centerY + (centerX - barWidth) * Math.cos(-Math.toRadians(thresholdAngle)));
         }
+    }
+
+    private void redraw() {
+        locale                   = getSkinnable().getLocale();
+        formatString             = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * width))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        barColor                 = getSkinnable().getBarColor();
+        thresholdColor           = getSkinnable().getThresholdColor();
+        barBackgroundColor       = getSkinnable().getBarBackgroundColor();
+        thresholdBackgroundColor = Color.color(thresholdColor.getRed(), thresholdColor.getGreen(), thresholdColor.getBlue(), 0.25);
+        barBackground.setFill(barBackgroundColor);
+        thresholdBar.setFill(thresholdBackgroundColor);
+        dataBar.setFill(barColor);
+        dataBarThreshold.setFill(thresholdColor);
+
+        titleText.setFill(getSkinnable().getTitleColor());
+        titleText.setText(getSkinnable().getTitle());
+
+        valueText.setFill(getSkinnable().getValueColor());
+        valueText.setText(String.format(locale, formatString, getSkinnable().getCurrentValue()));
+        valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
+
+        unitText.setFill(getSkinnable().getUnitColor());
+        unitText.setText(getSkinnable().getUnit());
+        unitText.relocate((width - unitText.getLayoutBounds().getWidth()), 0.79 * height);
     }
 }

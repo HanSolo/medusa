@@ -39,6 +39,9 @@ import javafx.scene.paint.Stop;
  * Created by hansolo on 18.12.15.
  */
 public enum GaugeDesign {
+    NONE(0) {
+        @Override public Border getBorder(final double SIZE) { return Border.EMPTY; }
+    },
     METAL(0.08333333) {
         @Override public Border getBorder(final double SIZE) {
             double fromX = 0;
@@ -82,17 +85,17 @@ public enum GaugeDesign {
             BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132),
                                                         BorderStrokeStyle.SOLID,
                                                         new CornerRadii(1024),
-                                                        BorderWidths.FULL,
+                                                        new BorderWidths(1),
                                                         Insets.EMPTY);
             BorderStroke innerBorder = new BorderStroke(new LinearGradient(fromX, fromY, toX, toY, false, CycleMethod.NO_CYCLE, stops),
                                                         BorderStrokeStyle.SOLID,
                                                         new CornerRadii(1024),
-                                                        BorderWidths.FULL,
+                                                        new BorderWidths(FRAME_FACTOR * SIZE),
                                                         new Insets(0.0037037 * SIZE));
-            BorderStroke bodyStroke  = new BorderStroke(Color.TRANSPARENT, BorderStrokeStyle.SOLID, new CornerRadii(1024), BorderWidths.FULL, new Insets(FRAME_FACTOR * SIZE));
-            return new Border(outerBorder, innerBorder, bodyStroke);
+            return new Border(outerBorder, innerBorder);
         }
-    }, TILTED_BLACK(0.08333333) {
+    },
+    TILTED_BLACK(0.08333333) {
         @Override public Border getBorder(final double SIZE) {
             double fromX = 0.2336448598130841 * SIZE;
             double fromY = 0.08411214953271028 * SIZE;

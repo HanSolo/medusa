@@ -29,6 +29,10 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Arc;
@@ -66,6 +70,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private boolean       sectionsVisible;
     private List<Section> sections;
     private String        formatString;
+    private Locale        locale;
 
 
     // ******************** Constructors **************************************
@@ -80,8 +85,8 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
         formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
 
-        init();
         initGraphics();
         registerListeners();
 
@@ -90,24 +95,17 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
+        // Set initial size
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() < 0 && getSkinnable().getPrefHeight() < 0) {
+            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
+                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+            } else {
                 getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
-        if (Double.compare(getSkinnable().getMinWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMinHeight(), 0.0) <= 0) {
-            getSkinnable().setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
-        }
-
-        if (Double.compare(getSkinnable().getMaxWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMaxHeight(), 0.0) <= 0) {
-            getSkinnable().setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
-        }
-    }
-
-    private void initGraphics() {
         barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.48590226, PREFERRED_HEIGHT * 0.48590226, 90, 360);
         barBackground.setType(ArcType.OPEN);
         barBackground.setStroke(getSkinnable().getBarBackgroundColor());
@@ -124,14 +122,18 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setFill(getSkinnable().getTitleColor());
+        Helper.enableNode(titleText, !getSkinnable().getSubTitle().isEmpty());
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
         valueText.setFill(getSkinnable().getValueColor());
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         unitText = new Text(getSkinnable().getUnit());
         unitText.setFill(getSkinnable().getUnitColor());
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         pane = new Pane(barBackground, bar, titleText, valueText, unitText);
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         getChildren().setAll(pane);
@@ -156,9 +158,17 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Methods *******************************************
+    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
+
     private void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
+            redraw();
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
@@ -167,6 +177,10 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angleStep = ANGLE_RANGE / range;
             sections  = getSkinnable().getSections();
             redraw();
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
         }
     }
 
@@ -177,7 +191,7 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setLength(-VALUE * angleStep);
         }
         setBarColor(VALUE);
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         resizeValueText();
     }
     private void setBarColor(final double VALUE) {
@@ -197,24 +211,6 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Resizing ******************************************
-    private void redraw() {
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
-        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
-        sectionsVisible      = getSkinnable().getSectionsVisible();
-
-        titleText.setText(getSkinnable().getTitle());
-        unitText.setText(getSkinnable().getUnit());
-        resizeStaticText();
-
-        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
-        setBarColor(getSkinnable().getCurrentValue());
-        titleText.setFill(getSkinnable().getTitleColor());
-        valueText.setFill(getSkinnable().getValueColor());
-        unitText.setFill(getSkinnable().getUnitColor());
-    }
-
     private void resizeValueText() {
         double maxWidth = size * 0.86466165;
         double fontSize = size * 0.2556391;
@@ -257,5 +253,25 @@ public class SlimSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resizeStaticText();
             resizeValueText();
         }
+    }
+
+    private void redraw() {
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        locale               = getSkinnable().getLocale();
+        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
+        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
+        sectionsVisible      = getSkinnable().getSectionsVisible();
+
+        titleText.setText(getSkinnable().getTitle());
+        unitText.setText(getSkinnable().getUnit());
+        resizeStaticText();
+
+        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
+        setBarColor(getSkinnable().getCurrentValue());
+        titleText.setFill(getSkinnable().getTitleColor());
+        valueText.setFill(getSkinnable().getValueColor());
+        unitText.setFill(getSkinnable().getUnitColor());
     }
 }

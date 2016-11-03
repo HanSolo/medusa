@@ -18,14 +18,9 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.Gauge.ButtonEvent;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelOrientation;
-import eu.hansolo.medusa.events.UpdateEvent;
-import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.tools.Helper;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -61,6 +56,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -113,27 +109,35 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private EventHandler<MouseEvent> mouseHandler;
     private Tooltip                  buttonTooltip;
     private String                   formatString;
+    private Locale                   locale;
+    private boolean                  sectionsVisible;
+    private List<Section>            sections;
+    private Color                    barColor;
+    private Color                    thresholdColor;
 
 
     // ******************** Constructors **************************************
     public ModernSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleStep     = ANGLE_RANGE / (gauge.getRange());
-        mouseHandler  = new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent event) {ModernSkin.this.handleMouseEvent(event);}
-        };
-        buttonTooltip = new Tooltip();
-        formatString  = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        angleStep       = ANGLE_RANGE / (gauge.getRange());
+        mouseHandler    = event -> handleMouseEvent(event);
+        buttonTooltip   = new Tooltip();
+        formatString    = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale          = gauge.getLocale();
+        sectionsVisible = gauge.getSectionsVisible();
+        sections        = gauge.getSections();
+        barColor        = gauge.getBarColor();
+        thresholdColor  = gauge.getThresholdColor();
 
-        init();
         initGraphics();
         registerListeners();
     }
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
+        // Set initial size
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
             if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
@@ -143,16 +147,6 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         }
 
-        if (Double.compare(getSkinnable().getMinWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMinHeight(), 0.0) <= 0) {
-            getSkinnable().setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
-        }
-
-        if (Double.compare(getSkinnable().getMaxWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMaxHeight(), 0.0) <= 0) {
-            getSkinnable().setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
-        }
-    }
-
-    private void initGraphics() {
         innerShadow0 = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 1, 0, 0, 1);
 
         innerShadow1 = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(255, 255, 255, 0.65), 1, 0, 0, -1);
@@ -185,9 +179,9 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double targetAngle = 180 - START_ANGLE + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
 
-        glow1   = new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getBarColor(), 0.085 * PREFERRED_WIDTH, 0, 0, 0);
-        glow2   = new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getBarColor(), 0.085 * PREFERRED_WIDTH, 0, 0, 0);
-        bigGlow = new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getBarColor(), 0.25 * PREFERRED_WIDTH, 0, 0, 0);
+        glow1   = new DropShadow(BlurType.TWO_PASS_BOX, barColor, 0.085 * PREFERRED_WIDTH, 0, 0, 0);
+        glow2   = new DropShadow(BlurType.TWO_PASS_BOX, barColor, 0.085 * PREFERRED_WIDTH, 0, 0, 0);
+        bigGlow = new DropShadow(BlurType.TWO_PASS_BOX, barColor, 0.25 * PREFERRED_WIDTH, 0, 0, 0);
 
         needleMoveTo1       = new MoveTo();
         needleCubicCurveTo2 = new CubicCurveTo();
@@ -223,107 +217,76 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setFill(getSkinnable().getTitleColor());
         titleText.setEffect(glow1);
         titleText.setMouseTransparent(true);
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         subTitleText = new Text(getSkinnable().getSubTitle());
         subTitleText.setTextOrigin(VPos.CENTER);
         subTitleText.setFill(getSkinnable().getSubTitleColor());
         subTitleText.setEffect(glow1);
         subTitleText.setMouseTransparent(true);
+        Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
 
         unitText = new Text(getSkinnable().getUnit());
         unitText.setTextOrigin(VPos.CENTER);
         unitText.setFill(getSkinnable().getUnitColor());
         unitText.setEffect(glow1);
         unitText.setMouseTransparent(true);
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
         valueText.setEffect(bigGlow);
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         // Add all nodes
-        pane = new Pane();
-        pane.getChildren().setAll(background,
-                                  mainCanvas,
-                                  tickMarkCanvas,
-                                  mask,
-                                  needle,
-                                  centerKnob,
-                                  titleText,
-                                  subTitleText,
-                                  unitText,
-                                  valueText);
+        pane = new Pane(background,
+                        mainCanvas,
+                        tickMarkCanvas,
+                        mask,
+                        needle,
+                        centerKnob,
+                        titleText,
+                        subTitleText,
+                        unitText,
+                        valueText);
 
         getChildren().setAll(pane);
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable o) {ModernSkin.this.handleEvents("RESIZE");}
-        });
-        getSkinnable().heightProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable o) {ModernSkin.this.handleEvents("RESIZE");}
-        });
-        getSkinnable().animatedProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable o) {ModernSkin.this.handleEvents("ANIMATED");}
-        });
-        getSkinnable().getSections().addListener((ListChangeListener<Section>) new ListChangeListener<Section>() {
-            @Override public void onChanged(Change<? extends Section> change) {ModernSkin.this.handleEvents("RESIZE");}
-        });
-        getSkinnable().setOnUpdate(new UpdateEventListener() {
-            @Override public void onUpdateEvent(UpdateEvent e) {ModernSkin.this.handleEvents(e.eventType.name());}
-        });
-        getSkinnable().setOnButtonPressed(new EventHandler<ButtonEvent>() {
-            @Override public void handle(ButtonEvent e) {ModernSkin.this.handleButtonEvent(e);}
-        });
-        getSkinnable().setOnButtonReleased(new EventHandler<ButtonEvent>() {
-            @Override public void handle(ButtonEvent e) {ModernSkin.this.handleButtonEvent(e);}
-        });
-        getSkinnable().currentValueProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable observable) {
-                rotateNeedle(getSkinnable().getCurrentValue());
-            }
-        });
+        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
+        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
+        getSkinnable().animatedProperty().addListener(o -> handleEvents("ANIMATED"));
+        getSkinnable().getSections().addListener((ListChangeListener<Section>) change -> handleEvents("RESIZE"));
+        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
+        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle(getSkinnable().getCurrentValue()));
+
         handleEvents("INTERACTIVITY");
     }
 
 
     // ******************** Methods *******************************************
+    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
+
     protected void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
+            redraw();
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            if (getSkinnable().getTitle().isEmpty()) {
-                titleText.setVisible(false);
-                titleText.setManaged(false);
-            } else {
-                titleText.setManaged(true);
-                titleText.setVisible(true);
-            }
-            if (getSkinnable().getSubTitle().isEmpty()) {
-                subTitleText.setVisible(false);
-                subTitleText.setManaged(false);
-            } else {
-                subTitleText.setManaged(true);
-                subTitleText.setVisible(true);
-            }
-            if (getSkinnable().getUnit().isEmpty()) {
-                unitText.setVisible(false);
-                unitText.setManaged(false);
-            } else {
-                unitText.setManaged(true);
-                unitText.setVisible(true);
-            }
-            if (getSkinnable().isValueVisible()) {
-                valueText.setManaged(true);
-                valueText.setVisible(true);
-            } else {
-                valueText.setVisible(false);
-                valueText.setManaged(false);
-            }
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
+            sectionsVisible = getSkinnable().getSectionsVisible();
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             angleStep = ANGLE_RANGE / getSkinnable().getRange();
@@ -340,21 +303,17 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 centerKnob.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseHandler);
                 Tooltip.uninstall(centerKnob, buttonTooltip);
             }
+        } else if ("SECTIONS".equals(EVENT_TYPE)) {
+            sectionsVisible = getSkinnable().getSectionsVisible();
+            sections        = getSkinnable().getSections();
         }
     }
 
     public void handleMouseEvent(final MouseEvent EVENT) {
+        if (getSkinnable().isDisabled()) return;
         final EventType TYPE = EVENT.getEventType();
         if (MouseEvent.MOUSE_PRESSED.equals(TYPE)) {
-            getSkinnable().fireButtonEvent(getSkinnable().BUTTON_PRESSED_EVENT);
-        } else if (MouseEvent.MOUSE_RELEASED.equals(TYPE)) {
-            getSkinnable().fireButtonEvent(getSkinnable().BUTTON_RELEASED_EVENT);
-        }
-    }
-
-    public void handleButtonEvent(final ButtonEvent EVENT) {
-        final EventType TYPE = EVENT.getEventType();
-        if (ButtonEvent.BUTTON_PRESSED.equals(TYPE)) {
+            getSkinnable().fireEvent(getSkinnable().BTN_PRESSED_EVENT);
             centerKnob.setFill(new LinearGradient(0.5 * size, 0.2708333333333333 * size,
                                                   0.5 * size, 0.7291666666666666 * size,
                                                   false, CycleMethod.NO_CYCLE,
@@ -363,7 +322,8 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             valueText.setTranslateY(size * 0.501);
             subTitleText.setTranslateY(size * 0.3525);
             unitText.setTranslateY(size * 0.6675);
-        } else if (ButtonEvent.BUTTON_RELEASED.equals(TYPE)) {
+        } else if (MouseEvent.MOUSE_RELEASED.equals(TYPE)) {
+            getSkinnable().fireEvent(getSkinnable().BTN_RELEASED_EVENT);
             centerKnob.setFill(new LinearGradient(0.5 * size, 0.2708333333333333 * size,
                                                   0.5 * size, 0.7291666666666666 * size,
                                                   false, CycleMethod.NO_CYCLE,
@@ -381,18 +341,19 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleStep          = ANGLE_RANGE / getSkinnable().getRange();
         double targetAngle = 180 - START_ANGLE + (VALUE - getSkinnable().getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         if (valueText.getLayoutBounds().getWidth() > 0.395 * size) {
             resizeText();
             placeTextVerticaly();
         }
+
         if (VALUE > getSkinnable().getThreshold()) {
-            glow2.setColor(getSkinnable().getThresholdColor());
-            bigGlow.setColor(getSkinnable().getThresholdColor());
+            glow2.setColor(thresholdColor);
+            bigGlow.setColor(thresholdColor);
         } else {
-            glow2.setColor(getSkinnable().getBarColor());
-            bigGlow.setColor(getSkinnable().getBarColor());
+            glow2.setColor(barColor);
+            bigGlow.setColor(barColor);
         }
         highlightValue(tickMarkCtx, VALUE);
     }
@@ -418,9 +379,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         boolean    mediumTickMarksVisible = getSkinnable().getMediumTickMarksVisible();
         double     threshold              = getSkinnable().getThreshold();
         Color      tickMarkColor          = Color.TRANSPARENT;
-        Color      highlightColor         = CURRENT_VALUE < getSkinnable().getThreshold() ? getSkinnable().getBarColor() : getSkinnable().getThresholdColor();
-        Color      barColor               = getSkinnable().getBarColor();
-        Color      thresholdColor         = getSkinnable().getThresholdColor();
+        Color      highlightColor         = CURRENT_VALUE < getSkinnable().getThreshold() ? barColor : thresholdColor;
 
         double innerPointX;
         double innerPointY;
@@ -446,15 +405,15 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             outerMediumPointX = centerX + size * 0.4 * sinValue;
             outerMediumPointY = centerY + size * 0.4 * cosValue;
 
-            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw major tick mark
                 if (majorTickMarksVisible) {
                     CTX.setStroke(counter < CURRENT_VALUE ? highlightColor : tickMarkColor);
                     CTX.strokeLine(innerPointX, innerPointY, outerPointX, outerPointY);
                 }
             } else if (mediumTickMarksVisible &&
-                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0d) != 0d &&
-                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0d) == 0d) {
+                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0.0) != 0.0 &&
+                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0.0) == 0.0) {
                 // Draw medium tick mark
                 CTX.setStroke(counter < CURRENT_VALUE ? highlightColor : tickMarkColor);
                 CTX.strokeLine(innerMediumPointX, innerMediumPointY, outerMediumPointX, outerMediumPointY);
@@ -497,28 +456,30 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double maxValue         = getSkinnable().getMaxValue();
         double offset           = 90 - START_ANGLE;
         double sectionWidth     = size * 0.05;
-        int    listSize         = getSkinnable().getSections().size();
-        for (int i = 0 ; i < listSize ; i++) {
-            final Section SECTION = getSkinnable().getSections().get(i);
-            final double SECTION_START_ANGLE;
-            if (Double.compare(SECTION.getStart(), maxValue) <= 0 && Double.compare(SECTION.getStop(), minValue) >= 0) {
-                if (Double.compare(SECTION.getStart(), minValue) < 0 && Double.compare(SECTION.getStop(), maxValue) < 0) {
-                    SECTION_START_ANGLE = 0;
-                } else {
-                    SECTION_START_ANGLE = (SECTION.getStart() - minValue) * angleStep;
+        if (sectionsVisible) {
+            int listSize = sections.size();
+            for (int i = 0; i < listSize; i++) {
+                final Section SECTION = sections.get(i);
+                final double  SECTION_START_ANGLE;
+                if (Double.compare(SECTION.getStart(), maxValue) <= 0 && Double.compare(SECTION.getStop(), minValue) >= 0) {
+                    if (Double.compare(SECTION.getStart(), minValue) < 0 && Double.compare(SECTION.getStop(), maxValue) < 0) {
+                        SECTION_START_ANGLE = 0;
+                    } else {
+                        SECTION_START_ANGLE = (SECTION.getStart() - minValue) * angleStep;
+                    }
+                    final double SECTION_ANGLE_EXTEND;
+                    if (Double.compare(SECTION.getStop(), maxValue) > 0) {
+                        SECTION_ANGLE_EXTEND = (maxValue - SECTION.getStart()) * angleStep;
+                    } else {
+                        SECTION_ANGLE_EXTEND = (SECTION.getStop() - SECTION.getStart()) * angleStep;
+                    }
+                    mainCtx.save();
+                    mainCtx.setStroke(SECTION.getColor());
+                    mainCtx.setLineWidth(sectionWidth);
+                    mainCtx.setLineCap(StrokeLineCap.BUTT);
+                    mainCtx.strokeArc(sectionsXY, sectionsXY, sectionsWH, sectionsWH, -(offset + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
+                    mainCtx.restore();
                 }
-                final double SECTION_ANGLE_EXTEND;
-                if (Double.compare(SECTION.getStop(), maxValue) > 0) {
-                    SECTION_ANGLE_EXTEND = (maxValue - SECTION.getStart()) * angleStep;
-                } else {
-                    SECTION_ANGLE_EXTEND = (SECTION.getStop() - SECTION.getStart()) * angleStep;
-                }
-                mainCtx.save();
-                mainCtx.setStroke(SECTION.getColor());
-                mainCtx.setLineWidth(sectionWidth);
-                mainCtx.setLineCap(StrokeLineCap.BUTT);
-                mainCtx.strokeArc(sectionsXY, sectionsXY, sectionsWH, sectionsWH, -(offset + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
-                mainCtx.restore();
             }
         }
 
@@ -624,7 +585,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             // Set the general tickmark color
             CTX.setStroke(tickMarkColor);
 
-            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw major tick mark
                 if (majorTickMarksVisible) {
                     CTX.setFill(majorTickMarkColor);
@@ -644,12 +605,12 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         Double.compare(counter, maxValue) == 0)) {
                             CTX.setFill(Color.TRANSPARENT);
                     }
-                    CTX.fillText(String.format(Locale.US, "%." + decimals + "f", counter), 0, 0);
+                    CTX.fillText(String.format(locale, "%." + decimals + "f", counter), 0, 0);
                     CTX.restore();
                 }
             } else if (mediumTickMarksVisible &&
-                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0d) != 0d &&
-                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0d) == 0d) {
+                       Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0.0) != 0.0 &&
+                       Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0.0) == 0.0) {
                 // Draw medium tick mark
                 CTX.setFill(mediumTickMarkColor);
                 CTX.setStroke(mediumTickMarkColor);
@@ -665,7 +626,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + getSkinnable().getMinValue();
 
         valueText.setFont(Fonts.latoRegular(size * 0.22));
-        valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue));
+        valueText.setText(String.format(locale, "%." + getSkinnable().getDecimals() + "f", currentValue));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, size * 0.22); }
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
 
@@ -811,6 +772,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        locale       = getSkinnable().getLocale();
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         needle.setFill(getSkinnable().getNeedleColor());
         titleText.setFill(getSkinnable().getTitleColor());
@@ -818,6 +780,8 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setFill(getSkinnable().getUnitColor());
         valueText.setFill(getSkinnable().getValueColor());
         buttonTooltip.setText(getSkinnable().getButtonTooltipText());
+        barColor       = getSkinnable().getBarColor();
+        thresholdColor = getSkinnable().getThresholdColor();
         resizeText();
     }
 }

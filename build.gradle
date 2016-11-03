@@ -1,74 +1,69 @@
+import java.text.SimpleDateFormat
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:3.0.0'
+  }
+}
+	
 // Medusa main build file
-import org.gradle.api.XmlProvider
-import org.gradle.api.artifacts.maven.MavenDeployment
-
-apply plugin: 'idea'
-apply plugin: 'signing'
-
-def isDevBuild
-def isSnapshotBuild
-def isReleaseBuild
-
-def sonatypeRepositoryUrl
-
-// Apply settings for signing if available
-if (file("signing.properties").exists()) {
-    Properties props = new Properties()
-    props.load(new FileInputStream("signing.properties"))
-    props.each { key, value -> project.ext[key] = value }
+plugins {
+    id 'idea'
+    id 'java'
+    id 'maven-publish'
+    id 'net.nemerosa.versioning' version '1.6.0'
+    id 'com.jfrog.bintray' version '1.6'
 }
 
+apply plugin: 'biz.aQute.bnd.builder'
 
-//set build variables based on build type (release, continuous integration, development)
-if(hasProperty("release")) {
-    isReleaseBuild = true
-    sonatypeRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-} else if (hasProperty("snapshot")) {
-    isSnapshotBuild = true
-    version += "-SNAPSHOT"
-    sonatypeRepositoryUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-} else {
-    isDevBuild = true
+description = 'Medusa is a JavaFX 8 library containing gauges and clocks'
+
+Date buildTimeAndDate = new Date()
+ext {
+    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
+    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+}
+
+jar {
+    manifest {
+        attributes(
+                'Built-By': System.properties['user.name'],
+                'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
+                'Build-Date': project.buildDate,
+                'Build-Time': project.buildTime,
+                'Build-Revision': versioning.info.commit,
+                'Specification-Title': project.name,
+                'Specification-Version': project.version,
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Bundle-Name': project.name,
+                'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://www.eclipse.org/legal/eplfaq.php',
+                'Bundle-Description': description,
+                'Bundle-SymbolicName': 'eu.hansolo.medusa',
+                'Export-Package': 'eu.hansolo.medusa,eu.hansolo.medusa.tools,eu.hansolo.medusa.skins,eu.hansolo.medusa.events'
+        )
+    }
 }
 
 repositories {
     jcenter()
 }
 
-allprojects {
-    apply plugin: 'idea'
-    apply plugin: 'java'
-    apply plugin: 'maven'
-
-    idea {
-        project {
-            jdkName '1.8'
-            languageLevel '1.8'
-        }
-    }
-}
-
 // create one jar for the javadoc
-task docs(type: Javadoc) {
-    source subprojects.collect { project -> project.sourceSets.main.allJava }
-    classpath = files(subprojects.collect { project -> project.sourceSets.main.compileClasspath })
-    destinationDir = new File('build/docs/javadoc')
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
 }
-task javadocJar(type: Jar, dependsOn: docs) {
-    classifier ='javadoc'
-    from 'build/docs/javadoc'
-}
-
 
 // create one jar for the source files
-task sourcesJar(type: Jar, dependsOn: javadocJar) {
-    classifier  = 'sources'
-    subprojects.each {
-        subproject ->
-            from subproject.configurations.archives.allArtifacts.files.filter { it.name.endsWith("sources.jar") }.collect { zipTree(it) }
-    }
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
-
 
 artifacts {
     archives jar
@@ -76,63 +71,65 @@ artifacts {
     archives sourcesJar
 }
 
-
-// signing the artifacts
-if (isReleaseBuild) {
-    signing {
-        sign configurations.archives
+def pomConfig = {
+    name 'Medusa'
+    // Description won't be used when creating the pom file automatically.
+    // So I've added it manually in the pom.withXml{} section in the publishing task
+    //description 'Medusa is a JavaFX 8 library containing gauges and clocks'
+    url 'https://github.com/HanSolo/Medusa/wiki'
+    inceptionYear '2016'
+    licenses {
+        license([:]) {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+        }
     }
-} else {
-    task signArchives {
-        // do nothing
+    scm {
+        url 'scm:git@github.com:HanSolo/Medusa.git'
+        connection 'scm:git@github.com:HanSolo/Medusa.git'
+        developerConnection 'scm:git@github.com:HanSolo/Medusa.git'
+    }
+    developers {
+        developer {
+            id 'HanSolo'
+            name 'Gerrit Grunwald'
+        }
     }
 }
 
+publishing {
+    publications {
+        mavenCustom(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
 
-// upload artifacts to maven
-uploadArchives {
-    repositories {
-        if (isDevBuild) {
-            //mavenLocal()
-        }
-        else {
-            mavenDeployer {
-                if(isReleaseBuild) {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-                }
-
-                repository(url: sonatypeRepositoryUrl) {
-                    authentication(userName: sonatypeUsername, password: sonatypePassword)
-                }
-
-                pom.project {
-                    name 'Medusa'
-                    packaging 'jar'
-                    description 'Medusa is a JavaFX 8 gauges library'
-                    url 'https://github.com/HanSolo/Medusa/wiki'
-
-                    scm {
-                        url 'scm:git@github.com:HanSolo/Medusa.git'
-                        connection 'scm:git@github.com:HanSolo/Medusa.git'
-                        developerConnection 'scm:git@github.com:HanSolo/Medusa.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'The Apache Software License, Version 2.0'
-                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                            distribution 'repo'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'HanSolo'
-                            name 'Gerrit Grunwald'
-                        }
-                    }
-                }
+            pom.withXml {
+                asNode().children().last() + pomConfig
+                asNode().appendNode('description', description)
             }
         }
+    }
+}
+
+if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
+if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = ''
+
+bintray {
+    user = project.bintrayUsername
+    key = project.bintrayApiKey
+    publications = ['mavenCustom']
+    pkg {
+        repo                  = 'Medusa'
+        userOrg               = 'hansolo'
+        name                  = project.name
+        desc                  = description
+        licenses              = ['Apache-2.0']
+        labels                = ['javafx']
+        websiteUrl            = 'https://github.com/HanSolo/Medusa/wiki'
+        issueTrackerUrl       = 'https://github.com/HanSolo/Medusa/issues'
+        vcsUrl                = 'git@github.com:HanSolo/Medusa.git'
+        publicDownloadNumbers = true
     }
 }

@@ -79,27 +79,36 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Rotate              needleRotate;
     private Text                valueText;
     private Text                titleText;
+    private Text                subTitleText;
     private double              angleStep;
     private String              formatString;
+    private Locale              locale;
     private List<Section>       sections;
+    private boolean             highlightSections;
+    private double              minValue;
+    private double              maxValue;
 
 
     // ******************** Constructors **************************************
     public SimpleSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleStep    = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        sections     = gauge.getSections();
+        angleStep         = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
+        formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale            = gauge.getLocale();
+        sections          = gauge.getSections();
+        highlightSections = gauge.isHighlightSections();
+        minValue          = gauge.getMinValue();
+        maxValue          = gauge.getMaxValue();
 
-        init();
         initGraphics();
         registerListeners();
     }
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
+        // Set initial size
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
             if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
@@ -109,16 +118,6 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         }
 
-        if (Double.compare(getSkinnable().getMinWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMinHeight(), 0.0) <= 0) {
-            getSkinnable().setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
-        }
-
-        if (Double.compare(getSkinnable().getMaxWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMaxHeight(), 0.0) <= 0) {
-            getSkinnable().setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
-        }
-    }
-
-    private void initGraphics() {
         sectionsCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
         sectionsCtx    = sectionsCanvas.getGraphicsContext2D();
 
@@ -145,21 +144,24 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setStrokeLineCap(StrokeLineCap.ROUND);
         needle.setStrokeLineJoin(StrokeLineJoin.BEVEL);
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setFill(getSkinnable().getTitleColor());
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+
+        subTitleText = new Text(getSkinnable().getSubTitle());
+        subTitleText.setTextOrigin(VPos.CENTER);
+        subTitleText.setFill(getSkinnable().getSubTitleColor());
+        Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
 
         // Add all nodes
-        pane = new Pane();
-        pane.getChildren().setAll(sectionsCanvas,
-                                  needle,
-                                  valueText,
-                                  titleText);
+        pane = new Pane(sectionsCanvas, needle, valueText, titleText, subTitleText);
 
         getChildren().setAll(pane);
     }
@@ -186,30 +188,44 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Methods *******************************************
+    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
+
     protected void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
+            redraw();
         } else if ("REDRAW".equals(EVENT_TYPE)) {
-            needle.setFill(getSkinnable().getNeedleColor());
-            needle.setStroke(getSkinnable().getBorderPaint());
-            titleText.setFill(getSkinnable().getTitleColor());
-            valueText.setFill(getSkinnable().getValueColor());
+            redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             if (getSkinnable().getCheckSectionsForValue()) {
                 double currentValue = getSkinnable().getCurrentValue();
                 int listSize = sections.size();
                 for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(currentValue); }
             }
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
+            // Highlight Sections if enabled
+            if (highlightSections) {
+                drawSections();
+            }
         } else if ("RECALC".equals(EVENT_TYPE)) {
+            minValue  = getSkinnable().getMinValue();
+            maxValue  = getSkinnable().getMaxValue();
             angleStep = ANGLE_RANGE / getSkinnable().getRange();
             needleRotate.setAngle((180 - START_ANGLE) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
             resize();
         } else if ("SECTION".equals(EVENT_TYPE)) {
-            sections = getSkinnable().getSections();
+            sections          = getSkinnable().getSections();
+            highlightSections = getSkinnable().isHighlightSections();
             resize();
             redraw();
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
         }
     }
 
@@ -218,24 +234,31 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void rotateNeedle(final double VALUE) {
         double targetAngle = 180 - START_ANGLE + (VALUE - getSkinnable().getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
-        valueText.setText(String.format(Locale.US, formatString, VALUE) + getSkinnable().getUnit());
+        valueText.setText(String.format(locale, formatString, VALUE) + getSkinnable().getUnit());
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         if (valueText.getLayoutBounds().getWidth() > 0.395 * size) { resizeText(); }
     }
 
+
+    // ******************** Drawing *******************************************
     private void drawSections() {
         sectionsCtx.clearRect(0, 0, size, size);
-        double minValue       = getSkinnable().getMinValue();
-        double maxValue       = getSkinnable().getMaxValue();
-        double offset         = START_ANGLE - 90;
-        int noOfSections      = getSkinnable().getSections().size();
-        double sectionsOffset = size * 0.015;
-        double sectionsSize   = size - (size * 0.03);
-        angleStep             = ANGLE_RANGE / (getSkinnable().getRange());
+        double value               = getSkinnable().getCurrentValue();
+        boolean sectionTextVisible = getSkinnable().isSectionTextVisible();
+        boolean sectionIconVisible = getSkinnable().getSectionIconsVisible();
+        double offset              = START_ANGLE - 90;
+        int listSize               = sections.size();
+        double xy                  = size * 0.015;
+        double wh                  = size - (size * 0.03);
+        double sectionXY           = size * 0.1375;
+        double sectionWH           = size - (size * 0.275);
+        angleStep                  = ANGLE_RANGE / (getSkinnable().getRange());
         double sinValue;
         double cosValue;
-        for (int i = 0 ; i < noOfSections ; i++) {
-            Section section = getSkinnable().getSections().get(i);
+        sectionsCtx.setLineWidth(size * 0.27);
+        sectionsCtx.setLineCap(StrokeLineCap.BUTT);
+        for (int i = 0 ; i < listSize ; i++) {
+            Section section = sections.get(i);
             final double SECTION_START_ANGLE;
             if (section.getStart() > maxValue || section.getStop() < minValue) continue;
 
@@ -245,17 +268,23 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 SECTION_START_ANGLE = (section.getStart() - minValue) * angleStep;
             }
             final double SECTION_ANGLE_EXTEND;
-            if (section.getStop() > maxValue) {
+            if (Double.compare(section.getStop(), maxValue) > 0) {
                 SECTION_ANGLE_EXTEND = (maxValue - section.getStart()) * angleStep;
+            } else if (Double.compare(section.getStart(), minValue) < 0) {
+                SECTION_ANGLE_EXTEND = (section.getStop() - minValue) * angleStep;
             } else {
                 SECTION_ANGLE_EXTEND = (section.getStop() - section.getStart()) * angleStep;
             }
             sectionsCtx.save();
-            sectionsCtx.setFill(section.getColor());
-            sectionsCtx.fillArc(sectionsOffset, sectionsOffset, sectionsSize, sectionsSize, (offset - SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.ROUND);
+            if (highlightSections) {
+                sectionsCtx.setStroke(section.contains(value) ? section.getHighlightColor() : section.getColor());
+            } else {
+                sectionsCtx.setStroke(section.getColor());
+            }
+            sectionsCtx.strokeArc(sectionXY, sectionXY, sectionWH, sectionWH, (offset - SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
 
             // Draw Section Text
-            if (getSkinnable().isSectionTextVisible()) {
+            if (sectionTextVisible) {
                 sinValue = -Math.sin(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
                 cosValue = -Math.cos(Math.toRadians(offset - 90 - SECTION_START_ANGLE - SECTION_ANGLE_EXTEND * 0.5));
                 Point2D textPoint = new Point2D(size * 0.5 + size * 0.365 * sinValue, size * 0.5 + size * 0.365 * cosValue);
@@ -263,8 +292,8 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 sectionsCtx.setTextAlign(TextAlignment.CENTER);
                 sectionsCtx.setTextBaseline(VPos.CENTER);
                 sectionsCtx.setFill(section.getTextColor());
-                sectionsCtx.fillText(section.getText(), textPoint.getX(), textPoint.getY());
-            } else if (size > 0 && getSkinnable().getSectionIconsVisible()) {
+                sectionsCtx.fillText(section.getText(), textPoint.getX(), textPoint.getY(), 0.2 * size);
+            } else if (size > 0 && sectionIconVisible) {
                 // Draw Section Icon
                 Image icon = section.getImage();
                 if (null != icon) {
@@ -279,22 +308,39 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Draw white border around area
         sectionsCtx.setStroke(getSkinnable().getBorderPaint());
         sectionsCtx.setLineWidth(size * 0.025);
-        sectionsCtx.strokeArc(sectionsOffset, sectionsOffset, sectionsSize, sectionsSize, offset + 90, ANGLE_RANGE, ArcType.ROUND);
+        sectionsCtx.strokeArc(xy, xy, wh, wh, offset + 90, ANGLE_RANGE, ArcType.ROUND);
+
+        if (getSkinnable().getTickLabelsVisible()) {
+            sectionsCtx.setFont(Fonts.robotoRegular(size * 0.1));
+            sectionsCtx.setFill(getSkinnable().getTickLabelColor());
+            sectionsCtx.setTextBaseline(VPos.TOP);
+            sectionsCtx.setTextAlign(TextAlignment.LEFT);
+            sectionsCtx.fillText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()), size * 0.15075377, size * 0.86180905, size * 0.3);
+            sectionsCtx.setTextAlign(TextAlignment.RIGHT);
+            sectionsCtx.fillText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()), size * 0.84924623, size * 0.86180905, size * 0.3);
+        }
     }
 
     private void resizeText() {
-        double fontSize = size * 0.145;
+        double fontSize = size * 0.25;
+        double maxWidth = 0.35 * size;
         valueText.setFont(Fonts.robotoMedium(fontSize));
-        double maxWidth = 0.395 * size;
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
-        valueText.setTranslateY(size * (titleText.getText().isEmpty() ? 0.5 : 0.48));
+        valueText.setTranslateY(size * (titleText.getText().isEmpty() ? 0.5 : 0.46));
 
-        fontSize = size * 0.045;
+        fontSize = size * 0.075;
+        maxWidth = size * 0.3;
         titleText.setFont(Fonts.robotoMedium(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.setTranslateX((size - titleText.getLayoutBounds().getWidth()) * 0.5);
-        titleText.setTranslateY(size * 0.5 + valueText.getFont().getSize() * 0.7);
+        titleText.setTranslateY(size * 0.5 + valueText.getFont().getSize() * 0.45);
+
+        maxWidth = size * 0.45;
+        subTitleText.setFont(Fonts.robotoMedium(fontSize));
+        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, fontSize); }
+        subTitleText.setTranslateX((size - subTitleText.getLayoutBounds().getWidth()) * 0.5);
+        subTitleText.setTranslateY(size * 0.8);
     }
     
     private void resize() {
@@ -313,6 +359,8 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sectionsCanvas.setCache(true);
             sectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
+            needle.setCache(false);
+
             needleMoveTo1.setX(0.275 * size); needleMoveTo1.setY(0.5 * size);
 
             needleCubicCurveTo2.setControlX1(0.275 * size); needleCubicCurveTo2.setControlY1(0.62426575 * size);
@@ -327,13 +375,16 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleCubicCurveTo4.setControlX2(0.6448105 * size); needleCubicCurveTo4.setControlY2(0.296985 * size);
             needleCubicCurveTo4.setX(0.5392625 * size); needleCubicCurveTo4.setY(0.2784125 * size);
 
-            needleLineTo5.setX(0.5 * size); needleLineTo5.setY(0.0225 * size);
+            needleLineTo5.setX(0.5 * size); needleLineTo5.setY(0.004 * size);
 
             needleLineTo6.setX(0.4607375 * size); needleLineTo6.setY(0.2784125 * size);
 
             needleCubicCurveTo7.setControlX1(0.3551895 * size); needleCubicCurveTo7.setControlY1(0.296985 * size);
             needleCubicCurveTo7.setControlX2(0.275 * size); needleCubicCurveTo7.setControlY2(0.3891265 * size);
             needleCubicCurveTo7.setX(0.275 * size); needleCubicCurveTo7.setY(0.5 * size);
+
+            needle.setCache(true);
+            needle.setCacheHint(CacheHint.ROTATE);
 
             needle.setStrokeWidth(size * 0.025);
 
@@ -342,7 +393,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleRotate.setPivotY(size * 0.5);
 
             double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + getSkinnable().getMinValue();
-            valueText.setText(String.format(Locale.US, "%." + getSkinnable().getDecimals() + "f", currentValue) + getSkinnable().getUnit());
+            valueText.setText(String.format(locale, "%." + getSkinnable().getDecimals() + "f", currentValue) + getSkinnable().getUnit());
             valueText.setVisible(getSkinnable().isValueVisible());
 
             titleText.setText(getSkinnable().getTitle());
@@ -352,10 +403,14 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        needle.setFill(getSkinnable().getNeedleColor());
+        needle.setStroke(getSkinnable().getNeedleBorderColor());
+        titleText.setFill(getSkinnable().getTitleColor());
+        subTitleText.setFill(getSkinnable().getSubTitleColor());
+        valueText.setFill(getSkinnable().getValueColor());
+        locale       = getSkinnable().getLocale();
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         titleText.setText(getSkinnable().getTitle());
-        titleText.setFill(getSkinnable().getTitleColor());
-        valueText.setFill(getSkinnable().getValueColor());
         resizeText();
     }
 }

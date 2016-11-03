@@ -102,6 +102,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private List<Section>   sections;
     private Tooltip         needleTooltip;
     private String          formatString;
+    private Locale          locale;
 
 
     // ******************** Constructors **************************************
@@ -116,9 +117,9 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         colorGradientEnabled = gauge.isGradientBarEnabled();
         noOfGradientStops    = gauge.getGradientBarStops().size();
         sections             = gauge.getSections();
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
 
-        init();
         initGraphics();
         registerListeners();
 
@@ -129,24 +130,17 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
+        // Set initial size
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() < 0 && getSkinnable().getPrefHeight() < 0) {
+            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
+                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+            } else {
                 getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
-        if (Double.compare(getSkinnable().getMinWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMinHeight(), 0.0) <= 0) {
-            getSkinnable().setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
-        }
-
-        if (Double.compare(getSkinnable().getMaxWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMaxHeight(), 0.0) <= 0) {
-            getSkinnable().setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
-        }
-    }
-
-    private void initGraphics() {
         barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, ANGLE_RANGE * 0.5 + 90, -ANGLE_RANGE);
         barBackground.setType(ArcType.OPEN);
         barBackground.setStroke(getSkinnable().getBarBackgroundColor());
@@ -180,12 +174,12 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setStrokeWidth(1);
         needle.setStroke(getSkinnable().getBackgroundPaint());
 
-        needleTooltip = new Tooltip(String.format(Locale.US, formatString, getSkinnable().getValue()));
+        needleTooltip = new Tooltip(String.format(locale, formatString, getSkinnable().getValue()));
         needleTooltip.setTextAlignment(TextAlignment.CENTER);
         Tooltip.install(needle, needleTooltip);
 
         pane = new Pane(barBackground, sectionCanvas, needle);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(26))));
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         getChildren().setAll(pane);
@@ -210,9 +204,17 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Methods *******************************************
+    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
+
     private void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
+            redraw();
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
@@ -223,7 +225,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angleStep = ANGLE_RANGE / range;
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            needleTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getValue()));
+            needleTooltip.setText(String.format(locale, formatString, getSkinnable().getValue()));
         }
     }
     
@@ -235,7 +237,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
 
-    // ******************** Resizing ******************************************
+    // ******************** Drawing *******************************************
     private void drawSections() {
         if (sections.isEmpty()) return;
         sectionCtx.clearRect(0, 0, size, size);
@@ -255,6 +257,8 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 double sectionAngleExtend;
                 if (Double.compare(section.getStop(), maxValue) > 0) {
                     sectionAngleExtend = (maxValue - section.getStart()) * angleStep;
+                } else if (Double.compare(section.getStart(), minValue) < 0) {
+                    sectionAngleExtend = (section.getStop() - minValue) * angleStep;
                 } else {
                     sectionAngleExtend = (section.getStop() - section.getStart()) * angleStep;
                 }
@@ -318,7 +322,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             cosValue    = Math.cos(Math.toRadians(angle + startAngle));
             dotCenterX  = centerX + size * 0.3125 * sinValue;
             dotCenterY  = centerY + size * 0.3125 * cosValue;
-            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 if ((Double.compare(counter, minValue) == 0 || Double.compare(counter, maxValue) == 0)) {
                     sectionCtx.setFill(Color.TRANSPARENT);
                 } else {
@@ -332,32 +336,9 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angle -= tmpAngleStep;
         }
     }
-    
-    private void redraw() {
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
-        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
-        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
 
-        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
-
-        // Areas, Sections and Tick Marks
-        sectionCanvas.setCache(false);
-        sectionCtx.clearRect(0, 0, size, size);
-        if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
-            drawGradientBar();
-            if (getSkinnable().getMajorTickMarksVisible()) drawTickMarks();
-        } else if (getSkinnable().getSectionsVisible()) {
-            drawSections();
-            if (getSkinnable().getMajorTickMarksVisible()) drawTickMarks();
-        }
-        sectionCanvas.setCache(true);
-        sectionCanvas.setCacheHint(CacheHint.QUALITY);
-
-        needle.setFill(getSkinnable().getNeedleColor());
-    }
-
+    // ******************** Resizing ******************************************
     private void resize() {
         double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
@@ -371,7 +352,6 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             pane.setMaxSize(size, size);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
-            pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(0.09558824 * size))));
 
             barBackground.setCenterX(centerX);
             barBackground.setCenterY(centerY);
@@ -399,6 +379,8 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             double needleWidth  = size * 0.26470588;
             double needleHeight = size * 0.47426471;
+
+            needle.setCache(false);
 
             needleMoveTo1.setX(0.277777777777778 * needleWidth); needleMoveTo1.setY(0.720930232558139 * needleHeight);
 
@@ -436,9 +418,39 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleCubicCurveTo11.setControlX2(0); needleCubicCurveTo11.setControlY2(0.566860465116279 * needleHeight);
             needleCubicCurveTo11.setX(0); needleCubicCurveTo11.setY(0.720930232558139 * needleHeight);
 
+            needle.setCache(true);
+            needle.setCacheHint(CacheHint.ROTATE);
+
             needle.relocate((size - needle.getLayoutBounds().getWidth()) * 0.5, centerY - needle.getLayoutBounds().getHeight() + needle.getLayoutBounds().getWidth() * 0.5);
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
             needleRotate.setPivotY(needle.getLayoutBounds().getHeight() - needle.getLayoutBounds().getWidth() * 0.5);
         }
+    }
+
+    private void redraw() {
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+
+        locale               = getSkinnable().getLocale();
+        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
+        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
+
+        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
+
+        // Areas, Sections and Tick Marks
+        sectionCanvas.setCache(false);
+        sectionCtx.clearRect(0, 0, size, size);
+        if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
+            drawGradientBar();
+            if (getSkinnable().getMajorTickMarksVisible()) drawTickMarks();
+        } else if (getSkinnable().getSectionsVisible()) {
+            drawSections();
+            if (getSkinnable().getMajorTickMarksVisible()) drawTickMarks();
+        }
+        sectionCanvas.setCache(true);
+        sectionCanvas.setCacheHint(CacheHint.QUALITY);
+
+        needle.setFill(getSkinnable().getNeedleColor());
     }
 }

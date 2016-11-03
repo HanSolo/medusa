@@ -36,15 +36,15 @@ import javafx.scene.paint.Color;
  */
 public class Marker implements Comparable<Marker>{
     public enum MarkerType { STANDARD, DOT, TRIANGLE }
-    private static final Color DEFAULT_MARKER_COLOR = Color.rgb(123, 30, 202);
-    public final MarkerEvent MARKER_PRESSED_EVENT  = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_PRESSED);
-    public final MarkerEvent MARKER_RELEASED_EVENT = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_RELEASED);
-    public final MarkerEvent VALUE_CHANGED_EVENT   = new MarkerEvent(Marker.this, null, MarkerEvent.VALUE_CHANGED);
-    public final MarkerEvent COLOR_CHANGED_EVENT   = new MarkerEvent(Marker.this, null, MarkerEvent.COLOR_CHANGED);
-    public final MarkerEvent TEXT_CHANGED_EVENT    = new MarkerEvent(Marker.this, null, MarkerEvent.TEXT_CHANGED);
-    public final MarkerEvent TYPE_CHANGED_EVENT    = new MarkerEvent(Marker.this, null, MarkerEvent.TYPE_CHANGED);
-    public final MarkerEvent EXCEEDED_EVENT        = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_EXCEEDED);
-    public final MarkerEvent UNDERRUN_EVENT        = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_UNDERRUN);
+    private static final Color DEFAULT_MARKER_COLOR  = Color.rgb(123, 30, 202);
+    public final MarkerEvent   MARKER_PRESSED_EVENT  = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_PRESSED);
+    public final MarkerEvent   MARKER_RELEASED_EVENT = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_RELEASED);
+    public final MarkerEvent   VALUE_CHANGED_EVENT   = new MarkerEvent(Marker.this, null, MarkerEvent.VALUE_CHANGED);
+    public final MarkerEvent   COLOR_CHANGED_EVENT   = new MarkerEvent(Marker.this, null, MarkerEvent.COLOR_CHANGED);
+    public final MarkerEvent   TEXT_CHANGED_EVENT    = new MarkerEvent(Marker.this, null, MarkerEvent.TEXT_CHANGED);
+    public final MarkerEvent   TYPE_CHANGED_EVENT    = new MarkerEvent(Marker.this, null, MarkerEvent.TYPE_CHANGED);
+    public final MarkerEvent   EXCEEDED_EVENT        = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_EXCEEDED);
+    public final MarkerEvent   UNDERRUN_EVENT        = new MarkerEvent(Marker.this, null, MarkerEvent.MARKER_UNDERRUN);
     private double                     _value;
     private DoubleProperty             value;
     private String                     _text;
@@ -54,41 +54,57 @@ public class Marker implements Comparable<Marker>{
     private MarkerType                 _markerType;
     private ObjectProperty<MarkerType> markerType;
     private double                     checkedValue;
+    private String                     styleClass;
 
 
     // ******************** Constructors **************************************
+    /**
+     *
+     */
     public Marker() {
-        this(0, "", DEFAULT_MARKER_COLOR, MarkerType.STANDARD);
+        this(0, "", DEFAULT_MARKER_COLOR, MarkerType.STANDARD, "");
     }
     public Marker(final double VALUE, final String TEXT) {
-        this(VALUE, TEXT, DEFAULT_MARKER_COLOR, MarkerType.STANDARD);
+        this(VALUE, TEXT, DEFAULT_MARKER_COLOR, MarkerType.STANDARD, "");
     }
     public Marker(final double VALUE, final Color COLOR) {
-        this(VALUE, "", COLOR, MarkerType.STANDARD);
+        this(VALUE, "", COLOR, MarkerType.STANDARD, "");
     }
     public Marker(final double VALUE, final MarkerType TYPE) {
-        this(VALUE, "", DEFAULT_MARKER_COLOR, TYPE);
+        this(VALUE, "", DEFAULT_MARKER_COLOR, TYPE, "");
     }
     public Marker(final double VALUE, final Color COLOR, final MarkerType TYPE) {
-        this(VALUE, "", COLOR, TYPE);
+        this(VALUE, "", COLOR, TYPE, "");
     }
     public Marker(final double VALUE, final String TEXT, final MarkerType TYPE) {
-        this(VALUE, TEXT, DEFAULT_MARKER_COLOR, TYPE);
+        this(VALUE, TEXT, DEFAULT_MARKER_COLOR, TYPE, "");
     }
     public Marker(final double VALUE, final String TEXT, final Color COLOR) {
-        this(VALUE, TEXT, COLOR, MarkerType.STANDARD);
+        this(VALUE, TEXT, COLOR, MarkerType.STANDARD, "");
     }
     public Marker(final double VALUE, final String TEXT, final Color COLOR, final MarkerType TYPE) {
+        this(VALUE, TEXT, COLOR, TYPE, "");
+    }
+    public Marker(final double VALUE, final String TEXT, final Color COLOR, final MarkerType TYPE, final String STYLE_CLASS) {
         _value       = VALUE;
         _text        = TEXT;
         _color       = COLOR;
         _markerType  = null == TYPE ? MarkerType.STANDARD : TYPE;
         checkedValue = -Double.MAX_VALUE;
+        styleClass   = STYLE_CLASS;
     }
 
 
     // ******************** Methods *******************************************
+    /**
+     * Returns the value that was defined for the marker.
+     * @return the value that was defined for the marker
+     */
     public double getValue() { return null == value ? _value : value.get(); }
+    /**
+     * Defines the value for the marker
+     * @param VALUE
+     */
     public void setValue(final double VALUE) {
         if (null == value) {
             _value = VALUE;
@@ -102,7 +118,18 @@ public class Marker implements Comparable<Marker>{
         return value;
     }
 
+    /**
+     * Returns the text that was defined for the marker.
+     * This text can be used as a description and will be
+     * used in tooltips.
+     * @return the text that was defined for the marker
+     */
     public String getText() { return null == text ? _text : text.get(); }
+    /**
+     * Defines a text for this marker. This text can be
+     * used as a description and will be used in tooltips.
+     * @param TEXT
+     */
     public void setText(final String TEXT) {
         if (null == text) {
             _text = TEXT;
@@ -116,7 +143,16 @@ public class Marker implements Comparable<Marker>{
         return text;
     }
 
+    /**
+     * Returns the color that will be used to colorize
+     * the marker.
+     * @return the color that will be used to colorize the marker
+     */
     public Color getColor() { return null == color ? _color : color.get(); }
+    /**
+     * Defines the color that will be used to colorize the marker.
+     * @param COLOR
+     */
     public void setColor(final Color COLOR) {
         if (null == color) {
             _color = COLOR;
@@ -129,8 +165,18 @@ public class Marker implements Comparable<Marker>{
         if (null == color) { color = new SimpleObjectProperty<>(Marker.this, "color", _color); }
         return color;
     }
-    
+
+    /**
+     * Returns the shape that will be used to visualize the marker.
+     * The values are STANDARD, DOT, TRAPEZOID.
+     * @return the shape that will be used to visualize the marker
+     */
     public MarkerType getMarkerType() { return null == markerType ? _markerType : markerType.get(); }
+    /**
+     * Defines the shape that will be used to visualize the marker.
+     * The values are STANDARD, DOT, TRAPEZOID.
+     * @param TYPE
+     */
     public void setMarkerType(final MarkerType TYPE) {
         if (null == markerType) {
             _markerType = null == TYPE ? MarkerType.STANDARD : TYPE;
@@ -149,12 +195,32 @@ public class Marker implements Comparable<Marker>{
         }
         return markerType;
     }
+
+    /**
+     * Returns the style class that can be used to colorize the marker.
+     * This is not implemented in the current available skins.
+     * @return the style class that can be used to colorize the marker
+     */
+    public String getStyleClass() { return styleClass; }
+    /**
+     * Defines the style class that can be used to colorize the marker.
+     * This is not implemented in the current available marker.
+     * @param STYLE_CLASS
+     */
+    public void setStyleClass(final String STYLE_CLASS) { styleClass = STYLE_CLASS; }
     
     public boolean equals(final Marker MARKER) {
         return (Double.compare(MARKER.getValue(), getValue()) == 0 &&
                 MARKER.getText().equals(getText()));
     }
 
+    /**
+     * Checks if a given value is smaller/bigger than the stored
+     * value. With those checks it can be detected if the current
+     * value exceeds or underruns the marker. In both cases an
+     * event will be fired.
+     * @param VALUE
+     */
     public void checkForValue(final double VALUE) {
         boolean wasSmaller = Double.compare(checkedValue, VALUE) < 0;
         boolean wasBigger  = Double.compare(checkedValue, VALUE) > 0;
@@ -176,12 +242,13 @@ public class Marker implements Comparable<Marker>{
     }
 
     @Override public String toString() {
-        return new StringBuilder("Marker : ").append("\n")
-                                             .append("value:").append(getValue())
-                                             .append("text : ").append(getText()).append("\n")
-                                             .append("color: ").append(getColor())
-                                             .append("type : ").append(getMarkerType())
-                                             .toString();
+        return new StringBuilder().append("{\n")
+                                  .append("\"value\":").append(getValue()).append(",\n")
+                                  .append("\"text\":\"").append(getText()).append("\",\n")
+                                  .append("\"color\":\n").append(getColor().toString().substring(0, 8).replace("0x", "#")).append("\",\n")
+                                  .append("\"type\":\"").append(getMarkerType().name()).append("\"\n")
+                                  .append("}")
+                                  .toString();
     }
 
 

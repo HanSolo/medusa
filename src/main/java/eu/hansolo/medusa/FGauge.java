@@ -59,6 +59,9 @@ public class FGauge extends Region {
 
 
     // ******************** Constructors **************************************
+    public FGauge() {
+        this(new Gauge(), GaugeDesign.BLACK_METAL, GaugeBackground.BEIGE);
+    }
     public FGauge(final Gauge GAUGE, final GaugeDesign DESIGN) {
         this(GAUGE, DESIGN, GaugeBackground.DARK_GRAY);
     }
@@ -165,6 +168,11 @@ public class FGauge extends Region {
                                                         background.getLayoutBounds().getMaxX(), background.getLayoutBounds().getMaxY()));
 
             switch(gaugeDesign) {
+                case NONE:
+                    frame.setVisible(false);
+                    foreground.setVisible(false);
+                    background.setVisible(false);
+                    break;
                 case ENZO:
                     background.setFill(Color.rgb(240, 240, 240));
                     innerShadow.setRadius(0.07407407 * size);
@@ -175,6 +183,9 @@ public class FGauge extends Region {
                     foreground.setStroke(null);
                     break;
                 default:
+                    frame.setVisible(true);
+                    foreground.setVisible(true);
+                    background.setVisible(true);
                     innerShadow.setColor(Color.rgb(0, 0, 0, 0.65));
                     innerShadow.setRadius(0.08 * size);
                     innerShadow.setOffsetX(0);
@@ -186,7 +197,7 @@ public class FGauge extends Region {
                     break;
             }
 
-            gauge.setPrefSize(size * (1d - gaugeDesign.FRAME_FACTOR * 2d), size * (1d - gaugeDesign.FRAME_FACTOR * 2d));
+            gauge.setPrefSize(size * (1.0 - gaugeDesign.FRAME_FACTOR * 2.0), size * (1.0 - gaugeDesign.FRAME_FACTOR * 2.0));
             gauge.relocate(gaugeDesign.FRAME_FACTOR * size, gaugeDesign.FRAME_FACTOR * size);
 
             foreground.setCenterX(size * 0.5);

@@ -19,16 +19,20 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
-import eu.hansolo.medusa.events.UpdateEvent;
-import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.tools.Helper;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.InnerShadow;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcTo;
@@ -81,6 +85,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private LineTo        dataBarLineToInnerArc;
     private ArcTo         dataBarInnerArc;
     private Line          threshold;
+    private Text          thresholdText;
     private InnerShadow   innerShadow;
     private Font          smallFont;
     private Font          bigFont;
@@ -92,6 +97,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private List<Section> sections;
     private String        formatString;
     private String        otherFormatString;
+    private Locale        locale;
     private double        minValue;
 
 
@@ -108,15 +114,18 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         currentValueAngle    = 0;
         formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         otherFormatString    = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
 
-        init();
         initGraphics();
         registerListeners();
+
+        setBar(gauge.getValue());
     }
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
+        // Set initial size
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
             if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
@@ -126,38 +135,35 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         }
 
-        if (Double.compare(getSkinnable().getMinWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMinHeight(), 0.0) <= 0) {
-            getSkinnable().setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
-        }
-
-        if (Double.compare(getSkinnable().getMaxWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMaxHeight(), 0.0) <= 0) {
-            getSkinnable().setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
-        }
-    }
-
-    private void initGraphics() {
         unitText = new Text(getSkinnable().getUnit());
         unitText.setTextOrigin(VPos.CENTER);
         unitText.setFill(getSkinnable().getUnitColor());
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setFill(getSkinnable().getTitleColor());
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
-        valueText = new Text(String.format(Locale.US, formatString, getSkinnable().getValue()));
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
+        Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
         minValue = getSkinnable().getMinValue();
-        minText  = new Text(String.format(Locale.US, otherFormatString, minValue));
+        minText  = new Text(String.format(locale, otherFormatString, minValue));
         minText.setTextOrigin(VPos.CENTER);
         minText.setFill(getSkinnable().getValueColor());
 
-        maxText = new Text(String.format(Locale.US, otherFormatString, getSkinnable().getMaxValue()));
+        maxText = new Text(String.format(locale, otherFormatString, getSkinnable().getMaxValue()));
         maxText.setTextOrigin(VPos.CENTER);
         maxText.setFill(getSkinnable().getValueColor());
 
-        innerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.3), 30d, 0d, 0d, 10d);
+        boolean tickLabelsVisible = getSkinnable().getTickLabelsVisible();
+        Helper.enableNode(minText, tickLabelsVisible);
+        Helper.enableNode(maxText, tickLabelsVisible);
+
+        innerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.3), 30.0, 0.0, 0.0, 10.0);
 
         barBackgroundStart          = new MoveTo(0, 0.675 * PREFERRED_HEIGHT);
         barBackgroundOuterArc       = new ArcTo(0.675 * PREFERRED_HEIGHT, 0.675 * PREFERRED_HEIGHT, 0, PREFERRED_WIDTH, 0.675 * PREFERRED_HEIGHT, true, true);
@@ -193,42 +199,38 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         threshold = new Line();
         threshold.setStrokeLineCap(StrokeLineCap.BUTT);
-        threshold.setVisible(getSkinnable().isThresholdVisible());
-        threshold.setManaged(getSkinnable().isThresholdVisible());
+        Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
 
-        pane = new Pane();
-        pane.getChildren().setAll(unitText,
-                                  titleText,
-                                  valueText,
-                                  minText,
-                                  maxText,
-                                  barBackground,
-                                  dataBar,
-                                  threshold);
+        thresholdText = new Text(String.format(locale, formatString, getSkinnable().getThreshold()));
+        Helper.enableNode(thresholdText, getSkinnable().isThresholdVisible());
+
+        pane = new Pane(unitText, titleText, valueText, minText, maxText, barBackground, dataBar, threshold, thresholdText);
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable o) {DashboardSkin.this.resize();}
-        });
-        getSkinnable().heightProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable o) {DashboardSkin.this.resize();}
-        });
-        getSkinnable().setOnUpdate(new UpdateEventListener() {
-            @Override public void onUpdateEvent(UpdateEvent e) {DashboardSkin.this.handleEvents(e.eventType.name());}
-        });
-        getSkinnable().currentValueProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable o) {DashboardSkin.this.setBar(getSkinnable().getCurrentValue());}
-        });
+        getSkinnable().widthProperty().addListener(o -> resize());
+        getSkinnable().heightProperty().addListener(o -> resize());
+        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
+        getSkinnable().currentValueProperty().addListener(o -> setBar(getSkinnable().getCurrentValue()));
     }
 
 
     // ******************** Methods *******************************************
+    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
+
     protected void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
+            redraw();
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
@@ -239,8 +241,15 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resize();
             redraw();
         } else if ("VISBILITY".equals(EVENT_TYPE)) {
-            threshold.setVisible(getSkinnable().isThresholdVisible());
-            threshold.setManaged(getSkinnable().isThresholdVisible());
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
+            boolean tickLabelsVisible = getSkinnable().getTickLabelsVisible();
+            Helper.enableNode(minText, tickLabelsVisible);
+            Helper.enableNode(maxText, tickLabelsVisible);
+            boolean thresholdVisible = getSkinnable().isThresholdVisible();
+            Helper.enableNode(threshold, thresholdVisible);
+            Helper.enableNode(thresholdText, thresholdVisible);
             redraw();
         }
     }
@@ -248,13 +257,13 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Private Methods ***********************************
     private void setBar(final double VALUE) {
-        currentValueAngle = Helper.clamp(90d, 270d, (VALUE - minValue) * angleStep + 90d);
+        currentValueAngle = Helper.clamp(90.0, 270.0, (VALUE - minValue) * angleStep + 90.0);
         dataBarOuterArc.setX(centerX + (0.675 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
         dataBarOuterArc.setY(centerX + (0.675 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
         dataBarLineToInnerArc.setX(centerX + (0.3 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
         dataBarLineToInnerArc.setY(centerX + (0.3 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
         setBarColor(VALUE);
-        valueText.setText(String.format(Locale.US, formatString, VALUE));
+        valueText.setText(String.format(locale, formatString, VALUE));
         if (valueText.getLayoutBounds().getWidth() > 0.28 * width) Helper.adjustTextSize(valueText, 0.28 * width, size * 0.24);
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
     }
@@ -271,43 +280,6 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 }
             }
         }
-    }
-
-    private void redraw() {
-        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        otherFormatString    = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
-        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
-        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
-        sectionsVisible      = getSkinnable().getSectionsVisible();
-
-        barBackground.setFill(getSkinnable().getBarBackgroundColor());
-        barBackground.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
-
-        setBarColor(getSkinnable().getCurrentValue());
-
-        titleText.setFill(getSkinnable().getTitleColor());
-        titleText.setText(getSkinnable().getTitle());
-        titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.88 * height);
-
-        valueText.setFill(getSkinnable().getValueColor());
-        valueText.setText(String.format(Locale.US, formatString, getSkinnable().getCurrentValue()));
-        valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
-
-        minText.setFill(getSkinnable().getValueColor());
-        minText.setText(String.format(Locale.US, otherFormatString, getSkinnable().getMinValue()));
-        minText.relocate(((0.27778 * width) - minText.getLayoutBounds().getWidth()) * 0.5, 0.7 * height);
-
-        maxText.setFill(getSkinnable().getValueColor());
-        maxText.setText(String.format(Locale.US, otherFormatString, getSkinnable().getMaxValue()));
-        maxText.relocate(((0.27778 * width) - maxText.getLayoutBounds().getWidth()) * 0.5 + 0.72222 * width, 0.7 * height);
-
-        unitText.setFill(getSkinnable().getUnitColor());
-        unitText.setText(getSkinnable().getUnit());
-        unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.5 * height);
-
-        dataBar.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
-
-        threshold.setStroke(getSkinnable().getThresholdColor());
     }
 
     private void resize() {
@@ -342,12 +314,15 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (valueText.getLayoutBounds().getWidth() > maxWidth) Helper.adjustTextSize(valueText, maxWidth, size * 0.24);
             valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
 
-            minText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", minValue));
+            maxWidth = 0.27  * width;
+            minText.setText(String.format(locale, otherFormatString, minValue));
             minText.setFont(smallFont);
+            if (minText.getLayoutBounds().getWidth() > maxWidth) Helper.adjustTextSize(minText, maxWidth, size * 0.12);
             minText.relocate(((0.27778 * width) - minText.getLayoutBounds().getWidth()) * 0.5, 0.7 * height);
 
-            maxText.setText(String.format(Locale.US, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
+            maxText.setText(String.format(locale, otherFormatString, getSkinnable().getMaxValue()));
             maxText.setFont(smallFont);
+            if (maxText.getLayoutBounds().getWidth() > maxWidth) Helper.adjustTextSize(maxText, maxWidth, size * 0.12);
             maxText.relocate(((0.27778 * width) - maxText.getLayoutBounds().getWidth()) * 0.5 + 0.72222 * width, 0.7 * height);
 
             if (getSkinnable().isShadowsEnabled()) {
@@ -368,7 +343,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             barBackgroundInnerArc.setX(0.27778 * width);
             barBackgroundInnerArc.setY(0.675 * height);
 
-            currentValueAngle = Helper.clamp(90d, 270d, (getSkinnable().getCurrentValue() - minValue) * angleStep + 90d);
+            currentValueAngle = Helper.clamp(90.0, 270.0, (getSkinnable().getCurrentValue() - minValue) * angleStep + 90.0);
             dataBarStart.setX(0);
             dataBarStart.setY(0.675 * height);
             dataBarOuterArc.setRadiusX(0.675 * height);
@@ -383,14 +358,83 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             dataBarInnerArc.setY(0.675 * height);
 
             threshold.setStroke(getSkinnable().getThresholdColor());
-            threshold.setStrokeWidth(Helper.clamp(1d, 2d, 0.00675676 * height));
+            threshold.setStrokeWidth(Helper.clamp(1.0, 2.0, 0.00675676 * height));
             double thresholdInnerRadius = 0.3 * height;
             double thresholdOuterRadius = 0.675 * height;
-            double thresholdAngle = Helper.clamp(90d, 270d, (getSkinnable().getThreshold() - minValue) * angleStep + 90d);
+            double thresholdAngle       = Helper.clamp(90.0, 270.0, (getSkinnable().getThreshold() - minValue) * angleStep + 90.0);
             threshold.setStartX(centerX + thresholdInnerRadius * Math.sin(-Math.toRadians(thresholdAngle)));
             threshold.setStartY(centerX + thresholdInnerRadius * Math.cos(-Math.toRadians(thresholdAngle)));
             threshold.setEndX(centerX + thresholdOuterRadius * Math.sin(-Math.toRadians(thresholdAngle)));
             threshold.setEndY(centerX + thresholdOuterRadius * Math.cos(-Math.toRadians(thresholdAngle)));
+
+            double thresholdTextRadius = 0.26 * height;
+            thresholdText.setFill(getSkinnable().getValueColor());
+            thresholdText.setText(String.format(locale, formatString, getSkinnable().getThreshold()));
+            thresholdText.setFont(Fonts.robotoBold(size * 0.047));
+            thresholdText.setRotate(thresholdAngle + 180);
+            thresholdText.relocate(centerX - (thresholdText.getLayoutBounds().getWidth() * 0.5) + thresholdTextRadius * Math.sin(-Math.toRadians(thresholdAngle)),
+                                   centerX - (thresholdText.getLayoutBounds().getWidth() * 0.5) + thresholdTextRadius * Math.cos(-Math.toRadians(thresholdAngle)));
         }
+    }
+
+    private void redraw() {
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / 250 * size))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+
+        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
+        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
+        sectionsVisible      = getSkinnable().getSectionsVisible();
+
+        barBackground.setFill(getSkinnable().getBarBackgroundColor());
+        barBackground.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
+
+        setBarColor(getSkinnable().getCurrentValue());
+
+        dataBar.setEffect(getSkinnable().isShadowsEnabled() ? innerShadow : null);
+
+        threshold.setStroke(getSkinnable().getThresholdColor());
+        double thresholdInnerRadius = 0.3 * height;
+        double thresholdOuterRadius = 0.675 * height;
+        double thresholdAngle       = Helper.clamp(90.0, 270.0, (getSkinnable().getThreshold() - minValue) * angleStep + 90.0);
+        threshold.setStartX(centerX + thresholdInnerRadius * Math.sin(-Math.toRadians(thresholdAngle)));
+        threshold.setStartY(centerX + thresholdInnerRadius * Math.cos(-Math.toRadians(thresholdAngle)));
+        threshold.setEndX(centerX + thresholdOuterRadius * Math.sin(-Math.toRadians(thresholdAngle)));
+        threshold.setEndY(centerX + thresholdOuterRadius * Math.cos(-Math.toRadians(thresholdAngle)));
+
+        redrawText();
+    }
+    private void redrawText() {
+        locale            = getSkinnable().getLocale();
+        formatString      = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        otherFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
+
+        titleText.setFill(getSkinnable().getTitleColor());
+        titleText.setText(getSkinnable().getTitle());
+        titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.88 * height);
+
+        valueText.setFill(getSkinnable().getValueColor());
+        valueText.setText(String.format(locale, formatString, getSkinnable().getCurrentValue()));
+        valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
+
+        minText.setFill(getSkinnable().getValueColor());
+        minText.setText(String.format(locale, otherFormatString, getSkinnable().getMinValue()));
+        minText.relocate(((0.27778 * width) - minText.getLayoutBounds().getWidth()) * 0.5, 0.7 * height);
+
+        maxText.setFill(getSkinnable().getValueColor());
+        maxText.setText(String.format(locale, otherFormatString, getSkinnable().getMaxValue()));
+        maxText.relocate(((0.27778 * width) - maxText.getLayoutBounds().getWidth()) * 0.5 + 0.72222 * width, 0.7 * height);
+
+        unitText.setFill(getSkinnable().getUnitColor());
+        unitText.setText(getSkinnable().getUnit());
+        unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.5 * height);
+
+        double thresholdAngle      = Helper.clamp(90.0, 270.0, (getSkinnable().getThreshold() - minValue) * angleStep + 90.0);
+        double thresholdTextRadius = 0.26 * height;
+        thresholdText.setFill(getSkinnable().getValueColor());
+        thresholdText.setText(String.format(locale, formatString, getSkinnable().getThreshold()));
+        thresholdText.setFont(Fonts.robotoBold(size * 0.047));
+        thresholdText.setRotate(thresholdAngle + 180);
+        thresholdText.relocate(centerX - (thresholdText.getLayoutBounds().getWidth() * 0.5) + thresholdTextRadius * Math.sin(-Math.toRadians(thresholdAngle)),
+                               centerX - (thresholdText.getLayoutBounds().getWidth() * 0.5) + thresholdTextRadius * Math.cos(-Math.toRadians(thresholdAngle)));
     }
 }

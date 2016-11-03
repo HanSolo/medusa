@@ -18,6 +18,7 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Gauge.KnobType;
 import eu.hansolo.medusa.Gauge.LedType;
+import eu.hansolo.medusa.Gauge.NeedleBehavior;
 import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.NeedleType;
@@ -40,14 +41,18 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
+import javafx.scene.text.Font;
 
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -116,6 +121,16 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B averagingEnabled(final boolean ENABLED) {
+        properties.put("averagingEnabled", new SimpleBooleanProperty(ENABLED));
+        return (B)this;
+    }
+
+    public final B averagingPeriod(final int PERIOD) {
+        properties.put("averagingPeriod", new SimpleIntegerProperty(PERIOD));
+        return (B)this;
+    }
+
     public final B foregroundBaseColor(final Color COLOR) {
         properties.put("foregroundBaseColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
@@ -166,6 +181,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B borderWidth(final double WIDTH) {
+        properties.put("borderWidth", new SimpleDoubleProperty(WIDTH));
+        return (B)this;
+    }
+
     public final B foregroundPaint(final Paint PAINT) {
         properties.put("foregroundPaint", new SimpleObjectProperty<>(PAINT));
         return (B)this;
@@ -178,6 +198,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B knobType(final KnobType TYPE) {
         properties.put("knobType", new SimpleObjectProperty<>(TYPE));
+        return (B)this;
+    }
+
+    public final B knobVisible(final boolean VISIBLE) {
+        properties.put("knobVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
     }
 
@@ -226,13 +251,28 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B needleBehavior(final NeedleBehavior BEHAVIOR) {
+        properties.put("needleBehavior", new SimpleObjectProperty<>(BEHAVIOR));
+        return (B)this;
+    }
+
     public final B needleColor(final Color COLOR) {
         properties.put("needleColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
+    public final B needleBorderColor(final Color COLOR) {
+        properties.put("needleBorderColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B barColor(final Color COLOR) {
         properties.put("barColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
+    public final B barBorderColor(final Color COLOR) {
+        properties.put("barBorderColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
@@ -251,7 +291,12 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
-    public final B numberFormat(final Gauge.NumberFormat FORMAT) {
+    public final B locale(final Locale LOCALE) {
+        properties.put("locale", new SimpleObjectProperty<>(LOCALE));
+        return (B)this;
+    }
+
+    public final B numberFormat(final NumberFormat FORMAT) {
         properties.put("numberFormat", new SimpleObjectProperty<>(FORMAT));
         return (B)this;
     }
@@ -296,16 +341,46 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B majorTickMarkLengthFactor(final double FACTOR) {
+        properties.put("majorTickMarkLengthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+    
+    public final B majorTickMarkWidthFactor(final double FACTOR) {
+        properties.put("majorTickMarkWidthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+    
     public final B mediumTickMarkColor(final Color COLOR) {
         properties.put("mediumTickMarkColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
+    public final B mediumTickMarkLengthFactor(final double FACTOR) {
+        properties.put("mediumTickMarkLengthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+
+    public final B mediumTickMarkWidthFactor(final double FACTOR) {
+        properties.put("mediumTickMarkWidthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+    
     public final B minorTickMarkColor(final Color COLOR) {
         properties.put("minorTickMarkColor", new SimpleObjectProperty<>(COLOR));
         return (B)this;
     }
 
+    public final B minorTickMarkLengthFactor(final double FACTOR) {
+        properties.put("minorTickMarkLengthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+
+    public final B minorTickMarkWidthFactor(final double FACTOR) {
+        properties.put("minorTickMarkWidthFactor", new SimpleDoubleProperty(FACTOR));
+        return (B)this;
+    }
+    
     public final B majorTickMarkType(final TickMarkType TYPE) {
         properties.put("majorTickMarkType", new SimpleObjectProperty<>(TYPE));
         return (B)this;
@@ -441,6 +516,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public B averageColor(final Color COLOR) {
+        properties.put("averageColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B checkSectionsForValue(final boolean CHECK) {
         properties.put("checkSectionsForValue", new SimpleBooleanProperty(CHECK));
         return (B)this;
@@ -466,8 +546,18 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B averageVisible(final boolean VISIBLE) {
+        properties.put("averageVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B sectionsVisible(final boolean VISIBLE) {
         properties.put("sectionsVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B sectionsAlwaysVisible(final boolean VISIBLE) {
+        properties.put("sectionsAlwaysVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
     }
 
@@ -481,8 +571,28 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B highlightSections(final boolean HIGHLIGHT) {
+        properties.put("highlightSections", new SimpleBooleanProperty(HIGHLIGHT));
+        return (B)this;
+    }
+
     public final B areasVisible(final boolean VISIBLE) {
         properties.put("areasVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B areaTextVisible(final boolean VISIBLE) {
+        properties.put("areaTextVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B areaIconsVisible(final boolean VISIBLE) {
+        properties.put("areaIconsVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B highlightAreas(final boolean HIGHLIGHT) {
+        properties.put("highlightAreas", new SimpleBooleanProperty(HIGHLIGHT));
         return (B)this;
     }
 
@@ -523,6 +633,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B minorTickMarksVisible(final boolean VISIBLE) {
         properties.put("minorTickMarksVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
+    public final B tickMarkRingVisible(final boolean VISIBLE) {
+        properties.put("tickMarkRingVisible", new SimpleBooleanProperty(VISIBLE));
         return (B)this;
     }
 
@@ -593,6 +708,16 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B keepAspect(final boolean KEEP) {
         properties.put("keepAspect", new SimpleBooleanProperty(KEEP));
+        return (B)this;
+    }
+
+    public final B customFontEnabled(final boolean ENABLED) {
+        properties.put("customFontEnabled", new SimpleBooleanProperty(ENABLED));
+        return (B)this;
+    }
+
+    public final B customFont(final Font FONT) {
+        properties.put("customFont", new SimpleObjectProperty(FONT));
         return (B)this;
     }
 
@@ -688,6 +813,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B padding(final Insets INSETS) {
+        properties.put("padding", new SimpleObjectProperty<>(INSETS));
+        return (B)this;
+    }
+
     public final Gauge build() {
         final Gauge CONTROL;
         if (properties.containsKey("skinType")) {
@@ -764,11 +894,14 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 case SIMPLE      :
                     CONTROL.setKnobPosition(Pos.CENTER);
                     CONTROL.setBorderPaint(Color.WHITE);
+                    CONTROL.setNeedleBorderColor(Color.WHITE);
                     CONTROL.setBackgroundPaint(Color.DARKGRAY);
                     CONTROL.setDecimals(0);
+                    CONTROL.setTickLabelColor(Color.WHITE);
                     CONTROL.setNeedleColor(Color.web("#5a615f"));
                     CONTROL.setValueColor(Color.WHITE);
                     CONTROL.setTitleColor(Color.WHITE);
+                    CONTROL.setSubTitleColor(Color.WHITE);
                     break;
                 case SLIM        :
                     CONTROL.setKnobPosition(Pos.CENTER);
@@ -807,8 +940,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setMinMeasuredValueVisible(true);
                     CONTROL.setMaxMeasuredValueVisible(true);
                     CONTROL.setOldValueVisible(true);
+                    CONTROL.setBorderPaint(Color.WHITE);
+                    CONTROL.setForegroundPaint(Color.WHITE);
                     break;
                 case TINY:
+                    CONTROL.setBorderWidth(24);
                     CONTROL.setBackgroundPaint(Color.rgb(216,216,216));
                     CONTROL.setBorderPaint(Color.rgb(76,76,76));
                     CONTROL.setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));
@@ -830,6 +966,59 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setOrientation(Orientation.VERTICAL);
                     CONTROL.setBarColor(Gauge.DARK_COLOR);
                     CONTROL.setBarEffectEnabled(true);
+                    break;
+                case DIGITAL:
+                    CONTROL.setBarColor(Gauge.DARK_COLOR);
+                    break;
+                case SIMPLE_DIGITAL:
+                    CONTROL.setBarColor(Gauge.DARK_COLOR);
+                    break;
+                case SECTION:
+                    CONTROL.setBackgroundPaint(Gauge.DARK_COLOR);
+                    CONTROL.setAutoScale(false);
+                    CONTROL.setValueVisible(false);
+                    CONTROL.setKnobColor(Color.rgb(82,82,84));
+                    CONTROL.setSectionsVisible(true);
+                    CONTROL.setSectionTextVisible(true);
+                    break;
+                case BAR:
+                    Color barColor = CONTROL.getBarColor();
+                    CONTROL.setAnimated(true);
+                    CONTROL.setAnimationDuration(1000);
+                    CONTROL.setMinValue(0);
+                    CONTROL.setMaxValue(100);
+                    CONTROL.setGradientBarEnabled(true);
+                    CONTROL.setGradientBarStops(new Stop(0.0, barColor),
+                                                new Stop(0.01, barColor),
+                                                new Stop(0.75, barColor.deriveColor(-10, 1, 1, 1)),
+                                                new Stop(1.0, barColor.deriveColor(-20, 1, 1, 1)));
+                    CONTROL.setBarColor(barColor);
+                    break;
+                case WHITE:
+                    CONTROL.setAnimated(true);
+                    CONTROL.setAnimationDuration(1000);
+                    CONTROL.setAngleRange(360);
+                    CONTROL.setMinValue(0);
+                    CONTROL.setMaxValue(100);
+                    CONTROL.setBarColor(Color.WHITE);
+                    CONTROL.setValueColor(Color.WHITE);
+                    CONTROL.setUnitColor(Color.WHITE);
+                    break;
+                case CHARGE:
+                    CONTROL.setMinValue(0);
+                    CONTROL.setMaxValue(1.0);
+                    CONTROL.setAnimated(true);
+                    break;
+                case SIMPLE_SECTION:
+                    CONTROL.setAnimated(true);
+                    CONTROL.setStartAngle(150);
+                    CONTROL.setAngleRange(300);
+                    CONTROL.setSectionsVisible(true);
+                    CONTROL.setBarBackgroundColor(Color.rgb(150, 150, 150, 0.25));
+                    CONTROL.setBarColor(Color.rgb(69, 106, 207));
+                    CONTROL.setTitleColor(Color.rgb(90, 90, 90));
+                    CONTROL.setUnitColor(Color.rgb(90, 90, 90));
+                    CONTROL.setValueColor(Color.rgb(90, 90, 90));
                     break;
             }
         } else {
@@ -890,16 +1079,23 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
             CONTROL.setForegroundBaseColor(((ObjectProperty<Color>) properties.get("foregroundBaseColor")).get());
         }
 
+        if (properties.keySet().contains("minValue")) {
+            CONTROL.setMinValue(((DoubleProperty) properties.get("minValue")).get());
+        }
+        if (properties.keySet().contains("maxValue")) {
+            CONTROL.setMaxValue(((DoubleProperty) properties.get("maxValue")).get());
+        }
+
         for (String key : properties.keySet()) {
             if ("prefSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
                 CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
             } else if("minSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
+                CONTROL.setMinSize(dim.getWidth(), dim.getHeight());
             } else if("maxSize".equals(key)) {
                 Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
+                CONTROL.setMaxSize(dim.getWidth(), dim.getHeight());
             } else if("prefWidth".equals(key)) {
                 CONTROL.setPrefWidth(((DoubleProperty) properties.get(key)).get());
             } else if("prefHeight".equals(key)) {
@@ -924,13 +1120,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setTranslateX(((DoubleProperty) properties.get(key)).get());
             } else if ("translateY".equals(key)) {
                 CONTROL.setTranslateY(((DoubleProperty) properties.get(key)).get());
+            } else if ("padding".equals(key)) {
+                CONTROL.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
             } else if("styleClass".equals(key)) {
                 CONTROL.getStyleClass().setAll("gauge");
                 CONTROL.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
-            } else if("minValue".equals(key)) {
-                CONTROL.setMinValue(((DoubleProperty) properties.get(key)).get());
-            } else if("maxValue".equals(key)) {
-                CONTROL.setMaxValue(((DoubleProperty) properties.get(key)).get());
             } else if ("autoScale".equals(key)) {
                 CONTROL.setAutoScale(((BooleanProperty) properties.get(key)).get());
             } else if("value".equals(key)) {
@@ -945,6 +1139,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setSubTitle(((StringProperty) properties.get(key)).get());
             } else if("unit".equals(key)) {
                 CONTROL.setUnit(((StringProperty) properties.get(key)).get());
+            } else if("averagingEnabled".equals(key)) {
+                CONTROL.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
+            } else if("averagingPeriod".equals(key)) {
+                CONTROL.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
             } else if("startFromZero".equals(key)) {
                 CONTROL.setStartFromZero(((BooleanProperty) properties.get(key)).get());
             } else if("returnToZero".equals(key)) {
@@ -963,6 +1161,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setBackgroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
             } else if ("borderPaint".equals(key)) {
                 CONTROL.setBorderPaint(((ObjectProperty<Paint>) properties.get(key)).get());
+            } else if ("borderWidth".equals(key)) {
+                CONTROL.setBorderWidth(((DoubleProperty) properties.get(key)).get());
             } else if ("foregroundPaint".equals(key)) {
                 CONTROL.setForegroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
             } else if ("knobColor".equals(key)) {
@@ -971,6 +1171,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setKnobType(((ObjectProperty<KnobType>) properties.get(key)).get());
             } else if ("knobPosition".equals(key)) {
                 CONTROL.setKnobPosition(((ObjectProperty<Pos>) properties.get(key)).get());
+            } else if ("knobVisible".equals(key)) {
+                CONTROL.setKnobVisible(((BooleanProperty) properties.get(key)).get());
             } else if("animated".equals(key)) {
                 CONTROL.setAnimated(((BooleanProperty) properties.get(key)).get());
             } else if("animationDuration".equals(key)) {
@@ -985,18 +1187,26 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setNeedleShape(((ObjectProperty<NeedleShape>) properties.get(key)).get());
             } else if("needleSize".equals(key)) {
                 CONTROL.setNeedleSize(((ObjectProperty<NeedleSize>) properties.get(key)).get());
+            } else if("needleBehavior".equals(key)) {
+                CONTROL.setNeedleBehavior(((ObjectProperty<NeedleBehavior>) properties.get(key)).get());
             } else if("needleColor".equals(key)) {
                 CONTROL.setNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if("needleBorderColor".equals(key)) {
+                CONTROL.setNeedleBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("barColor".equals(key)) {
                 CONTROL.setBarColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if("barBorderColor".equals(key)) {
+                CONTROL.setBarBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("barBackgroundColor".equals(key)) {
                 CONTROL.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if("tickLabelOrientation".equals(key)) {
                 CONTROL.setTickLabelOrientation(((ObjectProperty<TickLabelOrientation>) properties.get(key)).get());
             } else if("tickLabelLocation".equals(key)) {
                 CONTROL.setTickLabelLocation(((ObjectProperty<TickLabelLocation>) properties.get(key)).get());
+            } else if("locale".equals(key)) {
+                CONTROL.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
             } else if("numberFormat".equals(key)) {
-                CONTROL.setNumberFormat(((ObjectProperty<Gauge.NumberFormat>) properties.get(key)).get());
+                CONTROL.setNumberFormat(((ObjectProperty<NumberFormat>) properties.get(key)).get());
             } else if("majorTickSpace".equals(key)) {
                 CONTROL.setMajorTickSpace(((DoubleProperty) properties.get(key)).get());
             } else if("minorTickSpace".equals(key)) {
@@ -1013,10 +1223,22 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("majorTickMarkColor".equals(key)) {
                 CONTROL.setMajorTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("majorTickMarkLengthFactor".equals(key)) {
+                CONTROL.setMajorTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
+            } else if ("majorTickMarkWidthFactor".equals(key)) {
+                CONTROL.setMajorTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
             } else if ("mediumTickMarkColor".equals(key)) {
                 CONTROL.setMediumTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("mediumTickMarkLengthFactor".equals(key)) {
+                CONTROL.setMediumTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
+            } else if ("mediumTickMarkWidthFactor".equals(key)) {
+                CONTROL.setMediumTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
             } else if ("minorTickMarkColor".equals(key)) {
                 CONTROL.setMinorTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("minorTickMarkLengthFactor".equals(key)) {
+                CONTROL.setMinorTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
+            } else if ("minorTickMarkWidthFactor".equals(key)) {
+                CONTROL.setMinorTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
             } else if ("style".equals(key)) {
                 CONTROL.setStyle(((StringProperty) properties.get(key)).get());
             } else if("ledColor".equals(key)) {
@@ -1037,14 +1259,26 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("thresholdVisible".equals(key)) {
                 CONTROL.setThresholdVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("averageVisible".equals(key)) {
+                CONTROL.setAverageVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionsVisible".equals(key)) {
                 CONTROL.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("sectionsAlwaysVisible".equals(key)) {
+                CONTROL.setSectionsAlwaysVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionTextVisible".equals(key)) {
                 CONTROL.setSectionTextVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("sectionIconsVisible".equals(key)) {
                 CONTROL.setSectionIconsVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("highlightSections".equals(key)) {
+                CONTROL.setHighlightSections(((BooleanProperty) properties.get(key)).get());
             } else if ("areasVisible".equals(key)) {
                 CONTROL.setAreasVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("areaTextVisible".equals(key)) {
+                CONTROL.setAreaTextVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("areaIconsVisible".equals(key)) {
+                CONTROL.setAreaIconsVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("highlightAreas".equals(key)) {
+                CONTROL.setHighlightAreas(((BooleanProperty) properties.get(key)).get());
             } else if ("tickMarkSectionsVisible".equals(key)) {
                 CONTROL.setTickMarkSectionsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("tickLabelSectionsVisible".equals(key)) {
@@ -1067,6 +1301,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("thresholdColor".equals(key)) {
                 CONTROL.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("averageColor".equals(key)) {
+                CONTROL.setAverageColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("tickLabelsVisible".equals(key)) {
                 CONTROL.setTickLabelsVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("onlyFirstAndLastTickLabelVisible".equals(key)) {
@@ -1077,6 +1313,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setMediumTickMarksVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("minorTickMarksVisible".equals(key)) {
                 CONTROL.setMinorTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("tickMarkRingVisible".equals(key)) {
+                CONTROL.setTickMarkRingVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("ledBlinking".equals(key)) {
                 CONTROL.setLedBlinking(((BooleanProperty) properties.get(key)).get());
             } else if ("ledOn".equals(key)) {
@@ -1115,6 +1353,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setKeepAspect(((BooleanProperty) properties.get(key)).get());
             } else if ("threshold".equals(key)) {
                 CONTROL.setThreshold(((DoubleProperty) properties.get(key)).get());
+            } else if ("customFontEnabled".equals(key)) {
+                CONTROL.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
+            } else if ("customFont".equals(key)) {
+                CONTROL.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
             }
         }
 

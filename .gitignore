@@ -1,7 +1,6 @@
 .idea
 medusa.iml
 build
-gradle
 logos
 signing.properties
 cache.properties.lock

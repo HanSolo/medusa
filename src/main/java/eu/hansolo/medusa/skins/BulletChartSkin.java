@@ -20,12 +20,10 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
-import eu.hansolo.medusa.events.UpdateEvent;
-import eu.hansolo.medusa.events.UpdateEventListener;
 import eu.hansolo.medusa.tools.Helper;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
@@ -34,6 +32,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -73,6 +78,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Tooltip         barTooltip;
     private              Tooltip         thresholdTooltip;
     private              String          formatString;
+    private              Locale          locale;
 
 
 
@@ -84,6 +90,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         barTooltip       = new Tooltip();
         thresholdTooltip = new Tooltip();
         formatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale           = gauge.getLocale();
 
         if (Orientation.VERTICAL == orientation) {
             preferredWidth  = 64;
@@ -94,14 +101,14 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
         gauge.setPrefSize(preferredWidth, preferredHeight);
 
-        init();
         initGraphics();
         registerListeners();
     }
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
+        // Set initial size
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
             if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
@@ -111,25 +118,17 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         }
 
-        if (Double.compare(getSkinnable().getMinWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMinHeight(), 0.0) <= 0) {
-            getSkinnable().setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
-        }
-
-        if (Double.compare(getSkinnable().getMaxWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMaxHeight(), 0.0) <= 0) {
-            getSkinnable().setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
-        }
-    }
-
-    private void initGraphics() {
-        Orientation orientation = getSkinnable().getOrientation();
+        orientation = getSkinnable().getOrientation();
 
         aspectRatio = preferredHeight / preferredWidth;
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
+        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         unitText = new Text(getSkinnable().getUnit());
         unitText.setTextOrigin(VPos.CENTER);
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         tickMarkCanvas    = new Canvas(0.79699248 * preferredWidth, 0.08333333 * preferredHeight);
 
@@ -145,66 +144,51 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdRect     = new Rectangle();
         Tooltip.install(thresholdRect, thresholdTooltip);
 
-        pane = new Pane();
-        pane.getChildren().setAll(titleText,
-                                  unitText,
-                                  tickMarkCanvas,
-                                  sectionsCanvas,
-                                  barRect,
-                                  thresholdRect);
+        pane = new Pane(titleText,
+                        unitText,
+                        tickMarkCanvas,
+                        sectionsCanvas,
+                        barRect,
+                        thresholdRect);
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+
         getChildren().setAll(pane);
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable o) {BulletChartSkin.this.handleEvents("RESIZE");}
-        });
-        getSkinnable().heightProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable o) {BulletChartSkin.this.handleEvents("RESIZE");}
-        });
-        getSkinnable().getSections().addListener((ListChangeListener<Section>) new ListChangeListener<Section>() {
-            @Override public void onChanged(Change<? extends Section> c) {BulletChartSkin.this.redraw();}
-        });
-        getSkinnable().getTickMarkSections().addListener((ListChangeListener<Section>) new ListChangeListener<Section>() {
-            @Override public void onChanged(Change<? extends Section> c) {BulletChartSkin.this.redraw();}
-        });
-        getSkinnable().getTickLabelSections().addListener((ListChangeListener<Section>) new ListChangeListener<Section>() {
-            @Override public void onChanged(Change<? extends Section> c) {BulletChartSkin.this.redraw();}
-        });
-        getSkinnable().getMarkers().addListener((ListChangeListener<Marker>) new ListChangeListener<Marker>() {
-            @Override public void onChanged(Change<? extends Marker> c) {BulletChartSkin.this.redraw();}
-        });
-        getSkinnable().setOnUpdate(new UpdateEventListener() {
-            @Override public void onUpdateEvent(UpdateEvent e) {BulletChartSkin.this.handleEvents(e.eventType.name());}
-        });
+        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
+        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
+        getSkinnable().getSections().addListener((ListChangeListener<Section>) c -> redraw());
+        getSkinnable().getTickMarkSections().addListener((ListChangeListener<Section>) c -> redraw());
+        getSkinnable().getTickLabelSections().addListener((ListChangeListener<Section>) c -> redraw());
+        getSkinnable().getMarkers().addListener((ListChangeListener<Marker>) c -> redraw());
+        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
 
-        getSkinnable().currentValueProperty().addListener(new InvalidationListener() {
-            @Override public void invalidated(Observable o) {BulletChartSkin.this.updateBar();}
-        });
+        getSkinnable().currentValueProperty().addListener(o -> updateBar());
+
+        pane.widthProperty().addListener(o -> { resize(); redraw(); });
+        pane.heightProperty().addListener(o -> { resize(); redraw(); });
     }
 
 
     // ******************** Methods *******************************************
+    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
+
     protected void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
+            redraw();
         }else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            if (getSkinnable().getTitle().isEmpty()) {
-                titleText.setVisible(false);
-                titleText.setManaged(false);
-            } else {
-                titleText.setManaged(true);
-                titleText.setVisible(true);
-            }
-            if (getSkinnable().getUnit().isEmpty()) {
-                unitText.setVisible(false);
-                unitText.setManaged(false);
-            } else {
-                unitText.setManaged(true);
-                unitText.setVisible(true);
-            }
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
             redraw();
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
@@ -220,10 +204,12 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resize();
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            barTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getValue()));
+            barTooltip.setText(String.format(locale, formatString, getSkinnable().getValue()));
         }
     }
 
+
+    // ******************** Private Methods ***********************************
     private void drawTickMarks(final GraphicsContext CTX) {
         tickMarkCanvas.setCache(false);
         CTX.clearRect(0, 0, tickMarkCanvas.getWidth(), tickMarkCanvas.getHeight());
@@ -233,7 +219,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         List<Section> tickLabelSections        = getSkinnable().getTickLabelSections();
         Color         majorTickMarkColor       = getSkinnable().getTickMarkColor();
         Color         tickLabelColor           = getSkinnable().getTickLabelColor();
-        boolean       smallRange               = Double.compare(getSkinnable().getRange(), 10d) <= 0;
+        boolean       smallRange               = Double.compare(getSkinnable().getRange(), 10.0) <= 0;
         double        minValue                 = getSkinnable().getMinValue();
         double        maxValue                 = getSkinnable().getMaxValue();
         double        tmpStepSize              = smallRange ? stepSize / 10 : stepSize;
@@ -267,7 +253,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             // Set the general tickmark color
             CTX.setStroke(getSkinnable().getTickMarkColor());
-            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0d) == 0) {
+            if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw major tick mark
                 if (getSkinnable().getMajorTickMarksVisible()) {
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
@@ -355,15 +341,6 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void adjustTextSize(final Text TEXT, final double MAX_WIDTH, final double DECREMENT_FACTOR) {
-        double decrement = 0d;
-        double size      = width < height ? width : height;
-        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && TEXT.getFont().getSize() > 0) {
-            TEXT.setFont(Fonts.robotoMedium(size * (DECREMENT_FACTOR - decrement)));
-            decrement += 0.01;
-        }
-    }
-
     private void resize() {
         width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
@@ -378,6 +355,9 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             pane.setMaxSize(width, height);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+
+            width  = pane.getLayoutBounds().getWidth();
+            height = pane.getLayoutBounds().getHeight();
 
             tickMarkCanvas.setWidth(0.39 * width);
             tickMarkCanvas.setHeight(height);
@@ -399,11 +379,11 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             double maxTextWidth = width;
             titleText.setFont(Fonts.robotoRegular(0.24 * width));
-            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { adjustTextSize(titleText, maxTextWidth, 0.3); }
+            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(titleText, maxTextWidth, 0.24 * width); }
             titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.03 * width);
 
             unitText.setFont(Fonts.robotoRegular(0.15 * width));
-            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { adjustTextSize(unitText, maxTextWidth, 0.2); }
+            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(unitText, maxTextWidth, 0.15 * width); }
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.35 * width);
         } else {
             height   = width * aspectRatio;
@@ -411,6 +391,9 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             pane.setMaxSize(width, height);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+
+            width  = pane.getLayoutBounds().getWidth();
+            height = pane.getLayoutBounds().getHeight();
 
             tickMarkCanvas.setWidth(width);
             tickMarkCanvas.setHeight(0.29166667 * height);
@@ -432,21 +415,24 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             double maxTextWidth = 0.20300752 * width;
             titleText.setFont(Fonts.robotoMedium(0.24 * height));
-            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { adjustTextSize(titleText, maxTextWidth, 0.3); }
+            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(titleText, maxTextWidth, 0.24 * width); }
             titleText.relocate(0.17593985 * width - (titleText.getLayoutBounds().getWidth()), 0.075 * height);
 
             unitText.setFont(Fonts.robotoRegular(0.15 * height));
-            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { adjustTextSize(unitText, maxTextWidth, 0.2); }
+            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(unitText, maxTextWidth, 0.15 * width); }
             unitText.relocate(0.17593985 * width - (unitText.getLayoutBounds().getWidth()), 0.4 * height);
         }
         redraw();
     }
 
     private void redraw() {
+        locale = getSkinnable().getLocale();
+        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
         drawTickMarks(tickMarksCtx);
         drawSections(sectionsCtx);
         thresholdRect.setFill(getSkinnable().getThresholdColor());
-        thresholdTooltip.setText(String.format(Locale.US, formatString, getSkinnable().getThreshold()));
+        thresholdTooltip.setText(String.format(locale, formatString, getSkinnable().getThreshold()));
         barRect.setFill(getSkinnable().getBarColor());
         titleText.setFill(getSkinnable().getTitleColor());
         unitText.setFill(getSkinnable().getUnitColor());

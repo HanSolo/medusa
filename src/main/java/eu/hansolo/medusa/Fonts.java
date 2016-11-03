@@ -75,7 +75,7 @@ public class Fonts {
             robotoBoldCondensedName    = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/RobotoCondensed-Bold.ttf"), 10).getName();
             latoLightName              = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Lato-Lig.otf"), 10).getName();
             latoRegularName            = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Lato-Reg.otf"), 10).getName();
-            latoRegularName            = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Lato-Bol.otf"), 10).getName();
+            latoBoldName               = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Lato-Bol.otf"), 10).getName();
         } catch (Exception exception) { }
         DIGITAL_NAME                  = digitalName;
         DIGITAL_READOUT_NAME          = digitalReadoutName;

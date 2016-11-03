@@ -16,7 +16,6 @@
 
 package eu.hansolo.medusa;
 
-import eu.hansolo.medusa.Marker.MarkerEvent;
 import eu.hansolo.medusa.Section.SectionEvent;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -73,8 +72,18 @@ public class SectionBuilder<B extends SectionBuilder<B>> {
         return (B)this;
     }
 
+    public final B highlightColor(final Color COLOR) {
+        properties.put("highlightColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
     public final B textColor(final Color COLOR) {
         properties.put("textColor", new SimpleObjectProperty<>(COLOR));
+        return (B)this;
+    }
+
+    public final B styleClass(final String STYLE_CLASS) {
+        properties.put("styleClass", new SimpleStringProperty(STYLE_CLASS));
         return (B)this;
     }
 
@@ -101,12 +110,16 @@ public class SectionBuilder<B extends SectionBuilder<B>> {
                 SECTION.setIcon(((ObjectProperty<Image>) properties.get(key)).get());
             } else if ("color".equals(key)) {
                 SECTION.setColor(((ObjectProperty<Color>) properties.get(key)).get());
+            } else if ("highlightColor".equals(key)) {
+                SECTION.setHighlightColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("textColor".equals(key)) {
                 SECTION.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
             } else if ("onSectionEntered".equals(key)) {
                 SECTION.setOnSectionEntered(((ObjectProperty<EventHandler>) properties.get(key)).get());
             } else if ("onSectionLeft".equals(key)) {
                 SECTION.setOnSectionLeft(((ObjectProperty<EventHandler>) properties.get(key)).get());
+            } else if ("styleClass".equals(key)) {
+                SECTION.setStyleClass(((StringProperty) properties.get(key)).get());
             }
         }
         return SECTION;

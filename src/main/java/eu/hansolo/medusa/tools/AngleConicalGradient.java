@@ -43,11 +43,11 @@ public class AngleConicalGradient {
         this(CENTER_X, CENTER_Y, 0.0, ANGLE_STOP_MAP, DIRECTION);
     }
     public AngleConicalGradient(final double CENTER_X, final double CENTER_Y, final double OFFSET_ANGLE, final Map<Double, Color> ANGLE_STOP_MAP, final ScaleDirection DIRECTION) {
-        final double ANGLE_FACTOR = 1d / 360d;
-        double       offset       = Helper.clamp(0d, 1d, (OFFSET_ANGLE % 360d) * ANGLE_FACTOR);
+        final double ANGLE_FACTOR = 1.0 / 360.0;
+        double       offset       = Helper.clamp(0, 1, (OFFSET_ANGLE % 360.0) * ANGLE_FACTOR);
         List<Stop>   stops        = new ArrayList<>();
         for (double fraction : ANGLE_STOP_MAP.keySet()) {
-            stops.add(new Stop(Helper.clamp(0d, 1d, (fraction % 360d) * ANGLE_FACTOR), ANGLE_STOP_MAP.get(fraction)));
+            stops.add(new Stop(Helper.clamp(0, 1, (fraction % 360.0) * ANGLE_FACTOR), ANGLE_STOP_MAP.get(fraction)));
         }
         gradient = new ConicalGradient(CENTER_X, CENTER_Y, offset, DIRECTION, stops);
     }
