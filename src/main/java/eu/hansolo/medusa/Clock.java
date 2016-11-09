@@ -60,7 +60,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT, DESIGN }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -2046,6 +2046,7 @@ public class Clock extends Control {
             case MINIMAL  : return new MinimalClockSkin(Clock.this);
             case DIGITAL  : return new DigitalClockSkin(Clock.this);
             case TEXT     : return new TextClockSkin(Clock.this);
+            case DESIGN   : return new DesignClockSkin(Clock.this);
             case CLOCK    :
             default       : return new ClockSkin(Clock.this);
         }
@@ -2144,6 +2145,16 @@ public class Clock extends Control {
                 setSecondsVisible(true);
                 super.setSkin(new TextClockSkin(Clock.this));
                 break;
+            case DESIGN:
+                setDiscreteHours(false);
+                setDiscreteMinutes(false);
+                setDiscreteSeconds(false);
+                setTextVisible(false);
+                setDateVisible(false);
+                setSecondsVisible(false);
+                setHourColor(Color.RED);
+                setBackgroundPaint(Color.WHITE);
+                super.setSkin(new DesignClockSkin(Clock.this));
             case CLOCK:
             default:
                 super.setSkin(new ClockSkin(Clock.this));

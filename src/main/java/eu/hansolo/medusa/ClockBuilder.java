@@ -499,6 +499,16 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setDateVisible(true);
                     CONTROL.setSecondsVisible(true);
                     break;
+                case DESIGN:
+                    CONTROL.setDiscreteHours(false);
+                    CONTROL.setDiscreteMinutes(false);
+                    CONTROL.setDiscreteSeconds(false);
+                    CONTROL.setTextVisible(false);
+                    CONTROL.setDateVisible(false);
+                    CONTROL.setSecondsVisible(false);
+                    CONTROL.setHourColor(Color.RED);
+                    CONTROL.setBackgroundPaint(Color.WHITE);
+                    break;
             }
         } else {
             CONTROL = new Clock();
