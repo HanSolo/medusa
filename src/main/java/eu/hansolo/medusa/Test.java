@@ -47,6 +47,9 @@ import javafx.stage.Stage;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Random;
 
@@ -66,6 +69,7 @@ public class Test extends Application {
     private              long            lastTimerCall;
     private              AnimationTimer  timer;
     private              DoubleProperty  value;
+    private              long            epochSeconds;
     private              BooleanProperty toggle;
 
 
@@ -118,6 +122,8 @@ public class Test extends Application {
 
         //gauge.valueVisibleProperty().bind(toggle);
 
+        epochSeconds = Instant.now().getEpochSecond();
+
         clock = ClockBuilder.create()
                             .skinType(ClockSkinType.DESIGN)
                             //.prefSize(400, 400)
@@ -128,7 +134,7 @@ public class Test extends Application {
                             //.dateVisible(true)
                             //.customFont(Fonts.latoLight(10))
                             .shadowsEnabled(true)
-                            .running(true)
+                            //.running(true)
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -147,6 +153,10 @@ public class Test extends Application {
                     //System.out.println(gauge.isValueVisible());
 
                     //gauge.setValue(v);
+
+                    //epochSeconds+=20;
+                    //clock.setTime(epochSeconds);
+
                     lastTimerCall = now;
                 }
             }
@@ -154,7 +164,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(clock);
+        StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
