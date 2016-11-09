@@ -119,13 +119,15 @@ public class Test extends Application {
         //gauge.valueVisibleProperty().bind(toggle);
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.TEXT)
+                            .skinType(ClockSkinType.DESIGN)
+                            //.prefSize(400, 400)
                             //.onTimeEvent(e -> System.out.println(e.TYPE))
                             //.discreteSeconds(false)
                             .locale(Locale.GERMANY)
-                            .secondsVisible(true)
-                            .dateVisible(true)
-                            .customFont(Fonts.latoLight(10))
+                            //.secondsVisible(true)
+                            //.dateVisible(true)
+                            //.customFont(Fonts.latoLight(10))
+                            .shadowsEnabled(true)
                             .running(true)
                             .build();
 
@@ -138,7 +140,7 @@ public class Test extends Application {
 
                     //gauge.setValue(v);
 
-                    System.out.println("MovingAverage over " + gauge.getAveragingWindow().size() + " values: " + gauge.getAverage() + "  last value = " + v);
+                    //System.out.println("MovingAverage over " + gauge.getAveragingWindow().size() + " values: " + gauge.getAverage() + "  last value = " + v);
 
                     //toggle.set(!toggle.get());
 
@@ -152,7 +154,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(gauge);
+        StackPane pane = new StackPane(clock);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
