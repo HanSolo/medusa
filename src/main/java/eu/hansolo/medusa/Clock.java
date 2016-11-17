@@ -933,7 +933,8 @@ public class Clock extends Control {
         }
     }
     public BooleanProperty runningProperty() { 
-        if (null == running) { new BooleanPropertyBase(_running) {
+        if (null == running) {
+            running = new BooleanPropertyBase(_running) {
             @Override protected void invalidated() {
                 if (get() && !isAnimated()) { scheduleTickTask(); } else { stopTask(periodicTickTask); }
             }
@@ -2123,6 +2124,7 @@ public class Clock extends Control {
                 setSecondColor(Color.WHITE);
                 setDateColor(Color.WHITE);
                 super.setSkin(new SlimClockSkin(Clock.this));
+                break;
             case MINIMAL:
                 setBackgroundPaint(Color.rgb(255, 255, 255, 0.3));
                 setMinuteColor(Color.rgb(59, 209, 255));
