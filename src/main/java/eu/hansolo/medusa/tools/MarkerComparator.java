@@ -18,13 +18,14 @@ package eu.hansolo.medusa.tools;
 
 import eu.hansolo.medusa.Marker;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 
 /**
  * Created by hansolo on 26.01.16.
  */
-public class MarkerComparator implements Comparator<Marker> {
+public class MarkerComparator implements Comparator<Marker>, Serializable {
     @Override public int compare(final Marker MARKER_1, final Marker MARKER_2) {
         return MARKER_1.compareTo(MARKER_2);
     }

@@ -330,7 +330,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
         size = width < height ? width : height;
 
-        if (size > 0 && size > 0) {
+        if (size > 0 ) {
             double centerX   = size * 0.5;
             double centerY   = size * 0.5;
             double barRadius = size * 0.3125;

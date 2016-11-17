@@ -771,7 +771,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw major tick mark
                 isNotZero = Double.compare(0.0, counter) != 0;
-                TickMarkType tickMarkType = null;
+                TickMarkType tickMarkType = TickMarkType.LINE;
                 if (majorTickMarksVisible) {
                     tickMarkType = majorTickMarkType;
                     tickMarkCtx.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);

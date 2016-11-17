@@ -86,7 +86,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LCD)
+                            .skinType(SkinType.SIMPLE_SECTION)
                             //.prefSize(250, 250)
                             //.minValue(0)
                             //.maxValue(100)

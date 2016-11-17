@@ -298,10 +298,10 @@ public enum GaugeDesign {
     },
     FLAT(0.08333333) {
         @Override public Border getBorder(final double SIZE) {
-            double fromX = 0;
-            double fromY = 0;
-            double toX   = 0;
-            double toY   = SIZE;
+            //double fromX = 0;
+            //double fromY = 0;
+            //double toX   = 0;
+            //double toY   = SIZE;
 
             BorderStroke outerBorder = new BorderStroke(Color.rgb(132,132,132),
                                                         BorderStrokeStyle.SOLID,
