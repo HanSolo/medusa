@@ -98,7 +98,9 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private              Rotate             hourRotate;
     private              Rotate             minuteRotate;
     private              Rotate             secondRotate;
-    private              Group              shadowGroup;
+    private              Group              shadowGroupHour;
+    private              Group              shadowGroupMinute;
+    private              Group              shadowGroupSecond;
     private              DropShadow         dropShadow;
     private              List<TimeSection>  sections;
     private              List<TimeSection>  areas;
@@ -176,8 +178,13 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         dropShadow.setRadius(0.015 * PREFERRED_WIDTH);
         dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
 
-        shadowGroup = new Group(hour, minute, second);
-        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroupHour   = new Group(hour);
+        shadowGroupMinute = new Group(minute);
+        shadowGroupSecond = new Group(second);
+
+        shadowGroupHour.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroupMinute.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroupSecond.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
 
         title = new Text("");
         title.setVisible(getSkinnable().isTitleVisible());
@@ -195,7 +202,7 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         text.setVisible(getSkinnable().isTextVisible());
         text.setManaged(getSkinnable().isTextVisible());
 
-        pane = new Pane(sectionsAndAreasCanvas, tickCanvas, alarmPane, title, dateText, dateNumber, text, shadowGroup);
+        pane = new Pane(sectionsAndAreasCanvas, tickCanvas, alarmPane, title, dateText, dateNumber, text, shadowGroupHour, shadowGroupMinute, shadowGroupSecond);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
@@ -650,7 +657,9 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
-        shadowGroup.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroupHour.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroupMinute.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroupSecond.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
 
         // Areas, Sections
         sectionsAndAreasCtx.clearRect(0, 0, size, size);
