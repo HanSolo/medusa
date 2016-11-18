@@ -41,6 +41,8 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -60,7 +62,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT, DESIGN }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -84,6 +86,7 @@ public class Clock extends Control {
 
     private ObjectProperty<ZonedDateTime>     time;
     private LongProperty                      currentTime;
+    private ZoneId                            zoneId;
     private Timeline                          timeline;
     private int                               updateInterval;
     private ClockSkinType                     skinType;
@@ -198,6 +201,9 @@ public class Clock extends Control {
     public Clock(final ZonedDateTime TIME) {
         this(ClockSkinType.CLOCK, TIME);
     }
+    public Clock(final long EPOCH_SECONDS) {
+        this(ClockSkinType.CLOCK, ZonedDateTime.ofInstant(Instant.ofEpochSecond(EPOCH_SECONDS), ZoneId.systemDefault()));
+    }
     public Clock(final ClockSkinType SKIN, final ZonedDateTime TIME) {
         skinType = SKIN;
         getStyleClass().add("clock");
@@ -232,6 +238,7 @@ public class Clock extends Control {
             @Override public Object getBean() { return Clock.this; }
             @Override public String getName() { return "currentTime"; }
         };
+        zoneId                  = time.get().getZone();
         timeline                = new Timeline();
         timeline.setOnFinished(e -> fireUpdateEvent(FINISHED_EVENT));
         updateInterval          = LONG_INTERVAL;
@@ -301,7 +308,10 @@ public class Clock extends Control {
      * Defines the current time of the clock.
      * @param TIME
      */
-    public void setTime(ZonedDateTime TIME) { time.set(TIME); }
+    public void setTime(final ZonedDateTime TIME) { time.set(TIME); }
+    public void setTime(final long EPOCH_SECONDS) {
+        time.set(ZonedDateTime.ofInstant(Instant.ofEpochSecond(EPOCH_SECONDS), getZoneId()));
+    }
     public ObjectProperty<ZonedDateTime> timeProperty() { return time; }
 
     /**
@@ -310,6 +320,8 @@ public class Clock extends Control {
      */
     public long getCurrentTime() { return currentTime.get(); }
     public ReadOnlyLongProperty currentTimeProperty() { return currentTime; }
+
+    public ZoneId getZoneId() { return zoneId; }
 
     /**
      * Returns the title of the clock. The title
@@ -324,7 +336,7 @@ public class Clock extends Control {
      * city or timezone
      * @param TITLE
      */
-    public void setTitle(String TITLE) {
+    public void setTitle(final String TITLE) {
         if (null == title) {
             _title = TITLE;
             fireUpdateEvent(REDRAW_EVENT);
@@ -355,7 +367,7 @@ public class Clock extends Control {
      * This text could be used for additional information.
      * @param TEXT
      */
-    public void setText(String TEXT) { 
+    public void setText(final String TEXT) {
         if (null == text) {
             _text = TEXT;
             fireUpdateEvent(REDRAW_EVENT);
@@ -2047,6 +2059,7 @@ public class Clock extends Control {
             case MINIMAL  : return new MinimalClockSkin(Clock.this);
             case DIGITAL  : return new DigitalClockSkin(Clock.this);
             case TEXT     : return new TextClockSkin(Clock.this);
+            case DESIGN   : return new DesignClockSkin(Clock.this);
             case CLOCK    :
             default       : return new ClockSkin(Clock.this);
         }
@@ -2146,6 +2159,16 @@ public class Clock extends Control {
                 setSecondsVisible(true);
                 super.setSkin(new TextClockSkin(Clock.this));
                 break;
+            case DESIGN:
+                setDiscreteHours(false);
+                setDiscreteMinutes(false);
+                setDiscreteSeconds(false);
+                setTextVisible(false);
+                setDateVisible(false);
+                setSecondsVisible(false);
+                setHourColor(Color.RED);
+                setBackgroundPaint(Color.WHITE);
+                super.setSkin(new DesignClockSkin(Clock.this));
             case CLOCK:
             default:
                 super.setSkin(new ClockSkin(Clock.this));
