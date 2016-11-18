@@ -4107,7 +4107,7 @@ public class Gauge extends Control {
             tickMarkSectionsVisible.set(VISIBLE);
         }
     }
-    public BooleanProperty TickMarkSectionsVisibleProperty() {
+    public BooleanProperty tickMarkSectionsVisibleProperty() {
         if (null == tickMarkSectionsVisible) {
             tickMarkSectionsVisible = new BooleanPropertyBase(_tickMarkSectionsVisible) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
@@ -4139,7 +4139,7 @@ public class Gauge extends Control {
             tickLabelSectionsVisible.set(VISIBLE);
         }
     }
-    public BooleanProperty TickLabelSectionsVisibleProperty() {
+    public BooleanProperty tickLabelSectionsVisibleProperty() {
         if (null == tickLabelSectionsVisible) {
             tickLabelSectionsVisible = new BooleanPropertyBase(_tickLabelSectionsVisible) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
@@ -4326,7 +4326,7 @@ public class Gauge extends Control {
             minorTickMarksVisible.set(VISIBLE);
         }
     }
-    public BooleanProperty MinorTickMarksVisibleProperty() {
+    public BooleanProperty minorTickMarksVisibleProperty() {
         if (null == minorTickMarksVisible) {
             minorTickMarksVisible = new BooleanPropertyBase(_minorTickMarksVisible) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }

@@ -210,8 +210,7 @@ public class Marker implements Comparable<Marker>{
     public void setStyleClass(final String STYLE_CLASS) { styleClass = STYLE_CLASS; }
     
     public boolean equals(final Marker MARKER) {
-        return (Double.compare(MARKER.getValue(), getValue()) == 0 &&
-                MARKER.getText().equals(getText()));
+        return (Double.compare(MARKER.getValue(), getValue()) == 0 && MARKER.getText().equals(getText()));
     }
 
     /**

@@ -327,7 +327,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         Point2D    center           = new Point2D(width * 0.5, height * 0.77);
         double     minorTickSpace   = getSkinnable().getMinorTickSpace();
         double     minValue         = getSkinnable().getMinValue();
-        double     maxValue         = getSkinnable().getMaxValue();
+        //double     maxValue         = getSkinnable().getMaxValue();
         double     tmpAngleStep     = angleStep * minorTickSpace;
         int        decimals         = getSkinnable().getTickLabelDecimals();
         BigDecimal minorTickSpaceBD = BigDecimal.valueOf(minorTickSpace);

@@ -63,10 +63,10 @@ public class ChargeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double MINIMUM_HEIGHT   = 33;
     private static final double MAXIMUM_WIDTH    = 918;
     private static final double MAXIMUM_HEIGHT   = 198;
+    private static double       aspectRatio      = PREFERRED_HEIGHT / PREFERRED_WIDTH;
     private        Region[]     bars;
     private        Background[] barBackgrounds;
     private        Border       barBorder;
-    private static double       aspectRatio;
     private        double       width;
     private        double       height;
     private        HBox         pane;
@@ -78,7 +78,6 @@ public class ChargeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Constructors **************************************
     public ChargeSkin(Gauge gauge) {
         super(gauge);
-        aspectRatio     = PREFERRED_HEIGHT / PREFERRED_WIDTH;
         backgroundPaint = Color.TRANSPARENT;
         borderPaint     = Color.TRANSPARENT;
         borderWidth     = 0;

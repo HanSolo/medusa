@@ -47,6 +47,9 @@ import javafx.stage.Stage;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Random;
 
@@ -66,6 +69,7 @@ public class Test extends Application {
     private              long            lastTimerCall;
     private              AnimationTimer  timer;
     private              DoubleProperty  value;
+    private              long            epochSeconds;
     private              BooleanProperty toggle;
 
 
@@ -86,7 +90,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LCD)
+                            .skinType(SkinType.SIMPLE_SECTION)
                             //.prefSize(250, 250)
                             //.minValue(0)
                             //.maxValue(100)
@@ -118,15 +122,19 @@ public class Test extends Application {
 
         //gauge.valueVisibleProperty().bind(toggle);
 
+        epochSeconds = Instant.now().getEpochSecond();
+
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.TEXT)
+                            .skinType(ClockSkinType.DESIGN)
+                            //.prefSize(400, 400)
                             //.onTimeEvent(e -> System.out.println(e.TYPE))
                             //.discreteSeconds(false)
                             .locale(Locale.GERMANY)
-                            .secondsVisible(true)
-                            .dateVisible(true)
-                            .customFont(Fonts.latoLight(10))
-                            .running(true)
+                            //.secondsVisible(true)
+                            //.dateVisible(true)
+                            //.customFont(Fonts.latoLight(10))
+                            .shadowsEnabled(true)
+                            //.running(true)
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -138,13 +146,17 @@ public class Test extends Application {
 
                     //gauge.setValue(v);
 
-                    System.out.println("MovingAverage over " + gauge.getAveragingWindow().size() + " values: " + gauge.getAverage() + "  last value = " + v);
+                    //System.out.println("MovingAverage over " + gauge.getAveragingWindow().size() + " values: " + gauge.getAverage() + "  last value = " + v);
 
                     //toggle.set(!toggle.get());
 
                     //System.out.println(gauge.isValueVisible());
 
                     //gauge.setValue(v);
+
+                    //epochSeconds+=20;
+                    //clock.setTime(epochSeconds);
+
                     lastTimerCall = now;
                 }
             }

@@ -65,9 +65,6 @@ public class SimpleSectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private Text            valueText;
     private Text            unitText;
     private Pane            pane;
-    private Paint           backgroundPaint;
-    private Paint           borderPaint;
-    private double          borderWidth;
     private List<Section>   sections;
     private String          formatString;
 
@@ -130,8 +127,6 @@ public class SimpleSectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         Helper.enableNode(unitText, getSkinnable().isValueVisible() && !getSkinnable().getUnit().isEmpty());
 
         pane = new Pane(barBackground, sectionCanvas, titleText, valueText, unitText, bar);
-        pane.setBackground(new Background(new BackgroundFill(backgroundPaint, new CornerRadii(1024), Insets.EMPTY)));
-        pane.setBorder(new Border(new BorderStroke(borderPaint, BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(borderWidth))));
 
         getChildren().setAll(pane);
     }
@@ -290,9 +285,6 @@ public class SimpleSectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
-        pane.setBackground(new Background(new BackgroundFill(backgroundPaint, new CornerRadii(1024), Insets.EMPTY)));
-        pane.setBorder(new Border(new BorderStroke(borderPaint, BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(borderWidth / PREFERRED_WIDTH * size))));
-
         drawBackground();
         setBar(getSkinnable().getCurrentValue());
 
