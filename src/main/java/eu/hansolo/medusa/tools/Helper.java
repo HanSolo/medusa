@@ -388,7 +388,7 @@ public class Helper {
 
         double orthTextFactor;
         if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
-            orthTextFactor    = TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.45 * textDisplacementFactor : 0.45 * textDisplacementFactor;
+            orthTextFactor    = 0.45 * textDisplacementFactor;//TickLabelOrientation.ORTHOGONAL == tickLabelOrientation ? 0.45 * textDisplacementFactor : 0.45 * textDisplacementFactor;
             majorDotSize      = 0.02 * SIZE;
             majorHalfDotSize  = majorDotSize * 0.5;
             mediumDotSize     = 0.01375 * SIZE;

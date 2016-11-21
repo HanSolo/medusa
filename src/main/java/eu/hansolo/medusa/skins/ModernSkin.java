@@ -558,7 +558,7 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double textPointX;
         double textPointY;
 
-        double orthTextFactor = TickLabelOrientation.ORTHOGONAL == getSkinnable().getTickLabelOrientation() ? 0.46 : 0.46;
+        double orthTextFactor = 0.46; //TickLabelOrientation.ORTHOGONAL == getSkinnable().getTickLabelOrientation() ? 0.46 : 0.46;
 
         Font tickLabelFont = Fonts.robotoCondensedLight((decimals == 0 ? 0.047 : 0.040) * size);
         CTX.setFont(tickLabelFont);

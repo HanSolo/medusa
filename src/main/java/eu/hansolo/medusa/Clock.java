@@ -62,7 +62,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT, DESIGN }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT, DESIGN, INDUSTRIAL }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -945,7 +945,8 @@ public class Clock extends Control {
         }
     }
     public BooleanProperty runningProperty() { 
-        if (null == running) { new BooleanPropertyBase(_running) {
+        if (null == running) {
+            running = new BooleanPropertyBase(_running) {
             @Override protected void invalidated() {
                 if (get() && !isAnimated()) { scheduleTickTask(); } else { stopTask(periodicTickTask); }
             }
@@ -2047,20 +2048,21 @@ public class Clock extends Control {
     // ******************** Style related *************************************
     @Override protected Skin createDefaultSkin() {
         switch(skinType) {
-            case YOTA2    : return new ClockSkin(Clock.this);
-            case LCD      : return new LcdClockSkin(Clock.this);
-            case PEAR     : return new PearClockSkin(Clock.this);
-            case PLAIN    : return new PlainClockSkin(Clock.this);
-            case DB       : return new DBClockSkin(Clock.this);
-            case FAT      : return new FatClockSkin(Clock.this);
-            case ROUND_LCD: return new RoundLcdClockSkin(Clock.this);
-            case SLIM     : return new SlimClockSkin(Clock.this);
-            case MINIMAL  : return new MinimalClockSkin(Clock.this);
-            case DIGITAL  : return new DigitalClockSkin(Clock.this);
-            case TEXT     : return new TextClockSkin(Clock.this);
-            case DESIGN   : return new DesignClockSkin(Clock.this);
-            case CLOCK    :
-            default       : return new ClockSkin(Clock.this);
+            case YOTA2     : return new ClockSkin(Clock.this);
+            case LCD       : return new LcdClockSkin(Clock.this);
+            case PEAR      : return new PearClockSkin(Clock.this);
+            case PLAIN     : return new PlainClockSkin(Clock.this);
+            case DB        : return new DBClockSkin(Clock.this);
+            case FAT       : return new FatClockSkin(Clock.this);
+            case ROUND_LCD : return new RoundLcdClockSkin(Clock.this);
+            case SLIM      : return new SlimClockSkin(Clock.this);
+            case MINIMAL   : return new MinimalClockSkin(Clock.this);
+            case DIGITAL   : return new DigitalClockSkin(Clock.this);
+            case TEXT      : return new TextClockSkin(Clock.this);
+            case DESIGN    : return new DesignClockSkin(Clock.this);
+            case INDUSTRIAL: return new IndustrialClockSkin(Clock.this);
+            case CLOCK     :
+            default        : return new ClockSkin(Clock.this);
         }
     }
 
@@ -2136,6 +2138,7 @@ public class Clock extends Control {
                 setSecondColor(Color.WHITE);
                 setDateColor(Color.WHITE);
                 super.setSkin(new SlimClockSkin(Clock.this));
+                break;
             case MINIMAL:
                 setBackgroundPaint(Color.rgb(255, 255, 255, 0.3));
                 setMinuteColor(Color.rgb(59, 209, 255));
@@ -2167,6 +2170,27 @@ public class Clock extends Control {
                 setHourColor(Color.RED);
                 setBackgroundPaint(Color.WHITE);
                 super.setSkin(new DesignClockSkin(Clock.this));
+                break;
+            case INDUSTRIAL:
+                setBackgroundPaint(Color.web("#efefef"));
+                setHourColor(Color.web("#2a2a2a"));
+                setMinuteColor(Color.web("#2a2a2a"));
+                setSecondColor(Color.web("#d1222b"));
+                setHourTickMarkColor(Color.BLACK);
+                setMinuteTickMarkColor(Color.BLACK);
+                setTickLabelsVisible(false);
+                setTickLabelColor(Color.BLACK);
+                setDateColor(Color.BLACK);
+                setDateVisible(false);
+                setSecondsVisible(true);
+                setTextVisible(false);
+                setTextColor(Color.BLACK);
+                setTitleVisible(false);
+                setTitleColor(Color.BLACK);
+                setBorderPaint(Color.BLACK);
+                setBorderWidth(5);
+                super.setSkin(new IndustrialClockSkin(Clock.this));
+                break;
             case CLOCK:
             default:
                 super.setSkin(new ClockSkin(Clock.this));

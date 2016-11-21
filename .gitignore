@@ -12,4 +12,5 @@ otherResources
 ._*
 .gradle
 .DS_Store
+/out
 /.nb-gradle/

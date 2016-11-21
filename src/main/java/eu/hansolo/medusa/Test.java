@@ -90,7 +90,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LCD)
+                            .skinType(SkinType.SIMPLE_SECTION)
                             //.prefSize(250, 250)
                             //.minValue(0)
                             //.maxValue(100)
@@ -125,16 +125,17 @@ public class Test extends Application {
         epochSeconds = Instant.now().getEpochSecond();
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.DESIGN)
-                            //.prefSize(400, 400)
-                            //.onTimeEvent(e -> System.out.println(e.TYPE))
-                            //.discreteSeconds(false)
+                            .skinType(ClockSkinType.INDUSTRIAL)
                             .locale(Locale.GERMANY)
-                            //.secondsVisible(true)
-                            //.dateVisible(true)
-                            //.customFont(Fonts.latoLight(10))
                             .shadowsEnabled(true)
-                            //.running(true)
+                            //.discreteSeconds(false)
+                            .running(true)
+                            //.backgroundPaint(Color.web("#1f1e23"))
+                            //.hourColor(Color.web("#dad9db"))
+                            //.minuteColor(Color.web("#dad9db"))
+                            //.secondColor(Color.web("#d1222b"))
+                            //.hourTickMarkColor(Color.web("#9f9fa1"))
+                            //.minuteTickMarkColor(Color.web("#9f9fa1"))
                             .build();
 
         lastTimerCall = System.nanoTime();
@@ -164,7 +165,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(gauge);
+        StackPane pane = new StackPane(clock);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,

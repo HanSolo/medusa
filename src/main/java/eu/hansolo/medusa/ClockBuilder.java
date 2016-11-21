@@ -509,6 +509,25 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setHourColor(Color.RED);
                     CONTROL.setBackgroundPaint(Color.WHITE);
                     break;
+                case INDUSTRIAL:
+                    CONTROL.setBackgroundPaint(Color.web("#efefef"));
+                    CONTROL.setHourColor(Color.web("#2a2a2a"));
+                    CONTROL.setMinuteColor(Color.web("#2a2a2a"));
+                    CONTROL.setSecondColor(Color.web("#d1222b"));
+                    CONTROL.setHourTickMarkColor(Color.BLACK);
+                    CONTROL.setMinuteTickMarkColor(Color.BLACK);
+                    CONTROL.setTickLabelsVisible(false);
+                    CONTROL.setTickLabelColor(Color.BLACK);
+                    CONTROL.setDateColor(Color.BLACK);
+                    CONTROL.setDateVisible(false);
+                    CONTROL.setSecondsVisible(true);
+                    CONTROL.setTextVisible(false);
+                    CONTROL.setTextColor(Color.BLACK);
+                    CONTROL.setTitleVisible(false);
+                    CONTROL.setTitleColor(Color.BLACK);
+                    CONTROL.setBorderPaint(Color.BLACK);
+                    CONTROL.setBorderWidth(5);
+                    break;
             }
         } else {
             CONTROL = new Clock();

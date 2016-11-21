@@ -277,15 +277,11 @@ public class ConicalGradient {
         return sortedStops;
     }
 
-    private List<Stop> normalizeStops(final Stop... STOPS) {
-        return normalizeStops(0, Arrays.asList(STOPS));
-    }
-    private List<Stop> normalizeStops(final double OFFSET, final Stop... STOPS) {
-        return normalizeStops(OFFSET, Arrays.asList(STOPS));
-    }
-    private List<Stop> normalizeStops(final List<Stop> STOPS) {
-        return normalizeStops(0, STOPS);
-    }
+    /*
+    private List<Stop> normalizeStops(final Stop... STOPS) { return normalizeStops(0, Arrays.asList(STOPS)); }
+    private List<Stop> normalizeStops(final double OFFSET, final Stop... STOPS) { return normalizeStops(OFFSET, Arrays.asList(STOPS)); }
+    private List<Stop> normalizeStops(final List<Stop> STOPS) { return normalizeStops(0, STOPS); }
+    */
     private List<Stop> normalizeStops(final double OFFSET, final List<Stop> STOPS) {
         double offset = Helper.clamp(0.0, 1.0, OFFSET);
         List<Stop> stops;

@@ -19,13 +19,11 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Alarm;
 import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
-import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TimeSection;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
-import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
@@ -51,9 +49,7 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
 import java.time.Instant;
@@ -67,9 +63,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
- * Created by hansolo on 29.01.16.
+ * Created by hansolo on 18.11.16.
  */
-public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
+public class IndustrialClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private static final double             PREFERRED_WIDTH       = 250;
     private static final double             PREFERRED_HEIGHT      = 250;
     private static final double             MINIMUM_WIDTH         = 50;
@@ -93,6 +89,7 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private              Text               dateText;
     private              Text               dateNumber;
     private              Text               text;
+    private              Circle             centerDot;
     private              Pane               pane;
     private              Pane               alarmPane;
     private              Rotate             hourRotate;
@@ -111,7 +108,7 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Constructors **************************************
-    public PearClockSkin(Clock clock) {
+    public IndustrialClockSkin(Clock clock) {
         super(clock);
 
         minuteRotate      = new Rotate();
@@ -172,6 +169,9 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         second.setVisible(getSkinnable().isSecondsVisible());
         second.setManaged(getSkinnable().isSecondsVisible());
 
+        centerDot = new Circle();
+        centerDot.setFill(Color.WHITE);
+
         dropShadow = new DropShadow();
         dropShadow.setColor(Color.rgb(0, 0, 0, 0.25));
         dropShadow.setBlurType(BlurType.TWO_PASS_BOX);
@@ -202,7 +202,7 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         text.setVisible(getSkinnable().isTextVisible());
         text.setManaged(getSkinnable().isTextVisible());
 
-        pane = new Pane(sectionsAndAreasCanvas, tickCanvas, alarmPane, title, dateText, dateNumber, text, shadowGroupHour, shadowGroupMinute, shadowGroupSecond);
+        pane = new Pane(sectionsAndAreasCanvas, tickCanvas, alarmPane, title, dateText, dateNumber, text, shadowGroupMinute, shadowGroupHour, shadowGroupSecond, centerDot);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
@@ -214,7 +214,8 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
         if (getSkinnable().isAnimated()) {
-            getSkinnable().currentTimeProperty().addListener(o -> updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId()))));
+            getSkinnable().currentTimeProperty().addListener(o -> updateTime(
+                ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId()))));
         } else {
             getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
         }
@@ -271,51 +272,29 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         Point2D center                 = new Point2D(size * 0.5, size * 0.5);
         Color   hourTickMarkColor      = getSkinnable().getHourTickMarkColor();
         Color   minuteTickMarkColor    = getSkinnable().getMinuteTickMarkColor();
-        Color   tickLabelColor         = getSkinnable().getTickLabelColor();
         boolean hourTickMarksVisible   = getSkinnable().isHourTickMarksVisible();
         boolean minuteTickMarksVisible = getSkinnable().isMinuteTickMarksVisible();
-        boolean tickLabelsVisible      = getSkinnable().isTickLabelsVisible();
-        Font    font                   = Fonts.robotoLight(size * 0.084);
         tickCtx.clearRect(0, 0, size, size);
         tickCtx.setLineCap(StrokeLineCap.BUTT);
-        tickCtx.setFont(font);
-        tickCtx.setLineWidth(size * 0.005);
+        tickCtx.setLineWidth(size * 0.02493075);
         for (double angle = 0, counter = 0 ; Double.compare(counter, 239) <= 0 ; angle -= angleStep, counter++) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
 
-            Point2D innerPoint       = new Point2D(center.getX() + size * 0.45866667 * sinValue, center.getY() + size * 0.45866667 * cosValue);
-            Point2D innerMinutePoint = new Point2D(center.getX() + size * 0.47733333 * sinValue, center.getY() + size * 0.47733333 * cosValue);
-            Point2D outerPoint       = new Point2D(center.getX() + size * 0.5 * sinValue, center.getY() + size * 0.5 * cosValue);
-            Point2D textPoint        = new Point2D(center.getX() + size * 0.405 * sinValue, center.getY() + size * 0.405 * cosValue);
-            
+            Point2D innerPoint       = new Point2D(center.getX() + size * 0.35277778 * sinValue, center.getY() + size * 0.35277778 * cosValue);
+            Point2D innerMinutePoint = new Point2D(center.getX() + size * 0.40972222 * sinValue, center.getY() + size * 0.40972222 * cosValue);
+            Point2D outerPoint       = new Point2D(center.getX() + size * 0.46388889 * sinValue, center.getY() + size * 0.46388889 * cosValue);
+
             if (counter % 20 == 0) {
                 tickCtx.setStroke(hourTickMarkColor);
                 if (hourTickMarksVisible) {
+                    tickCtx.setLineWidth(size * 0.02493075);
                     tickCtx.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
                 } else if (minuteTickMarksVisible) {
                     tickCtx.strokeLine(innerMinutePoint.getX(), innerMinutePoint.getY(), outerPoint.getX(), outerPoint.getY());
                 }
-                if (tickLabelsVisible) {
-                    tickCtx.save();
-                    tickCtx.translate(textPoint.getX(), textPoint.getY());
-
-                    Helper.rotateContextForText(tickCtx, startAngle, angle, TickLabelOrientation.HORIZONTAL);
-                    tickCtx.setTextAlign(TextAlignment.CENTER);
-                    tickCtx.setTextBaseline(VPos.CENTER);
-                    tickCtx.setFill(tickLabelColor);
-                    if (counter == 0) {
-                        tickCtx.fillText("12", 0, 0);
-                    } else {
-                        tickCtx.fillText(Integer.toString((int) (counter / 20)), 0, 0);
-                    }
-
-                    tickCtx.restore();
-                }
             } else if (counter % 4 == 0 && minuteTickMarksVisible) {
-                tickCtx.setStroke(minuteTickMarkColor);
-                tickCtx.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
-            } else if (counter % 1 == 0 && minuteTickMarksVisible) {
+                tickCtx.setLineWidth(size * 0.00833333);
                 tickCtx.setStroke(minuteTickMarkColor);
                 tickCtx.strokeLine(innerMinutePoint.getX(), innerMinutePoint.getY(), outerPoint.getX(), outerPoint.getY());
             }
@@ -325,213 +304,145 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
     // ******************** Graphics ******************************************
     private void createHourPointer() {
-        double width  = size * 0.04533333;
-        double height = size * 0.292;
+        double width  = size;
+        double height = size;
         hour.setCache(false);
         hour.getElements().clear();
-        hour.getElements().add(new MoveTo(0.3235294117647059 * width, 0.9223744292237442 * height));
-        hour.getElements().add(new CubicCurveTo(0.3235294117647059 * width, 0.906392694063927 * height,
-                                                0.39705882352941174 * width, 0.8949771689497716 * height,
-                                                0.5 * width, 0.8949771689497716 * height));
-        hour.getElements().add(new CubicCurveTo(0.6029411764705882 * width, 0.8949771689497716 * height,
-                                                0.6764705882352942 * width, 0.906392694063927 * height,
-                                                0.6764705882352942 * width, 0.9223744292237442 * height));
-        hour.getElements().add(new CubicCurveTo(0.6764705882352942 * width, 0.9383561643835616 * height,
-                                                0.6029411764705882 * width, 0.9497716894977168 * height,
-                                                0.5 * width, 0.9497716894977168 * height));
-        hour.getElements().add(new CubicCurveTo(0.39705882352941174 * width, 0.9497716894977168 * height,
-                                                0.3235294117647059 * width, 0.9383561643835616 * height,
-                                                0.3235294117647059 * width, 0.9223744292237442 * height));
+        hour.getElements().add(new MoveTo(0.4930555555555556 * width, 0.28541666666666665 * height));
+        hour.getElements().add(new CubicCurveTo(0.4930555555555556 * width, 0.28125 * height,
+                                                0.49583333333333335 * width, 0.27847222222222223 * height,
+                                                0.5 * width, 0.27847222222222223 * height));
+        hour.getElements().add(new CubicCurveTo(0.5041666666666667 * width, 0.27847222222222223 * height,
+                                                0.5069444444444444 * width, 0.28125 * height,
+                                                0.5069444444444444 * width, 0.28541666666666665 * height));
+        hour.getElements().add(new CubicCurveTo(0.5069444444444444 * width, 0.28541666666666665 * height,
+                                                0.5069444444444444 * width, 0.39375 * height,
+                                                0.5069444444444444 * width, 0.39375 * height));
+        hour.getElements().add(new LineTo(0.4930555555555556 * width, 0.39375 * height));
+        hour.getElements().add(new CubicCurveTo(0.4930555555555556 * width, 0.39375 * height,
+                                                0.4930555555555556 * width, 0.28541666666666665 * height,
+                                                0.4930555555555556 * width, 0.28541666666666665 * height));
         hour.getElements().add(new ClosePath());
-        hour.getElements().add(new MoveTo(0.22058823529411764 * width, 0.0639269406392694 * height));
-        hour.getElements().add(new CubicCurveTo(0.22058823529411764 * width, 0.03881278538812785 * height,
-                                                0.3382352941176471 * width, 0.02054794520547945 * height,
-                                                0.5 * width, 0.02054794520547945 * height));
-        hour.getElements().add(new CubicCurveTo(0.6617647058823529 * width, 0.02054794520547945 * height,
-                                                0.7794117647058824 * width, 0.03881278538812785 * height,
-                                                0.7794117647058824 * width, 0.0639269406392694 * height));
-        hour.getElements().add(new CubicCurveTo(0.7794117647058824 * width, 0.0639269406392694 * height,
-                                                0.7794117647058824 * width, 0.6484018264840182 * height,
-                                                0.7794117647058824 * width, 0.6484018264840182 * height));
-        hour.getElements().add(new CubicCurveTo(0.7794117647058824 * width, 0.6735159817351598 * height,
-                                                0.6617647058823529 * width, 0.6917808219178082 * height,
-                                                0.5 * width, 0.6917808219178082 * height));
-        hour.getElements().add(new CubicCurveTo(0.3382352941176471 * width, 0.6917808219178082 * height,
-                                                0.22058823529411764 * width, 0.6735159817351598 * height,
-                                                0.22058823529411764 * width, 0.6484018264840182 * height));
-        hour.getElements().add(new CubicCurveTo(0.22058823529411764 * width, 0.6484018264840182 * height,
-                                                0.22058823529411764 * width, 0.0639269406392694 * height,
-                                                0.22058823529411764 * width, 0.0639269406392694 * height));
-        hour.getElements().add(new ClosePath());
-        hour.getElements().add(new MoveTo(0.0, 0.9223744292237442 * height));
-        hour.getElements().add(new CubicCurveTo(0.0, 0.9657534246575342 * height,
-                                                0.22058823529411764 * width, height,
-                                                0.5 * width, height));
-        hour.getElements().add(new CubicCurveTo(0.7794117647058824 * width, height,
-                                                width, 0.9657534246575342 * height,
-                                                width, 0.9223744292237442 * height));
-        hour.getElements().add(new CubicCurveTo(width, 0.8881278538812786 * height,
-                                                0.8529411764705882 * width, 0.8584474885844748 * height,
-                                                0.6617647058823529 * width, 0.8493150684931506 * height));
-        hour.getElements().add(new CubicCurveTo(0.6617647058823529 * width, 0.8493150684931506 * height,
-                                                0.6617647058823529 * width, 0.7077625570776256 * height,
-                                                0.6617647058823529 * width, 0.7077625570776256 * height));
-        hour.getElements().add(new CubicCurveTo(0.8088235294117647 * width, 0.6986301369863014 * height,
-                                                0.9117647058823529 * width, 0.6757990867579908 * height,
-                                                0.9117647058823529 * width, 0.6484018264840182 * height));
-        hour.getElements().add(new CubicCurveTo(0.9117647058823529 * width, 0.6484018264840182 * height,
-                                                0.9117647058823529 * width, 0.0639269406392694 * height,
-                                                0.9117647058823529 * width, 0.0639269406392694 * height));
-        hour.getElements().add(new CubicCurveTo(0.9117647058823529 * width, 0.0273972602739726 * height,
-                                                0.7352941176470589 * width, 0.0,
-                                                0.5 * width, 0.0));
-        hour.getElements().add(new CubicCurveTo(0.2647058823529412 * width, 0.0,
-                                                0.08823529411764706 * width, 0.0273972602739726 * height,
-                                                0.08823529411764706 * width, 0.0639269406392694 * height));
-        hour.getElements().add(new CubicCurveTo(0.08823529411764706 * width, 0.0639269406392694 * height,
-                                                0.08823529411764706 * width, 0.6484018264840182 * height,
-                                                0.08823529411764706 * width, 0.6484018264840182 * height));
-        hour.getElements().add(new CubicCurveTo(0.08823529411764706 * width, 0.6757990867579908 * height,
-                                                0.19117647058823528 * width, 0.6986301369863014 * height,
-                                                0.3382352941176471 * width, 0.7077625570776256 * height));
-        hour.getElements().add(new CubicCurveTo(0.3382352941176471 * width, 0.7077625570776256 * height,
-                                                0.3382352941176471 * width, 0.8493150684931506 * height,
-                                                0.3382352941176471 * width, 0.8493150684931506 * height));
-        hour.getElements().add(new CubicCurveTo(0.14705882352941177 * width, 0.8584474885844748 * height,
-                                                0.0, 0.8881278538812786 * height,
-                                                0.0, 0.9223744292237442 * height));
+        hour.getElements().add(new MoveTo(0.4847222222222222 * width, 0.28541666666666665 * height));
+        hour.getElements().add(new CubicCurveTo(0.4847222222222222 * width, 0.28541666666666665 * height,
+                                                0.4847222222222222 * width, 0.49722222222222223 * height,
+                                                0.4847222222222222 * width, 0.49722222222222223 * height));
+        hour.getElements().add(new CubicCurveTo(0.4847222222222222 * width, 0.5055555555555555 * height,
+                                                0.49166666666666664 * width, 0.5125 * height,
+                                                0.5 * width, 0.5125 * height));
+        hour.getElements().add(new CubicCurveTo(0.5083333333333333 * width, 0.5125 * height,
+                                                0.5152777777777777 * width, 0.5055555555555555 * height,
+                                                0.5152777777777777 * width, 0.49722222222222223 * height));
+        hour.getElements().add(new CubicCurveTo(0.5152777777777777 * width, 0.49722222222222223 * height,
+                                                0.5152777777777777 * width, 0.28541666666666665 * height,
+                                                0.5152777777777777 * width, 0.28541666666666665 * height));
+        hour.getElements().add(new CubicCurveTo(0.5152777777777777 * width, 0.27708333333333335 * height,
+                                                0.5083333333333333 * width, 0.2701388888888889 * height,
+                                                0.5 * width, 0.2701388888888889 * height));
+        hour.getElements().add(new CubicCurveTo(0.49166666666666664 * width, 0.2701388888888889 * height,
+                                                0.4847222222222222 * width, 0.27708333333333335 * height,
+                                                0.4847222222222222 * width, 0.28541666666666665 * height));
         hour.getElements().add(new ClosePath());
         hour.setCache(true);
         hour.setCacheHint(CacheHint.ROTATE);
     }
 
     private void createMinutePointer() {
-        double width  = size * 0.04533333;
-        double height = size * 0.488;
+        double width  = size;
+        double height = size;
         minute.setCache(false);
         minute.getElements().clear();
-        minute.getElements().add(new MoveTo(0.3235294117647059 * width, 0.953551912568306 * height));
-        minute.getElements().add(new CubicCurveTo(0.3235294117647059 * width, 0.9439890710382514 * height,
-                                                  0.39705882352941174 * width, 0.9371584699453552 * height,
-                                                  0.5 * width, 0.9371584699453552 * height));
-        minute.getElements().add(new CubicCurveTo(0.6029411764705882 * width, 0.9371584699453552 * height,
-                                                  0.6764705882352942 * width, 0.9439890710382514 * height,
-                                                  0.6764705882352942 * width, 0.953551912568306 * height));
-        minute.getElements().add(new CubicCurveTo(0.6764705882352942 * width, 0.9631147540983607 * height,
-                                                  0.6029411764705882 * width, 0.9699453551912568 * height,
-                                                  0.5 * width, 0.9699453551912568 * height));
-        minute.getElements().add(new CubicCurveTo(0.39705882352941174 * width, 0.9699453551912568 * height,
-                                                  0.3235294117647059 * width, 0.9631147540983607 * height,
-                                                  0.3235294117647059 * width, 0.953551912568306 * height));
+        minute.getElements().add(new MoveTo(0.4930555555555556 * width, 0.17083333333333334 * height));
+        minute.getElements().add(new CubicCurveTo(0.4930555555555556 * width, 0.16666666666666666 * height,
+                                                  0.49583333333333335 * width, 0.1638888888888889 * height,
+                                                  0.5 * width, 0.1638888888888889 * height));
+        minute.getElements().add(new CubicCurveTo(0.5041666666666667 * width, 0.1638888888888889 * height,
+                                                  0.5069444444444444 * width, 0.16666666666666666 * height,
+                                                  0.5069444444444444 * width, 0.17083333333333334 * height));
+        minute.getElements().add(new CubicCurveTo(0.5069444444444444 * width, 0.17083333333333334 * height,
+                                                  0.5069444444444444 * width, 0.33194444444444443 * height,
+                                                  0.5069444444444444 * width, 0.33194444444444443 * height));
+        minute.getElements().add(new LineTo(0.4930555555555556 * width, 0.33194444444444443 * height));
+        minute.getElements().add(new CubicCurveTo(0.4930555555555556 * width, 0.33194444444444443 * height,
+                                                  0.4930555555555556 * width, 0.17083333333333334 * height,
+                                                  0.4930555555555556 * width, 0.17083333333333334 * height));
         minute.getElements().add(new ClosePath());
-        minute.getElements().add(new MoveTo(0.22058823529411764 * width, 0.03825136612021858 * height));
-        minute.getElements().add(new CubicCurveTo(0.22058823529411764 * width, 0.02459016393442623 * height,
-                                                  0.35294117647058826 * width, 0.012295081967213115 * height,
-                                                  0.5 * width, 0.012295081967213115 * height));
-        minute.getElements().add(new CubicCurveTo(0.6470588235294118 * width, 0.012295081967213115 * height,
-                                                  0.7794117647058824 * width, 0.02459016393442623 * height,
-                                                  0.7794117647058824 * width, 0.03825136612021858 * height));
-        minute.getElements().add(new CubicCurveTo(0.7794117647058824 * width, 0.03825136612021858 * height,
-                                                  0.7794117647058824 * width, 0.7896174863387978 * height,
-                                                  0.7794117647058824 * width, 0.7896174863387978 * height));
-        minute.getElements().add(new CubicCurveTo(0.7794117647058824 * width, 0.8032786885245902 * height,
-                                                  0.6470588235294118 * width, 0.8155737704918032 * height,
-                                                  0.5 * width, 0.8155737704918032 * height));
-        minute.getElements().add(new CubicCurveTo(0.35294117647058826 * width, 0.8155737704918032 * height,
-                                                  0.22058823529411764 * width, 0.8032786885245902 * height,
-                                                  0.22058823529411764 * width, 0.7896174863387978 * height));
-        minute.getElements().add(new CubicCurveTo(0.22058823529411764 * width, 0.7896174863387978 * height,
-                                                  0.22058823529411764 * width, 0.03825136612021858 * height,
-                                                  0.22058823529411764 * width, 0.03825136612021858 * height));
-        minute.getElements().add(new ClosePath());
-        minute.getElements().add(new MoveTo(0.0, 0.953551912568306 * height));
-        minute.getElements().add(new CubicCurveTo(0.0, 0.9795081967213115 * height,
-                                                  0.22058823529411764 * width, height,
-                                                  0.5 * width, height));
-        minute.getElements().add(new CubicCurveTo(0.7794117647058824 * width, height,
-                                                  width, 0.9795081967213115 * height,
-                                                  width, 0.953551912568306 * height));
-        minute.getElements().add(new CubicCurveTo(width, 0.9330601092896175 * height,
-                                                  0.8529411764705882 * width, 0.9153005464480874 * height,
-                                                  0.6617647058823529 * width, 0.9098360655737705 * height));
-        minute.getElements().add(new CubicCurveTo(0.6617647058823529 * width, 0.9098360655737705 * height,
-                                                  0.6617647058823529 * width, 0.825136612021858 * height,
-                                                  0.6617647058823529 * width, 0.825136612021858 * height));
-        minute.getElements().add(new CubicCurveTo(0.8088235294117647 * width, 0.8183060109289617 * height,
-                                                  0.9117647058823529 * width, 0.8060109289617486 * height,
-                                                  0.9117647058823529 * width, 0.7896174863387978 * height));
-        minute.getElements().add(new CubicCurveTo(0.9117647058823529 * width, 0.7896174863387978 * height,
-                                                  0.9117647058823529 * width, 0.03825136612021858 * height,
-                                                  0.9117647058823529 * width, 0.03825136612021858 * height));
-        minute.getElements().add(new CubicCurveTo(0.9117647058823529 * width, 0.017759562841530054 * height,
-                                                  0.7205882352941176 * width, 0.0,
-                                                  0.5 * width, 0.0));
-        minute.getElements().add(new CubicCurveTo(0.27941176470588236 * width, 0.0,
-                                                  0.08823529411764706 * width, 0.017759562841530054 * height,
-                                                  0.08823529411764706 * width, 0.03825136612021858 * height));
-        minute.getElements().add(new CubicCurveTo(0.08823529411764706 * width, 0.03825136612021858 * height,
-                                                  0.08823529411764706 * width, 0.7896174863387978 * height,
-                                                  0.08823529411764706 * width, 0.7896174863387978 * height));
-        minute.getElements().add(new CubicCurveTo(0.08823529411764706 * width, 0.8060109289617486 * height,
-                                                  0.19117647058823528 * width, 0.8183060109289617 * height,
-                                                  0.3382352941176471 * width, 0.825136612021858 * height));
-        minute.getElements().add(new CubicCurveTo(0.3382352941176471 * width, 0.825136612021858 * height,
-                                                  0.3382352941176471 * width, 0.9098360655737705 * height,
-                                                  0.3382352941176471 * width, 0.9098360655737705 * height));
-        minute.getElements().add(new CubicCurveTo(0.14705882352941177 * width, 0.9153005464480874 * height,
-                                                  0.0, 0.9330601092896175 * height,
-                                                  0.0, 0.953551912568306 * height));
+        minute.getElements().add(new MoveTo(0.4722222222222222 * width, 0.5 * height));
+        minute.getElements().add(new CubicCurveTo(0.4722222222222222 * width, 0.5152777777777777 * height,
+                                                  0.4847222222222222 * width, 0.5277777777777778 * height,
+                                                  0.5 * width, 0.5277777777777778 * height));
+        minute.getElements().add(new CubicCurveTo(0.5152777777777777 * width, 0.5277777777777778 * height,
+                                                  0.5277777777777778 * width, 0.5152777777777777 * height,
+                                                  0.5277777777777778 * width, 0.5 * height));
+        minute.getElements().add(new CubicCurveTo(0.5277777777777778 * width, 0.49027777777777776 * height,
+                                                  0.5229166666666667 * width, 0.48194444444444445 * height,
+                                                  0.5152777777777777 * width, 0.47708333333333336 * height));
+        minute.getElements().add(new CubicCurveTo(0.5152777777777777 * width, 0.47708333333333336 * height,
+                                                  0.5152777777777777 * width, 0.17083333333333334 * height,
+                                                  0.5152777777777777 * width, 0.17083333333333334 * height));
+        minute.getElements().add(new CubicCurveTo(0.5152777777777777 * width, 0.1625 * height,
+                                                  0.5083333333333333 * width, 0.15555555555555556 * height,
+                                                  0.5 * width, 0.15555555555555556 * height));
+        minute.getElements().add(new CubicCurveTo(0.49166666666666664 * width, 0.15555555555555556 * height,
+                                                  0.4847222222222222 * width, 0.1625 * height,
+                                                  0.4847222222222222 * width, 0.17083333333333334 * height));
+        minute.getElements().add(new CubicCurveTo(0.4847222222222222 * width, 0.17083333333333334 * height,
+                                                  0.4847222222222222 * width, 0.47708333333333336 * height,
+                                                  0.4847222222222222 * width, 0.47708333333333336 * height));
+        minute.getElements().add(new CubicCurveTo(0.47708333333333336 * width, 0.48194444444444445 * height,
+                                                  0.4722222222222222 * width, 0.49027777777777776 * height,
+                                                  0.4722222222222222 * width, 0.5 * height));
         minute.getElements().add(new ClosePath());
         minute.setCache(true);
         minute.setCacheHint(CacheHint.ROTATE);
     }
 
     private void createSecondPointer() {
-        double width  = size * 0.02933333;
-        double height = size * 0.58133333;
+        double width  = size;
+        double height = size;
         second.setCache(false);
         second.getElements().clear();
-        second.getElements().add(new MoveTo(0.22727272727272727 * width, 0.8600917431192661 * height));
-        second.getElements().add(new CubicCurveTo(0.22727272727272727 * width, 0.8520642201834863 * height,
-                                                  0.3409090909090909 * width, 0.8463302752293578 * height,
-                                                  0.5 * width, 0.8463302752293578 * height));
-        second.getElements().add(new CubicCurveTo(0.6590909090909091 * width, 0.8463302752293578 * height,
-                                                  0.7727272727272727 * width, 0.8520642201834863 * height,
-                                                  0.7727272727272727 * width, 0.8600917431192661 * height));
-        second.getElements().add(new CubicCurveTo(0.7727272727272727 * width, 0.8681192660550459 * height,
-                                                  0.6590909090909091 * width, 0.8738532110091743 * height,
-                                                  0.5 * width, 0.8738532110091743 * height));
-        second.getElements().add(new CubicCurveTo(0.3409090909090909 * width, 0.8738532110091743 * height,
-                                                  0.22727272727272727 * width, 0.8681192660550459 * height,
-                                                  0.22727272727272727 * width, 0.8600917431192661 * height));
+        second.getElements().add(new MoveTo(0.4951388888888889 * width, 0.5 * height));
+        second.getElements().add(new CubicCurveTo(0.4951388888888889 * width, 0.49722222222222223 * height,
+                                                  0.49722222222222223 * width, 0.4951388888888889 * height,
+                                                  0.5 * width, 0.4951388888888889 * height));
+        second.getElements().add(new CubicCurveTo(0.5027777777777778 * width, 0.4951388888888889 * height,
+                                                  0.5048611111111111 * width, 0.49722222222222223 * height,
+                                                  0.5048611111111111 * width, 0.5 * height));
+        second.getElements().add(new CubicCurveTo(0.5048611111111111 * width, 0.5027777777777778 * height,
+                                                  0.5027777777777778 * width, 0.5048611111111111 * height,
+                                                  0.5 * width, 0.5048611111111111 * height));
+        second.getElements().add(new CubicCurveTo(0.49722222222222223 * width, 0.5048611111111111 * height,
+                                                  0.4951388888888889 * width, 0.5027777777777778 * height,
+                                                  0.4951388888888889 * width, 0.5 * height));
         second.getElements().add(new ClosePath());
-        second.getElements().add(new MoveTo(0.0, 0.8600917431192661 * height));
-        second.getElements().add(new CubicCurveTo(0.0, 0.8715596330275229 * height,
-                                                  0.1590909090909091 * width, 0.8818807339449541 * height,
-                                                  0.38636363636363635 * width, 0.8841743119266054 * height));
-        second.getElements().add(new CubicCurveTo(0.38636363636363635 * width, 0.8841743119266054 * height,
-                                                  0.38636363636363635 * width, height,
-                                                  0.38636363636363635 * width, height));
-        second.getElements().add(new LineTo(0.6136363636363636 * width, height));
-        second.getElements().add(new CubicCurveTo(0.6136363636363636 * width, height,
-                                                  0.6136363636363636 * width, 0.8841743119266054 * height,
-                                                  0.6136363636363636 * width, 0.8841743119266054 * height));
-        second.getElements().add(new CubicCurveTo(0.8409090909090909 * width, 0.8818807339449541 * height,
-                                                  width, 0.8715596330275229 * height,
-                                                  width, 0.8600917431192661 * height));
-        second.getElements().add(new CubicCurveTo(width, 0.8486238532110092 * height,
-                                                  0.8409090909090909 * width, 0.838302752293578 * height,
-                                                  0.6136363636363636 * width, 0.8360091743119266 * height));
-        second.getElements().add(new CubicCurveTo(0.6136363636363636 * width, 0.8360091743119266 * height,
-                                                  0.6136363636363636 * width, 0.0,
-                                                  0.6136363636363636 * width, 0.0));
-        second.getElements().add(new LineTo(0.38636363636363635 * width, 0.0));
-        second.getElements().add(new CubicCurveTo(0.38636363636363635 * width, 0.0,
-                                                  0.38636363636363635 * width, 0.8360091743119266 * height,
-                                                  0.38636363636363635 * width, 0.8360091743119266 * height));
-        second.getElements().add(new CubicCurveTo(0.1590909090909091 * width, 0.838302752293578 * height,
-                                                  0.0, 0.8486238532110092 * height,
-                                                  0.0, 0.8600917431192661 * height));
+        second.getElements().add(new MoveTo(0.4875 * width, 0.5 * height));
+        second.getElements().add(new CubicCurveTo(0.4875 * width, 0.5048611111111111 * height,
+                                                  0.49027777777777776 * width, 0.5090277777777777 * height,
+                                                  0.49444444444444446 * width, 0.5111111111111111 * height));
+        second.getElements().add(new CubicCurveTo(0.49444444444444446 * width, 0.5111111111111111 * height,
+                                                  0.49444444444444446 * width, 0.5638888888888889 * height,
+                                                  0.49444444444444446 * width, 0.5638888888888889 * height));
+        second.getElements().add(new LineTo(0.5055555555555555 * width, 0.5638888888888889 * height));
+        second.getElements().add(new CubicCurveTo(0.5055555555555555 * width, 0.5638888888888889 * height,
+                                                  0.5055555555555555 * width, 0.5111111111111111 * height,
+                                                  0.5055555555555555 * width, 0.5111111111111111 * height));
+        second.getElements().add(new CubicCurveTo(0.5097222222222222 * width, 0.5090277777777777 * height,
+                                                  0.5125 * width, 0.5048611111111111 * height,
+                                                  0.5125 * width, 0.5 * height));
+        second.getElements().add(new CubicCurveTo(0.5125 * width, 0.4951388888888889 * height,
+                                                  0.5097222222222222 * width, 0.4909722222222222 * height,
+                                                  0.5055555555555555 * width, 0.4888888888888889 * height));
+        second.getElements().add(new CubicCurveTo(0.5055555555555555 * width, 0.4888888888888889 * height,
+                                                  0.5055555555555555 * width, 0.19027777777777777 * height,
+                                                  0.5055555555555555 * width, 0.19027777777777777 * height));
+        second.getElements().add(new LineTo(0.49444444444444446 * width, 0.19027777777777777 * height));
+        second.getElements().add(new CubicCurveTo(0.49444444444444446 * width, 0.19027777777777777 * height,
+                                                  0.49444444444444446 * width, 0.4888888888888889 * height,
+                                                  0.49444444444444446 * width, 0.4888888888888889 * height));
+        second.getElements().add(new CubicCurveTo(0.49027777777777776 * width, 0.4909722222222222 * height,
+                                                  0.4875 * width, 0.4951388888888889 * height,
+                                                  0.4875 * width, 0.5 * height));
         second.getElements().add(new ClosePath());
         second.setCache(true);
         second.setCacheHint(CacheHint.ROTATE);
@@ -605,8 +516,8 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             pane.setMaxSize(size, size);
             pane.relocate((getSkinnable().getWidth() - size) * 0.5, (getSkinnable().getHeight() - size) * 0.5);
 
-            dropShadow.setRadius(0.008 * size);
-            dropShadow.setOffsetY(0.008 * size);
+            dropShadow.setRadius(0.012 * size);
+            dropShadow.setOffsetY(0.012 * size);
 
             sectionsAndAreasCanvas.setWidth(size);
             sectionsAndAreasCanvas.setHeight(size);
@@ -618,15 +529,19 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
             createHourPointer();
             hour.setFill(getSkinnable().getHourColor());
-            hour.relocate((size - hour.getLayoutBounds().getWidth()) * 0.5, size * 0.23066667);
+            hour.relocate((size - hour.getLayoutBounds().getWidth()) * 0.5, size * 0.27361111);
 
             createMinutePointer();
             minute.setFill(getSkinnable().getMinuteColor());
-            minute.relocate((size - minute.getLayoutBounds().getWidth()) * 0.5, size * 0.03466667);
+            minute.relocate((size - minute.getLayoutBounds().getWidth()) * 0.5, size * 0.15555556);
 
             createSecondPointer();
             second.setFill(getSkinnable().getSecondColor());
-            second.relocate((size - second.getLayoutBounds().getWidth()) * 0.5, 0);
+            second.relocate((size - second.getLayoutBounds().getWidth()) * 0.5, size * 0.19027778);
+
+            centerDot.setCenterX(size * 0.5);
+            centerDot.setCenterY(size * 0.5);
+            centerDot.setRadius(size * 0.00486111);
 
             title.setFill(getSkinnable().getTextColor());
             title.setFont(Fonts.latoLight(size * 0.12));
@@ -644,12 +559,12 @@ public class PearClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             text.setFont(Fonts.latoLight(size * 0.12));
             text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
 
-            hourRotate.setPivotX(hour.getLayoutBounds().getWidth() * 0.5);
-            hourRotate.setPivotY(hour.getLayoutBounds().getHeight() * 0.92237443);
-            minuteRotate.setPivotX(minute.getLayoutBounds().getWidth() * 0.5);
-            minuteRotate.setPivotY(minute.getLayoutBounds().getHeight() * 0.95355191);
-            secondRotate.setPivotX(second.getLayoutBounds().getWidth() * 0.5);
-            secondRotate.setPivotY(second.getLayoutBounds().getHeight() * 0.86009174);
+            hourRotate.setPivotX(size * 0.5);
+            hourRotate.setPivotY(size * 0.5);
+            minuteRotate.setPivotX(size * 0.5);
+            minuteRotate.setPivotY(size * 0.5);
+            secondRotate.setPivotX(size * 0.5);
+            secondRotate.setPivotY(size * 0.5);
         }
     }
 
