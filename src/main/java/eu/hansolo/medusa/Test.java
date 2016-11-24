@@ -129,6 +129,7 @@ public class Test extends Application {
                             .locale(Locale.GERMANY)
                             .shadowsEnabled(true)
                             //.discreteSeconds(false)
+                            //.discreteMinutes(false)
                             .running(true)
                             //.backgroundPaint(Color.web("#1f1e23"))
                             //.hourColor(Color.web("#dad9db"))
