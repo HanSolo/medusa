@@ -1020,6 +1020,17 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setUnitColor(Color.rgb(90, 90, 90));
                     CONTROL.setValueColor(Color.rgb(90, 90, 90));
                     break;
+                case TILE_KPI:
+                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
+                    CONTROL.setDecimals(0);
+                    CONTROL.setBackgroundPaint(Color.rgb(42,42,42));
+                    CONTROL.setForegroundBaseColor(Color.rgb(223,223,223));
+                    CONTROL.setBarColor(Color.rgb(223,223,223));
+                    CONTROL.setThresholdVisible(true);
+                    CONTROL.setThresholdColor(Color.rgb(136,203,79));
+                    CONTROL.setNeedleColor(Color.rgb(223,223,223));
+                    CONTROL.setAngleRange(180);
+                    break;
             }
         } else {
             CONTROL = new Gauge();
