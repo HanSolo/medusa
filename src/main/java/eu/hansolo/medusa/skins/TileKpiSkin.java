@@ -34,13 +34,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.FillRule;
-import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
@@ -52,31 +53,33 @@ import java.util.Locale;
  * Created by hansolo on 29.11.16.
  */
 public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double PREFERRED_WIDTH  = 250;
-    private static final double PREFERRED_HEIGHT = 250;
-    private static final double MINIMUM_WIDTH    = 50;
-    private static final double MINIMUM_HEIGHT   = 50;
-    private static final double MAXIMUM_WIDTH    = 1024;
-    private static final double MAXIMUM_HEIGHT   = 1024;
-    private double    size;
-    private double    oldValue;
-    private Arc       barBackground;
-    private Arc       thresholdBar;
-    private Path      needle;
-    private Rotate    needleRotate;
-    private Text      titleText;
-    private Text      valueText;
-    private Text      minValueText;
-    private Text      maxValueText;
-    private Rectangle thresholdRect;
-    private Text      thresholdText;
-    private Pane      pane;
-    private double    angleRange;
-    private double    minValue;
-    private double    range;
-    private double    angleStep;
-    private String    formatString;
-    private Locale    locale;
+    private static final double    PREFERRED_WIDTH  = 250;
+    private static final double    PREFERRED_HEIGHT = 250;
+    private static final double    MINIMUM_WIDTH    = 50;
+    private static final double    MINIMUM_HEIGHT   = 50;
+    private static final double    MAXIMUM_WIDTH    = 1024;
+    private static final double    MAXIMUM_HEIGHT   = 1024;
+    private              double    size;
+    private              double    oldValue;
+    private              Arc       barBackground;
+    private              Arc       thresholdBar;
+    private              Rectangle needleRect;
+    private              Path      needle;
+    private              Rotate    needleRotate;
+    private              Rotate    needleRectRotate;
+    private              Text      titleText;
+    private              Text      valueText;
+    private              Text      minValueText;
+    private              Text      maxValueText;
+    private              Rectangle thresholdRect;
+    private              Text      thresholdText;
+    private              Pane      pane;
+    private              double    angleRange;
+    private              double    minValue;
+    private              double    range;
+    private              double    angleStep;
+    private              String    formatString;
+    private              Locale    locale;
 
 
     // ******************** Constructors **************************************
@@ -124,7 +127,12 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdBar.setStrokeLineCap(StrokeLineCap.BUTT);
         thresholdBar.setFill(null);
 
-        needleRotate = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
+        needleRotate     = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
+        needleRectRotate = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
+
+        needleRect = new Rectangle();
+        needleRect.setFill(getSkinnable().getBackgroundPaint());
+        needleRect.getTransforms().setAll(needleRectRotate);
 
         needle = new Path();
         needle.setFillRule(FillRule.EVEN_ODD);
@@ -154,7 +162,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(thresholdText, Double.compare(getSkinnable().getThreshold(), getSkinnable().getMinValue()) != 0 && Double.compare(getSkinnable().getThreshold(), getSkinnable().getMaxValue()) != 0);
 
-        pane = new Pane(barBackground, thresholdBar, needle, titleText, valueText, minValueText, maxValueText, thresholdRect, thresholdText);
+        pane = new Pane(barBackground, thresholdBar, needleRect, needle, titleText, valueText, minValueText, maxValueText, thresholdRect, thresholdText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -197,6 +205,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double targetAngle = (VALUE - minValue) * angleStep - needleStartAngle;
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
+        needleRectRotate.setAngle(targetAngle);
         valueText.setText(String.format(locale, formatString, VALUE));
         resizeValueText();
     }
@@ -205,6 +214,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double needleWidth  = size * 0.05;
         double needleHeight = size * 0.3325;
         needle.setCache(false);
+
         needle.getElements().clear();
         needle.getElements().add(new MoveTo(0.25 * needleWidth, 0.924812030075188 * needleHeight));
         needle.getElements().add(new CubicCurveTo(0.25 * needleWidth, 0.9022556390977443 * needleHeight,
@@ -333,6 +343,12 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             thresholdBar.setStartAngle(90 - angleRange * 0.5);
             thresholdBar.setLength((getSkinnable().getMaxValue() - getSkinnable().getThreshold()) * angleStep);
 
+            needleRect.setWidth(size * 0.035);
+            needleRect.setHeight(size * 0.05);
+            needleRect.relocate((size - needleRect.getWidth()) * 0.5, size * 0.4575);
+            needleRectRotate.setPivotX(needleRect.getLayoutBounds().getWidth() * 0.5);
+            needleRectRotate.setPivotY(size * 0.325);
+
             drawNeedle();
 
             needle.relocate((size - needle.getLayoutBounds().getWidth()) * 0.5, size * 0.475);
@@ -353,7 +369,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void redraw() {
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(size * 0.025), Insets.EMPTY)));
 
         locale       = getSkinnable().getLocale();
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
@@ -366,6 +382,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         barBackground.setStroke(getSkinnable().getBarColor());
         thresholdBar.setStroke(getSkinnable().getThresholdColor());
+        needleRect.setFill(getSkinnable().getBackgroundPaint());
         needle.setFill(getSkinnable().getNeedleColor());
         titleText.setFill(getSkinnable().getTitleColor());
         minValueText.setFill(getSkinnable().getTitleColor());
