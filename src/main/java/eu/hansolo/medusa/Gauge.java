@@ -105,7 +105,7 @@ public class Gauge extends Control {
         AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
         MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL,
         LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL, SIMPLE_DIGITAL, SECTION,
-        BAR, WHITE, CHARGE, SIMPLE_SECTION, TILE_KPI
+        BAR, WHITE, CHARGE, SIMPLE_SECTION, TILE_KPI, TILE_TEXT_KPI
     }
 
     public static final  Color   DARK_COLOR          = Color.rgb(36, 36, 36);
@@ -5095,6 +5095,7 @@ public class Gauge extends Control {
             case CHARGE        : return new ChargeSkin(Gauge.this);
             case SIMPLE_SECTION: return new SimpleSectionSkin(Gauge.this);
             case TILE_KPI      : return new TileKpiSkin(Gauge.this);
+            case TILE_TEXT_KPI : return new TileTextKpiSkin(Gauge.this);
             case GAUGE         :
             default            : return new GaugeSkin(Gauge.this);
         }
@@ -5330,13 +5331,25 @@ public class Gauge extends Control {
                 setKnobPosition(Pos.BOTTOM_CENTER);
                 setDecimals(0);
                 setBackgroundPaint(Color.rgb(42,42,42));
-                setForegroundBaseColor(Color.rgb(223,223,223));
-                setBarColor(Color.rgb(223,223,223));
+                setForegroundBaseColor(Color.rgb(238,238,238));
+                setBarColor(Color.rgb(238,238,238));
                 setThresholdVisible(true);
-                setThresholdColor(Color.rgb(136,203,79));
-                setNeedleColor(Color.rgb(223,223,223));
+                setThresholdColor(Color.rgb(41,177,255));
+                setNeedleColor(Color.rgb(238,238,238));
                 setAngleRange(180);
                 super.setSkin(new TileKpiSkin(Gauge.this));
+                break;
+            case TILE_TEXT_KPI:
+                setKnobPosition(Pos.BOTTOM_CENTER);
+                setDecimals(0);
+                setBackgroundPaint(Color.rgb(42,42,42));
+                setForegroundBaseColor(Color.rgb(238,238,238));
+                setBarColor(Color.rgb(41,177,255));
+                setValueColor(Color.rgb(238, 238, 238));
+                setThresholdVisible(true);
+                setThresholdColor(Color.rgb(139,144,146));
+                setAngleRange(180);
+                super.setSkin(new TileTextKpiSkin(Gauge.this));
                 break;
             case GAUGE:
             default:
