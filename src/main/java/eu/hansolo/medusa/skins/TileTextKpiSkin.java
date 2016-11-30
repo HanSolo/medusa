@@ -255,7 +255,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         resizeStaticText();
 
-        barBackground.setBackground(new Background(new BackgroundFill(getSkinnable().getBarBackgroundColor().brighter(), new CornerRadii(0.0, 0.0, size * 0.025, size * 0.025, false), Insets.EMPTY)));
+        barBackground.setBackground(new Background(new BackgroundFill(getSkinnable().getBarBackgroundColor().brighter().brighter(), new CornerRadii(0.0, 0.0, size * 0.025, size * 0.025, false), Insets.EMPTY)));
         bar.setFill(getSkinnable().getBarColor());
 
         titleText.setFill(getSkinnable().getTitleColor());
