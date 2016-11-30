@@ -159,8 +159,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdRect.setFill(getSkinnable().getThresholdColor());
 
         thresholdText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
-        thresholdText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(thresholdText, Double.compare(getSkinnable().getThreshold(), getSkinnable().getMinValue()) != 0 && Double.compare(getSkinnable().getThreshold(), getSkinnable().getMaxValue()) != 0);
+        thresholdText.setFill(getSkinnable().getBackgroundPaint());
 
         pane = new Pane(barBackground, thresholdBar, needleRect, needle, titleText, valueText, minValueText, maxValueText, thresholdRect, thresholdText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
@@ -273,7 +272,6 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double maxWidth   = 0.98 * size;
         double fontSize   = size * 0.06;
         double textRadius;
-        double textAngle;
         double sinValue;
         double cosValue;
         double textX;
@@ -310,7 +308,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdText.setFont(Fonts.latoRegular(fontSize));
         if (thresholdText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(thresholdText, maxWidth, fontSize); }
         thresholdText.setX((size - thresholdText.getLayoutBounds().getWidth()) * 0.5);
-        thresholdText.setY(size * 0.93);
+        thresholdText.setY(size * 0.925);
     }
 
     private void resize() {
@@ -389,7 +387,5 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxValueText.setFill(getSkinnable().getTitleColor());
         thresholdText.setFill(getSkinnable().getBackgroundPaint());
         valueText.setFill(getSkinnable().getValueColor());
-
-        thresholdText.setVisible(Double.compare(getSkinnable().getThreshold(), getSkinnable().getMinValue()) != 0 && Double.compare(getSkinnable().getThreshold(), getSkinnable().getMaxValue()) != 0);
     }
 }
