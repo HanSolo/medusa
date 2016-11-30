@@ -121,7 +121,6 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         maxValueText = new Text();
         maxValueText.setFill(getSkinnable().getBackgroundPaint());
-        Helper.enableNode(maxValueText, Double.compare(getSkinnable().getThreshold(), getSkinnable().getMinValue()) != 0 && Double.compare(getSkinnable().getThreshold(), getSkinnable().getMaxValue()) != 0);
 
         pane = new Pane(barBackground, bar, titleText, valueText, percentageText, percentageUnitText, maxValueRect, maxValueText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
