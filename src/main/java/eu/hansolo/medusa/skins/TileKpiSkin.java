@@ -146,6 +146,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         Helper.enableNode(thresholdBar, !getSkinnable().getSectionsVisible());
 
         sectionPane = new Pane();
+        Helper.enableNode(sectionPane, getSkinnable().getSectionsVisible());
 
         if (sectionsVisible) { drawSections(); }
 
@@ -179,9 +180,13 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         thresholdRect = new Rectangle();
         thresholdRect.setFill(sectionsVisible ? getSkinnable().getBackgroundPaint() : getSkinnable().getThresholdColor());
+        Helper.enableNode(thresholdRect, getSkinnable().isThresholdVisible());
 
         thresholdText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
-        thresholdText.setFill(getSkinnable().getBackgroundPaint());
+        thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundPaint());
+        Helper.enableNode(thresholdText, getSkinnable().isThresholdVisible());
+
+        System.out.println(sectionsVisible);
 
         pane = new Pane(barBackground, thresholdBar, sectionPane, needleRect, needle, titleText, valueText, minValueText, maxValueText, thresholdRect, thresholdText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
@@ -217,10 +222,17 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             minValue          = getSkinnable().getMinValue();
             range             = getSkinnable().getRange();
             angleStep         = angleRange / range;
-            sectionsVisible   = getSkinnable().getSectionsVisible();
             highlightSections = getSkinnable().isHighlightSections();
-            sections          = getSkinnable().getSections();
             redraw();
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(sectionPane, getSkinnable().getSectionsVisible());
+            Helper.enableNode(thresholdRect, getSkinnable().isThresholdVisible());
+            Helper.enableNode(thresholdText, getSkinnable().isThresholdVisible());
+            sectionsVisible = getSkinnable().getSectionsVisible();
+        } else if ("SECTION".equals(EVENT_TYPE)) {
+            sections = getSkinnable().getSections();
+            sectionMap.clear();
+            for(Section section : sections) { sectionMap.put(section, new Arc()); }
         }
     }
 
@@ -485,7 +497,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setFill(getSkinnable().getTitleColor());
         minValueText.setFill(getSkinnable().getTitleColor());
         maxValueText.setFill(getSkinnable().getTitleColor());
-        thresholdText.setFill(getSkinnable().getBackgroundPaint());
+        thresholdRect.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getThresholdColor());
+        thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundPaint());
         valueText.setFill(getSkinnable().getValueColor());
     }
 }
