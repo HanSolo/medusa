@@ -246,17 +246,17 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (highlightSections) {
             sections.forEach(section -> {
                 if (section.contains(VALUE)) {
-                    sectionMap.get(section).setOpacity(1.0);
+                    sectionMap.get(section).setVisible(section.contains(VALUE));
                 } else {
-                    sectionMap.get(section).setOpacity(0.25);
+                    sectionMap.get(section).setVisible(false);
                 }
             });
         } else {
             sections.forEach(section -> {
                 if (section.contains(VALUE)) {
-                    sectionMap.get(section).setVisible(section.contains(VALUE));
+                    sectionMap.get(section).setOpacity(1.0);
                 } else {
-                    sectionMap.get(section).setVisible(false);
+                    sectionMap.get(section).setOpacity(0.25);
                 }
             });
         }
