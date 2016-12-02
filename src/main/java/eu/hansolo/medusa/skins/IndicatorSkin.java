@@ -49,6 +49,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -431,11 +432,11 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (sections.isEmpty()) return;
         sectionLayer.getChildren().clear();
 
-        double centerX   = width * 0.5;
-        double centerY   = height * 0.85;
-        double barRadius = height * 0.54210526;
-        double barWidth  = width * 0.28472222;
-
+        double    centerX     = width * 0.5;
+        double    centerY     = height * 0.85;
+        double    barRadius   = height * 0.54210526;
+        double    barWidth    = width * 0.28472222;
+        List<Arc> sectionBars = new ArrayList<>(sections.size());
         for (Section section : sections) {
             Arc sectionBar = new Arc(centerX, centerY, barRadius, barRadius, angleRange * 0.5 + 90 - (section.getStart() * angleStep), -((section.getStop() - section.getStart()) - minValue) * angleStep);
             sectionBar.setType(ArcType.OPEN);
@@ -446,7 +447,8 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             Tooltip sectionTooltip = new Tooltip(new StringBuilder(section.getText()).append("\n").append(String.format(Locale.US, "%.2f", section.getStart())).append(" - ").append(String.format(Locale.US, "%.2f", section.getStop())).toString());
             sectionTooltip.setTextAlignment(TextAlignment.CENTER);
             Tooltip.install(sectionBar, sectionTooltip);
-            sectionLayer.getChildren().add(sectionBar);
+            sectionBars.add(sectionBar);
         }
+        sectionLayer.getChildren().addAll(sectionBars);
     }
 }
