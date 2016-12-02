@@ -186,8 +186,6 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundPaint());
         Helper.enableNode(thresholdText, getSkinnable().isThresholdVisible());
 
-        System.out.println(sectionsVisible);
-
         pane = new Pane(barBackground, thresholdBar, sectionPane, needleRect, needle, titleText, valueText, minValueText, maxValueText, thresholdRect, thresholdText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
