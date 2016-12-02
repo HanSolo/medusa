@@ -5330,6 +5330,7 @@ public class Gauge extends Control {
             case TILE_KPI:
                 setKnobPosition(Pos.BOTTOM_CENTER);
                 setDecimals(0);
+                setValueColor(Color.rgb(238, 238, 238));
                 setBackgroundPaint(Color.rgb(42,42,42));
                 setForegroundBaseColor(Color.rgb(238,238,238));
                 setBarColor(Color.rgb(238,238,238));
@@ -5346,6 +5347,7 @@ public class Gauge extends Control {
                 setForegroundBaseColor(Color.rgb(238,238,238));
                 setBarColor(Color.rgb(41,177,255));
                 setValueColor(Color.rgb(238, 238, 238));
+                setUnitColor(Color.rgb(238, 238, 238));
                 setThresholdVisible(true);
                 setThresholdColor(Color.rgb(139,144,146));
                 setAngleRange(180);
