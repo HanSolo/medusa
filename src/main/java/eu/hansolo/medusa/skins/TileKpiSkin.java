@@ -291,8 +291,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sectionArc.setStrokeWidth(barWidth);
             sectionArc.setStrokeLineCap(StrokeLineCap.BUTT);
             sectionArc.setFill(null);
-            sectionArc.setVisible(highlightSections);
-            sectionArc.setOpacity(highlightSections ? 0.25 : 1.0);
+            sectionArc.setVisible(!highlightSections);
+            sectionArc.setOpacity(highlightSections ? 1.0 : 0.25);
             Tooltip sectionTooltip = new Tooltip(section.getText());
             sectionTooltip.setTextAlignment(TextAlignment.CENTER);
             Tooltip.install(sectionArc, sectionTooltip);
