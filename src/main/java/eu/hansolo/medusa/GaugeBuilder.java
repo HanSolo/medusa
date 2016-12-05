@@ -721,6 +721,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B alertMessage(final String MESSAGE) {
+        properties.put("alertMessage", new SimpleStringProperty(MESSAGE));
+        return (B)this;
+    }
+
     public final B onValueChanged(final InvalidationListener LISTENER) {
         properties.put("onValueChanged", new SimpleObjectProperty<>(LISTENER));
         return (B)this;
@@ -1379,6 +1384,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("customFont".equals(key)) {
                 CONTROL.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
+            } else if ("alertMessage".equals(key)) {
+                CONTROL.setAlertMessage(((StringProperty) properties.get(key)).get());
             }
         }
 

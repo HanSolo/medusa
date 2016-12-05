@@ -379,6 +379,8 @@ public class Gauge extends Control {
     private ObjectProperty<Font>                 customFont;
     private boolean                              _alert;
     private BooleanProperty                      alert;
+    private String                               _alertMessage;
+    private StringProperty                       alertMessage;
 
     // others
     private double   originalMinValue;
@@ -593,6 +595,7 @@ public class Gauge extends Control {
         _customFontEnabled                  = false;
         _customFont                         = Fonts.robotoRegular(12);
         _alert                              = false;
+        _alertMessage                       = "";
 
         originalMinValue                    = -Double.MAX_VALUE;
         originalMaxValue                    = Double.MAX_VALUE;
@@ -5035,6 +5038,37 @@ public class Gauge extends Control {
             };
         }
         return alert;
+    }
+
+    /**
+     * Returns the alert message text that could be used in a tooltip
+     * in case of an alert.
+     * @return the alert message text
+     */
+    public String getAlertMessage() { return null == alertMessage ? _alertMessage : alertMessage.get(); }
+    /**
+     * Defines the text that could be used in a tooltip as an
+     * alert message.
+     * @param MESSAGE
+     */
+    public void setAlertMessage(final String MESSAGE) {
+        if (null == alertMessage) {
+            _alertMessage = MESSAGE;
+            fireUpdateEvent(ALERT_EVENT);
+        } else {
+            alertMessage.set(MESSAGE);
+        }
+    }
+    public StringProperty alertMessageProperty() {
+        if (null == alertMessage) {
+            alertMessage = new StringPropertyBase(_alertMessage) {
+                @Override protected void invalidated() { fireUpdateEvent(ALERT_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "alertMessage"; }
+            };
+            _alertMessage = null;
+        }
+        return alertMessage;
     }
 
     /**
