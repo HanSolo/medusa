@@ -256,6 +256,10 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needleRectRotate.setAngle(targetAngle);
         valueText.setText(String.format(locale, formatString, VALUE));
         resizeDynamicText();
+        highlightSections(VALUE);
+    }
+
+    private void highlightSections(final double VALUE) {
         if (!sectionsVisible || sections.isEmpty()) return;
         if (highlightSections) {
             sections.forEach(section -> sectionMap.get(section).setVisible(section.contains(VALUE)));
@@ -554,8 +558,6 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
         resizeStaticText();
 
-        if (getSkinnable().getSectionsVisible()) { drawSections(); }
-
         barBackground.setStroke(getSkinnable().getBarColor());
         thresholdBar.setStroke(getSkinnable().getThresholdColor());
         needleRect.setFill(getSkinnable().getBackgroundPaint());
@@ -566,5 +568,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdRect.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getThresholdColor());
         thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundPaint());
         valueText.setFill(getSkinnable().getValueColor());
+
+        highlightSections(getSkinnable().getValue());
     }
 }

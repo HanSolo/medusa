@@ -110,6 +110,7 @@ public class Test extends Application {
                                       new Section(33, 66, Color.YELLOW),
                                       new Section(66, 100, Color.LIME))
                             .sectionsVisible(true)
+                            .highlightSections(true)
                             //.autoScale(false)
                             .averagingEnabled(true)
                             .averageVisible(true)
