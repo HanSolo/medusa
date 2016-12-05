@@ -82,6 +82,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Text              thresholdText;
     private              Pane              sectionPane;
     private              Path              alertIcon;
+    private              Tooltip           alertTooltip;
     private              Pane              pane;
     private              double            angleRange;
     private              double            minValue;
@@ -156,6 +157,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         alertIcon.setFill(Color.YELLOW);
         alertIcon.setStroke(null);
         Helper.enableNode(alertIcon, getSkinnable().isAlert());
+        alertTooltip = new Tooltip(getSkinnable().getAlertMessage());
+        Tooltip.install(alertIcon, alertTooltip);
 
         needleRotate     = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
         needleRectRotate = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
@@ -241,6 +244,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("ALERT".equals(EVENT_TYPE)) {
             Helper.enableNode(valueText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
             Helper.enableNode(alertIcon, getSkinnable().isAlert());
+            alertTooltip.setText(getSkinnable().getAlertMessage());
         }
     }
 
