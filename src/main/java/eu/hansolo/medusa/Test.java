@@ -90,7 +90,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.SIMPLE_SECTION)
+                            .skinType(SkinType.TILE_KPI)
                             //.prefSize(250, 250)
                             //.minValue(0)
                             //.maxValue(100)
@@ -114,6 +114,8 @@ public class Test extends Application {
                             .averagingEnabled(true)
                             .averageVisible(true)
                             .build();
+
+        gauge.setAlert(true);
 
         // Calling bind() directly sets a value to gauge
         gauge.valueProperty().bind(value);
@@ -166,7 +168,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(clock);
+        StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(20));
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,

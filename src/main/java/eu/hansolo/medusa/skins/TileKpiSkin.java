@@ -81,6 +81,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Rectangle         thresholdRect;
     private              Text              thresholdText;
     private              Pane              sectionPane;
+    private              Path              alertIcon;
+    private              Tooltip           alertTooltip;
     private              Pane              pane;
     private              double            angleRange;
     private              double            minValue;
@@ -150,6 +152,14 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         if (sectionsVisible) { drawSections(); }
 
+        alertIcon = new Path();
+        alertIcon.setFillRule(FillRule.EVEN_ODD);
+        alertIcon.setFill(Color.YELLOW);
+        alertIcon.setStroke(null);
+        Helper.enableNode(alertIcon, getSkinnable().isAlert());
+        alertTooltip = new Tooltip(getSkinnable().getAlertMessage());
+        Tooltip.install(alertIcon, alertTooltip);
+
         needleRotate     = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
         needleRectRotate = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
 
@@ -170,7 +180,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
         valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        Helper.enableNode(valueText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
 
         minValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
         minValueText.setFill(getSkinnable().getTitleColor());
@@ -186,7 +196,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundPaint());
         Helper.enableNode(thresholdText, getSkinnable().isThresholdVisible());
 
-        pane = new Pane(barBackground, thresholdBar, sectionPane, needleRect, needle, titleText, valueText, minValueText, maxValueText, thresholdRect, thresholdText);
+        pane = new Pane(barBackground, thresholdBar, sectionPane, alertIcon, needleRect, needle, titleText, valueText, minValueText, maxValueText, thresholdRect, thresholdText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -231,6 +241,10 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sections = getSkinnable().getSections();
             sectionMap.clear();
             for(Section section : sections) { sectionMap.put(section, new Arc()); }
+        } else if ("ALERT".equals(EVENT_TYPE)) {
+            Helper.enableNode(valueText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
+            Helper.enableNode(alertIcon, getSkinnable().isAlert());
+            alertTooltip.setText(getSkinnable().getAlertMessage());
         }
     }
 
@@ -244,21 +258,9 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         resizeDynamicText();
         if (!sectionsVisible || sections.isEmpty()) return;
         if (highlightSections) {
-            sections.forEach(section -> {
-                if (section.contains(VALUE)) {
-                    sectionMap.get(section).setOpacity(1.0);
-                } else {
-                    sectionMap.get(section).setOpacity(0.25);
-                }
-            });
+            sections.forEach(section -> sectionMap.get(section).setVisible(section.contains(VALUE)));
         } else {
-            sections.forEach(section -> {
-                if (section.contains(VALUE)) {
-                    sectionMap.get(section).setVisible(section.contains(VALUE));
-                } else {
-                    sectionMap.get(section).setVisible(false);
-                }
-            });
+            sections.forEach(section -> sectionMap.get(section).setOpacity(section.contains(VALUE) ? 1.0 : 0.25));
         }
     }
 
@@ -291,8 +293,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sectionArc.setStrokeWidth(barWidth);
             sectionArc.setStrokeLineCap(StrokeLineCap.BUTT);
             sectionArc.setFill(null);
-            sectionArc.setVisible(highlightSections);
-            sectionArc.setOpacity(highlightSections ? 0.25 : 1.0);
+            sectionArc.setVisible(!highlightSections);
+            sectionArc.setOpacity(highlightSections ? 1.0 : 0.25);
             Tooltip sectionTooltip = new Tooltip(section.getText());
             sectionTooltip.setTextAlignment(TextAlignment.CENTER);
             Tooltip.install(sectionArc, sectionTooltip);
@@ -349,6 +351,69 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.getElements().add(new ClosePath());
         needle.setCache(true);
         needle.setCacheHint(CacheHint.ROTATE);
+    }
+
+    private void drawAlertIcon() {
+        alertIcon.setCache(false);
+        double iconWidth  = size * 0.155;
+        double iconHeight = size * 0.135;
+        alertIcon.getElements().clear();
+        alertIcon.getElements().add(new MoveTo(0.4411764705882353 * iconWidth, 0.3380952380952381 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.4411764705882353 * iconWidth, 0.3 * iconHeight,
+                                                     0.4684873949579832 * iconWidth, 0.2714285714285714 * iconHeight,
+                                                     0.5 * iconWidth, 0.2714285714285714 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.5315126050420168 * iconWidth, 0.2714285714285714 * iconHeight,
+                                                     0.5588235294117647 * iconWidth, 0.3 * iconHeight,
+                                                     0.5588235294117647 * iconWidth, 0.3380952380952381 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.5588235294117647 * iconWidth, 0.3380952380952381 * iconHeight,
+                                                     0.5588235294117647 * iconWidth, 0.6 * iconHeight,
+                                                     0.5588235294117647 * iconWidth, 0.6 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.5588235294117647 * iconWidth, 0.6357142857142857 * iconHeight,
+                                                     0.5315126050420168 * iconWidth, 0.6666666666666666 * iconHeight,
+                                                     0.5 * iconWidth, 0.6666666666666666 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.4684873949579832 * iconWidth, 0.6666666666666666 * iconHeight,
+                                                     0.4411764705882353 * iconWidth, 0.6357142857142857 * iconHeight,
+                                                     0.4411764705882353 * iconWidth, 0.6 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.4411764705882353 * iconWidth, 0.6 * iconHeight,
+                                                     0.4411764705882353 * iconWidth, 0.3380952380952381 * iconHeight,
+                                                     0.4411764705882353 * iconWidth, 0.3380952380952381 * iconHeight));
+        alertIcon.getElements().add(new ClosePath());
+        alertIcon.getElements().add(new MoveTo(0.4411764705882353 * iconWidth, 0.8 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.4411764705882353 * iconWidth, 0.7642857142857142 * iconHeight,
+                                                     0.4684873949579832 * iconWidth, 0.7333333333333333 * iconHeight,
+                                                     0.5 * iconWidth, 0.7333333333333333 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.5315126050420168 * iconWidth, 0.7333333333333333 * iconHeight,
+                                                     0.5588235294117647 * iconWidth, 0.7642857142857142 * iconHeight,
+                                                     0.5588235294117647 * iconWidth, 0.8 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.5588235294117647 * iconWidth, 0.8380952380952381 * iconHeight,
+                                                     0.5315126050420168 * iconWidth, 0.8666666666666667 * iconHeight,
+                                                     0.5 * iconWidth, 0.8666666666666667 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.4684873949579832 * iconWidth, 0.8666666666666667 * iconHeight,
+                                                     0.4411764705882353 * iconWidth, 0.8380952380952381 * iconHeight,
+                                                     0.4411764705882353 * iconWidth, 0.8 * iconHeight));
+        alertIcon.getElements().add(new ClosePath());
+        alertIcon.getElements().add(new MoveTo(0.5504201680672269 * iconWidth, 0.04285714285714286 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.523109243697479 * iconWidth, -0.011904761904761904 * iconHeight,
+                                                     0.47689075630252103 * iconWidth, -0.011904761904761904 * iconHeight,
+                                                     0.4495798319327731 * iconWidth, 0.04285714285714286 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.4495798319327731 * iconWidth, 0.04285714285714286 * iconHeight,
+                                                     0.012605042016806723 * iconWidth, 0.9 * iconHeight,
+                                                     0.012605042016806723 * iconWidth, 0.9 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(-0.014705882352941176 * iconWidth, 0.9547619047619048 * iconHeight,
+                                                     0.0063025210084033615 * iconWidth, iconHeight,
+                                                     0.06302521008403361 * iconWidth, iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.06302521008403361 * iconWidth, iconHeight,
+                                                     0.9369747899159664 * iconWidth, iconHeight,
+                                                     0.9369747899159664 * iconWidth, iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.9936974789915967 * iconWidth, iconHeight,
+                                                     1.0147058823529411 * iconWidth, 0.9547619047619048 * iconHeight,
+                                                     0.9873949579831933 * iconWidth, 0.9 * iconHeight));
+        alertIcon.getElements().add(new CubicCurveTo(0.9873949579831933 * iconWidth, 0.9 * iconHeight,
+                                                     0.5504201680672269 * iconWidth, 0.04285714285714286 * iconHeight,
+                                                     0.5504201680672269 * iconWidth, 0.04285714285714286 * iconHeight));
+        alertIcon.getElements().add(new ClosePath());
+        alertIcon.setCache(true);
+        alertIcon.setCacheHint(CacheHint.SPEED);
     }
 
 
@@ -448,6 +513,9 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             thresholdBar.setLength((getSkinnable().getMaxValue() - getSkinnable().getThreshold()) * angleStep);
 
             if (sectionsVisible) { drawSections(); }
+
+            drawAlertIcon();
+            alertIcon.relocate((size - alertIcon.getLayoutBounds().getWidth()) * 0.5, size * 0.244);
 
             needleRect.setWidth(size * 0.035);
             needleRect.setHeight(size * 0.05);

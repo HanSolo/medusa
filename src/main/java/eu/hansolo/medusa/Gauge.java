@@ -126,13 +126,14 @@ public class Gauge extends Control {
     private final UpdateEvent    INTERACTIVITY_EVENT = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
     private final UpdateEvent    FINISHED_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
     private final UpdateEvent    SECTION_EVENT       = new UpdateEvent(Gauge.this, UpdateEvent.EventType.SECTION);
+    private final UpdateEvent    ALERT_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.ALERT);
 
-    private static volatile Future          blinkFuture;
-    private static ScheduledExecutorService blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
-    private static volatile Callable<Void>  blinkTask;
+    private static volatile Future               blinkFuture;
+    private static ScheduledExecutorService      blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
+    private static volatile Callable<Void>       blinkTask;
 
     // Update events
-    private List<UpdateEventListener> listenerList = new CopyOnWriteArrayList<>();
+    private List<UpdateEventListener>            listenerList = new CopyOnWriteArrayList<>();
 
     // Data related
     private DoubleProperty                       value;
@@ -376,6 +377,10 @@ public class Gauge extends Control {
     private BooleanProperty                      customFontEnabled;
     private Font                                 _customFont;
     private ObjectProperty<Font>                 customFont;
+    private boolean                              _alert;
+    private BooleanProperty                      alert;
+    private String                               _alertMessage;
+    private StringProperty                       alertMessage;
 
     // others
     private double   originalMinValue;
@@ -589,6 +594,8 @@ public class Gauge extends Control {
         _keepAspect                         = true;
         _customFontEnabled                  = false;
         _customFont                         = Fonts.robotoRegular(12);
+        _alert                              = false;
+        _alertMessage                       = "";
 
         originalMinValue                    = -Double.MAX_VALUE;
         originalMaxValue                    = Double.MAX_VALUE;
@@ -4999,6 +5006,69 @@ public class Gauge extends Control {
             _customFont = null;
         }
         return customFont;
+    }
+
+    /**
+     * Returns true if the alert property was set.
+     * This property can be used to visualize an alert
+     * situation in a skin.
+     * @return true if the alert property was set
+     */
+    public boolean isAlert() { return null == alert ? _alert : alert.get(); }
+    /**
+     * Defines if the alert property should be set. This
+     * property can be used to visualize an alert situation
+     * in the skin.
+     * @param ALERT
+     */
+    public void setAlert(final boolean ALERT) {
+        if (null == alert) {
+            _alert = ALERT;
+            fireUpdateEvent(ALERT_EVENT);
+        } else {
+            alert.set(ALERT);
+        }
+    }
+    public BooleanProperty alertProperty() {
+        if (null == alert) {
+            alert = new BooleanPropertyBase(_alert) {
+                @Override protected void invalidated() { fireUpdateEvent(ALERT_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "alert"; }
+            };
+        }
+        return alert;
+    }
+
+    /**
+     * Returns the alert message text that could be used in a tooltip
+     * in case of an alert.
+     * @return the alert message text
+     */
+    public String getAlertMessage() { return null == alertMessage ? _alertMessage : alertMessage.get(); }
+    /**
+     * Defines the text that could be used in a tooltip as an
+     * alert message.
+     * @param MESSAGE
+     */
+    public void setAlertMessage(final String MESSAGE) {
+        if (null == alertMessage) {
+            _alertMessage = MESSAGE;
+            fireUpdateEvent(ALERT_EVENT);
+        } else {
+            alertMessage.set(MESSAGE);
+        }
+    }
+    public StringProperty alertMessageProperty() {
+        if (null == alertMessage) {
+            alertMessage = new StringPropertyBase(_alertMessage) {
+                @Override protected void invalidated() { fireUpdateEvent(ALERT_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "alertMessage"; }
+            };
+            _alertMessage = null;
+        }
+        return alertMessage;
     }
 
     /**
