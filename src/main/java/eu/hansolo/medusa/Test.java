@@ -95,8 +95,8 @@ public class Test extends Application {
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.TILE_SPARK_LINE)
                             //.prefSize(250, 250)
-                            .minValue(0)
-                            .maxValue(100)
+                            .minValue(-20)
+                            .maxValue(50)
                             .animated(false)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
@@ -108,7 +108,6 @@ public class Test extends Application {
                             .subTitle("SubTitle")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
-                            //.title("Title")
                             .sections(new Section(0, 33, Color.RED),
                                       new Section(33, 66, Color.YELLOW),
                                       new Section(66, 100, Color.LIME))

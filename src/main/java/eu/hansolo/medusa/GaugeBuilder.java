@@ -1053,10 +1053,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setBarColor(Color.rgb(41,177,255));
                     CONTROL.setValueColor(Color.rgb(238, 238, 238));
                     CONTROL.setUnitColor(Color.rgb(238, 238, 238));
-                    CONTROL.setValueVisible(true);
                     CONTROL.setAveragingEnabled(true);
                     CONTROL.setAveragingPeriod(10);
                     CONTROL.setAverageColor(Color.rgb(238, 238, 238, 0.5));
+                    CONTROL.setAnimated(false);
                     break;
             }
         } else {
