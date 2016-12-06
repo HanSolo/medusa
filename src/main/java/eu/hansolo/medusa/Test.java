@@ -116,7 +116,7 @@ public class Test extends Application {
                             //.autoScale(false)
                             //.averagingEnabled(true)
                             .averagingPeriod(10)
-                            .averageVisible(false)
+                            .averageVisible(true)
                             .build();
 
         gauge.setAlert(true);
