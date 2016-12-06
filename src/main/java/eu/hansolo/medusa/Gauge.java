@@ -127,6 +127,7 @@ public class Gauge extends Control {
     private final UpdateEvent    FINISHED_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
     private final UpdateEvent    SECTION_EVENT       = new UpdateEvent(Gauge.this, UpdateEvent.EventType.SECTION);
     private final UpdateEvent    ALERT_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.ALERT);
+    private final UpdateEvent    VALUE_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VALUE);
 
     private static volatile Future               blinkFuture;
     private static ScheduledExecutorService      blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
@@ -446,6 +447,10 @@ public class Gauge extends Control {
                     fireUpdateEvent(FINISHED_EVENT);
                 }
                 if (isAveragingEnabled()) { movingAverage.addData(new Data(VALUE)); }
+            }
+            @Override public void set(final double VALUE) {
+                super.set(VALUE);
+                fireUpdateEvent(VALUE_EVENT);
             }
             @Override public Object getBean() { return Gauge.this; }
             @Override public String getName() { return "value"; }
