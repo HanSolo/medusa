@@ -50,6 +50,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -90,11 +93,11 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.TILE_KPI)
+                            .skinType(SkinType.TILE_SPARK_LINE)
                             //.prefSize(250, 250)
-                            //.minValue(0)
-                            //.maxValue(100)
-                            .animated(true)
+                            .minValue(0)
+                            .maxValue(100)
+                            .animated(false)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
                             //.lcdVisible(true)
@@ -112,7 +115,8 @@ public class Test extends Application {
                             .sectionsVisible(true)
                             .highlightSections(true)
                             //.autoScale(false)
-                            .averagingEnabled(true)
+                            //.averagingEnabled(true)
+                            .averagingPeriod(10)
                             .averageVisible(true)
                             .build();
 

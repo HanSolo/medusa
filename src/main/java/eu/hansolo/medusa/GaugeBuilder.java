@@ -1037,15 +1037,26 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setAngleRange(180);
                     break;
                 case TILE_TEXT_KPI:
-                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
                     CONTROL.setDecimals(0);
                     CONTROL.setBackgroundPaint(Color.rgb(42,42,42));
                     CONTROL.setForegroundBaseColor(Color.rgb(238,238,238));
                     CONTROL.setBarColor(Color.rgb(41,177,255));
                     CONTROL.setValueColor(Color.rgb(238, 238, 238));
+                    CONTROL.setUnitColor(Color.rgb(238, 238, 238));
                     CONTROL.setThresholdVisible(true);
                     CONTROL.setThresholdColor(Color.rgb(139,144,146));
-                    CONTROL.setAngleRange(180);
+                    break;
+                case TILE_SPARK_LINE:
+                    CONTROL.setDecimals(0);
+                    CONTROL.setBackgroundPaint(Color.rgb(42,42,42));
+                    CONTROL.setForegroundBaseColor(Color.rgb(238,238,238));
+                    CONTROL.setBarColor(Color.rgb(41,177,255));
+                    CONTROL.setValueColor(Color.rgb(238, 238, 238));
+                    CONTROL.setUnitColor(Color.rgb(238, 238, 238));
+                    CONTROL.setValueVisible(true);
+                    CONTROL.setAveragingEnabled(true);
+                    CONTROL.setAveragingPeriod(10);
+                    CONTROL.setAverageColor(Color.rgb(238, 238, 238, 0.5));
                     break;
             }
         } else {
