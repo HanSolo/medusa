@@ -233,6 +233,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             highlightSections = getSkinnable().isHighlightSections();
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(sectionPane, getSkinnable().getSectionsVisible());
             Helper.enableNode(thresholdRect, getSkinnable().isThresholdVisible());
             Helper.enableNode(thresholdText, getSkinnable().isThresholdVisible());

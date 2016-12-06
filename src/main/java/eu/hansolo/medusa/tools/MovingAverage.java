@@ -27,18 +27,19 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Created by hansolo on 01.11.16.
  */
 public class MovingAverage {
-    private final Queue<Data> window;
-    private       int         numberPeriod;
-    private       double      sum;
+    public  static final int         MAX_PERIOD     = 1000;
+    private static final int         DEFAULT_PERIOD = 10;
+    private        final Queue<Data> window;
+    private              int         numberPeriod;
+    private              double      sum;
 
 
     // ******************** Constructors **************************************
     public MovingAverage() {
-        this(10);
+        this(DEFAULT_PERIOD);
     }
     public MovingAverage(final int NUMBER_PERIOD) {
-        assert (NUMBER_PERIOD > 0 && NUMBER_PERIOD <= 1000) : "Number period must be between 1 - 1000";
-        numberPeriod = NUMBER_PERIOD;
+        numberPeriod = Helper.clamp(0, MAX_PERIOD, NUMBER_PERIOD);
         window       = new ConcurrentLinkedQueue<>();
     }
 

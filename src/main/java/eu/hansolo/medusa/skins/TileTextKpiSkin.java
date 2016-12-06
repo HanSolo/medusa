@@ -122,6 +122,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         unitText = new Text(getSkinnable().getUnit());
         unitText.setFill(getSkinnable().getUnitColor());
+        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         percentageText = new Text();
         percentageText.setFill(getSkinnable().getBarColor());
@@ -168,6 +169,10 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             range    = getSkinnable().getRange();
             stepSize = size / range;
             redraw();
+        } else if ("VISIBLITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(valueText, getSkinnable().isValueVisible());
+            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = getSkinnable().getSections();
         }
@@ -215,7 +220,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.5);
+        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.48);
 
         maxWidth = size * 0.45;
         fontSize = size * 0.18;
