@@ -18,6 +18,7 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
@@ -292,8 +293,19 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         double barRadius = size * 0.3;
         double barWidth  = size * 0.045;
+        double maxValue  = getSkinnable().getMaxValue();
         for (Section section : sections) {
-            Arc sectionArc = new Arc(centerX, centerY, barRadius, barRadius, angleRange * 0.5 + 90 - (section.getStart() * angleStep), -((section.getStop() - section.getStart()) - minValue) * angleStep);
+            double startAngle = (section.getStart() - minValue) * angleStep - angleRange;
+            double length;
+            if (section.getStop() > maxValue) {
+                length = (maxValue - section.getStart()) * angleStep;
+            } else if (Double.compare(section.getStart(), minValue) < 0) {
+                length = (section.getStop() - minValue) * angleStep;
+            } else {
+                length = (section.getStop() - section.getStart()) * angleStep;
+            }
+            Arc sectionArc = new Arc(centerX, centerY, barRadius, barRadius, -startAngle, -length);
+
             sectionArc.setType(ArcType.OPEN);
             sectionArc.setStroke(section.getColor());
             sectionArc.setStrokeWidth(barWidth);
