@@ -170,6 +170,7 @@ public class SimpleSectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Canvas ********************************************
     private void setBar(final double VALUE) {
+        bar.setStartAngle(getSkinnable().getStartAngle() + 90 + getSkinnable().getMinValue() * getSkinnable().getAngleStep());
         if (getSkinnable().getMinValue() > 0) {
             bar.setLength((getSkinnable().getMinValue() - VALUE) * getSkinnable().getAngleStep());
         } else {
