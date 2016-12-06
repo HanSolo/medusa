@@ -94,7 +94,7 @@ public class Test extends Application {
 
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.TILE_SPARK_LINE)
-                            //.prefSize(250, 250)
+                            .prefSize(400, 400)
                             .minValue(-20)
                             .maxValue(50)
                             .animated(false)
@@ -151,7 +151,7 @@ public class Test extends Application {
                 if (now > lastTimerCall + 3_000_000_000l) {
                     double v = RND.nextDouble() * gauge.getRange() + gauge.getMinValue();
                     value.set(v);
-
+                    System.out.println(v);
                     //gauge.setValue(v);
 
                     //System.out.println("MovingAverage over " + gauge.getAveragingWindow().size() + " values: " + gauge.getAverage() + "  last value = " + v);
