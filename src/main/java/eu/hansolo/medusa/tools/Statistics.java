@@ -43,4 +43,8 @@ public class Statistics {
         Collections.sort(DATA);
         return size % 2 == 0 ? (DATA.get((size / 2) - 1) + DATA.get(size / 2)) / 2.0 : DATA.get(size / 2);
     }
+
+    public static double getMin(final List<Double> DATA) { return DATA.stream().mapToDouble(v -> v).min().orElse(0); }
+
+    public static double getMax(final List<Double> DATA) { return DATA.stream().mapToDouble(v -> v).max().orElse(0); }
 }

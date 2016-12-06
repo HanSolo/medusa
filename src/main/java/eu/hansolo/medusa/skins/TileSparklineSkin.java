@@ -225,8 +225,8 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawChart(final double VALUE) {
-        low   = Math.min(VALUE, low);
-        high  = Math.max(VALUE, high);
+        low   = Statistics.getMin(dataList);
+        high  = Statistics.getMax(dataList);
         range = high - low;
 
         if (Double.compare(range, 0.0) == 0) return;
@@ -239,13 +239,13 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double stepY = graphBounds.getHeight() / range;
 
         MoveTo begin = (MoveTo) pathElements.get(0);
-        begin.setX(minX); begin.setY(maxY - dataList.get(0) * stepY);
+        begin.setX(minX); begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
         for (int i = 1 ; i < (noOfDatapoints - 1) ; i++) {
             LineTo lineTo = (LineTo) pathElements.get(i);
-            lineTo.setX(minX + i * stepX); lineTo.setY(maxY - dataList.get(i) * stepY);
+            lineTo.setX(minX + i * stepX); lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
         }
         LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
-        end.setX(maxX); end.setY(maxY - dataList.get(noOfDatapoints - 1) * stepY);
+        end.setX(maxX); end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
 
         dot.setCenterX(maxX);
         dot.setCenterY(end.getY());
@@ -254,8 +254,8 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         averageLine.setStartX(minX);
         averageLine.setEndX(maxX);
-        averageLine.setStartY(maxY - average * stepY);
-        averageLine.setEndY(maxY - average * stepY);
+        averageLine.setStartY(maxY - Math.abs(low - average) * stepY);
+        averageLine.setEndY(maxY - Math.abs(low - average) * stepY);
 
         stdDeviationArea.setY(averageLine.getStartY() - (stdDeviation * 0.5 * stepY));
         stdDeviationArea.setHeight(stdDeviation * stepY);
