@@ -173,6 +173,8 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
         getSkinnable().currentValueProperty().addListener(o -> {
+            if(getSkinnable().isAnimated()) { getSkinnable().setAnimated(false); }
+            if (!getSkinnable().isAveragingEnabled()) { getSkinnable().setAveragingEnabled(true); }
             double value = getSkinnable().getCurrentValue();
             addData(value);
             drawChart(value);

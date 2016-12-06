@@ -108,7 +108,6 @@ public class Test extends Application {
                             .subTitle("SubTitle")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
-                            //.title("Title")
                             .sections(new Section(0, 33, Color.RED),
                                       new Section(33, 66, Color.YELLOW),
                                       new Section(66, 100, Color.LIME))
@@ -117,7 +116,7 @@ public class Test extends Application {
                             //.autoScale(false)
                             //.averagingEnabled(true)
                             .averagingPeriod(10)
-                            .averageVisible(true)
+                            .averageVisible(false)
                             .build();
 
         gauge.setAlert(true);
