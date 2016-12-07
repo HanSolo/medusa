@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.Statistics;
 import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Background;
@@ -41,12 +42,16 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+
+import static eu.hansolo.medusa.tools.Helper.clamp;
 
 
 /**
@@ -63,6 +68,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Text              titleText;
     private              Text              valueText;
     private              Text              unitText;
+    private              TextFlow          textContainer;
     private              Text              averageText;
     private              Text              highText;
     private              Text              lowText;
@@ -95,7 +101,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         locale         = gauge.getLocale();
         noOfDatapoints = gauge.getAveragingPeriod();
         dataList       = new LinkedList<>();
-        for (int i = 0; i < noOfDatapoints; i++) { dataList.add(0.0); }
+        for (int i = 0; i < noOfDatapoints; i++) { dataList.add(gauge.getMinValue()); }
 
         initGraphics();
         registerListeners();
@@ -120,7 +126,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setFill(getSkinnable().getTitleColor());
         Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
+        valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
         valueText.setFill(getSkinnable().getValueColor());
         Helper.enableNode(valueText, getSkinnable().isValueVisible());
 
@@ -128,14 +134,20 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
+        textContainer = new TextFlow(valueText, unitText);
+        textContainer.setTextAlignment(TextAlignment.RIGHT);
+        textContainer.setPrefWidth(PREFERRED_WIDTH * 0.9);
+
         averageText = new Text(String.format(locale, formatString, getSkinnable().getAverage()));
         averageText.setFill(getSkinnable().getAverageColor());
         Helper.enableNode(averageText, getSkinnable().isAverageVisible());
 
         highText = new Text();
+        highText.setTextOrigin(VPos.BOTTOM);
         highText.setFill(getSkinnable().getValueColor());
 
         lowText = new Text();
+        lowText.setTextOrigin(VPos.TOP);
         lowText.setFill(getSkinnable().getValueColor());
 
         stdDeviationArea = new Rectangle();
@@ -161,7 +173,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dot = new Circle();
         dot.setFill(getSkinnable().getBarColor());
 
-        pane = new Pane(titleText, valueText, unitText, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText);
+        pane = new Pane(titleText, textContainer, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -172,13 +184,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> {
-            if(getSkinnable().isAnimated()) { getSkinnable().setAnimated(false); }
-            if (!getSkinnable().isAveragingEnabled()) { getSkinnable().setAveragingEnabled(true); }
-            double value = getSkinnable().getCurrentValue();
-            addData(value);
-            drawChart(value);
-        });
+        getSkinnable().currentValueProperty().addListener(o -> handleEvents("VALUE"));
     }
 
 
@@ -213,6 +219,12 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         } else if ("ALERT".equals(EVENT_TYPE)) {
 
+        } else if ("VALUE".equals(EVENT_TYPE)) {
+            if(getSkinnable().isAnimated()) { getSkinnable().setAnimated(false); }
+            if (!getSkinnable().isAveragingEnabled()) { getSkinnable().setAveragingEnabled(true); }
+            double value = getSkinnable().getValue();
+            addData(value);
+            drawChart(value);
         }
     }
 
@@ -227,11 +239,13 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawChart(final double VALUE) {
-        low   = Statistics.getMin(dataList);
-        high  = Statistics.getMax(dataList);
+        low  = Statistics.getMin(dataList);
+        high = Statistics.getMax(dataList);
+        if (Double.compare(low, high) == 0) {
+            low  = getSkinnable().getMinValue();
+            high = getSkinnable().getMaxValue();
+        }
         range = high - low;
-
-        if (Double.compare(range, 0.0) == 0) return;
 
         double minX  = graphBounds.getX();
         double maxX  = minX + graphBounds.getWidth();
@@ -241,23 +255,27 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double stepY = graphBounds.getHeight() / range;
 
         MoveTo begin = (MoveTo) pathElements.get(0);
-        begin.setX(minX); begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
-        for (int i = 1 ; i < (noOfDatapoints - 1) ; i++) {
+        begin.setX(minX);
+        begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
+        for (int i = 1; i < (noOfDatapoints - 1); i++) {
             LineTo lineTo = (LineTo) pathElements.get(i);
-            lineTo.setX(minX + i * stepX); lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
+            lineTo.setX(minX + i * stepX);
+            lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
         }
         LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
-        end.setX(maxX); end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
+        end.setX(maxX);
+        end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
 
         dot.setCenterX(maxX);
         dot.setCenterY(end.getY());
 
         double average = getSkinnable().getAverage();
+        double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
 
         averageLine.setStartX(minX);
         averageLine.setEndX(maxX);
-        averageLine.setStartY(maxY - Math.abs(low - average) * stepY);
-        averageLine.setEndY(maxY - Math.abs(low - average) * stepY);
+        averageLine.setStartY(averageY);
+        averageLine.setEndY(averageY);
 
         stdDeviationArea.setY(averageLine.getStartY() - (stdDeviation * 0.5 * stepY));
         stdDeviationArea.setHeight(stdDeviation * stepY);
@@ -267,7 +285,6 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         highText.setText(String.format(locale, formatString, high));
         lowText.setText(String.format(locale, formatString, low));
-
         resizeDynamicText();
     }
 
@@ -278,20 +295,23 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double fontSize = 0.24 * size;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-        valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), (size * 0.12));
 
         fontSize = size * 0.05;
         averageText.setFont(Fonts.latoRegular(fontSize));
         if (averageText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(averageText, maxWidth, fontSize); }
-        averageText.setY(averageLine.getStartY() - (size * 0.0075));
+        if (averageLine.getStartY() < graphBounds.getY() + graphBounds.getHeight() * 0.5) {
+            averageText.setY(averageLine.getStartY() + (size * 0.0425));
+        } else {
+            averageText.setY(averageLine.getStartY() - (size * 0.0075));
+        }
 
         highText.setFont(Fonts.latoRegular(fontSize));
         if (highText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(highText, maxWidth, fontSize); }
-        highText.setY(graphBounds.getY());
+        highText.setY(graphBounds.getY() - size * 0.0125);
 
         lowText.setFont(Fonts.latoRegular(fontSize));
         if (lowText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(lowText, maxWidth, fontSize); }
-        lowText.setY(graphBounds.getY() + graphBounds.getHeight());
+        lowText.setY(size * 0.9);
     }
     private void resizeStaticText() {
         double maxWidth = 0.98 * size;
@@ -303,9 +323,8 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.4);
 
-        averageText.setX(size * 0.055);
+        averageText.setX(size * 0.05);
         highText.setX(size * 0.05);
         lowText.setX(size * 0.05);
     }
@@ -319,16 +338,20 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             pane.setMaxSize(size, size);
             pane.relocate((width - size) * 0.5, (height - size) * 0.5);
 
-            graphBounds = new Rectangle(size * 0.05, size * 0.5, size * 0.9, size * 0.45);
+            //graphBounds = new Rectangle(size * 0.05, size * 0.5, size * 0.9, size * 0.45);
+            graphBounds = new Rectangle(size * 0.05, size * 0.5, size * 0.9, size * 0.39);
 
             stdDeviationArea.setX(graphBounds.getX());
             stdDeviationArea.setWidth(graphBounds.getWidth());
 
             averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
-            drawChart(getSkinnable().getCurrentValue());
+            drawChart(getSkinnable().getValue());
             sparkLine.setStrokeWidth(size * 0.01);
             dot.setRadius(size * 0.014);
+
+            textContainer.setPrefWidth(size * 0.9);
+            textContainer.relocate(size * 0.05, size * 0.18);
 
             resizeStaticText();
             resizeDynamicText();
