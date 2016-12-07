@@ -93,11 +93,11 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.TILE_KPI)
+                            .skinType(SkinType.TILE_SPARK_LINE)
                             .prefSize(400, 400)
                             .minValue(-20)
                             .maxValue(50)
-                            .animated(true)
+                            //.animated(true)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
                             //.lcdVisible(true)
@@ -113,13 +113,13 @@ public class Test extends Application {
                                       new Section(25, 50, Color.RED))
                             .sectionsVisible(true)
                             .highlightSections(true)
-                            //.autoScale(false)
-                            //.averagingEnabled(true)
-                            //.averagingPeriod(10)
-                            //.averageVisible(true)
+                            .autoScale(false)
+                            .averagingEnabled(true)
+                            .averagingPeriod(10)
+                            .averageVisible(true)
                             .build();
 
-        gauge.setAlert(true);
+        //gauge.setAlert(true);
 
         // Calling bind() directly sets a value to gauge
         gauge.valueProperty().bind(value);
