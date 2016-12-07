@@ -18,7 +18,6 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
@@ -79,7 +78,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Text              titleText;
     private              Text              valueText;
     private              Text              unitText;
-    private              TextFlow          dynamicText;
+    private              TextFlow          textContainer;
     private              Text              minValueText;
     private              Text              maxValueText;
     private              Rectangle         thresholdRect;
@@ -190,10 +189,9 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
 
-        dynamicText = new TextFlow(valueText, unitText);
-        dynamicText.setTextAlignment(TextAlignment.CENTER);
-        dynamicText.setPrefWidth(PREFERRED_WIDTH);
-        //dynamicText.relocate((PREFERRED_WIDTH - dynamicText.getWidth()) * 0.5, PREFERRED_HEIGHT * 0.2);
+        textContainer = new TextFlow(valueText, unitText);
+        textContainer.setTextAlignment(TextAlignment.CENTER);
+        textContainer.setPrefWidth(PREFERRED_WIDTH * 0.9);
 
         minValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
         minValueText.setFill(getSkinnable().getTitleColor());
@@ -209,7 +207,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundPaint());
         Helper.enableNode(thresholdText, getSkinnable().isThresholdVisible());
 
-        pane = new Pane(barBackground, thresholdBar, sectionPane, alertIcon, needleRect, needle, titleText, dynamicText, minValueText, maxValueText, thresholdRect, thresholdText);
+        pane = new Pane(barBackground, thresholdBar, sectionPane, alertIcon, needleRect, needle, titleText, textContainer, minValueText, maxValueText, thresholdRect, thresholdText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -452,7 +450,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Resizing ******************************************
     private void resizeDynamicText() {
         double maxWidth = 0.86466165 * size;
-        double fontSize = 0.18 * size;
+        double fontSize = 0.24 * size;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
 
@@ -563,8 +561,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
             needleRotate.setPivotY(needle.getLayoutBounds().getHeight() - needle.getLayoutBounds().getWidth() * 0.5);
 
-            dynamicText.setPrefWidth(size);
-            dynamicText.setLayoutY(size * 0.2);
+            textContainer.setPrefWidth(size * 0.9);
+            textContainer.relocate(size * 0.05, size * 0.18);
 
             resizeStaticText();
             resizeDynamicText();
