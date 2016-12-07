@@ -206,7 +206,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Resizing ******************************************
     private void resizeDynamicText() {
-        double maxWidth = 0.9 * size;
+        double maxWidth = unitText.isManaged() ? size * 0.725 : size * 0.9;
         double fontSize = 0.24 * size;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
@@ -215,13 +215,14 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         percentageUnitText.relocate(percentageText.getLayoutBounds().getMaxX() + size * 0.075, size * 0.765);
     }
     private void resizeStaticText() {
-        double maxWidth = 0.98 * size;
+        double maxWidth = size * 0.9;
         double fontSize = size * 0.06;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
+        maxWidth = size * 0.15;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
         unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.3575);

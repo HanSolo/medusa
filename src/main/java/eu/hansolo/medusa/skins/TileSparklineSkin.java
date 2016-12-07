@@ -284,12 +284,13 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Resizing ******************************************
     private void resizeDynamicText() {
-        double maxWidth = 0.9 * size;
-        double fontSize = 0.24 * size;
+        double maxWidth = unitText.isManaged() ? size * 0.725 : size * 0.9;
+        double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
         valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.18);
 
+        maxWidth = size * 0.3;
         fontSize = size * 0.05;
         averageText.setFont(Fonts.latoRegular(fontSize));
         if (averageText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(averageText, maxWidth, fontSize); }
@@ -308,17 +309,19 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         lowText.setY(size * 0.9);
     }
     private void resizeStaticText() {
-        double maxWidth = 0.98 * size;
+        double maxWidth = size * 0.9;
         double fontSize = size * 0.06;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
+        maxWidth = 0.15 * size;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
         unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.3575);
 
+        maxWidth = 0.3 * size;
         averageText.setX(size * 0.05);
         highText.setX(size * 0.05);
         lowText.setX(size * 0.05);

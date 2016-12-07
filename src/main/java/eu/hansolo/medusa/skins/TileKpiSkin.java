@@ -443,11 +443,12 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Resizing ******************************************
     private void resizeDynamicText() {
-        double maxWidth = 0.86466165 * size;
-        double fontSize = 0.24 * size;
+        double maxWidth = unitText.isManaged() ? size * 0.725 : size * 0.9;
+        double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
 
+        maxWidth = size * 0.15;
         fontSize = size * 0.06;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
@@ -465,8 +466,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
     private void resizeStaticText() {
-        double maxWidth   = 0.98 * size;
-        double fontSize   = size * 0.06;
+        double maxWidth = size * 0.9;
+        double fontSize = size * 0.06;
         double textRadius;
         double sinValue;
         double cosValue;
@@ -477,7 +478,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = size * 0.144;
+        maxWidth = size * 0.15;
         fontSize = size * 0.07;
         maxValueText.setFont(Fonts.latoRegular(fontSize));
         if (maxValueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(maxValueText, maxWidth, fontSize); }
