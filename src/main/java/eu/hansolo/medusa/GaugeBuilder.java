@@ -1031,7 +1031,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setBackgroundPaint(Color.rgb(42,42,42));
                     CONTROL.setForegroundBaseColor(Color.rgb(238,238,238));
                     CONTROL.setBarColor(Color.rgb(238,238,238));
-                    CONTROL.setThresholdVisible(true);
+                    CONTROL.setThresholdVisible(false);
                     CONTROL.setThresholdColor(Color.rgb(41,177,255));
                     CONTROL.setNeedleColor(Color.rgb(238,238,238));
                     CONTROL.setAngleRange(180);
@@ -1043,7 +1043,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setBarColor(Color.rgb(41,177,255));
                     CONTROL.setValueColor(Color.rgb(238, 238, 238));
                     CONTROL.setUnitColor(Color.rgb(238, 238, 238));
-                    CONTROL.setThresholdVisible(true);
+                    CONTROL.setThresholdVisible(false);
                     CONTROL.setThresholdColor(Color.rgb(139,144,146));
                     break;
                 case TILE_SPARK_LINE:

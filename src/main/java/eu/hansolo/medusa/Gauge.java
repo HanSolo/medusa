@@ -5410,7 +5410,7 @@ public class Gauge extends Control {
                 setBackgroundPaint(Color.rgb(42,42,42));
                 setForegroundBaseColor(Color.rgb(238,238,238));
                 setBarColor(Color.rgb(238,238,238));
-                setThresholdVisible(true);
+                setThresholdVisible(false);
                 setThresholdColor(Color.rgb(41,177,255));
                 setNeedleColor(Color.rgb(238,238,238));
                 setAngleRange(180);
@@ -5423,7 +5423,7 @@ public class Gauge extends Control {
                 setBarColor(Color.rgb(41,177,255));
                 setValueColor(Color.rgb(238, 238, 238));
                 setUnitColor(Color.rgb(238, 238, 238));
-                setThresholdVisible(true);
+                setThresholdVisible(false);
                 setThresholdColor(Color.rgb(139,144,146));
                 super.setSkin(new TileTextKpiSkin(Gauge.this));
                 break;
