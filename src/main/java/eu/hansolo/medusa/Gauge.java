@@ -5438,7 +5438,7 @@ public class Gauge extends Control {
                 setAveragingPeriod(10);
                 setAverageColor(Color.rgb(238, 238, 238, 0.5));
                 setAnimated(false);
-                super.setSkin(new TileTextKpiSkin(Gauge.this));
+                super.setSkin(new TileSparklineSkin(Gauge.this));
                 break;
             case GAUGE:
             default:
