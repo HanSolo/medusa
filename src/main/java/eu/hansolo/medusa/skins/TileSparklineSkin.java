@@ -288,7 +288,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
-        if (unitText.isManaged()) {
+        if (unitText.isVisible()) {
             valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
         } else {
             valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);

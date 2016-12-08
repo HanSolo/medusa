@@ -452,7 +452,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         fontSize = size * 0.06;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-        if (unitText.isManaged()) {
+        if (unitText.isVisible()) {
             valueText.relocate((size - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth()) * 0.5, size * 0.15);
             unitText.relocate(valueText.getLayoutX() + valueText.getLayoutBounds().getWidth() + size * 0.025, size * 0.3275);
         } else {
