@@ -35,8 +35,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 
 import java.util.List;
 import java.util.Locale;
@@ -59,12 +57,12 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Text          titleText;
     private              Text          valueText;
     private              Text          unitText;
-    private              TextFlow      textContainer;
     private              Text          percentageText;
     private              Text          percentageUnitText;
     private              Rectangle     maxValueRect;
     private              Text          maxValueText;
     private              Pane          pane;
+    private              double        minValue;
     private              double        range;
     private              double        stepSize;
     private              String        formatString;
@@ -78,6 +76,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     public TileTextKpiSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
+        minValue        = gauge.getMinValue();
         range           = gauge.getRange();
         stepSize        = PREFERRED_WIDTH / range;
         formatString    = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
@@ -127,10 +126,6 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
-        textContainer = new TextFlow(valueText, unitText);
-        textContainer.setTextAlignment(TextAlignment.RIGHT);
-        textContainer.setPrefWidth(PREFERRED_WIDTH * 0.9);
-
         percentageText = new Text();
         percentageText.setFill(getSkinnable().getBarColor());
 
@@ -143,7 +138,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxValueText = new Text();
         maxValueText.setFill(getSkinnable().getBackgroundPaint());
 
-        pane = new Pane(barBackground, bar, titleText, textContainer, percentageText, percentageUnitText, maxValueRect, maxValueText);
+        pane = new Pane(barBackground, bar, titleText, valueText, unitText, percentageText, percentageUnitText, maxValueRect, maxValueText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -173,6 +168,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
+            minValue = getSkinnable().getMinValue();
             range    = getSkinnable().getRange();
             stepSize = size / range;
             redraw();
@@ -186,10 +182,10 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void setBar(final double VALUE) {
-        double targetValue = VALUE * stepSize;
+        double targetValue = (VALUE - minValue) * stepSize;
         bar.setWidth(targetValue);
         valueText.setText(String.format(locale, formatString, VALUE));
-        percentageText.setText(String.format(locale, formatString, (VALUE / range * 100)));
+        percentageText.setText(String.format(locale, formatString, ((VALUE - minValue) / range * 100)));
         resizeDynamicText();
         if (sectionsVisible && !sections.isEmpty()) { setBarColor(VALUE); }
     }
@@ -210,22 +206,26 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Resizing ******************************************
     private void resizeDynamicText() {
-        double maxWidth = 0.9 * size;
+        double maxWidth = unitText.isManaged() ? size * 0.725 : size * 0.9;
         double fontSize = 0.24 * size;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
+        valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
+
         percentageUnitText.relocate(percentageText.getLayoutBounds().getMaxX() + size * 0.075, size * 0.765);
     }
     private void resizeStaticText() {
-        double maxWidth = 0.98 * size;
+        double maxWidth = size * 0.9;
         double fontSize = size * 0.06;
 
         titleText.setFont(Fonts.latoRegular(fontSize));
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
+        maxWidth = size * 0.15;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
+        unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.3275);
 
         maxWidth = size * 0.45;
         fontSize = size * 0.18;
@@ -271,9 +271,6 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setY(size * 0.965);
             bar.setWidth(getSkinnable().getValue() * stepSize);
             bar.setHeight(size * 0.035);
-
-            textContainer.setPrefWidth(size * 0.9);
-            textContainer.relocate(size * 0.05, size * 0.18);
 
             resizeStaticText();
             resizeDynamicText();

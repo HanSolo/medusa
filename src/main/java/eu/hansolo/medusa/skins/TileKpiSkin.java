@@ -47,7 +47,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 import javafx.scene.transform.Rotate;
 
 import java.util.ArrayList;
@@ -78,7 +77,6 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Text              titleText;
     private              Text              valueText;
     private              Text              unitText;
-    private              TextFlow          textContainer;
     private              Text              minValueText;
     private              Text              maxValueText;
     private              Rectangle         thresholdRect;
@@ -189,10 +187,6 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.setFill(getSkinnable().getUnitColor());
         Helper.enableNode(unitText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
 
-        textContainer = new TextFlow(valueText, unitText);
-        textContainer.setTextAlignment(TextAlignment.CENTER);
-        textContainer.setPrefWidth(PREFERRED_WIDTH * 0.9);
-
         minValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
         minValueText.setFill(getSkinnable().getTitleColor());
 
@@ -207,7 +201,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundPaint());
         Helper.enableNode(thresholdText, getSkinnable().isThresholdVisible());
 
-        pane = new Pane(barBackground, thresholdBar, sectionPane, alertIcon, needleRect, needle, titleText, textContainer, minValueText, maxValueText, thresholdRect, thresholdText);
+        pane = new Pane(barBackground, thresholdBar, sectionPane, alertIcon, needleRect, needle, titleText, valueText, unitText, minValueText, maxValueText, thresholdRect, thresholdText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -449,10 +443,18 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Resizing ******************************************
     private void resizeDynamicText() {
-        double maxWidth = 0.86466165 * size;
-        double fontSize = 0.24 * size;
+        double maxWidth = unitText.isManaged() ? size * 0.725 : size * 0.9;
+        double fontSize = size * 0.24;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
+
+        maxWidth = size * 0.15;
+        fontSize = size * 0.06;
+        unitText.setFont(Fonts.latoRegular(fontSize));
+        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
+
+        valueText.relocate((size - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth()) * 0.5, size * 0.15);
+        unitText.relocate(valueText.getLayoutX() + valueText.getLayoutBounds().getWidth() + size * 0.025, size * 0.3275);
 
         if (sectionsVisible) {
             fontSize = size * 0.09;
@@ -464,8 +466,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
     private void resizeStaticText() {
-        double maxWidth   = 0.98 * size;
-        double fontSize   = size * 0.06;
+        double maxWidth = size * 0.9;
+        double fontSize = size * 0.06;
         double textRadius;
         double sinValue;
         double cosValue;
@@ -476,10 +478,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        unitText.setFont(Fonts.latoRegular(fontSize));
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
-
-        maxWidth = size * 0.144;
+        maxWidth = size * 0.15;
         fontSize = size * 0.07;
         maxValueText.setFont(Fonts.latoRegular(fontSize));
         if (maxValueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(maxValueText, maxWidth, fontSize); }
@@ -560,9 +559,6 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needle.relocate((size - needle.getLayoutBounds().getWidth()) * 0.5, size * 0.475);
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
             needleRotate.setPivotY(needle.getLayoutBounds().getHeight() - needle.getLayoutBounds().getWidth() * 0.5);
-
-            textContainer.setPrefWidth(size * 0.9);
-            textContainer.relocate(size * 0.05, size * 0.18);
 
             resizeStaticText();
             resizeDynamicText();
