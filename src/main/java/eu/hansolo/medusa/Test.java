@@ -104,7 +104,7 @@ public class Test extends Application {
                             //.locale(Locale.GERMANY)
                             //.numberFormat(numberFormat)
                             .title("Title")
-                            .unit("°C")
+                            .unit("\u00B0C")
                             .subTitle("SubTitle")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
@@ -184,7 +184,6 @@ public class Test extends Application {
         //pane.setBackground(new Background(new BackgroundFill(Gauge.DARK_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
-
 
         stage.setTitle("Medusa");
         stage.setScene(scene);
