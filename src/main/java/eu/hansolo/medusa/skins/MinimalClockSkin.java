@@ -218,7 +218,6 @@ public class MinimalClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         minuteCircle.setCenterY(center + size * 0.45 * cosValue);
         minute.relocate(minuteCircle.getCenterX() - (minute.getLayoutBounds().getWidth() * 0.5),
                         minuteCircle.getCenterY() - (minute.getLayoutBounds().getHeight() * 0.5));
-
     }
 
 
@@ -251,6 +250,7 @@ public class MinimalClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             minute.setFont(Fonts.robotoRegular(size * 0.075));
 
             minuteCircle.setRadius(size * 0.075);
+            moveMinute(6 * getSkinnable().getTime().getMinute());
         }
     }
 
