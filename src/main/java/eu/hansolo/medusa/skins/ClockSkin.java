@@ -174,7 +174,7 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
         shadowGroupHour   = new Group(hour);
         shadowGroupMinute = new Group(minute);
-        shadowGroupSecond = new Group(second);
+        shadowGroupSecond = new Group(second, knob);
 
         shadowGroupHour.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
         shadowGroupMinute.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
