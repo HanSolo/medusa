@@ -66,7 +66,7 @@ import java.util.Map;
  * Created by hansolo on 21.01.16.
  */
 public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double                PREFERRED_WIDTH    = 275;
+    private static final double                PREFERRED_WIDTH    = 220;//275;
     private static final double                PREFERRED_HEIGHT   = 100;
     private static final double                MINIMUM_WIDTH      = 5;
     private static final double                MINIMUM_HEIGHT     = 5;
@@ -501,6 +501,8 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if (1 / (aspectRatio / height) > width) {
             height = aspectRatio * width;
         }
+
+        System.out.println("Gauge: " + width + ", " + height);
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);

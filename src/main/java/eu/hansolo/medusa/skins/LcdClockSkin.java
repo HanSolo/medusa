@@ -65,7 +65,7 @@ import java.util.Locale;
  * Created by hansolo on 28.01.16.
  */
 public class LcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
-    private static final double     PREFERRED_WIDTH    = 190;
+    private static final double     PREFERRED_WIDTH    = 220;//190;
     private static final double     PREFERRED_HEIGHT   = 100;
     private static final double     MINIMUM_WIDTH      = 5;
     private static final double     MINIMUM_HEIGHT     = 5;
@@ -574,6 +574,8 @@ public class LcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         } else if (1 / (ASPECT_RATIO / height) > width) {
             height = ASPECT_RATIO * width;
         }
+
+        System.out.println("Clock: " + width + ", " + height);
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
