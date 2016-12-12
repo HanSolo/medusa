@@ -575,8 +575,6 @@ public class LcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             height = ASPECT_RATIO * width;
         }
 
-        System.out.println("Clock: " + width + ", " + height);
-
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
