@@ -502,8 +502,6 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             height = aspectRatio * width;
         }
 
-        System.out.println("Gauge: " + width + ", " + height);
-
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
