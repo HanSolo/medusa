@@ -33,6 +33,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -42,6 +43,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -263,20 +265,24 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
         double stepY = graphBounds.getHeight() / range;
 
-        MoveTo begin = (MoveTo) pathElements.get(0);
-        begin.setX(minX);
-        begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
-        for (int i = 1; i < (noOfDatapoints - 1); i++) {
-            LineTo lineTo = (LineTo) pathElements.get(i);
-            lineTo.setX(minX + i * stepX);
-            lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
-        }
-        LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
-        end.setX(maxX);
-        end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
+        if (getSkinnable().isSmoothing()) {
+            smooth(dataList);
+        } else {
+            MoveTo begin = (MoveTo) pathElements.get(0);
+            begin.setX(minX);
+            begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
+            for (int i = 1; i < (noOfDatapoints - 1); i++) {
+                LineTo lineTo = (LineTo) pathElements.get(i);
+                lineTo.setX(minX + i * stepX);
+                lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
+            }
+            LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
+            end.setX(maxX);
+            end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
 
-        dot.setCenterX(maxX);
-        dot.setCenterY(end.getY());
+            dot.setCenterX(maxX);
+            dot.setCenterY(end.getY());
+        }
 
         double average = getSkinnable().getAverage();
         double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
@@ -295,6 +301,91 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         highText.setText(String.format(locale, formatString, high));
         lowText.setText(String.format(locale, formatString, low));
         resizeDynamicText();
+    }
+
+
+    // ******************** Smoothing *****************************************
+    public void smooth(final List<Double> DATA_LIST) {
+        int      size = DATA_LIST.size();
+        double[] x    = new double[size];
+        double[] y    = new double[size];
+
+        low  = Statistics.getMin(DATA_LIST);
+        high = Statistics.getMax(DATA_LIST);
+        if (Double.compare(low, high) == 0) {
+            low  = getSkinnable().getMinValue();
+            high = getSkinnable().getMaxValue();
+        }
+        range = high - low;
+
+        double minX  = graphBounds.getX();
+        double maxX  = minX + graphBounds.getWidth();
+        double minY  = graphBounds.getY();
+        double maxY  = minY + graphBounds.getHeight();
+        double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
+        double stepY = graphBounds.getHeight() / range;
+
+        for (int i = 0 ; i < size ; i++) {
+            x[i] = minX + i * stepX;
+            y[i] = maxY - Math.abs(low - DATA_LIST.get(i)) * stepY;
+        }
+
+        Pair<Double[], Double[]> px = computeControlPoints(x);
+        Pair<Double[], Double[]> py = computeControlPoints(y);
+
+        sparkLine.getElements().clear();
+        for (int i = 0 ; i < size - 1 ; i++) {
+            sparkLine.getElements().add(new MoveTo(x[i], y[i]));
+            sparkLine.getElements().add(new CubicCurveTo(px.getKey()[i], py.getKey()[i], px.getValue()[i], py.getValue()[i], x[i + 1], y[i + 1]));
+        }
+        dot.setCenterX(maxX);
+        dot.setCenterY(y[size - 1]);
+    }
+    private Pair<Double[], Double[]> computeControlPoints(final double[] K) {
+        int      n  = K.length - 1;
+        Double[] p1 = new Double[n];
+        Double[] p2 = new Double[n];
+
+	    /*rhs vector*/
+        double[] a = new double[n];
+        double[] b = new double[n];
+        double[] c = new double[n];
+        double[] r = new double[n];
+
+	    /*left most segment*/
+        a[0] = 0;
+        b[0] = 2;
+        c[0] = 1;
+        r[0] = K[0]+2*K[1];
+
+	    /*internal segments*/
+        for (int i = 1; i < n - 1; i++) {
+            a[i] = 1;
+            b[i] = 4;
+            c[i] = 1;
+            r[i] = 4 * K[i] + 2 * K[i + 1];
+        }
+
+	    /*right segment*/
+        a[n-1] = 2;
+        b[n-1] = 7;
+        c[n-1] = 0;
+        r[n-1] = 8 * K[n - 1] + K[n];
+
+	    /*solves Ax = b with the Thomas algorithm*/
+        for (int i = 1; i < n; i++) {
+            double m = a[i] / b[i - 1];
+            b[i] = b[i] - m * c[i - 1];
+            r[i] = r[i] - m * r[i - 1];
+        }
+
+        p1[n-1] = r[n-1] / b[n-1];
+        for (int i = n - 2; i >= 0; --i) { p1[i] = (r[i] - c[i] * p1[i + 1]) / b[i]; }
+
+        for (int i = 0 ; i < n - 1 ; i++) { p2[i] = 2 * K[i + 1] - p1[i + 1]; }
+        p2[n - 1] = 0.5 * (K[n] + p1[n - 1]);
+
+        return new Pair<>(p1, p2);
     }
 
 

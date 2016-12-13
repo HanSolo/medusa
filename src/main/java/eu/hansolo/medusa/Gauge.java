@@ -383,6 +383,8 @@ public class Gauge extends Control {
     private BooleanProperty                      alert;
     private String                               _alertMessage;
     private StringProperty                       alertMessage;
+    private boolean                              _smoothing;
+    private BooleanProperty                      smoothing;
 
     // others
     private double   originalMinValue;
@@ -602,6 +604,7 @@ public class Gauge extends Control {
         _customFont                         = Fonts.robotoRegular(12);
         _alert                              = false;
         _alertMessage                       = "";
+        _smoothing                          = false;
 
         originalMinValue                    = -Double.MAX_VALUE;
         originalMaxValue                    = Double.MAX_VALUE;
@@ -5077,6 +5080,37 @@ public class Gauge extends Control {
             _alertMessage = null;
         }
         return alertMessage;
+    }
+
+    /**
+     * Returns true when smoothing is enabled. This property is only used
+     * in the TileSparklineSkin to smooth the path. In a custom skin it
+     * could be also used for other things.
+     * @return true when smoothing is enabled
+     */
+    public boolean isSmoothing() { return null == smoothing ? _smoothing : smoothing.get(); }
+    /**
+     * Defines if the smoothing property should be enabled/disabled.
+     * At the moment this is only used in the TileSparklineSkin.
+     * @param SMOOTHING
+     */
+    public void setSmoothing(final boolean SMOOTHING) {
+        if (null == smoothing) {
+            _smoothing = SMOOTHING;
+            fireUpdateEvent(REDRAW_EVENT);
+        } else {
+            smoothing.set(SMOOTHING);
+        }
+    }
+    public BooleanProperty smoothingProperty() {
+        if (null == smoothing) {
+            smoothing = new BooleanPropertyBase(_smoothing) {
+                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "smoothing"; }
+            };
+        }
+        return smoothing;
     }
 
     /**
