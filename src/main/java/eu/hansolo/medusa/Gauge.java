@@ -25,6 +25,7 @@ import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.MarkerComparator;
 import eu.hansolo.medusa.tools.MovingAverage;
 import eu.hansolo.medusa.tools.SectionComparator;
+import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -689,6 +690,7 @@ public class Gauge extends Control {
      * @param VALUE
      */
     public void setMinValue(final double VALUE) {
+        if (Status.RUNNING == timeline.getStatus()) { timeline.jumpTo(Duration.ONE); }
         if (null == minValue) {
             if (VALUE > getMaxValue()) { setMaxValue(VALUE); }
             _minValue = Helper.clamp(-Double.MAX_VALUE, getMaxValue(), VALUE);
@@ -735,6 +737,7 @@ public class Gauge extends Control {
      * @param VALUE
      */
     public void setMaxValue(final double VALUE) {
+        if (Status.RUNNING == timeline.getStatus()) { timeline.jumpTo(Duration.ONE); }
         if (null == maxValue) {
             if (VALUE < getMinValue()) { setMinValue(VALUE); }
             _maxValue = Helper.clamp(getMinValue(), Double.MAX_VALUE, VALUE);
