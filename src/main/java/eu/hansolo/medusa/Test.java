@@ -93,7 +93,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.TILE_KPI)
+                            .skinType(SkinType.TILE_TEXT_KPI)
                             .prefSize(400, 400)
                             .minValue(-20)
                             .maxValue(50)
@@ -149,7 +149,7 @@ public class Test extends Application {
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
                 if (now > lastTimerCall + 3_000_000_000l) {
-                    double v = RND.nextDouble() * gauge.getRange() + gauge.getMinValue();
+                    double v = RND.nextDouble() * gauge.getRange() * 1.5 + gauge.getMinValue();
                     value.set(v);
                     System.out.println(v);
                     //gauge.setValue(v);
