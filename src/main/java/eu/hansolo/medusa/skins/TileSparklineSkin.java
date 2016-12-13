@@ -81,6 +81,8 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Pane              pane;
     private              double            low;
     private              double            high;
+    private              double            minValue;
+    private              double            maxValue;
     private              double            range;
     private              double            stdDeviation;
     private              String            formatString;
@@ -95,13 +97,15 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         low            = gauge.getMaxValue();
         high           = gauge.getMinValue();
+        minValue       = gauge.getMinValue();
+        maxValue       = gauge.getMaxValue();
         range          = gauge.getRange();
         stdDeviation   = 0;
         formatString   = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         locale         = gauge.getLocale();
         noOfDatapoints = gauge.getAveragingPeriod();
         dataList       = new LinkedList<>();
-        for (int i = 0; i < noOfDatapoints; i++) { dataList.add(gauge.getMinValue()); }
+        for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
 
         // To get smooth lines in the chart we need at least 4 values
         if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
@@ -207,7 +211,9 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            range = getSkinnable().getRange();
+            minValue = getSkinnable().getMinValue();
+            maxValue = getSkinnable().getMaxValue();
+            range    = getSkinnable().getRange();
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
@@ -223,14 +229,14 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("VALUE".equals(EVENT_TYPE)) {
             if(getSkinnable().isAnimated()) { getSkinnable().setAnimated(false); }
             if (!getSkinnable().isAveragingEnabled()) { getSkinnable().setAveragingEnabled(true); }
-            double value = getSkinnable().getValue();
+            double value = clamp(minValue, maxValue, getSkinnable().getValue());
             addData(value);
             drawChart(value);
         } else if ("AVERAGING_PERIOD".equals(EVENT_TYPE)) {
             noOfDatapoints = getSkinnable().getAveragingPeriod();
             // To get smooth lines in the chart we need at least 4 values
             if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
-            for (int i = 0; i < noOfDatapoints; i++) { dataList.add(getSkinnable().getMinValue()); }
+            for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
             pathElements.clear();
             pathElements.add(0, new MoveTo());
             for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
@@ -253,8 +259,8 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         low  = Statistics.getMin(dataList);
         high = Statistics.getMax(dataList);
         if (Double.compare(low, high) == 0) {
-            low  = getSkinnable().getMinValue();
-            high = getSkinnable().getMaxValue();
+            low  = minValue;
+            high = maxValue;
         }
         range = high - low;
 
@@ -313,8 +319,8 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         low  = Statistics.getMin(DATA_LIST);
         high = Statistics.getMax(DATA_LIST);
         if (Double.compare(low, high) == 0) {
-            low  = getSkinnable().getMinValue();
-            high = getSkinnable().getMaxValue();
+            low  = minValue;
+            high = maxValue;
         }
         range = high - low;
 
