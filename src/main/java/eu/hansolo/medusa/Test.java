@@ -93,7 +93,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.TILE_TEXT_KPI)
+                            .skinType(SkinType.TILE_KPI)
                             .prefSize(400, 400)
                             .minValue(-20)
                             .maxValue(50)
