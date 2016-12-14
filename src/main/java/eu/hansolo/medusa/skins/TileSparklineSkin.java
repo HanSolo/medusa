@@ -33,6 +33,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -42,6 +43,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,6 +71,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Text              averageText;
     private              Text              highText;
     private              Text              lowText;
+    private              Text              subTitleText;
     private              Rectangle         graphBounds;
     private              List<PathElement> pathElements;
     private              Path              sparkLine;
@@ -78,6 +81,8 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Pane              pane;
     private              double            low;
     private              double            high;
+    private              double            minValue;
+    private              double            maxValue;
     private              double            range;
     private              double            stdDeviation;
     private              String            formatString;
@@ -92,13 +97,18 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         low            = gauge.getMaxValue();
         high           = gauge.getMinValue();
+        minValue       = gauge.getMinValue();
+        maxValue       = gauge.getMaxValue();
         range          = gauge.getRange();
         stdDeviation   = 0;
         formatString   = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         locale         = gauge.getLocale();
         noOfDatapoints = gauge.getAveragingPeriod();
         dataList       = new LinkedList<>();
-        for (int i = 0; i < noOfDatapoints; i++) { dataList.add(gauge.getMinValue()); }
+        for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
+
+        // To get smooth lines in the chart we need at least 4 values
+        if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
 
         initGraphics();
         registerListeners();
@@ -143,6 +153,10 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         lowText.setTextOrigin(VPos.TOP);
         lowText.setFill(getSkinnable().getValueColor());
 
+        subTitleText = new Text(getSkinnable().getSubTitle());
+        subTitleText.setTextOrigin(VPos.TOP);
+        subTitleText.setFill(getSkinnable().getSubTitleColor());
+
         stdDeviationArea = new Rectangle();
         Helper.enableNode(stdDeviationArea, getSkinnable().isAverageVisible());
 
@@ -166,7 +180,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dot = new Circle();
         dot.setFill(getSkinnable().getBarColor());
 
-        pane = new Pane(titleText, valueText, unitText, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText);
+        pane = new Pane(titleText, valueText, unitText, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, subTitleText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -178,6 +192,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
         getSkinnable().currentValueProperty().addListener(o -> handleEvents("VALUE"));
+        getSkinnable().averagingPeriodProperty().addListener(o -> handleEvents("AVERAGING_PERIOD"));
     }
 
 
@@ -194,12 +209,11 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resize();
             redraw();
         } else if ("REDRAW".equals(EVENT_TYPE)) {
-            noOfDatapoints = getSkinnable().getAveragingPeriod();
-            dataList.clear();
-            for (int i = 0 ; i < noOfDatapoints ; i++) { dataList.add(0.0); }
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            range = getSkinnable().getRange();
+            minValue = getSkinnable().getMinValue();
+            maxValue = getSkinnable().getMaxValue();
+            range    = getSkinnable().getRange();
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
@@ -215,9 +229,19 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("VALUE".equals(EVENT_TYPE)) {
             if(getSkinnable().isAnimated()) { getSkinnable().setAnimated(false); }
             if (!getSkinnable().isAveragingEnabled()) { getSkinnable().setAveragingEnabled(true); }
-            double value = getSkinnable().getValue();
+            double value = clamp(minValue, maxValue, getSkinnable().getValue());
             addData(value);
             drawChart(value);
+        } else if ("AVERAGING_PERIOD".equals(EVENT_TYPE)) {
+            noOfDatapoints = getSkinnable().getAveragingPeriod();
+            // To get smooth lines in the chart we need at least 4 values
+            if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
+            for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
+            pathElements.clear();
+            pathElements.add(0, new MoveTo());
+            for (int i = 1 ; i < noOfDatapoints ; i++) { pathElements.add(i, new LineTo()); }
+            sparkLine.getElements().setAll(pathElements);
+            redraw();
         }
     }
 
@@ -235,8 +259,8 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         low  = Statistics.getMin(dataList);
         high = Statistics.getMax(dataList);
         if (Double.compare(low, high) == 0) {
-            low  = getSkinnable().getMinValue();
-            high = getSkinnable().getMaxValue();
+            low  = minValue;
+            high = maxValue;
         }
         range = high - low;
 
@@ -247,20 +271,24 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
         double stepY = graphBounds.getHeight() / range;
 
-        MoveTo begin = (MoveTo) pathElements.get(0);
-        begin.setX(minX);
-        begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
-        for (int i = 1; i < (noOfDatapoints - 1); i++) {
-            LineTo lineTo = (LineTo) pathElements.get(i);
-            lineTo.setX(minX + i * stepX);
-            lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
-        }
-        LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
-        end.setX(maxX);
-        end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
+        if (getSkinnable().isSmoothing()) {
+            smooth(dataList);
+        } else {
+            MoveTo begin = (MoveTo) pathElements.get(0);
+            begin.setX(minX);
+            begin.setY(maxY - Math.abs(low - dataList.get(0)) * stepY);
+            for (int i = 1; i < (noOfDatapoints - 1); i++) {
+                LineTo lineTo = (LineTo) pathElements.get(i);
+                lineTo.setX(minX + i * stepX);
+                lineTo.setY(maxY - Math.abs(low - dataList.get(i)) * stepY);
+            }
+            LineTo end = (LineTo) pathElements.get(noOfDatapoints - 1);
+            end.setX(maxX);
+            end.setY(maxY - Math.abs(low - dataList.get(noOfDatapoints - 1)) * stepY);
 
-        dot.setCenterX(maxX);
-        dot.setCenterY(end.getY());
+            dot.setCenterX(maxX);
+            dot.setCenterY(end.getY());
+        }
 
         double average = getSkinnable().getAverage();
         double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
@@ -279,6 +307,91 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         highText.setText(String.format(locale, formatString, high));
         lowText.setText(String.format(locale, formatString, low));
         resizeDynamicText();
+    }
+
+
+    // ******************** Smoothing *****************************************
+    public void smooth(final List<Double> DATA_LIST) {
+        int      size = DATA_LIST.size();
+        double[] x    = new double[size];
+        double[] y    = new double[size];
+
+        low  = Statistics.getMin(DATA_LIST);
+        high = Statistics.getMax(DATA_LIST);
+        if (Double.compare(low, high) == 0) {
+            low  = minValue;
+            high = maxValue;
+        }
+        range = high - low;
+
+        double minX  = graphBounds.getX();
+        double maxX  = minX + graphBounds.getWidth();
+        double minY  = graphBounds.getY();
+        double maxY  = minY + graphBounds.getHeight();
+        double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
+        double stepY = graphBounds.getHeight() / range;
+
+        for (int i = 0 ; i < size ; i++) {
+            x[i] = minX + i * stepX;
+            y[i] = maxY - Math.abs(low - DATA_LIST.get(i)) * stepY;
+        }
+
+        Pair<Double[], Double[]> px = computeControlPoints(x);
+        Pair<Double[], Double[]> py = computeControlPoints(y);
+
+        sparkLine.getElements().clear();
+        for (int i = 0 ; i < size - 1 ; i++) {
+            sparkLine.getElements().add(new MoveTo(x[i], y[i]));
+            sparkLine.getElements().add(new CubicCurveTo(px.getKey()[i], py.getKey()[i], px.getValue()[i], py.getValue()[i], x[i + 1], y[i + 1]));
+        }
+        dot.setCenterX(maxX);
+        dot.setCenterY(y[size - 1]);
+    }
+    private Pair<Double[], Double[]> computeControlPoints(final double[] K) {
+        int      n  = K.length - 1;
+        Double[] p1 = new Double[n];
+        Double[] p2 = new Double[n];
+
+	    /*rhs vector*/
+        double[] a = new double[n];
+        double[] b = new double[n];
+        double[] c = new double[n];
+        double[] r = new double[n];
+
+	    /*left most segment*/
+        a[0] = 0;
+        b[0] = 2;
+        c[0] = 1;
+        r[0] = K[0]+2*K[1];
+
+	    /*internal segments*/
+        for (int i = 1; i < n - 1; i++) {
+            a[i] = 1;
+            b[i] = 4;
+            c[i] = 1;
+            r[i] = 4 * K[i] + 2 * K[i + 1];
+        }
+
+	    /*right segment*/
+        a[n-1] = 2;
+        b[n-1] = 7;
+        c[n-1] = 0;
+        r[n-1] = 8 * K[n - 1] + K[n];
+
+	    /*solves Ax = b with the Thomas algorithm*/
+        for (int i = 1; i < n; i++) {
+            double m = a[i] / b[i - 1];
+            b[i] = b[i] - m * c[i - 1];
+            r[i] = r[i] - m * r[i - 1];
+        }
+
+        p1[n-1] = r[n-1] / b[n-1];
+        for (int i = n - 2; i >= 0; --i) { p1[i] = (r[i] - c[i] * p1[i + 1]) / b[i]; }
+
+        for (int i = 0 ; i < n - 1 ; i++) { p2[i] = 2 * K[i + 1] - p1[i + 1]; }
+        p2[n - 1] = 0.5 * (K[n] + p1[n - 1]);
+
+        return new Pair<>(p1, p2);
     }
 
 
@@ -320,15 +433,20 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
         titleText.relocate(size * 0.05, size * 0.05);
 
-        maxWidth = 0.15 * size;
+        maxWidth = size * 0.15;
         unitText.setFont(Fonts.latoRegular(fontSize));
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, fontSize); }
         unitText.relocate(size * 0.95 - unitText.getLayoutBounds().getWidth(), size * 0.3275);
 
-        maxWidth = 0.3 * size;
         averageText.setX(size * 0.05);
         highText.setX(size * 0.05);
         lowText.setX(size * 0.05);
+
+        maxWidth = size * 0.75;
+        fontSize = size * 0.05;
+        subTitleText.setFont(Fonts.latoRegular(fontSize));
+        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, fontSize); }
+        subTitleText.relocate(size * 0.95 - subTitleText.getLayoutBounds().getWidth(), size * 0.9);
     }
 
     private void resize() {
@@ -364,6 +482,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
 
         titleText.setText(getSkinnable().getTitle());
+        subTitleText.setText(getSkinnable().getSubTitle());
         resizeStaticText();
 
         titleText.setFill(getSkinnable().getTitleColor());
@@ -371,6 +490,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         averageText.setFill(getSkinnable().getAverageColor());
         highText.setFill(getSkinnable().getValueColor());
         lowText.setFill(getSkinnable().getValueColor());
+        subTitleText.setFill(getSkinnable().getSubTitleColor());
         sparkLine.setStroke(getSkinnable().getBarColor());
         stdDeviationArea.setFill(Helper.getTranslucentColorFrom(getSkinnable().getAverageColor(), 0.1));
         averageLine.setStroke(getSkinnable().getAverageColor());

@@ -39,6 +39,8 @@ import javafx.scene.text.Text;
 import java.util.List;
 import java.util.Locale;
 
+import static eu.hansolo.medusa.tools.Helper.clamp;
+
 
 /**
  * Created by hansolo on 30.11.16.
@@ -63,6 +65,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Text          maxValueText;
     private              Pane          pane;
     private              double        minValue;
+    private              double        maxValue;
     private              double        range;
     private              double        stepSize;
     private              String        formatString;
@@ -77,6 +80,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         minValue        = gauge.getMinValue();
+        maxValue        = gauge.getMaxValue();
         range           = gauge.getRange();
         stepSize        = PREFERRED_WIDTH / range;
         formatString    = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
@@ -149,7 +153,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
         getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> setBar(getSkinnable().getCurrentValue()));
+        getSkinnable().currentValueProperty().addListener(o -> setBar(clamp(minValue, maxValue, getSkinnable().getCurrentValue())));
     }
 
 
@@ -169,6 +173,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             minValue = getSkinnable().getMinValue();
+            maxValue = getSkinnable().getMaxValue();
             range    = getSkinnable().getRange();
             stepSize = size / range;
             redraw();
