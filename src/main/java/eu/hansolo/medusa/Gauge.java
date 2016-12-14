@@ -2109,10 +2109,12 @@ public class Gauge extends Control {
         if (null == autoScale) {
             _autoScale = AUTO_SCALE;
             if (_autoScale) {
+                originalMinValue = getMinValue();
+                originalMaxValue = getMaxValue();
                 calcAutoScale();
             } else {
-                setMinValue(originalMinValue);
-                setMaxValue(originalMaxValue);
+                setMinValue(Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ? getMinValue() : originalMinValue);
+                setMaxValue(Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ? getMaxValue() : originalMaxValue);
             }
             fireUpdateEvent(RECALC_EVENT);
         } else {
