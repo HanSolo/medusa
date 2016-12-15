@@ -94,10 +94,10 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.HORIZONTAL)
+                            .skinType(SkinType.TILE_KPI)
                             //.prefSize(400, 400)
-                            //.minValue(-20)
-                            //.maxValue(50)
+                            .minValue(-20)
+                            .maxValue(50)
                             .animated(true)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
