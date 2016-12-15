@@ -219,9 +219,11 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
             Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
             Helper.enableNode(averageLine, getSkinnable().isAverageVisible());
             Helper.enableNode(averageText, getSkinnable().isAverageVisible());
             Helper.enableNode(stdDeviationArea, getSkinnable().isAverageVisible());
+            redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
 
         } else if ("ALERT".equals(EVENT_TYPE)) {
