@@ -278,7 +278,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             bar.setX(0);
             bar.setY(size * 0.965);
-            bar.setWidth(getSkinnable().getValue() * stepSize);
+            bar.setWidth(clamp(minValue, maxValue, getSkinnable().getValue()) * stepSize);
             bar.setHeight(size * 0.035);
 
             resizeStaticText();

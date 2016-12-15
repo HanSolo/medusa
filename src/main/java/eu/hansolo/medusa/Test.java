@@ -32,6 +32,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -93,10 +94,10 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.TILE_KPI)
-                            .prefSize(400, 400)
-                            .minValue(-20)
-                            .maxValue(50)
+                            .skinType(SkinType.HORIZONTAL)
+                            //.prefSize(400, 400)
+                            //.minValue(-20)
+                            //.maxValue(50)
                             .animated(true)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
@@ -114,9 +115,9 @@ public class Test extends Application {
                             .sectionsVisible(true)
                             .highlightSections(true)
                             .autoScale(false)
-                            .averagingEnabled(true)
-                            .averagingPeriod(10)
-                            .averageVisible(true)
+                            //.averagingEnabled(true)
+                            //.averagingPeriod(10)
+                            //.averageVisible(true)
                             .build();
 
         //gauge.setAlert(true);
@@ -151,7 +152,7 @@ public class Test extends Application {
                 if (now > lastTimerCall + 3_000_000_000l) {
                     double v = RND.nextDouble() * gauge.getRange() * 1.5 + gauge.getMinValue();
                     value.set(v);
-                    System.out.println(v);
+                    //System.out.println(v);
                     //gauge.setValue(v);
 
                     //System.out.println("MovingAverage over " + gauge.getAveragingWindow().size() + " values: " + gauge.getAverage() + "  last value = " + v);
@@ -174,6 +175,7 @@ public class Test extends Application {
     @Override public void start(Stage stage) {
         StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(20));
+        pane.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
                                                      false, CycleMethod.NO_CYCLE,
                                                      new Stop(0.0, Color.rgb(38, 38, 38)),
@@ -184,12 +186,13 @@ public class Test extends Application {
         //pane.setBackground(new Background(new BackgroundFill(Gauge.DARK_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
+        scene.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
 
         stage.setTitle("Medusa");
         stage.setScene(scene);
         stage.show();
 
-        //gauge.setValue(105);
+        //gauge.setValue(50);
 
         // Calculate number of nodes
         calcNoOfNodes(pane);

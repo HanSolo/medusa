@@ -49,6 +49,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Control;
@@ -400,6 +401,7 @@ public class Gauge extends Control {
         this(SkinType.GAUGE);
     }
     public Gauge(final SkinType SKIN) {
+        setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         skinType = SKIN;
         getStyleClass().add("gauge");
 
@@ -2109,10 +2111,12 @@ public class Gauge extends Control {
         if (null == autoScale) {
             _autoScale = AUTO_SCALE;
             if (_autoScale) {
+                originalMinValue = getMinValue();
+                originalMaxValue = getMaxValue();
                 calcAutoScale();
             } else {
-                setMinValue(originalMinValue);
-                setMaxValue(originalMaxValue);
+                setMinValue(Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ? getMinValue() : originalMinValue);
+                setMaxValue(Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ? getMaxValue() : originalMaxValue);
             }
             fireUpdateEvent(RECALC_EVENT);
         } else {
