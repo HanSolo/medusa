@@ -86,13 +86,11 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private              Group             shadowGroupMinute;
     private              Group             shadowGroupSecond;
     private              DropShadow        dropShadow;
-    private              Locale            locale;
 
 
     // ******************** Constructors **************************************
     public TileClockSkin(Clock gauge) {
         super(gauge);
-        locale       = gauge.getLocale();
         minuteRotate = new Rotate();
         hourRotate   = new Rotate();
         secondRotate = new Rotate();
