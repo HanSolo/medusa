@@ -530,7 +530,6 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     break;
                 case TILE:
                     CONTROL.setBackgroundPaint(Color.rgb(42,42,42));
-                    CONTROL.setBackgroundPaint(Color.RED);
                     CONTROL.setHourColor(Color.rgb(238, 238, 238));
                     CONTROL.setMinuteColor(Color.rgb(238, 238, 238));
                     CONTROL.setSecondColor(Color.rgb(238, 238, 238));

@@ -2063,6 +2063,7 @@ public class Clock extends Control {
             case TEXT      : return new TextClockSkin(Clock.this);
             case DESIGN    : return new DesignClockSkin(Clock.this);
             case INDUSTRIAL: return new IndustrialClockSkin(Clock.this);
+            case TILE      : return new TileClockSkin(Clock.this);
             case CLOCK     :
             default        : return new ClockSkin(Clock.this);
         }
