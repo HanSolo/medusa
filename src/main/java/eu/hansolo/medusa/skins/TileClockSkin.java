@@ -287,7 +287,7 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         dateText.setText(DATE_FORMATER.format(TIME).toUpperCase());
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.setX((size - dateText.getLayoutBounds().getWidth()) * 0.5);
-        dateText.setY(size * 0.6);
+        dateText.setY(size * 0.65);
     }
 
 
@@ -306,7 +306,7 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         dateText.setFont(Fonts.latoRegular(fontSize));
         if (dateText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(dateText, maxWidth, fontSize); }
         dateText.setX((size - dateText.getLayoutBounds().getWidth()) * 0.5);
-        dateText.setY(size * 0.6);
+        dateText.setY(size * 0.65);
 
         maxWidth = size * 0.9;
         fontSize = size * 0.05;
@@ -365,7 +365,7 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             second.setArcHeight(clockSize * 0.015);
             second.setCache(true);
             second.setCacheHint(CacheHint.ROTATE);
-            second.relocate((size - second.getWidth()) * 0.5, size * 0.03 / CLOCK_SCALE_FACTOR);
+            second.relocate((size - second.getWidth()) * 0.5, size * 0.11 / CLOCK_SCALE_FACTOR);
 
             knob.setFill(getSkinnable().getKnobColor());
             knob.setRadius(clockSize * 0.0225);
