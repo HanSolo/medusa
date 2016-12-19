@@ -76,6 +76,7 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private              Rectangle         second;
     private              Circle            knob;
     private              Text              title;
+    private              Text              amPmText;
     private              Text              dateText;
     private              Text              text;
     private              Pane              pane;
@@ -165,13 +166,15 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         title.setTextOrigin(VPos.TOP);
         Helper.enableNode(title, getSkinnable().isTitleVisible());
 
+        amPmText = new Text(getSkinnable().getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
+
         dateText = new Text("");
         Helper.enableNode(dateText, getSkinnable().isDateVisible());
 
         text = new Text("");
         Helper.enableNode(text, getSkinnable().isTextVisible());
 
-        pane = new Pane(hourTickMarks, minuteTickMarks, title, dateText, text, shadowGroupHour, shadowGroupMinute, shadowGroupSecond);
+        pane = new Pane(hourTickMarks, minuteTickMarks, title, amPmText, dateText, text, shadowGroupHour, shadowGroupMinute, shadowGroupSecond);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(getSkinnable().getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
 
@@ -284,6 +287,11 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             }
         }
 
+        amPmText.setText(getSkinnable().getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
+        Helper.adjustTextSize(amPmText, 0.2 * size, size * 0.05);
+        amPmText.setX((size - amPmText.getLayoutBounds().getWidth()) * 0.5);
+        amPmText.setY(size * 0.4);
+
         dateText.setText(DATE_FORMATER.format(TIME).toUpperCase());
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.setX((size - dateText.getLayoutBounds().getWidth()) * 0.5);
@@ -301,6 +309,13 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         if (title.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(title, maxWidth, fontSize); }
         title.setX(size * 0.05);
         title.setY(size * 0.05);
+
+        maxWidth = size * 0.2;
+        fontSize = size * 0.05;
+        amPmText.setText(getSkinnable().getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
+        Helper.adjustTextSize(amPmText, maxWidth, fontSize);
+        amPmText.setX((size - amPmText.getLayoutBounds().getWidth()) * 0.5);
+        amPmText.setY(size * 0.4);
 
         maxWidth = size * 0.6;
         dateText.setFont(Fonts.latoRegular(fontSize));
