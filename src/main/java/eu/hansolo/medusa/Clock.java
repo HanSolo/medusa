@@ -34,6 +34,7 @@ import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
@@ -62,7 +63,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT, DESIGN, INDUSTRIAL }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT, DESIGN, INDUSTRIAL, TILE }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -205,6 +206,7 @@ public class Clock extends Control {
         this(ClockSkinType.CLOCK, ZonedDateTime.ofInstant(Instant.ofEpochSecond(EPOCH_SECONDS), ZoneId.systemDefault()));
     }
     public Clock(final ClockSkinType SKIN, final ZonedDateTime TIME) {
+        setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         skinType = SKIN;
         getStyleClass().add("clock");
 
@@ -2061,6 +2063,7 @@ public class Clock extends Control {
             case TEXT      : return new TextClockSkin(Clock.this);
             case DESIGN    : return new DesignClockSkin(Clock.this);
             case INDUSTRIAL: return new IndustrialClockSkin(Clock.this);
+            case TILE      : return new TileClockSkin(Clock.this);
             case CLOCK     :
             default        : return new ClockSkin(Clock.this);
         }
@@ -2190,6 +2193,23 @@ public class Clock extends Control {
                 setBorderPaint(Color.BLACK);
                 setBorderWidth(5);
                 super.setSkin(new IndustrialClockSkin(Clock.this));
+                break;
+            case TILE:
+                setBackgroundPaint(Color.rgb(42,42,42));
+                setHourColor(Color.rgb(238, 238, 238));
+                setMinuteColor(Color.rgb(238, 238, 238));
+                setSecondColor(Color.rgb(238, 238, 238));
+                setKnobColor(Color.rgb(238, 238, 238));
+                setHourTickMarkColor(Color.rgb(238, 238, 238));
+                setMinuteTickMarkColor(Color.rgb(238, 238, 238));
+                setDateColor(Color.rgb(238, 238, 238));
+                setDateVisible(false);
+                setSecondsVisible(false);
+                setTextVisible(false);
+                setTextColor(Color.rgb(238, 238, 238));
+                setTitleVisible(true);
+                setTitleColor(Color.rgb(238, 238, 238));
+                super.setSkin(new TileClockSkin(Clock.this));
                 break;
             case CLOCK:
             default:

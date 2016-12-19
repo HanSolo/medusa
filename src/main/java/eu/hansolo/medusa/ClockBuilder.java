@@ -528,6 +528,22 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setBorderPaint(Color.BLACK);
                     CONTROL.setBorderWidth(5);
                     break;
+                case TILE:
+                    CONTROL.setBackgroundPaint(Color.rgb(42,42,42));
+                    CONTROL.setHourColor(Color.rgb(238, 238, 238));
+                    CONTROL.setMinuteColor(Color.rgb(238, 238, 238));
+                    CONTROL.setSecondColor(Color.rgb(238, 238, 238));
+                    CONTROL.setKnobColor(Color.rgb(238, 238, 238));
+                    CONTROL.setHourTickMarkColor(Color.rgb(238, 238, 238));
+                    CONTROL.setMinuteTickMarkColor(Color.rgb(238, 238, 238));
+                    CONTROL.setDateColor(Color.rgb(238, 238, 238));
+                    CONTROL.setDateVisible(false);
+                    CONTROL.setSecondsVisible(false);
+                    CONTROL.setTextVisible(false);
+                    CONTROL.setTextColor(Color.rgb(238, 238, 238));
+                    CONTROL.setTitleVisible(true);
+                    CONTROL.setTitleColor(Color.rgb(238, 238, 238));
+                    break;
             }
         } else {
             CONTROL = new Clock();
