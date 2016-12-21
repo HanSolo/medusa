@@ -75,7 +75,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final Color                 DARK_NOISE_COLOR   = Color.rgb(100, 100, 100, 0.10);
     private static final Color                 BRIGHT_NOISE_COLOR = Color.rgb(200, 200, 200, 0.05);
     private static final DropShadow            FOREGROUND_SHADOW  = new DropShadow();
-    private static       double                aspectRatio        = 0.36363636;
+    private static       double                aspectRatio        = 0.45454545;
     private static       Text                  oneSegment         = new Text("8");
     private static       Text                  dotSegment         = new Text(".");
     private              double                width;
