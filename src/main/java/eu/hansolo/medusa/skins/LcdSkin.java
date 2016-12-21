@@ -274,6 +274,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             Helper.enableNode(lowerRightText, !getSkinnable().getSubTitle().isEmpty());
             Helper.enableNode(lowerCenterText, getSkinnable().isOldValueVisible());
             Helper.enableNode(average, getSkinnable().isAverageVisible());
+            Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
             resize();
             redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
@@ -684,7 +685,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         otherFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
 
-        threshold.setVisible(Double.compare(getSkinnable().getCurrentValue(), getSkinnable().getThreshold()) >= 0);
+        if (getSkinnable().isThresholdVisible()) { threshold.setVisible(Double.compare(getSkinnable().getCurrentValue(), getSkinnable().getThreshold()) >= 0); }
 
         valueText.setText(isNoOfDigitsInvalid() ? "-E-" : String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
 
