@@ -66,6 +66,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final double            MINIMUM_HEIGHT   = 50;
     private static final double            MAXIMUM_WIDTH    = 1024;
     private static final double            MAXIMUM_HEIGHT   = 1024;
+    public  static final Color             GRAY             = Color.rgb(139,144,146);
     private              double            size;
     private              double            oldValue;
     private              Arc               barBackground;
@@ -87,6 +88,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Pane              pane;
     private              double            angleRange;
     private              double            minValue;
+    private              double            threshold;
+    private              Color             thresholdColor;
     private              double            range;
     private              double            angleStep;
     private              String            formatString;
@@ -104,6 +107,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         angleRange        = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
         oldValue          = gauge.getValue();
         minValue          = gauge.getMinValue();
+        threshold         = gauge.getThreshold();
+        thresholdColor    = gauge.getThresholdColor();
         range             = gauge.getRange();
         angleStep         = angleRange / range;
         formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
@@ -194,7 +199,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxValueText.setFill(getSkinnable().getTitleColor());
 
         thresholdRect = new Rectangle();
-        thresholdRect.setFill(sectionsVisible ? getSkinnable().getBackgroundPaint() : getSkinnable().getThresholdColor());
+        thresholdRect.setFill(sectionsVisible ? GRAY : getSkinnable().getThresholdColor());
         Helper.enableNode(thresholdRect, getSkinnable().isThresholdVisible());
 
         thresholdText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
@@ -233,6 +238,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("RECALC".equals(EVENT_TYPE)) {
             angleRange        = Helper.clamp(90.0, 180.0, getSkinnable().getAngleRange());
             minValue          = getSkinnable().getMinValue();
+            threshold         = getSkinnable().getThreshold();
             range             = getSkinnable().getRange();
             angleStep         = angleRange / range;
             highlightSections = getSkinnable().isHighlightSections();
@@ -264,6 +270,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needleRotate.setAngle(targetAngle);
         needleRectRotate.setAngle(targetAngle);
         valueText.setText(String.format(locale, formatString, VALUE));
+        thresholdRect.setFill(VALUE > threshold ? thresholdColor : GRAY);
         resizeDynamicText();
         highlightSections(VALUE);
     }
@@ -460,7 +467,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         if (sectionsVisible) {
-            fontSize = size * 0.09;
+            fontSize = size * 0.08;
             thresholdText.setFont(Fonts.latoRegular(fontSize));
             thresholdText.setTextOrigin(VPos.CENTER);
             if (thresholdText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(thresholdText, maxWidth, fontSize); }
@@ -505,7 +512,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         minValueText.relocate(textX, textY);
 
         if (!sectionsVisible) {
-            fontSize = size * 0.09;
+            fontSize = size * 0.08;
             thresholdText.setFont(Fonts.latoRegular(fontSize));
             thresholdText.setTextOrigin(VPos.CENTER);
             if (thresholdText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(thresholdText, maxWidth, fontSize); }
@@ -582,6 +589,8 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         locale       = getSkinnable().getLocale();
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
 
+        thresholdColor = getSkinnable().getThresholdColor();
+
         titleText.setText(getSkinnable().getTitle());
         unitText.setText(getSkinnable().getUnit());
         minValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
@@ -596,7 +605,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setFill(getSkinnable().getTitleColor());
         minValueText.setFill(getSkinnable().getTitleColor());
         maxValueText.setFill(getSkinnable().getTitleColor());
-        thresholdRect.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getThresholdColor());
+        thresholdRect.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getValue() > getSkinnable().getThreshold() ? getSkinnable().getThresholdColor() : GRAY);
         thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundPaint());
         valueText.setFill(getSkinnable().getValueColor());
 
