@@ -75,7 +75,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private static final Color                 DARK_NOISE_COLOR   = Color.rgb(100, 100, 100, 0.10);
     private static final Color                 BRIGHT_NOISE_COLOR = Color.rgb(200, 200, 200, 0.05);
     private static final DropShadow            FOREGROUND_SHADOW  = new DropShadow();
-    private static       double                aspectRatio        = 0.36363636;
+    private static       double                aspectRatio        = 0.45454545;
     private static       Text                  oneSegment         = new Text("8");
     private static       Text                  dotSegment         = new Text(".");
     private              double                width;
@@ -274,6 +274,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             Helper.enableNode(lowerRightText, !getSkinnable().getSubTitle().isEmpty());
             Helper.enableNode(lowerCenterText, getSkinnable().isOldValueVisible());
             Helper.enableNode(average, getSkinnable().isAverageVisible());
+            Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
             resize();
             redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
@@ -684,7 +685,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         otherFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
 
-        threshold.setVisible(Double.compare(getSkinnable().getCurrentValue(), getSkinnable().getThreshold()) >= 0);
+        if (getSkinnable().isThresholdVisible()) { threshold.setVisible(Double.compare(getSkinnable().getCurrentValue(), getSkinnable().getThreshold()) >= 0); }
 
         valueText.setText(isNoOfDigitsInvalid() ? "-E-" : String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
 
