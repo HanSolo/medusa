@@ -2051,7 +2051,7 @@ public class Gauge extends Control {
             angleRange = new DoublePropertyBase(_angleRange) {
                 @Override protected void invalidated() {
                     final double ANGLE_RANGE = get();
-                    if (ANGLE_RANGE < 0 || ANGLE_RANGE > 360) set(Helper.clamp(0.0, 360.0, ANGLE_RANGE));
+                    set(Helper.clamp(0.0, 360.0, ANGLE_RANGE));
                     setAngleStep(get() / getRange());
                     fireUpdateEvent(RECALC_EVENT);
                 }

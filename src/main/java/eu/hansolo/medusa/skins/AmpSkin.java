@@ -284,11 +284,9 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angleStep = getSkinnable().getAngleStep();
             needleRotate.setAngle((180 - START_ANGLE) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
             if (getSkinnable().getValue() < getSkinnable().getMinValue()) {
-                getSkinnable().setValue(getSkinnable().getMinValue());
                 oldValue = getSkinnable().getMinValue();
             }
             if (getSkinnable().getValue() > getSkinnable().getMaxValue()) {
-                getSkinnable().setValue(getSkinnable().getMaxValue());
                 oldValue = getSkinnable().getMaxValue();
             }
             redraw();

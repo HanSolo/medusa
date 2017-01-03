@@ -360,15 +360,8 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angleStep  = getSkinnable().getAngleStep();
             minValue   = getSkinnable().getMinValue();
             maxValue   = getSkinnable().getMaxValue();
-            needleRotate.setAngle((180 - startAngle) + (getSkinnable().getValue() - minValue) * angleStep);
-            if (getSkinnable().getValue() < minValue) {
-                getSkinnable().setValue(minValue);
-                oldValue = minValue;
-            }
-            if (getSkinnable().getValue() > maxValue) {
-                getSkinnable().setValue(maxValue);
-                oldValue = maxValue;
-            }
+            if (getSkinnable().getValue() < minValue) { oldValue = minValue; }
+            if (getSkinnable().getValue() > maxValue) { oldValue = maxValue; }
             resize();
             redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
