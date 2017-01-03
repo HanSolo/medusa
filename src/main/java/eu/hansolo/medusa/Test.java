@@ -94,7 +94,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.TILE_KPI)
+                            .skinType(SkinType.GAUGE)
                             //.prefSize(400, 400)
                             .minValue(-20)
                             .maxValue(50)
@@ -104,9 +104,9 @@ public class Test extends Application {
                             //.lcdVisible(true)
                             //.locale(Locale.GERMANY)
                             //.numberFormat(numberFormat)
-                            .title("Title")
+                            .title("Testing")
                             .unit("\u00B0C")
-                            .subTitle("SubTitle")
+                            .subTitle("Only")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
                             .sections(new Section(-20, 0, Color.BLUE),
