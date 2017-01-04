@@ -62,6 +62,8 @@ import javafx.scene.transform.Rotate;
 import java.math.BigDecimal;
 import java.util.Locale;
 
+import static eu.hansolo.medusa.tools.Helper.enableNode;
+
 
 /**
  * Created by hansolo on 30.12.15.
@@ -240,38 +242,11 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            if (getSkinnable().isLedVisible()) {
-                ledCanvas.setManaged(true);
-                ledCanvas.setVisible(true);
-            } else {
-                ledCanvas.setManaged(false);
-                ledCanvas.setVisible(false);
-            }
-            if (getSkinnable().getTitle().isEmpty()) {
-                titleText.setVisible(false);
-                titleText.setManaged(false);
-            } else {
-                titleText.setManaged(true);
-                titleText.setVisible(true);
-            }
-            if (getSkinnable().getUnit().isEmpty()) {
-                unitText.setVisible(false);
-                unitText.setManaged(false);
-            } else {
-                unitText.setManaged(true);
-                unitText.setVisible(true);
-            }
-            if (getSkinnable().isLcdVisible()) {
-                lcd.setManaged(true);
-                lcd.setVisible(true);
-                lcdText.setManaged(true);
-                lcdText.setVisible(true);
-            } else {
-                lcd.setVisible(false);
-                lcd.setManaged(false);
-                lcdText.setVisible(false);
-                lcdText.setManaged(false);
-            }
+            enableNode(ledCanvas, getSkinnable().isLedVisible());
+            enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            enableNode(lcd,getSkinnable().isLcdVisible());
+            enableNode(lcdText,getSkinnable().isLcdVisible());
             redraw();
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
@@ -282,7 +257,6 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (getSkinnable().isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             angleStep = getSkinnable().getAngleStep();
-            needleRotate.setAngle((180 - START_ANGLE) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
             if (getSkinnable().getValue() < getSkinnable().getMinValue()) {
                 oldValue = getSkinnable().getMinValue();
             }
@@ -290,6 +264,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 oldValue = getSkinnable().getMaxValue();
             }
             redraw();
+            rotateNeedle();
         }
     }
 

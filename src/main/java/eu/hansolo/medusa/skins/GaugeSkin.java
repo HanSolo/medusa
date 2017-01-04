@@ -354,7 +354,6 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("LCD".equals(EVENT_TYPE)) {
             if (getSkinnable().isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             startAngle = getSkinnable().getStartAngle();
             angleRange = getSkinnable().getAngleRange();
             angleStep  = getSkinnable().getAngleStep();
@@ -364,6 +363,7 @@ public class GaugeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (getSkinnable().getValue() > maxValue) { oldValue = maxValue; }
             resize();
             redraw();
+            rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections          = getSkinnable().getSections();
             highlightSections = getSkinnable().isHighlightSections();

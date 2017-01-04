@@ -210,6 +210,7 @@ public class TinySkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sections  = getSkinnable().getSections();
             angleStep = ANGLE_RANGE / range;
             redraw();
+            rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             needleTooltip.setText(String.format(locale, formatString, getSkinnable().getValue()));
         }

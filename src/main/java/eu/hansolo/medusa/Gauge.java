@@ -749,7 +749,6 @@ public class Gauge extends Control {
             setRange(_maxValue - getMinValue());
             if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = _maxValue;
             if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(Helper.clamp(getMinValue(), _maxValue, originalThreshold)); }
-            fireUpdateEvent(RECALC_EVENT);
             if (!valueProperty().isBound()) Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
         } else {
             maxValue.set(VALUE);
@@ -2041,6 +2040,7 @@ public class Gauge extends Control {
         if (null == angleRange) {
             _angleRange = tmpAngleRange;
             setAngleStep(tmpAngleRange / getRange());
+            if (isAutoScale()) { calcAutoScale(); }
             fireUpdateEvent(RECALC_EVENT);
         } else {
             angleRange.set(tmpAngleRange);
@@ -2053,6 +2053,7 @@ public class Gauge extends Control {
                     final double ANGLE_RANGE = get();
                     set(Helper.clamp(0.0, 360.0, ANGLE_RANGE));
                     setAngleStep(get() / getRange());
+                    if (isAutoScale()) { calcAutoScale(); }
                     fireUpdateEvent(RECALC_EVENT);
                 }
                 @Override public Object getBean() { return this; }

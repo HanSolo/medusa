@@ -247,6 +247,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             minValue  = getSkinnable().getMinValue();
             resize();
             redraw();
+            setBar(getSkinnable().getCurrentValue());
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());

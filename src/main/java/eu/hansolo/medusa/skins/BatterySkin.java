@@ -140,7 +140,6 @@ public class BatterySkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             setBar(getSkinnable().getCurrentValue());
             resize();
             redraw();

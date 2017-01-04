@@ -178,6 +178,7 @@ public class WhiteSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             range     = getSkinnable().getRange();
             angleStep = ANGLE_RANGE / range;
             redraw();
+            setBar(getSkinnable().getCurrentValue());
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(valueText, getSkinnable().isValueVisible());
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());

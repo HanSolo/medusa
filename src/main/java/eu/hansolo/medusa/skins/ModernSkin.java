@@ -290,8 +290,8 @@ public class ModernSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             angleStep = ANGLE_RANGE / getSkinnable().getRange();
-            needleRotate.setAngle((180 - START_ANGLE) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
             redraw();
+            rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("INTERACTIVITY".equals(EVENT_TYPE)) {
             if (getSkinnable().isInteractive()) {
                 centerKnob.setOnMousePressed(mouseHandler);

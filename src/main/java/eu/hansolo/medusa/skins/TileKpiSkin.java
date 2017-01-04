@@ -243,6 +243,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angleStep         = angleRange / range;
             highlightSections = getSkinnable().isHighlightSections();
             redraw();
+            rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
             Helper.enableNode(valueText, getSkinnable().isValueVisible());

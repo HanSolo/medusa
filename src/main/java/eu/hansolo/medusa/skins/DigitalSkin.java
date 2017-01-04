@@ -179,6 +179,7 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             range     = getSkinnable().getRange();
             angleStep = ANGLE_RANGE / range;
             redraw();
+            setBar(getSkinnable().getCurrentValue());
         } else if ("SECTIONS".equals(EVENT_TYPE)) {
             sections         = getSkinnable().getSections();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {

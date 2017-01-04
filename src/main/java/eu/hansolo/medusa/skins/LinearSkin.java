@@ -240,7 +240,6 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             resize();
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             if (Orientation.VERTICAL == orientation) {
                 width    = height / aspectRatio;
                 stepSize = Math.abs(0.67143 * height / getSkinnable().getRange());

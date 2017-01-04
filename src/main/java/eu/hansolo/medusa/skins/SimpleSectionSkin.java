@@ -162,6 +162,7 @@ public class SimpleSectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             redraw();
+            setBar(getSkinnable().getCurrentValue());
         } else if ("DECIMALS".equals(EVENT_TYPE)) {
             formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
         }

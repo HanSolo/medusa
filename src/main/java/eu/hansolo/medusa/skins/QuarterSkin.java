@@ -355,7 +355,6 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (getSkinnable().isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             startAngle = getStartAngle();
-            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             minValue  = getSkinnable().getMinValue();
             maxValue  = getSkinnable().getMaxValue();
             angleStep = ANGLE_RANGE / getSkinnable().getRange();
@@ -363,6 +362,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (getSkinnable().getValue() > maxValue) { oldValue = maxValue; }
             resize();
             redraw();
+            rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections          = getSkinnable().getSections();
             highlightSections = getSkinnable().isHighlightSections();

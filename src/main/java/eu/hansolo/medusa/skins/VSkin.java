@@ -329,7 +329,6 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("LED".equals(EVENT_TYPE)) {
             if (getSkinnable().isLedVisible()) { drawLed(); }
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             angleRange = Helper.clamp(90.0, 180.0, getSkinnable().getAngleRange());
             startAngle = getStartAngle();
             minValue   = getSkinnable().getMinValue();
@@ -339,6 +338,7 @@ public class VSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (getSkinnable().getValue() > maxValue) { oldValue = maxValue; }
             resize();
             redraw();
+            rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections          = getSkinnable().getSections();
             highlightSections = getSkinnable().isHighlightSections();

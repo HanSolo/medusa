@@ -174,6 +174,7 @@ public class FlatSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angleStep = ANGLE_RANGE / range;
             sections  = getSkinnable().getSections();
             redraw();
+            setBar(getSkinnable().getCurrentValue());
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());

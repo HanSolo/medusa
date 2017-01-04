@@ -193,7 +193,6 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             if (Orientation.VERTICAL == orientation) {
                 width    = height / aspectRatio;
                 stepSize = (0.79699248 * height) / getSkinnable().getRange();
@@ -203,6 +202,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
             resize();
             redraw();
+            updateBar();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             barTooltip.setText(String.format(locale, formatString, getSkinnable().getValue()));
         }
