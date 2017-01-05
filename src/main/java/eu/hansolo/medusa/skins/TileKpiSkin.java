@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static eu.hansolo.medusa.tools.Helper.enableNode;
+
 
 /**
  * Created by hansolo on 29.11.16.
@@ -151,10 +153,10 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdBar.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
         thresholdBar.setStrokeLineCap(StrokeLineCap.BUTT);
         thresholdBar.setFill(null);
-        Helper.enableNode(thresholdBar, !getSkinnable().getSectionsVisible());
+        enableNode(thresholdBar, !getSkinnable().getSectionsVisible());
 
         sectionPane = new Pane();
-        Helper.enableNode(sectionPane, getSkinnable().getSectionsVisible());
+        enableNode(sectionPane, getSkinnable().getSectionsVisible());
 
         if (sectionsVisible) { drawSections(); }
 
@@ -162,7 +164,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         alertIcon.setFillRule(FillRule.EVEN_ODD);
         alertIcon.setFill(Color.YELLOW);
         alertIcon.setStroke(null);
-        Helper.enableNode(alertIcon, getSkinnable().isAlert());
+        enableNode(alertIcon, getSkinnable().isAlert());
         alertTooltip = new Tooltip(getSkinnable().getAlertMessage());
         Tooltip.install(alertIcon, alertTooltip);
 
@@ -182,15 +184,15 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
         valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
+        enableNode(valueText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
 
         unitText = new Text(getSkinnable().getUnit());
         unitText.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(unitText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
+        enableNode(unitText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
 
         minValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
         minValueText.setFill(getSkinnable().getTitleColor());
@@ -200,11 +202,11 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         thresholdRect = new Rectangle();
         thresholdRect.setFill(sectionsVisible ? GRAY : getSkinnable().getThresholdColor());
-        Helper.enableNode(thresholdRect, getSkinnable().isThresholdVisible());
+        enableNode(thresholdRect, getSkinnable().isThresholdVisible());
 
         thresholdText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
         thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundPaint());
-        Helper.enableNode(thresholdText, getSkinnable().isThresholdVisible());
+        enableNode(thresholdText, getSkinnable().isThresholdVisible());
 
         pane = new Pane(barBackground, thresholdBar, sectionPane, alertIcon, needleRect, needle, titleText, valueText, unitText, minValueText, maxValueText, thresholdRect, thresholdText);
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(getSkinnable().getBorderWidth()))));
@@ -245,21 +247,21 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             redraw();
             rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(sectionPane, getSkinnable().getSectionsVisible());
-            Helper.enableNode(thresholdRect, getSkinnable().isThresholdVisible());
-            Helper.enableNode(thresholdText, getSkinnable().isThresholdVisible());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            enableNode(valueText, getSkinnable().isValueVisible());
+            enableNode(sectionPane, getSkinnable().getSectionsVisible());
+            enableNode(thresholdRect, getSkinnable().isThresholdVisible());
+            enableNode(thresholdText, getSkinnable().isThresholdVisible());
+            enableNode(unitText, !getSkinnable().getUnit().isEmpty());
             sectionsVisible = getSkinnable().getSectionsVisible();
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = getSkinnable().getSections();
             sectionMap.clear();
             for(Section section : sections) { sectionMap.put(section, new Arc()); }
         } else if ("ALERT".equals(EVENT_TYPE)) {
-            Helper.enableNode(valueText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
-            Helper.enableNode(unitText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
-            Helper.enableNode(alertIcon, getSkinnable().isAlert());
+            enableNode(valueText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
+            enableNode(unitText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
+            enableNode(alertIcon, getSkinnable().isAlert());
             alertTooltip.setText(getSkinnable().getAlertMessage());
         }
     }
@@ -591,6 +593,9 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
 
         thresholdColor = getSkinnable().getThresholdColor();
+
+        sectionsVisible = getSkinnable().getSectionsVisible();
+        enableNode(sectionPane, sectionsVisible);
 
         titleText.setText(getSkinnable().getTitle());
         unitText.setText(getSkinnable().getUnit());

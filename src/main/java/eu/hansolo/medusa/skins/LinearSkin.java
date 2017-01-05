@@ -328,7 +328,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawSections(final GraphicsContext CTX) {
-        if (sections.isEmpty()) return;
+        if (!getSkinnable().getSectionsVisible() && sections.isEmpty()) return;
         int           listSize = sections.size();
         double        minValue = getSkinnable().getMinValue();
         double        minPosition;

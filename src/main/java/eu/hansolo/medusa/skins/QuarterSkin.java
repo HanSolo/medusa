@@ -192,7 +192,6 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         sectionsAndAreasCanvas = new Canvas();
         sectionsAndAreasCtx    = sectionsAndAreasCanvas.getGraphicsContext2D();
-        Helper.enableNode(sectionsAndAreasCanvas, areasVisible | sectionsVisible);
 
         tickMarkCanvas = new Canvas();
         tickMarkCtx    = tickMarkCanvas.getGraphicsContext2D();
@@ -345,7 +344,6 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             Helper.enableNode(lcd, getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
             Helper.enableNode(knobCanvas, getSkinnable().isKnobVisible());
             Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
-            Helper.enableNode(sectionsAndAreasCanvas, areasVisible | sectionsVisible);
             boolean markersVisible = getSkinnable().getMarkersVisible();
             for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
             redraw();
@@ -1752,10 +1750,11 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Areas, Sections and Tick Marks
         tickLabelLocation = getSkinnable().getTickLabelLocation();
         scaleDirection    = getSkinnable().getScaleDirection();
-        if (getSkinnable().getAreasVisible() | getSkinnable().getSectionsVisible()) {
-            sectionsAndAreasCtx.clearRect(0, 0, size * 1.9, size * 1.9);
-            drawAreasAndSections(sectionsAndAreasCtx);
-        }
+        areasVisible      = getSkinnable().getAreasVisible();
+        sectionsVisible   = getSkinnable().getSectionsVisible();
+        sectionsAndAreasCtx.clearRect(0, 0, size * 1.9, size * 1.9);
+        drawAreasAndSections(sectionsAndAreasCtx);
+
         tickMarkCanvas.setCache(false);
         tickMarkCtx.clearRect(0, 0, size * 1.9, size * 1.9);
         if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {

@@ -492,6 +492,7 @@ public class DigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleColor      = getSkinnable().getTitleColor();
         subTitleColor   = getSkinnable().getSubTitleColor();
         unitColor       = getSkinnable().getUnitColor();
+        sectionsVisible = getSkinnable().getSectionsVisible();
         drawBackground();
 
         setBar(getSkinnable().getCurrentValue());

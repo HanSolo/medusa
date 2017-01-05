@@ -131,11 +131,9 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         tickMarkCanvas    = new Canvas(0.79699248 * preferredWidth, 0.08333333 * preferredHeight);
-
         tickMarksCtx      = tickMarkCanvas.getGraphicsContext2D();
 
         sectionsCanvas    = new Canvas(0.79699248 * preferredWidth, 0.5 * preferredHeight);
-
         sectionsCtx       = sectionsCanvas.getGraphicsContext2D();
 
         barRect           = new Rectangle();

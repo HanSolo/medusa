@@ -316,10 +316,11 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void redraw() {
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        locale     = getSkinnable().getLocale();
-        barColor   = getSkinnable().getBarColor();
-        valueColor = getSkinnable().getValueColor();
-        unitColor  = getSkinnable().getUnitColor();
+        locale          = getSkinnable().getLocale();
+        barColor        = getSkinnable().getBarColor();
+        valueColor      = getSkinnable().getValueColor();
+        unitColor       = getSkinnable().getUnitColor();
+        sectionsVisible = getSkinnable().getSectionsVisible();
         drawBackground();
 
         setBar(getSkinnable().getCurrentValue());
