@@ -419,5 +419,6 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         title.setFill(getSkinnable().getTitleColor());
         dateText.setFill(getSkinnable().getDateColor());
         text.setFill(getSkinnable().getTextColor());
+        amPmText.setFill(getSkinnable().getTextColor());
     }
 }
