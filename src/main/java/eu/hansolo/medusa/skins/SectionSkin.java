@@ -200,6 +200,7 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angleStep = ANGLE_RANGE / getSkinnable().getRange();
             needleRotate.setAngle((180 - START_ANGLE) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
             resize();
+            rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections          = getSkinnable().getSections();
             highlightSections = getSkinnable().isHighlightSections();
@@ -251,8 +252,8 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawSections() {
-        if (!sectionsVisible | sections.isEmpty()) return;
         sectionsCtx.clearRect(0, 0, size, size);
+        if (!sectionsVisible | sections.isEmpty()) return;
         double value               = getSkinnable().getCurrentValue();
         boolean sectionTextVisible = getSkinnable().isSectionTextVisible();
         boolean sectionIconVisible = getSkinnable().getSectionIconsVisible();
@@ -401,6 +402,8 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        sectionsVisible = getSkinnable().getSectionsVisible();
+        drawSections();
         needle.setFill(new LinearGradient(needle.getLayoutBounds().getMinX(), 0,
                                           needle.getLayoutBounds().getMaxX(), 0,
                                           false, CycleMethod.NO_CYCLE,

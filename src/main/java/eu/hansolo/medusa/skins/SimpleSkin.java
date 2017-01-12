@@ -46,6 +46,8 @@ import javafx.scene.transform.Rotate;
 import java.util.List;
 import java.util.Locale;
 
+import static eu.hansolo.medusa.tools.Helper.enableNode;
+
 
 /**
  * Created by hansolo on 20.12.15.
@@ -144,17 +146,17 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        enableNode(valueText, getSkinnable().isValueVisible());
 
         titleText = new Text(getSkinnable().getTitle());
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        enableNode(titleText, !getSkinnable().getTitle().isEmpty());
 
         subTitleText = new Text(getSkinnable().getSubTitle());
         subTitleText.setTextOrigin(VPos.CENTER);
         subTitleText.setFill(getSkinnable().getSubTitleColor());
-        Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
+        enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
 
         // Add all nodes
         pane = new Pane(sectionsCanvas, needle, valueText, titleText, subTitleText);
@@ -202,15 +204,16 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             angleStep = ANGLE_RANGE / getSkinnable().getRange();
             needleRotate.setAngle((180 - START_ANGLE) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
             resize();
+            rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections          = getSkinnable().getSections();
             highlightSections = getSkinnable().isHighlightSections();
             resize();
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
+            enableNode(valueText, getSkinnable().isValueVisible());
+            enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
         }
     }
 
@@ -388,6 +391,7 @@ public class SimpleSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void redraw() {
+        enableNode(sectionsCanvas, getSkinnable().getSectionsVisible());
         needle.setFill(getSkinnable().getNeedleColor());
         needle.setStroke(getSkinnable().getNeedleBorderColor());
         titleText.setFill(getSkinnable().getTitleColor());

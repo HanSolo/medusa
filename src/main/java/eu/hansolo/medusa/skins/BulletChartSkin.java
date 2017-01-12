@@ -131,11 +131,9 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
 
         tickMarkCanvas    = new Canvas(0.79699248 * preferredWidth, 0.08333333 * preferredHeight);
-
         tickMarksCtx      = tickMarkCanvas.getGraphicsContext2D();
 
         sectionsCanvas    = new Canvas(0.79699248 * preferredWidth, 0.5 * preferredHeight);
-
         sectionsCtx       = sectionsCanvas.getGraphicsContext2D();
 
         barRect           = new Rectangle();
@@ -193,7 +191,6 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             if (Orientation.VERTICAL == orientation) {
                 width    = height / aspectRatio;
                 stepSize = (0.79699248 * height) / getSkinnable().getRange();
@@ -203,6 +200,7 @@ public class BulletChartSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
             resize();
             redraw();
+            updateBar();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             barTooltip.setText(String.format(locale, formatString, getSkinnable().getValue()));
         }

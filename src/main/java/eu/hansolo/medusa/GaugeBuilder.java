@@ -912,6 +912,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setValueColor(Color.WHITE);
                     CONTROL.setTitleColor(Color.WHITE);
                     CONTROL.setSubTitleColor(Color.WHITE);
+                    CONTROL.setSectionsVisible(true);
                     break;
                 case SLIM        :
                     CONTROL.setKnobPosition(Pos.CENTER);

@@ -192,7 +192,6 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         sectionsAndAreasCanvas = new Canvas();
         sectionsAndAreasCtx    = sectionsAndAreasCanvas.getGraphicsContext2D();
-        Helper.enableNode(sectionsAndAreasCanvas, areasVisible | sectionsVisible);
 
         tickMarkCanvas = new Canvas();
         tickMarkCtx    = tickMarkCanvas.getGraphicsContext2D();
@@ -345,7 +344,6 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             Helper.enableNode(lcd, getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
             Helper.enableNode(knobCanvas, getSkinnable().isKnobVisible());
             Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
-            Helper.enableNode(sectionsAndAreasCanvas, areasVisible | sectionsVisible);
             boolean markersVisible = getSkinnable().getMarkersVisible();
             for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
             redraw();
@@ -355,21 +353,14 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (getSkinnable().isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             startAngle = getStartAngle();
-            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             minValue  = getSkinnable().getMinValue();
             maxValue  = getSkinnable().getMaxValue();
             angleStep = ANGLE_RANGE / getSkinnable().getRange();
-            needleRotate.setAngle((180 - startAngle) + (getSkinnable().getValue() - minValue) * angleStep);
-            if (getSkinnable().getValue() < minValue) {
-                getSkinnable().setValue(minValue);
-                oldValue = minValue;
-            }
-            if (getSkinnable().getValue() > maxValue) {
-                getSkinnable().setValue(maxValue);
-                oldValue = maxValue;
-            }
+            if (getSkinnable().getValue() < minValue) { oldValue = minValue; }
+            if (getSkinnable().getValue() > maxValue) { oldValue = maxValue; }
             resize();
             redraw();
+            rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections          = getSkinnable().getSections();
             highlightSections = getSkinnable().isHighlightSections();
@@ -1759,10 +1750,11 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Areas, Sections and Tick Marks
         tickLabelLocation = getSkinnable().getTickLabelLocation();
         scaleDirection    = getSkinnable().getScaleDirection();
-        if (getSkinnable().getAreasVisible() | getSkinnable().getSectionsVisible()) {
-            sectionsAndAreasCtx.clearRect(0, 0, size * 1.9, size * 1.9);
-            drawAreasAndSections(sectionsAndAreasCtx);
-        }
+        areasVisible      = getSkinnable().getAreasVisible();
+        sectionsVisible   = getSkinnable().getSectionsVisible();
+        sectionsAndAreasCtx.clearRect(0, 0, size * 1.9, size * 1.9);
+        drawAreasAndSections(sectionsAndAreasCtx);
+
         tickMarkCanvas.setCache(false);
         tickMarkCtx.clearRect(0, 0, size * 1.9, size * 1.9);
         if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {

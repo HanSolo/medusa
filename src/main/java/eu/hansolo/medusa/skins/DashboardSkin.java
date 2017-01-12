@@ -240,6 +240,7 @@ public class DashboardSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sections  = getSkinnable().getSections();
             resize();
             redraw();
+            setBar(getSkinnable().getCurrentValue());
         } else if ("VISBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
             Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());

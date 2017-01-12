@@ -190,7 +190,6 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         sectionsAndAreasCanvas = new Canvas();
         sectionsAndAreasCtx    = sectionsAndAreasCanvas.getGraphicsContext2D();
-        Helper.enableNode(sectionsAndAreasCanvas, areasVisible | sectionsVisible);
 
         tickMarkCanvas = new Canvas();
         tickMarkCtx    = tickMarkCanvas.getGraphicsContext2D();
@@ -341,7 +340,6 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             Helper.enableNode(lcd, getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
             Helper.enableNode(knobCanvas, getSkinnable().isKnobVisible());
             Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
-            Helper.enableNode(sectionsAndAreasCanvas, areasVisible | sectionsVisible);
             boolean markersVisible = getSkinnable().getMarkersVisible();
             for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
             redraw();
@@ -350,23 +348,16 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         } else if ("LCD".equals(EVENT_TYPE)) {
             if (getSkinnable().isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            if (getSkinnable().isAutoScale()) getSkinnable().calcAutoScale();
             angleRange = Helper.clamp(90.0, 180.0, getSkinnable().getAngleRange());
             startAngle = getStartAngle();
             minValue   = getSkinnable().getMinValue();
             maxValue   = getSkinnable().getMaxValue();
             angleStep  = angleRange / getSkinnable().getRange();
-            needleRotate.setAngle((180 - startAngle) + (getSkinnable().getValue() - minValue) * angleStep);
-            if (getSkinnable().getValue() < minValue) {
-                getSkinnable().setValue(minValue);
-                oldValue = minValue;
-            }
-            if (getSkinnable().getValue() > maxValue) {
-                getSkinnable().setValue(maxValue);
-                oldValue = maxValue;
-            }
+            if (getSkinnable().getValue() < minValue) { oldValue = minValue; }
+            if (getSkinnable().getValue() > maxValue) { oldValue = maxValue; }
             resize();
             redraw();
+            rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections          = getSkinnable().getSections();
             highlightSections = getSkinnable().isHighlightSections();
@@ -1050,10 +1041,11 @@ public class HSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Areas, Sections and Tick Marks
         tickLabelLocation = getSkinnable().getTickLabelLocation();
         scaleDirection    = getSkinnable().getScaleDirection();
-        if (getSkinnable().getAreasVisible() | getSkinnable().getSectionsVisible()) {
-            sectionsAndAreasCtx.clearRect(0, 0, width, width);
-            drawAreasAndSections(sectionsAndAreasCtx);
-        }
+        areasVisible      = getSkinnable().getAreasVisible();
+        sectionsVisible   = getSkinnable().getSectionsVisible();
+        sectionsAndAreasCtx.clearRect(0, 0, width, width);
+        drawAreasAndSections(sectionsAndAreasCtx);
+
         tickMarkCanvas.setCache(false);
         tickMarkCtx.clearRect(0, 0, width, width);
         if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {

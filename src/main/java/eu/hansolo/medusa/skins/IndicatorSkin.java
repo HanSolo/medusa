@@ -238,6 +238,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             sections   = getSkinnable().getSections();
             angleStep  = angleRange / range;
             redraw();
+            rotateNeedle(getSkinnable().getCurrentValue());
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             needleTooltip.setText(String.format(locale, formatString, getSkinnable().getValue()));
             double value = getSkinnable().getValue();
