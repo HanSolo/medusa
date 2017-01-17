@@ -178,6 +178,7 @@ public class SimpleSectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setLength(-VALUE * getSkinnable().getAngleStep());
         }
         if (getSkinnable().getSectionsVisible() && !sections.isEmpty()) {
+            bar.setStroke(getSkinnable().getBarColor());
             for (Section section : sections) {
                 if (section.contains(VALUE)) {
                     bar.setStroke(section.getColor());
