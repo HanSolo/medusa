@@ -2122,6 +2122,7 @@ public class Clock extends Control {
                 setDiscreteMinutes(true);
                 setSecondColor(Color.rgb(167, 0, 0));
                 setSecondsVisible(true);
+
                 super.setSkin(new DBClockSkin(Clock.this));
                 break;
             case FAT:

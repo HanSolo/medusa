@@ -69,12 +69,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by hansolo on 02.02.16.
  */
 public class FatClockSkin extends ClockSkinBase {
-    private static final double             PREFERRED_WIDTH     = 250;
-    private static final double             PREFERRED_HEIGHT    = 250;
-    private static final double             MINIMUM_WIDTH       = 50;
-    private static final double             MINIMUM_HEIGHT      = 50;
-    private static final double             MAXIMUM_WIDTH       = 1024;
-    private static final double             MAXIMUM_HEIGHT      = 1024;
     private static final DateTimeFormatter  DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("EEEE\ndd.MM.YYYY\nHH:mm:ss");
     private static final DateTimeFormatter  DATE_FORMATER       = DateTimeFormatter.ofPattern("EE d");
     private static final DateTimeFormatter  TIME_FORMATTER      = DateTimeFormatter.ofPattern("HH:mm");
