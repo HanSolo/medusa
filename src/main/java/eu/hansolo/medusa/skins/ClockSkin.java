@@ -21,15 +21,12 @@ import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.TimeSection;
 import eu.hansolo.medusa.tools.Helper;
-import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Background;
@@ -48,9 +45,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 
-import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.List;
@@ -61,13 +56,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by hansolo on 28.01.16.
  */
-public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
-    private static final double             PREFERRED_WIDTH     = 250;
-    private static final double             PREFERRED_HEIGHT    = 250;
-    private static final double             MINIMUM_WIDTH       = 50;
-    private static final double             MINIMUM_HEIGHT      = 50;
-    private static final double             MAXIMUM_WIDTH       = 1024;
-    private static final double             MAXIMUM_HEIGHT      = 1024;
+public class ClockSkin extends ClockSkinBase {
     private static final DateTimeFormatter  DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("EEEE\ndd.MM.YYYY\nHH:mm:ss");
     private static final DateTimeFormatter  DATE_FORMATER       = DateTimeFormatter.ofPattern("EE d");
     private static final DateTimeFormatter  TIME_FORMATTER      = DateTimeFormatter.ofPattern("HH:mm");
@@ -124,7 +113,7 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Initialization ************************************
-    private void initGraphics() {
+    @Override protected void initGraphics() {
         // Set initial size
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
@@ -199,37 +188,15 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        if (getSkinnable().isAnimated()) {
-            getSkinnable().currentTimeProperty().addListener(o -> updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId()))));
-        } else {
-            getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
-        }
-        getSkinnable().getAlarms().addListener((ListChangeListener<Alarm>) c -> {
-            updateAlarms();
-            redraw();
-        });
+    @Override protected void registerListeners() {
+        super.registerListeners();
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("VISIBILITY".equals(EVENT_TYPE)) {
             title.setVisible(getSkinnable().isTitleVisible());
             title.setManaged(getSkinnable().isTitleVisible());
             text.setVisible(getSkinnable().isTextVisible());
@@ -299,12 +266,7 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Graphics ******************************************
-    private void updateAlarms() {
-        alarmMap.clear();
-        for (Alarm alarm : getSkinnable().getAlarms()) { alarmMap.put(alarm, new Circle()); }
-    }
-
-    public void updateTime(final ZonedDateTime TIME) {
+    @Override public void updateTime(final ZonedDateTime TIME) {
         if (getSkinnable().isDiscreteHours()) {
             hourRotate.setAngle(TIME.getHour() * 30);
         } else {
@@ -348,9 +310,14 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
     }
 
+    @Override public void updateAlarms() {
+        alarmMap.clear();
+        for (Alarm alarm : getSkinnable().getAlarms()) { alarmMap.put(alarm, new Circle()); }
+    }
+
 
     // ******************** Resizing ******************************************
-    private void resize() {
+    @Override protected void resize() {
         double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
         double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
         size          = width < height ? width : height;
@@ -428,9 +395,17 @@ public class ClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
     }
 
-    private void redraw() {
+    @Override protected void redraw() {
         pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / 250 * size))));
         pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+
+        hour.setFill(clock.getHourColor());
+        minute.setFill(clock.getMinuteColor());
+        second.setFill(clock.getSecondColor());
+        knob.setFill(clock.getKnobColor());
+        title.setFill(clock.getTitleColor());
+        dateText.setFill(clock.getDateColor());
+        text.setFill(clock.getTextColor());
 
         shadowGroupHour.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
         shadowGroupMinute.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);

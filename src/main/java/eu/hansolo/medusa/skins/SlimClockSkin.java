@@ -20,8 +20,6 @@ import eu.hansolo.medusa.Clock;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.geometry.Insets;
-import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -36,8 +34,6 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 
-import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
@@ -46,13 +42,7 @@ import java.time.temporal.ChronoField;
 /**
  * Created by hansolo on 11.02.16.
  */
-public class SlimClockSkin extends SkinBase<Clock> implements Skin<Clock> {
-    private static final double             PREFERRED_WIDTH     = 250;
-    private static final double             PREFERRED_HEIGHT    = 250;
-    private static final double             MINIMUM_WIDTH       = 50;
-    private static final double             MINIMUM_HEIGHT      = 50;
-    private static final double             MAXIMUM_WIDTH       = 1024;
-    private static final double             MAXIMUM_HEIGHT      = 1024;
+public class SlimClockSkin extends ClockSkinBase {
     private static final DateTimeFormatter  DATE_TEXT_FORMATTER = DateTimeFormatter.ofPattern("cccc");
     private static final DateTimeFormatter  HOUR_FORMATTER      = DateTimeFormatter.ofPattern("HH");
     private static final DateTimeFormatter  MINUTE_FORMATTER    = DateTimeFormatter.ofPattern("mm");
@@ -79,91 +69,73 @@ public class SlimClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Initialization ************************************
-    private void initGraphics() {
+    @Override protected void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(clock.getPrefWidth(), 0.0) <= 0 || Double.compare(clock.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(clock.getWidth(), 0.0) <= 0 || Double.compare(clock.getHeight(), 0.0) <= 0) {
+            if (clock.getPrefWidth() > 0 && clock.getPrefHeight() > 0) {
+                clock.setPrefSize(clock.getPrefWidth(), clock.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                clock.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
-        ZonedDateTime time = getSkinnable().getTime();
+        ZonedDateTime time = clock.getTime();
 
         secondBackgroundCircle = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.48);
         secondBackgroundCircle.setStrokeWidth(PREFERRED_WIDTH * 0.008);
         secondBackgroundCircle.setStrokeType(StrokeType.CENTERED);
         secondBackgroundCircle.setStrokeLineCap(StrokeLineCap.ROUND);
         secondBackgroundCircle.setFill(null);
-        secondBackgroundCircle.setStroke(Helper.getTranslucentColorFrom(getSkinnable().getSecondColor(), 0.2));
-        secondBackgroundCircle.setVisible(getSkinnable().isSecondsVisible());
-        secondBackgroundCircle.setManaged(getSkinnable().isSecondsVisible());
+        secondBackgroundCircle.setStroke(Helper.getTranslucentColorFrom(clock.getSecondColor(), 0.2));
+        secondBackgroundCircle.setVisible(clock.isSecondsVisible());
+        secondBackgroundCircle.setManaged(clock.isSecondsVisible());
 
         dateText = new Text(DATE_TEXT_FORMATTER.format(time));
-        dateText.setVisible(getSkinnable().isDateVisible());
-        dateText.setManaged(getSkinnable().isDateVisible());
+        dateText.setVisible(clock.isDateVisible());
+        dateText.setManaged(clock.isDateVisible());
 
         dateNumbers = new Text(dateNumberFormatter.format(time));
-        dateNumbers.setVisible(getSkinnable().isDateVisible());
-        dateNumbers.setManaged(getSkinnable().isDateVisible());
+        dateNumbers.setVisible(clock.isDateVisible());
+        dateNumbers.setManaged(clock.isDateVisible());
 
         hour = new Text(HOUR_FORMATTER.format(time));
-        hour.setFill(getSkinnable().getHourColor());
+        hour.setFill(clock.getHourColor());
 
         minute = new Text(MINUTE_FORMATTER.format(time));
-        minute.setFill(getSkinnable().getMinuteColor());
+        minute.setFill(clock.getMinuteColor());
 
-        secondArc = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.96, PREFERRED_WIDTH * 0.48, 90, (-6 * getSkinnable().getTime().getSecond()));
+        secondArc = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.96, PREFERRED_WIDTH * 0.48, 90, (-6 * clock.getTime().getSecond()));
         secondArc.setStrokeWidth(PREFERRED_WIDTH * 0.008);
         secondArc.setStrokeType(StrokeType.CENTERED);
         secondArc.setStrokeLineCap(StrokeLineCap.ROUND);
         secondArc.setFill(null);
-        secondArc.setStroke(getSkinnable().getSecondColor());
-        secondArc.setVisible(getSkinnable().isSecondsVisible());
-        secondArc.setManaged(getSkinnable().isSecondsVisible());
+        secondArc.setStroke(clock.getSecondColor());
+        secondArc.setVisible(clock.isSecondsVisible());
+        secondArc.setManaged(clock.isSecondsVisible());
 
         pane = new Pane(secondBackgroundCircle, dateText, dateNumbers, hour, minute, secondArc);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(clock.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(clock.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(clock.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        if (getSkinnable().isAnimated()) {
-            getSkinnable().currentTimeProperty().addListener(o -> updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId()))));
-        } else {
-            getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
-        }
+    @Override protected void registerListeners() {
+        super.registerListeners();
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            boolean isDateVisible = getSkinnable().isDateVisible();
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("VISIBILITY".equals(EVENT_TYPE)) {
+            boolean isDateVisible = clock.isDateVisible();
             dateText.setVisible(isDateVisible);
             dateText.setManaged(isDateVisible);
             dateNumbers.setVisible(isDateVisible);
             dateNumbers.setManaged(isDateVisible);
-            boolean isSecondsVisible = getSkinnable().isSecondsVisible();
+            boolean isSecondsVisible = clock.isSecondsVisible();
             secondBackgroundCircle.setVisible(isSecondsVisible);
             secondBackgroundCircle.setManaged(isSecondsVisible);
             secondArc.setVisible(isSecondsVisible);
@@ -175,7 +147,7 @@ public class SlimClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Graphics ******************************************
-    public void updateTime(final ZonedDateTime TIME) {
+    @Override public void updateTime(final ZonedDateTime TIME) {
         if (dateText.isVisible()) {
             dateText.setText(DATE_TEXT_FORMATTER.format(TIME));
             Helper.adjustTextSize(dateText, 0.6 * size, size * 0.08);
@@ -196,7 +168,7 @@ public class SlimClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
         if (secondBackgroundCircle.isVisible()) {
             secondArc.setLength((-6 * TIME.getSecond()));
-            if (getSkinnable().isDiscreteSeconds()) {
+            if (clock.isDiscreteSeconds()) {
                 secondArc.setLength((-6 * TIME.getSecond()));
             } else {
                 secondArc.setLength((-6 * TIME.getSecond() -TIME.get(ChronoField.MILLI_OF_SECOND) * 0.006));
@@ -204,18 +176,22 @@ public class SlimClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
     }
 
+    @Override public void updateAlarms() {
+
+    }
+
 
     // ******************** Resizing ******************************************
-    private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        double width  = clock.getWidth() - clock.getInsets().getLeft() - clock.getInsets().getRight();
+        double height = clock.getHeight() - clock.getInsets().getTop() - clock.getInsets().getBottom();
         size          = width < height ? width : height;
 
         if (size > 0) {
             double center = size * 0.5;
 
             pane.setMaxSize(size, size);
-            pane.relocate((getSkinnable().getWidth() - size) * 0.5, (getSkinnable().getHeight() - size) * 0.5);
+            pane.relocate((clock.getWidth() - size) * 0.5, (clock.getHeight() - size) * 0.5);
 
             secondBackgroundCircle.setCenterX(center);
             secondBackgroundCircle.setCenterY(center);
@@ -236,20 +212,23 @@ public class SlimClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
     }
 
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / 250 * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+    @Override protected void redraw() {
+        pane.setBorder(new Border(new BorderStroke(clock.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(clock.getBorderWidth() / 250 * size))));
+        pane.setBackground(new Background(new BackgroundFill(clock.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        
+        secondBackgroundCircle.setStroke(Helper.getTranslucentColorFrom(clock.getSecondColor(), 0.2));
+        secondArc.setStroke(clock.getSecondColor());
 
-        secondBackgroundCircle.setStroke(Helper.getTranslucentColorFrom(getSkinnable().getSecondColor(), 0.2));
-        secondArc.setStroke(getSkinnable().getSecondColor());
+        hour.setFill(clock.getHourColor());
+        minute.setFill(clock.getMinuteColor());
+        
+        dateText.setFill(clock.getDateColor());
+        dateNumbers.setFill(clock.getDateColor());
 
-        dateText.setFill(getSkinnable().getDateColor());
-        dateNumbers.setFill(getSkinnable().getDateColor());
+        hour.setFill(clock.getHourColor());
+        minute.setFill(clock.getMinuteColor());
 
-        hour.setFill(getSkinnable().getHourColor());
-        minute.setFill(getSkinnable().getMinuteColor());
-
-        ZonedDateTime time = getSkinnable().getTime();
+        ZonedDateTime time = clock.getTime();
         updateTime(time);
     }
 }
