@@ -2212,10 +2212,17 @@ public class Clock extends Control {
                 super.setSkin(new TileClockSkin(Clock.this));
                 break;
             case CLOCK:
+                setHourTickMarkColor(Color.rgb(255, 255, 255));
+                setMinuteTickMarkColor(Color.rgb(255, 255, 255, 0.5));
+                setHourColor(Color.WHITE);
+                setMinuteColor(Color.WHITE);
+                setKnobColor(Color.WHITE);
+                setKnobColor(Color.WHITE);
             default:
                 super.setSkin(new ClockSkin(Clock.this));
                 break;
         }
+        fireUpdateEvent(RESIZE_EVENT);
     }
 
 
