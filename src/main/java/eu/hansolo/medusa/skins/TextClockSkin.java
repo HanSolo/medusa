@@ -45,13 +45,13 @@ import java.util.Locale;
 /**
  * Created by hansolo on 29.09.16.
  */
-public class TextClockSkin extends SkinBase<Clock> implements Skin<Clock> {
-    private static final double            PREFERRED_WIDTH       = 250;
-    private static final double            PREFERRED_HEIGHT      = 100;
-    private static final double            MINIMUM_WIDTH         = 50;
-    private static final double            MINIMUM_HEIGHT        = 20;
-    private static final double            MAXIMUM_WIDTH         = 1024;
-    private static final double            MAXIMUM_HEIGHT        = 1024;
+public class TextClockSkin extends ClockSkinBase {
+    protected static final double            PREFERRED_WIDTH       = 250;
+    protected static final double            PREFERRED_HEIGHT      = 100;
+    protected static final double            MINIMUM_WIDTH         = 50;
+    protected static final double            MINIMUM_HEIGHT        = 20;
+    protected static final double            MAXIMUM_WIDTH         = 1024;
+    protected static final double            MAXIMUM_HEIGHT        = 1024;
     private static final DateTimeFormatter HHMM_FORMATTER        = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter HHMMSS_FORMATTER      = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static final DateTimeFormatter AMPM_HHMM_FORMATTER   = DateTimeFormatter.ofPattern("hh:mm a");
@@ -82,14 +82,14 @@ public class TextClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Initialization ************************************
-    private void initGraphics() {
+    @Override protected void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(clock.getPrefWidth(), 0.0) <= 0 || Double.compare(clock.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(clock.getWidth(), 0.0) <= 0 || Double.compare(clock.getHeight(), 0.0) <= 0) {
+            if (clock.getPrefWidth() > 0 && clock.getPrefHeight() > 0) {
+                clock.setPrefSize(clock.getPrefWidth(), clock.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                clock.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
@@ -102,40 +102,21 @@ public class TextClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         dateText.setFill(dateColor);
 
         pane = new Pane(timeText, dateText);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(clock.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(clock.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(clock.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        if (getSkinnable().isAnimated()) {
-            getSkinnable().currentTimeProperty().addListener(o -> updateTime(
-                ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId()))));
-        } else {
-            getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
-        }
+    @Override protected void registerListeners() {
+        super.registerListeners();
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("VISIBILITY".equals(EVENT_TYPE)) {
 
         } else if ("SECTION".equals(EVENT_TYPE)) {
             redraw();
@@ -146,31 +127,33 @@ public class TextClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     // ******************** Canvas ********************************************
     private void drawTime(final ZonedDateTime TIME) {
         // draw the time
-        if (getSkinnable().isTextVisible()) {
-            if (Locale.US == getSkinnable().getLocale()) {
-                timeText.setText(getSkinnable().isSecondsVisible() ? AMPM_HHMMSS_FORMATTER.format(TIME) : AMPM_HHMM_FORMATTER.format(TIME));
+        if (clock.isTextVisible()) {
+            if (Locale.US == clock.getLocale()) {
+                timeText.setText(clock.isSecondsVisible() ? AMPM_HHMMSS_FORMATTER.format(TIME) : AMPM_HHMM_FORMATTER.format(TIME));
             } else {
-                timeText.setText(getSkinnable().isSecondsVisible() ? HHMMSS_FORMATTER.format(TIME) : HHMM_FORMATTER.format(TIME));
+                timeText.setText(clock.isSecondsVisible() ? HHMMSS_FORMATTER.format(TIME) : HHMM_FORMATTER.format(TIME));
             }
             timeText.setX((width - timeText.getLayoutBounds().getWidth()) * 0.5);
         }
 
         // draw the date
-        if (getSkinnable().isDateVisible()) {
+        if (clock.isDateVisible()) {
             dateText.setText(dateFormat.format(TIME));
             dateText.setX((width - dateText.getLayoutBounds().getWidth()) * 0.5);
         }
     }
 
-    private void updateTime(final ZonedDateTime TIME) {
+    @Override public void updateTime(final ZonedDateTime TIME) {
         drawTime(TIME);
     }
 
+    @Override public void updateAlarms() {}
+
 
     // ******************** Resizing ******************************************
-    private void resize() {
-        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        width  = clock.getWidth() - clock.getInsets().getLeft() - clock.getInsets().getRight();
+        height = clock.getHeight() - clock.getInsets().getTop() - clock.getInsets().getBottom();
 
         if (aspectRatio * width > height) {
             width = 1 / (aspectRatio / height);
@@ -180,22 +163,22 @@ public class TextClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
-            pane.relocate((getSkinnable().getWidth() - height) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+            pane.relocate((clock.getWidth() - height) * 0.5, (clock.getHeight() - height) * 0.5);
 
-            if (getSkinnable().isTextVisible()) {
+            if (clock.isTextVisible()) {
                 if (null == customFont) {
-                    timeText.setFont(Locale.US == getSkinnable().getLocale() ? Fonts.robotoLight(0.5 * height) : Fonts.robotoLight(0.6 * height));
+                    timeText.setFont(Locale.US == clock.getLocale() ? Fonts.robotoLight(0.5 * height) : Fonts.robotoLight(0.6 * height));
                 } else {
-                    timeText.setFont(Locale.US == getSkinnable().getLocale() ? new Font(customFont.getName(), 0.5 * height) : new Font(customFont.getName(), 0.6 * height));
+                    timeText.setFont(Locale.US == clock.getLocale() ? new Font(customFont.getName(), 0.5 * height) : new Font(customFont.getName(), 0.6 * height));
                 }
                 timeText.setX((width - timeText.getLayoutBounds().getWidth()) * 0.5);
-                if (getSkinnable().isDateVisible()) {
+                if (clock.isDateVisible()) {
                     timeText.setY(height * 0.3);
                 } else {
                     timeText.setY(height * 0.5);
                 }
             }
-            if (getSkinnable().isDateVisible()) {
+            if (clock.isDateVisible()) {
                 if (null == customFont) {
                     dateText.setFont(Fonts.robotoLight(0.3 * height));
                 } else {
@@ -207,15 +190,15 @@ public class TextClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
     }
 
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * height))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
-        ZonedDateTime time = getSkinnable().getTime();
+    @Override protected void redraw() {
+        pane.setBorder(new Border(new BorderStroke(clock.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(clock.getBorderWidth() / PREFERRED_WIDTH * height))));
+        pane.setBackground(new Background(new BackgroundFill(clock.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        ZonedDateTime time = clock.getTime();
 
-        textColor  = getSkinnable().getTextColor();
+        textColor  = clock.getTextColor();
         timeText.setFill(textColor);
 
-        dateColor  = getSkinnable().getDateColor();
+        dateColor  = clock.getDateColor();
         dateText.setFill(dateColor);
 
         drawTime(time);

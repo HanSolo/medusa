@@ -58,13 +58,7 @@ import java.util.Locale;
 /**
  * Created by hansolo on 16.12.16.
  */
-public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
-    private static final double            PREFERRED_WIDTH    = 250;
-    private static final double            PREFERRED_HEIGHT   = 250;
-    private static final double            MINIMUM_WIDTH      = 50;
-    private static final double            MINIMUM_HEIGHT     = 50;
-    private static final double            MAXIMUM_WIDTH      = 1024;
-    private static final double            MAXIMUM_HEIGHT     = 1024;
+public class TileClockSkin extends ClockSkinBase {
     private static final DateTimeFormatter DATE_FORMATER      = DateTimeFormatter.ofPattern("EE d");
     private static final double            CLOCK_SCALE_FACTOR = 0.75;
     private              double            size;
@@ -102,48 +96,48 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Initialization ************************************
-    private void initGraphics() {
+    @Override protected void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(clock.getPrefWidth(), 0.0) <= 0 || Double.compare(clock.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(clock.getWidth(), 0.0) <= 0 || Double.compare(clock.getHeight(), 0.0) <= 0) {
+            if (clock.getPrefWidth() > 0 && clock.getPrefHeight() > 0) {
+                clock.setPrefSize(clock.getPrefWidth(), clock.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                clock.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
         minuteTickMarks = new Path();
         minuteTickMarks.setFillRule(FillRule.EVEN_ODD);
         minuteTickMarks.setFill(null);
-        minuteTickMarks.setStroke(getSkinnable().getMinuteColor());
+        minuteTickMarks.setStroke(clock.getMinuteColor());
         minuteTickMarks.setStrokeLineCap(StrokeLineCap.ROUND);
 
         hourTickMarks = new Path();
         hourTickMarks.setFillRule(FillRule.EVEN_ODD);
         hourTickMarks.setFill(null);
-        hourTickMarks.setStroke(getSkinnable().getHourColor());
+        hourTickMarks.setStroke(clock.getHourColor());
         hourTickMarks.setStrokeLineCap(StrokeLineCap.ROUND);
 
         hour = new Rectangle(3, 60);
         hour.setArcHeight(3);
         hour.setArcWidth(3);
-        hour.setStroke(getSkinnable().getHourColor());
+        hour.setStroke(clock.getHourColor());
         hour.getTransforms().setAll(hourRotate);
 
         minute = new Rectangle(3, 96);
         minute.setArcHeight(3);
         minute.setArcWidth(3);
-        minute.setStroke(getSkinnable().getMinuteColor());
+        minute.setStroke(clock.getMinuteColor());
         minute.getTransforms().setAll(minuteRotate);
 
         second = new Rectangle(1, 96);
         second.setArcHeight(1);
         second.setArcWidth(1);
-        second.setStroke(getSkinnable().getSecondColor());
+        second.setStroke(clock.getSecondColor());
         second.getTransforms().setAll(secondRotate);
-        second.setVisible(getSkinnable().isSecondsVisible());
-        second.setManaged(getSkinnable().isSecondsVisible());
+        second.setVisible(clock.isSecondsVisible());
+        second.setManaged(clock.isSecondsVisible());
 
         knob = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, 4.5);
         knob.setStroke(Color.web("#282a3280"));
@@ -158,65 +152,42 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         shadowGroupMinute = new Group(minute);
         shadowGroupSecond = new Group(second, knob);
 
-        shadowGroupHour.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
-        shadowGroupMinute.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
-        shadowGroupSecond.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroupHour.setEffect(clock.getShadowsEnabled() ? dropShadow : null);
+        shadowGroupMinute.setEffect(clock.getShadowsEnabled() ? dropShadow : null);
+        shadowGroupSecond.setEffect(clock.getShadowsEnabled() ? dropShadow : null);
 
         title = new Text("");
         title.setTextOrigin(VPos.TOP);
-        Helper.enableNode(title, getSkinnable().isTitleVisible());
+        Helper.enableNode(title, clock.isTitleVisible());
 
-        amPmText = new Text(getSkinnable().getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
+        amPmText = new Text(clock.getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
 
         dateText = new Text("");
-        Helper.enableNode(dateText, getSkinnable().isDateVisible());
+        Helper.enableNode(dateText, clock.isDateVisible());
 
         text = new Text("");
-        Helper.enableNode(text, getSkinnable().isTextVisible());
+        Helper.enableNode(text, clock.isTextVisible());
 
         pane = new Pane(hourTickMarks, minuteTickMarks, title, amPmText, dateText, text, shadowGroupHour, shadowGroupMinute, shadowGroupSecond);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(clock.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(clock.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(clock.getBackgroundPaint(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        if (getSkinnable().isAnimated()) {
-            getSkinnable().currentTimeProperty().addListener(o -> updateTime(
-                ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId()))));
-        } else {
-            getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
-        }
+    @Override protected void registerListeners() {
+        super.registerListeners();
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) {
-        return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT);
-    }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) {
-        return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT);
-    }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(title, getSkinnable().isTitleVisible());
-            Helper.enableNode(text, getSkinnable().isTextVisible());
-            Helper.enableNode(dateText, getSkinnable().isDateVisible());
-            Helper.enableNode(second, getSkinnable().isSecondsVisible());
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(title, clock.isTitleVisible());
+            Helper.enableNode(text, clock.isTextVisible());
+            Helper.enableNode(dateText, clock.isDateVisible());
+            Helper.enableNode(second, clock.isSecondsVisible());
         } else if ("FINISHED".equals(EVENT_TYPE)) {
 
         }
@@ -232,8 +203,8 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         double  startAngle             = 180;
         double  angleStep              = 360 / 60;
         Point2D center                 = new Point2D(clockSize * 0.5, clockSize * 0.5);
-        boolean hourTickMarksVisible   = getSkinnable().isHourTickMarksVisible();
-        boolean minuteTickMarksVisible = getSkinnable().isMinuteTickMarksVisible();
+        boolean hourTickMarksVisible   = clock.isHourTickMarksVisible();
+        boolean minuteTickMarksVisible = clock.isMinuteTickMarksVisible();
         for (double angle = 0, counter = 0 ; Double.compare(counter, 59) <= 0 ; angle -= angleStep, counter++) {
             sinValue = Math.sin(Math.toRadians(angle + startAngle));
             cosValue = Math.cos(Math.toRadians(angle + startAngle));
@@ -266,28 +237,28 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         hourTickMarks.setCacheHint(CacheHint.QUALITY);
     }
 
-    public void updateTime(final ZonedDateTime TIME) {
-        if (getSkinnable().isDiscreteHours()) {
+    @Override public void updateTime(final ZonedDateTime TIME) {
+        if (clock.isDiscreteHours()) {
             hourRotate.setAngle(TIME.getHour() * 30);
         } else {
             hourRotate.setAngle(0.5 * (60 * TIME.getHour() + TIME.getMinute()));
         }
 
-        if (getSkinnable().isDiscreteMinutes()) {
+        if (clock.isDiscreteMinutes()) {
             minuteRotate.setAngle(TIME.getMinute() * 6);
         } else {
             minuteRotate.setAngle(TIME.getMinute() * 6 + TIME.getSecond() * 0.1);
         }
 
         if (second.isVisible()) {
-            if (getSkinnable().isDiscreteSeconds()) {
+            if (clock.isDiscreteSeconds()) {
                 secondRotate.setAngle(TIME.getSecond() * 6);
             } else {
                 secondRotate.setAngle(TIME.getSecond() * 6 + TIME.get(ChronoField.MILLI_OF_SECOND) * 0.006);
             }
         }
 
-        amPmText.setText(getSkinnable().getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
+        amPmText.setText(clock.getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
         Helper.adjustTextSize(amPmText, 0.2 * size, size * 0.05);
         amPmText.setX((size - amPmText.getLayoutBounds().getWidth()) * 0.5);
         amPmText.setY(size * 0.4);
@@ -298,6 +269,8 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         dateText.setY(size * 0.65);
     }
 
+    @Override public void updateAlarms() {}
+
 
     // ******************** Resizing ******************************************
     private void resizeText() {
@@ -305,14 +278,14 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         double fontSize = size * 0.06;
 
         title.setFont(Fonts.latoRegular(fontSize));
-        title.setText(getSkinnable().getTitle());
+        title.setText(clock.getTitle());
         if (title.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(title, maxWidth, fontSize); }
         title.setX(size * 0.05);
         title.setY(size * 0.05);
 
         maxWidth = size * 0.2;
         fontSize = size * 0.05;
-        amPmText.setText(getSkinnable().getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
+        amPmText.setText(clock.getTime().get(ChronoField.AMPM_OF_DAY) == 0 ? "AM" : "PM");
         Helper.adjustTextSize(amPmText, maxWidth, fontSize);
         amPmText.setX((size - amPmText.getLayoutBounds().getWidth()) * 0.5);
         amPmText.setY(size * 0.4);
@@ -325,15 +298,15 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
         maxWidth = size * 0.9;
         fontSize = size * 0.05;
-        text.setText(getSkinnable().getText());
+        text.setText(clock.getText());
         if (text.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(text, maxWidth, fontSize); }
         text.setX(size * 0.05);
         text.setY(size * 0.95);
     }
 
-    private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        double width  = clock.getWidth() - clock.getInsets().getLeft() - clock.getInsets().getRight();
+        double height = clock.getHeight() - clock.getInsets().getTop() - clock.getInsets().getBottom();
         size          = width < height ? width : height;
         clockSize     = size * CLOCK_SCALE_FACTOR;
 
@@ -341,7 +314,7 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             double center = size * 0.5;
 
             pane.setMaxSize(size, size);
-            pane.relocate((getSkinnable().getWidth() - size) * 0.5, (getSkinnable().getHeight() - size) * 0.5);
+            pane.relocate((clock.getWidth() - size) * 0.5, (clock.getHeight() - size) * 0.5);
 
             dropShadow.setRadius(0.008 * size);
             dropShadow.setOffsetY(0.008 * size);
@@ -352,7 +325,7 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             minuteTickMarks.relocate((size - minuteTickMarks.getLayoutBounds().getWidth()) * 0.5,
                                    (size - minuteTickMarks.getLayoutBounds().getHeight()) * 0.5);
 
-            hour.setFill(getSkinnable().getHourColor());
+            hour.setFill(clock.getHourColor());
             hour.setCache(false);
             hour.setWidth(clockSize * 0.015);
             hour.setHeight(clockSize * 0.29);
@@ -362,7 +335,7 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             hour.setCacheHint(CacheHint.ROTATE);
             hour.relocate((size - hour.getWidth()) * 0.5, size * 0.21 / CLOCK_SCALE_FACTOR);
 
-            minute.setFill(getSkinnable().getMinuteColor());
+            minute.setFill(clock.getMinuteColor());
             minute.setCache(false);
             minute.setWidth(clockSize * 0.015);
             minute.setHeight(clockSize * 0.47);
@@ -372,7 +345,7 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             minute.setCacheHint(CacheHint.ROTATE);
             minute.relocate((size - minute.getWidth()) * 0.5, size * 0.11 / CLOCK_SCALE_FACTOR);
 
-            second.setFill(getSkinnable().getSecondColor());
+            second.setFill(clock.getSecondColor());
             second.setCache(false);
             second.setWidth(clockSize * 0.005);
             second.setHeight(clockSize * 0.47);
@@ -382,7 +355,7 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             second.setCacheHint(CacheHint.ROTATE);
             second.relocate((size - second.getWidth()) * 0.5, size * 0.11 / CLOCK_SCALE_FACTOR);
 
-            knob.setFill(getSkinnable().getKnobColor());
+            knob.setFill(clock.getKnobColor());
             knob.setRadius(clockSize * 0.0225);
             knob.setCenterX(center);
             knob.setCenterY(center);
@@ -398,27 +371,27 @@ public class TileClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
     }
 
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(size * 0.025), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(size * 0.025), Insets.EMPTY)));
+    @Override protected void redraw() {
+        pane.setBorder(new Border(new BorderStroke(clock.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(size * 0.025), new BorderWidths(clock.getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(clock.getBackgroundPaint(), new CornerRadii(size * 0.025), Insets.EMPTY)));
 
-        shadowGroupHour.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
-        shadowGroupMinute.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
-        shadowGroupSecond.setEffect(getSkinnable().getShadowsEnabled() ? dropShadow : null);
+        shadowGroupHour.setEffect(clock.getShadowsEnabled() ? dropShadow : null);
+        shadowGroupMinute.setEffect(clock.getShadowsEnabled() ? dropShadow : null);
+        shadowGroupSecond.setEffect(clock.getShadowsEnabled() ? dropShadow : null);
 
         // Tick Marks
-        minuteTickMarks.setStroke(getSkinnable().getMinuteColor());
-        hourTickMarks.setStroke(getSkinnable().getHourColor());
+        minuteTickMarks.setStroke(clock.getMinuteColor());
+        hourTickMarks.setStroke(clock.getHourColor());
 
-        ZonedDateTime time = getSkinnable().getTime();
+        ZonedDateTime time = clock.getTime();
 
         updateTime(time);
 
         resizeText();
 
-        title.setFill(getSkinnable().getTitleColor());
-        dateText.setFill(getSkinnable().getDateColor());
-        text.setFill(getSkinnable().getTextColor());
-        amPmText.setFill(getSkinnable().getTextColor());
+        title.setFill(clock.getTitleColor());
+        dateText.setFill(clock.getDateColor());
+        text.setFill(clock.getTextColor());
+        amPmText.setFill(clock.getTextColor());
     }
 }

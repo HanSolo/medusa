@@ -51,13 +51,7 @@ import java.util.Locale;
 /**
  * Created by hansolo on 02.02.16.
  */
-public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
-    private static final double            PREFERRED_WIDTH     = 250;
-    private static final double            PREFERRED_HEIGHT    = 250;
-    private static final double            MINIMUM_WIDTH       = 50;
-    private static final double            MINIMUM_HEIGHT      = 50;
-    private static final double            MAXIMUM_WIDTH       = 1024;
-    private static final double            MAXIMUM_HEIGHT      = 1024;
+public class RoundLcdClockSkin extends ClockSkinBase {
     private static final DateTimeFormatter TIME_FORMATTER      = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter AMPM_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a");
     private              double            size;
@@ -103,14 +97,14 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
 
 
     // ******************** Initialization ************************************
-    private void initGraphics() {
+    @Override protected void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(clock.getPrefWidth(), 0.0) <= 0 || Double.compare(clock.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(clock.getWidth(), 0.0) <= 0 || Double.compare(clock.getHeight(), 0.0) <= 0) {
+            if (clock.getPrefWidth() > 0 && clock.getPrefHeight() > 0) {
+                clock.setPrefSize(clock.getPrefWidth(), clock.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                clock.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
@@ -130,39 +124,21 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         secondsCtx = secondsCanvas.getGraphicsContext2D();
 
         pane = new Pane(backgroundCanvas, foregroundCanvas, hoursCanvas, minutesCanvas, secondsCanvas);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(clock.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(clock.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(clock.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        if (getSkinnable().isAnimated()) {
-            getSkinnable().currentTimeProperty().addListener(o -> updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(getSkinnable().getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId()))));
-        } else {
-            getSkinnable().timeProperty().addListener(o -> updateTime(getSkinnable().getTime()));
-        }
+    @Override protected void registerListeners() {
+        super.registerListeners();
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("VISIBILITY".equals(EVENT_TYPE)) {
 
         } else if ("SECTION".equals(EVENT_TYPE)) {
             redraw();
@@ -174,10 +150,10 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
     private void drawForeground(final ZonedDateTime TIME) {
         foregroundCtx.clearRect(0, 0, size, size);
 
-        Locale locale = getSkinnable().getLocale();
+        Locale locale = clock.getLocale();
 
         // draw the time
-        if (getSkinnable().isTextVisible()) {
+        if (clock.isTextVisible()) {
             foregroundCtx.setFill(textColor);
             foregroundCtx.setTextBaseline(VPos.CENTER);
             foregroundCtx.setTextAlign(TextAlignment.CENTER);
@@ -191,14 +167,14 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
 
         // draw the date
-        if (getSkinnable().isDateVisible()) {
+        if (clock.isDateVisible()) {
             foregroundCtx.setFill(dateColor);
             foregroundCtx.setFont(Fonts.digital(0.09 * size));
             foregroundCtx.fillText(dateFormat.format(TIME), center, size * 0.65);
         }
 
         // draw the alarmOn icon
-        if (getSkinnable().isAlarmsEnabled() && getSkinnable().getAlarms().size() > 0) {
+        if (clock.isAlarmsEnabled() && clock.getAlarms().size() > 0) {
             foregroundCtx.setFill(alarmColor);
             drawAlarmIcon(foregroundCtx, foregroundCtx.getFill());
         }
@@ -299,8 +275,8 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
 
         // draw the title
-        if (getSkinnable().isTitleVisible()) {
-            String title = getSkinnable().getTitle();
+        if (clock.isTitleVisible()) {
+            String title = clock.getTitle();
             int    l     = title.length();
             char[] bkgChrs = new char[l];
             Arrays.fill(bkgChrs, '8');
@@ -313,9 +289,9 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
             backgroundCtx.fillText(title, center, size * 0.35, size * 0.55);
         }
 
-        Locale locale = getSkinnable().getLocale();
+        Locale locale = clock.getLocale();
         // draw the text
-        if (getSkinnable().isTextVisible()) {
+        if (clock.isTextVisible()) {
             backgroundCtx.setFill(Helper.getTranslucentColorFrom(textColor, 0.1));
             backgroundCtx.setTextBaseline(VPos.CENTER);
             backgroundCtx.setTextAlign(TextAlignment.CENTER);
@@ -329,7 +305,7 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
 
         // draw the date
-        if (getSkinnable().isDateVisible()) {
+        if (clock.isDateVisible()) {
             backgroundCtx.setFill(Helper.getTranslucentColorFrom(dateColor, 0.1));
             backgroundCtx.setFont(Fonts.digital(0.09 * size));
             if (Locale.US == locale) {
@@ -342,7 +318,7 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
 
         // draw the alarmOn icon
-        if (getSkinnable().isAlarmsEnabled() && getSkinnable().getAlarms().size() > 0) {
+        if (clock.isAlarmsEnabled() && clock.getAlarms().size() > 0) {
             backgroundCtx.setFill(Helper.getTranslucentColorFrom(alarmColor, 0.1));
             drawAlarmIcon(backgroundCtx, backgroundCtx.getFill());
         }
@@ -377,24 +353,26 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         CTX.restore();
     }
 
-    private void updateTime(final ZonedDateTime TIME) {
+    @Override public void updateTime(final ZonedDateTime TIME) {
         drawForeground(TIME);
         drawHours(TIME);
         drawMinutes(TIME);
         drawSeconds(TIME);
     }
 
+    @Override public void updateAlarms() {}
+
 
     // ******************** Resizing ******************************************
-    private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        double width  = clock.getWidth() - clock.getInsets().getLeft() - clock.getInsets().getRight();
+        double height = clock.getHeight() - clock.getInsets().getTop() - clock.getInsets().getBottom();
         size          = width < height ? width : height;
         center        = size * 0.5;
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(size, size);
-            pane.relocate((getSkinnable().getWidth() - size) * 0.5, (getSkinnable().getHeight() - size) * 0.5);
+            pane.relocate((clock.getWidth() - size) * 0.5, (clock.getHeight() - size) * 0.5);
 
             backgroundCanvas.setWidth(size);
             backgroundCanvas.setHeight(size);
@@ -410,19 +388,19 @@ public class RoundLcdClockSkin extends SkinBase<Clock> implements Skin<Clock> {
         }
     }
 
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        ZonedDateTime time = getSkinnable().getTime();
+    @Override protected void redraw() {
+        pane.setBorder(new Border(new BorderStroke(clock.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(clock.getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(clock.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        ZonedDateTime time = clock.getTime();
 
-        hourColor       = getSkinnable().getHourColor();
-        minuteColor     = getSkinnable().getMinuteColor();
+        hourColor       = clock.getHourColor();
+        minuteColor     = clock.getMinuteColor();
         fiveMinuteColor = minuteColor.darker();
-        secondColor     = getSkinnable().getSecondColor();
-        titleColor      = getSkinnable().getTitleColor();
-        textColor       = getSkinnable().getTextColor();
-        dateColor       = getSkinnable().getDateColor();
-        alarmColor      = getSkinnable().getAlarmColor();
+        secondColor     = clock.getSecondColor();
+        titleColor      = clock.getTitleColor();
+        textColor       = clock.getTextColor();
+        dateColor       = clock.getDateColor();
+        alarmColor      = clock.getAlarmColor();
 
         drawBackground();
         drawForeground(time);
