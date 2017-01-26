@@ -17,8 +17,6 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
-import eu.hansolo.medusa.Marker.MarkerEvent;
-import eu.hansolo.medusa.Marker.MarkerType;
 import eu.hansolo.medusa.skins.GaugeSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -27,12 +25,8 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.scene.control.Skin;
-import javafx.scene.paint.Color;
 
 import java.util.HashMap;
 
