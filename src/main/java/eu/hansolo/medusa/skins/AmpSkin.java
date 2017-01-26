@@ -22,6 +22,7 @@ import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -68,16 +69,16 @@ import static eu.hansolo.medusa.tools.Helper.enableNode;
 /**
  * Created by hansolo on 30.12.15.
  */
-public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double PREFERRED_WIDTH  = 310;
-    private static final double PREFERRED_HEIGHT = 260;
-    private static final double MINIMUM_WIDTH    = 31;
-    private static final double MINIMUM_HEIGHT   = 26;
-    private static final double MAXIMUM_WIDTH    = 1024;
-    private static final double MAXIMUM_HEIGHT   = 858;
-    private static final double ASPECT_RATIO     = 0.83870968;
-    private static final double START_ANGLE      = 225;
-    private static final double ANGLE_RANGE      = 90;
+public class AmpSkin extends GaugeSkinBase {
+    protected static final double PREFERRED_WIDTH  = 310;
+    protected static final double PREFERRED_HEIGHT = 260;
+    protected static final double MINIMUM_WIDTH    = 31;
+    protected static final double MINIMUM_HEIGHT   = 26;
+    protected static final double MAXIMUM_WIDTH    = 1024;
+    protected static final double MAXIMUM_HEIGHT   = 858;
+    private static final double ASPECT_RATIO       = 0.83870968;
+    private static final double START_ANGLE        = 225;
+    private static final double ANGLE_RANGE        = 90;
     private double          oldValue;
     private double          width;
     private double          height;
@@ -113,16 +114,23 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private double          angleStep;
     private String          formatString;
     private Locale          locale;
+    private ListChangeListener<Section> sectionListener;
+    private InvalidationListener        currentValueListener;
+    private InvalidationListener        needleRotateListener;
 
 
     // ******************** Constructors **************************************
     public AmpSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleStep    = gauge.getAngleRange() / gauge.getRange();
-        oldValue     = gauge.getValue();
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale       = gauge.getLocale();
+        angleStep            = gauge.getAngleRange() / gauge.getRange();
+        oldValue             = gauge.getValue();
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
+        sectionListener      = c -> redraw();
+        currentValueListener = o -> rotateNeedle();
+        needleRotateListener = o -> handleEvents("ANGLE");
+
 
         initGraphics();
         registerListeners();
@@ -132,12 +140,12 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
@@ -148,7 +156,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         led       = ledCanvas.getGraphicsContext2D();
 
         needleRotate = new Rotate(180 - START_ANGLE);
-        needleRotate.setAngle(needleRotate.getAngle() + (getSkinnable().getValue() - oldValue - getSkinnable().getMinValue()) * angleStep);
+        needleRotate.setAngle(needleRotate.getAngle() + (gauge.getValue() - oldValue - gauge.getMinValue()) * angleStep);
 
         needleMoveTo1       = new MoveTo();
         needleCubicCurveTo2 = new CubicCurveTo();
@@ -168,12 +176,12 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
 
         shadowGroup = new Group(needle);
-        shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(gauge.isShadowsEnabled() ? dropShadow : null);
 
-        titleText = new Text(getSkinnable().getTitle());
+        titleText = new Text(gauge.getTitle());
         titleText.setTextOrigin(VPos.CENTER);
 
-        unitText = new Text(getSkinnable().getUnit());
+        unitText = new Text(gauge.getUnit());
         unitText.setMouseTransparent(true);
         unitText.setTextOrigin(VPos.CENTER);
 
@@ -181,16 +189,16 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         lcd.setArcWidth(0.0125 * PREFERRED_HEIGHT);
         lcd.setArcHeight(0.0125 * PREFERRED_HEIGHT);
         lcd.relocate((PREFERRED_WIDTH - lcd.getWidth()) * 0.5, 0.44 * PREFERRED_HEIGHT);
-        lcd.setManaged(getSkinnable().isLcdVisible());
-        lcd.setVisible(getSkinnable().isLcdVisible());
+        lcd.setManaged(gauge.isLcdVisible());
+        lcd.setVisible(gauge.isLcdVisible());
 
-        lcdText = new Label(String.format(locale, "%." + getSkinnable().getDecimals() + "f", getSkinnable().getValue()));
+        lcdText = new Label(String.format(locale, "%." + gauge.getDecimals() + "f", gauge.getValue()));
         lcdText.setAlignment(Pos.CENTER_RIGHT);
-        lcdText.setVisible(getSkinnable().isLcdVisible());
+        lcdText.setVisible(gauge.isLcdVisible());
 
         // Set initial value
-        angleStep          = ANGLE_RANGE / getSkinnable().getRange();
-        double targetAngle = 180 - START_ANGLE + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep;
+        angleStep          = ANGLE_RANGE / gauge.getRange();
+        double targetAngle = 180 - START_ANGLE + (gauge.getValue() - gauge.getMinValue()) * angleStep;
         targetAngle        = clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle);
         needleRotate.setAngle(targetAngle);
 
@@ -214,54 +222,40 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().getSections().addListener((ListChangeListener<Section>) c -> redraw());
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-
-        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle());
-
-        needleRotate.angleProperty().addListener(observable -> handleEvents("ANGLE"));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        
+        gauge.getSections().addListener(sectionListener);
+        gauge.currentValueProperty().addListener(currentValueListener);
+        needleRotate.angleProperty().addListener(needleRotateListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
     protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
         if ("ANGLE".equals(EVENT_TYPE)) {
-            double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + getSkinnable().getMinValue();
+            double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + gauge.getMinValue();
             lcdText.setText((String.format(locale, formatString, currentValue)));
             lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            enableNode(ledCanvas, getSkinnable().isLedVisible());
-            enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            enableNode(lcd,getSkinnable().isLcdVisible());
-            enableNode(lcdText,getSkinnable().isLcdVisible());
-            redraw();
-        } else if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
+            enableNode(ledCanvas, gauge.isLedVisible());
+            enableNode(titleText, !gauge.getTitle().isEmpty());
+            enableNode(unitText, !gauge.getUnit().isEmpty());
+            enableNode(lcd,gauge.isLcdVisible());
+            enableNode(lcdText,gauge.isLcdVisible());
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
-            if (getSkinnable().isLedVisible()) { drawLed(led); }
+            if (gauge.isLedVisible()) { drawLed(led); }
         } else if ("LCD".equals(EVENT_TYPE)) {
-            if (getSkinnable().isLcdVisible()) redraw();
+            if (gauge.isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            angleStep = getSkinnable().getAngleStep();
-            if (getSkinnable().getValue() < getSkinnable().getMinValue()) {
-                oldValue = getSkinnable().getMinValue();
+            angleStep = gauge.getAngleStep();
+            if (gauge.getValue() < gauge.getMinValue()) {
+                oldValue = gauge.getMinValue();
             }
-            if (getSkinnable().getValue() > getSkinnable().getMaxValue()) {
-                oldValue = getSkinnable().getMaxValue();
+            if (gauge.getValue() > gauge.getMaxValue()) {
+                oldValue = gauge.getMaxValue();
             }
             redraw();
             rotateNeedle();
@@ -271,8 +265,8 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     // ******************** Private Methods ***********************************
     private void rotateNeedle() {
-        angleStep          = ANGLE_RANGE / (getSkinnable().getRange());
-        double targetAngle = 180 - START_ANGLE + (getSkinnable().getCurrentValue() - getSkinnable().getMinValue()) * angleStep;
+        angleStep          = ANGLE_RANGE / (gauge.getRange());
+        double targetAngle = 180 - START_ANGLE + (gauge.getCurrentValue() - gauge.getMinValue()) * angleStep;
         targetAngle        = clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle);
         needleRotate.setAngle(targetAngle);
     }
@@ -280,15 +274,15 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void drawTickMarks(final GraphicsContext CTX) {
         double     sinValue;
         double     cosValue;
-        double     orthText         = TickLabelOrientation.ORTHOGONAL == getSkinnable().getTickLabelOrientation() ? 0.51 : 0.52;
+        double     orthText         = TickLabelOrientation.ORTHOGONAL == gauge.getTickLabelOrientation() ? 0.51 : 0.52;
         Point2D    center           = new Point2D(width * 0.5, height * 0.77);
-        double     minorTickSpace   = getSkinnable().getMinorTickSpace();
-        double     minValue         = getSkinnable().getMinValue();
-        //double     maxValue         = getSkinnable().getMaxValue();
+        double     minorTickSpace   = gauge.getMinorTickSpace();
+        double     minValue         = gauge.getMinValue();
+        //double     maxValue         = gauge.getMaxValue();
         double     tmpAngleStep     = angleStep * minorTickSpace;
-        int        decimals         = getSkinnable().getTickLabelDecimals();
+        int        decimals         = gauge.getTickLabelDecimals();
         BigDecimal minorTickSpaceBD = BigDecimal.valueOf(minorTickSpace);
-        BigDecimal majorTickSpaceBD = BigDecimal.valueOf(getSkinnable().getMajorTickSpace());
+        BigDecimal majorTickSpaceBD = BigDecimal.valueOf(gauge.getMajorTickSpace());
         BigDecimal mediumCheck2     = BigDecimal.valueOf(2 * minorTickSpace);
         BigDecimal mediumCheck5     = BigDecimal.valueOf(5 * minorTickSpace);
         BigDecimal counterBD        = BigDecimal.valueOf(minValue);
@@ -307,7 +301,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             Point2D outerPoint       = new Point2D(center.getX() + width * 0.48387097 * sinValue, center.getY() + width * 0.48387097 * cosValue);
             Point2D textPoint        = new Point2D(center.getX() + width * orthText * sinValue, center.getY() + width * orthText * cosValue);
 
-            CTX.setStroke(getSkinnable().getTickMarkColor());
+            CTX.setStroke(gauge.getTickMarkColor());
             if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw major tickmark
                 CTX.setLineWidth(height * 0.0055);
@@ -316,7 +310,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 // Draw text
                 CTX.save();
                 CTX.translate(textPoint.getX(), textPoint.getY());
-                switch(getSkinnable().getTickLabelOrientation()) {
+                switch(gauge.getTickLabelOrientation()) {
                     case ORTHOGONAL:
                         if ((360 - START_ANGLE - angle) % 360 > 90 && (360 - START_ANGLE - angle) % 360 < 270) {
                             CTX.rotate((180 - START_ANGLE - angle) % 360);
@@ -337,15 +331,15 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 }
                 CTX.setTextAlign(TextAlignment.CENTER);
                 CTX.setTextBaseline(VPos.CENTER);
-                CTX.setFill(getSkinnable().getTickLabelColor());
+                CTX.setFill(gauge.getTickLabelColor());
                 CTX.fillText(String.format(locale, "%." + decimals + "f", counter), 0, 0);
                 CTX.restore();
-            } else if (getSkinnable().getMediumTickMarksVisible() &&
+            } else if (gauge.getMediumTickMarksVisible() &&
                        Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0.0) != 0.0 &&
                        Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0.0) == 0.0) {
                 CTX.setLineWidth(height * 0.0035);
                 CTX.strokeLine(innerPoint.getX(), innerPoint.getY(), outerMediumPoint.getX(), outerMediumPoint.getY());
-            } else if (getSkinnable().getMinorTickMarksVisible() && Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0.0) == 0) {
+            } else if (gauge.getMinorTickMarksVisible() && Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 CTX.setLineWidth(height * 0.00225);
                 CTX.strokeLine(innerPoint.getX(), innerPoint.getY(), outerMinorPoint.getX(), outerMinorPoint.getY());
             }
@@ -359,13 +353,13 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         final double y         = width * 0.21;
         final double w         = width * 0.88;
         final double h         = height * 1.05;
-        final double MIN_VALUE = getSkinnable().getMinValue();
-        final double MAX_VALUE = getSkinnable().getMaxValue();
+        final double MIN_VALUE = gauge.getMinValue();
+        final double MAX_VALUE = gauge.getMaxValue();
         final double OFFSET    = 90 - START_ANGLE;
 
-        int listSize = getSkinnable().getSections().size();
+        int listSize = gauge.getSections().size();
         for (int i = 0 ; i < listSize ; i++) {
-            final Section SECTION = getSkinnable().getSections().get(i);
+            final Section SECTION = gauge.getSections().get(i);
             final double  SECTION_START_ANGLE;
             if (Double.compare(SECTION.getStart(), MAX_VALUE) <= 0 && Double.compare(SECTION.getStop(), MIN_VALUE) >= 0) {
                 if (SECTION.getStart() < MIN_VALUE && SECTION.getStop() < MAX_VALUE) {
@@ -396,7 +390,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         CTX.fillOval(0, 0, ledSize, ledSize);
 
         CTX.save();
-        if (getSkinnable().isLedOn()) {
+        if (gauge.isLedOn()) {
             CTX.setEffect(ledOnShadow);
             CTX.setFill(ledOnGradient);
         } else {
@@ -427,7 +421,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         lcdText.setPadding(new Insets(0, 0.005 * width, 0, 0.005 * width));
 
-        switch(getSkinnable().getLcdFont()) {
+        switch(gauge.getLcdFont()) {
             case LCD:
                 lcdText.setFont(Fonts.digital(0.108 * height));
                 lcdText.setTranslateY(0.45 * height);
@@ -454,9 +448,16 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
     }
 
-    private void resize() {
-        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override public void dispose() {
+        gauge.getSections().removeListener(sectionListener);
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        needleRotate.angleProperty().removeListener(needleRotateListener);
+        super.dispose();
+    }
+
+    @Override protected void resize() {
+        width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
 
         if (ASPECT_RATIO * width > height) {
             width = 1 / (ASPECT_RATIO / height);
@@ -466,7 +467,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
-            pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+            pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
 
             dropShadow.setRadius(0.01 * height);
             dropShadow.setOffsetY(0.01 * height);
@@ -481,7 +482,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             lcd.relocate((width - lcd.getWidth()) * 0.5, 0.44 * height);
 
             ledSize = 0.06 * height;
-            final Color LED_COLOR = getSkinnable().getLedColor();
+            final Color LED_COLOR = gauge.getLedColor();
             frameGradient = new LinearGradient(0.14 * ledSize, 0.14 * ledSize,
                                                0.84 * ledSize, 0.84 * ledSize,
                                                false, CycleMethod.NO_CYCLE,
@@ -518,7 +519,7 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             ledCanvas.relocate(0.11 * width, 0.10 * height);
             ledOffShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
             ledOnShadow  = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
-            ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getLedColor(), 0.36 * ledSize, 0, 0, 0));
+            ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));
 
 
             double needleWidth  = height * 0.015;
@@ -552,10 +553,10 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             LinearGradient needleGradient = new LinearGradient(needle.getLayoutBounds().getMinX(), 0,
                                                                needle.getLayoutBounds().getMaxX(), 0,
                                                                false, CycleMethod.NO_CYCLE,
-                                                               new Stop(0.0, getSkinnable().getNeedleColor()),
-                                                               new Stop(0.5, getSkinnable().getNeedleColor()),
-                                                               new Stop(0.5, getSkinnable().getNeedleColor().brighter().brighter()),
-                                                               new Stop(1.0, getSkinnable().getNeedleColor().brighter().brighter()));
+                                                               new Stop(0.0, gauge.getNeedleColor()),
+                                                               new Stop(0.5, gauge.getNeedleColor()),
+                                                               new Stop(0.5, gauge.getNeedleColor().brighter().brighter()),
+                                                               new Stop(1.0, gauge.getNeedleColor().brighter().brighter()));
 
             needle.setFill(needleGradient);
             needle.setStrokeWidth(0);
@@ -576,11 +577,11 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void redraw() {
-        locale       = getSkinnable().getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+    @Override protected void redraw() {
+        locale       = gauge.getLocale();
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
-        Color backgroundColor = getSkinnable().getBackgroundPaint() instanceof Color ? (Color) getSkinnable().getBackgroundPaint() : Color.WHITE;
+        Color backgroundColor = gauge.getBackgroundPaint() instanceof Color ? (Color) gauge.getBackgroundPaint() : Color.WHITE;
         ticksAndSectionsCanvas.setCache(false);
         ticksAndSections.clearRect(0, 0, width, height);
         ticksAndSections.setFill(new LinearGradient(0, 0, 0, height, false, CycleMethod.NO_CYCLE,
@@ -592,15 +593,15 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                                     new Stop(1.0, Color.TRANSPARENT)));
 
         ticksAndSections.fillRect(0, 0, width, height);
-        if (getSkinnable().getSectionsVisible()) drawSections(ticksAndSections);
+        if (gauge.getSectionsVisible()) drawSections(ticksAndSections);
         drawTickMarks(ticksAndSections);
         ticksAndSectionsCanvas.setCache(true);
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        unitText.setFill(getSkinnable().getUnitColor());
-        if (getSkinnable().isLcdVisible()) {
-            LcdDesign lcdDesign = getSkinnable().getLcdDesign();
+        titleText.setFill(gauge.getTitleColor());
+        unitText.setFill(gauge.getUnitColor());
+        if (gauge.isLcdVisible()) {
+            LcdDesign lcdDesign = gauge.getLcdDesign();
             Color[] lcdColors = lcdDesign.getColors();
             LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
                                                             false, CycleMethod.NO_CYCLE,
@@ -626,10 +627,10 @@ public class AmpSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             lcdText.setTextFill(lcdColors[5]);
         }
 
-        if (getSkinnable().isLedVisible()) drawLed(led);
+        if (gauge.isLedVisible()) drawLed(led);
 
-        shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(gauge.isShadowsEnabled() ? dropShadow : null);
 
-        foreground.setFill(getSkinnable().getForegroundPaint());
+        foreground.setFill(gauge.getForegroundPaint());
     }
 }

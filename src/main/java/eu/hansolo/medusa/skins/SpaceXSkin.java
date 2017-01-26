@@ -19,10 +19,9 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
-import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -46,68 +45,70 @@ import java.util.Locale;
 /**
  * Created by hansolo on 29.12.15.
  */
-public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double          PREFERRED_WIDTH  = 250;
-    private static final double          PREFERRED_HEIGHT = 290;
-    private static final double          MINIMUM_WIDTH    = 50;
-    private static final double          MINIMUM_HEIGHT   = 50;
-    private static final double          MAXIMUM_WIDTH    = 1024;
-    private static final double          MAXIMUM_HEIGHT   = 1024;
-    private static final double          ASPECT_RATIO     = 1.1625;
-    private static final double          ANGLE_RANGE      = 270;
-    private              double          size;
-    private              double          width;
-    private              double          height;
-    private              double          centerX;
-    private              double          centerY;
-    private              double          range;
-    private              double          angleStep;
-    private              double          currentValueAngle;
-    private              double          thresholdAngle;
-    private              double          barWidth;
-    private              Pane            pane;
-    private              Text            unitText;
-    private              Text            titleText;
-    private              Text            valueText;
-    private              Path            barBackground;
-    private              MoveTo          barBackgroundStart;
-    private              ArcTo           barBackgroundOuterArc;
-    private              LineTo          barBackgroundLineToInnerArc;
-    private              ArcTo           barBackgroundInnerArc;
-    private              Path            thresholdBar;
-    private              MoveTo          thresholdBarStart;
-    private              ArcTo           thresholdBarOuterArc;
-    private              LineTo          thresholdBarLineToInnerArc;
-    private              ArcTo           thresholdBarInnerArc;
-    private              Path            dataBar;
-    private              MoveTo          dataBarStart;
-    private              ArcTo           dataBarOuterArc;
-    private              LineTo          dataBarLineToInnerArc;
-    private              ArcTo           dataBarInnerArc;
-    private              Path            dataBarThreshold;
-    private              MoveTo          dataBarThresholdStart;
-    private              ArcTo           dataBarThresholdOuterArc;
-    private              LineTo          dataBarThresholdLineToInnerArc;
-    private              ArcTo           dataBarThresholdInnerArc;
-    private              Color           barColor;
-    private              Color           thresholdColor;
-    private              Color           barBackgroundColor;
-    private              Color           thresholdBackgroundColor;
-    private              double          minValue;
-    private              String          formatString;
-    private              Locale          locale;
+public class SpaceXSkin extends GaugeSkinBase {
+    protected static final double             PREFERRED_WIDTH  = 250;
+    protected static final double             PREFERRED_HEIGHT = 290;
+    protected static final double             MINIMUM_WIDTH    = 50;
+    protected static final double             MINIMUM_HEIGHT   = 50;
+    protected static final double             MAXIMUM_WIDTH    = 1024;
+    protected static final double             MAXIMUM_HEIGHT   = 1024;
+    private static final double               ASPECT_RATIO     = 1.1625;
+    private static final double               ANGLE_RANGE      = 270;
+    private              double               size;
+    private              double               width;
+    private              double               height;
+    private              double               centerX;
+    private              double               centerY;
+    private              double               range;
+    private              double               angleStep;
+    private              double               currentValueAngle;
+    private              double               thresholdAngle;
+    private              double               barWidth;
+    private              Pane                 pane;
+    private              Text                 unitText;
+    private              Text                 titleText;
+    private              Text                 valueText;
+    private              Path                 barBackground;
+    private              MoveTo               barBackgroundStart;
+    private              ArcTo                barBackgroundOuterArc;
+    private              LineTo               barBackgroundLineToInnerArc;
+    private              ArcTo                barBackgroundInnerArc;
+    private              Path                 thresholdBar;
+    private              MoveTo               thresholdBarStart;
+    private              ArcTo                thresholdBarOuterArc;
+    private              LineTo               thresholdBarLineToInnerArc;
+    private              ArcTo                thresholdBarInnerArc;
+    private              Path                 dataBar;
+    private              MoveTo               dataBarStart;
+    private              ArcTo                dataBarOuterArc;
+    private              LineTo               dataBarLineToInnerArc;
+    private              ArcTo                dataBarInnerArc;
+    private              Path                 dataBarThreshold;
+    private              MoveTo               dataBarThresholdStart;
+    private              ArcTo                dataBarThresholdOuterArc;
+    private              LineTo               dataBarThresholdLineToInnerArc;
+    private              ArcTo                dataBarThresholdInnerArc;
+    private              Color                barColor;
+    private              Color                thresholdColor;
+    private              Color                barBackgroundColor;
+    private              Color                thresholdBackgroundColor;
+    private              double               minValue;
+    private              String               formatString;
+    private              Locale               locale;
+    private              InvalidationListener currentValueListener;
 
 
     // ******************** Constructors **************************************
     public SpaceXSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        range             = gauge.getRange();
-        angleStep         = ANGLE_RANGE / range;
-        minValue          = gauge.getMinValue();
-        currentValueAngle = 0;
-        formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale            = gauge.getLocale();
+        range                = gauge.getRange();
+        angleStep            = ANGLE_RANGE / range;
+        minValue             = gauge.getMinValue();
+        currentValueAngle    = 0;
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
+        currentValueListener = o -> setBar(gauge.getCurrentValue());
 
         initGraphics();
         registerListeners();
@@ -117,34 +118,34 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
-        barColor                 = getSkinnable().getBarColor();
-        thresholdColor           = getSkinnable().getThresholdColor();
-        barBackgroundColor       = getSkinnable().getBarBackgroundColor();
+        barColor                 = gauge.getBarColor();
+        thresholdColor           = gauge.getThresholdColor();
+        barBackgroundColor       = gauge.getBarBackgroundColor();
         thresholdBackgroundColor = Color.color(thresholdColor.getRed(), thresholdColor.getGreen(), thresholdColor.getBlue(), 0.25);
 
-        unitText = new Text(getSkinnable().getUnit());
+        unitText = new Text(gauge.getUnit());
         unitText.setTextOrigin(VPos.CENTER);
-        unitText.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+        unitText.setFill(gauge.getUnitColor());
+        Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        titleText = new Text(getSkinnable().getTitle());
+        titleText = new Text(gauge.getTitle());
         titleText.setTextOrigin(VPos.CENTER);
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(gauge.getTitleColor());
+        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
+        valueText = new Text(String.format(locale, formatString, gauge.getValue()));
         valueText.setTextOrigin(VPos.CENTER);
-        valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        valueText.setFill(gauge.getValueColor());
+        Helper.enableNode(valueText, gauge.isValueVisible());
 
         barBackgroundStart          = new MoveTo();
         barBackgroundOuterArc       = new ArcTo(0.675 * PREFERRED_HEIGHT, 0.675 * PREFERRED_HEIGHT, 0, PREFERRED_WIDTH, 0.675 * PREFERRED_HEIGHT, true, true);
@@ -189,7 +190,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBar.getElements().add(dataBarInnerArc);
         dataBar.getElements().add(new ClosePath());
         dataBar.setFill(barColor);
-        dataBar.setStroke(getSkinnable().getBorderPaint());
+        dataBar.setStroke(gauge.getBorderPaint());
 
         dataBarThresholdStart          = new MoveTo();
         dataBarThresholdOuterArc       = new ArcTo(PREFERRED_WIDTH, 0.5 * PREFERRED_HEIGHT, 0, 0, 0, false, true);
@@ -204,7 +205,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarThreshold.getElements().add(dataBarThresholdInnerArc);
         dataBarThreshold.getElements().add(new ClosePath());
         dataBarThreshold.setFill(thresholdColor);
-        dataBarThreshold.setStroke(getSkinnable().getBorderPaint());
+        dataBarThreshold.setStroke(gauge.getBorderPaint());
 
         pane = new Pane(titleText,
                         valueText,
@@ -213,53 +214,45 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         thresholdBar,
                         dataBar,
                         dataBarThreshold);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> resize());
-        getSkinnable().heightProperty().addListener(o -> resize());
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> setBar(getSkinnable().getCurrentValue()));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.currentValueProperty().addListener(currentValueListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    protected void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("RECALC".equals(EVENT_TYPE)) {
-            range     = getSkinnable().getRange();
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("RECALC".equals(EVENT_TYPE)) {
+            range     = gauge.getRange();
             angleStep = ANGLE_RANGE / range;
-            minValue  = getSkinnable().getMinValue();
+            minValue  = gauge.getMinValue();
             resize();
             redraw();
-            setBar(getSkinnable().getCurrentValue());
+            setBar(gauge.getCurrentValue());
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(valueText, gauge.isValueVisible());
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
+            Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
         }
+    }
+
+    @Override public void dispose() {
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        super.dispose();
     }
 
 
     // ******************** Private Methods ***********************************
     private void setBar(final double VALUE) {
         currentValueAngle = (VALUE - minValue) * angleStep;
-        thresholdAngle    = (getSkinnable().getThreshold() - minValue) * angleStep;
+        thresholdAngle    = (gauge.getThreshold() - minValue) * angleStep;
         double valueAngle = currentValueAngle > thresholdAngle ? thresholdAngle : currentValueAngle;
         dataBarOuterArc.setLargeArcFlag(valueAngle > 180);
         dataBarInnerArc.setLargeArcFlag(valueAngle > 180);
@@ -269,7 +262,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dataBarLineToInnerArc.setX(centerX + (centerX - barWidth) * Math.sin(-Math.toRadians(valueAngle)));
         dataBarLineToInnerArc.setY(centerY + (centerX - barWidth) * Math.cos(-Math.toRadians(valueAngle)));
 
-        double dataBarThresholdAngle = VALUE > getSkinnable().getThreshold() ? currentValueAngle : thresholdAngle;
+        double dataBarThresholdAngle = VALUE > gauge.getThreshold() ? currentValueAngle : thresholdAngle;
         dataBarThresholdOuterArc.setLargeArcFlag(dataBarThresholdAngle > 180 + thresholdAngle);
         dataBarThresholdInnerArc.setLargeArcFlag(dataBarThresholdAngle > 180 + thresholdAngle);
 
@@ -285,9 +278,9 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
     }
 
-    private void resize() {
-        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
         size   = width < height ? width : height;
 
         if (ASPECT_RATIO * width > height) {
@@ -298,7 +291,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
-            pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+            pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
 
             centerX  = 0.5 * width;
             centerY  = 0.56989247 * height;
@@ -316,8 +309,8 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             if (unitText.getLayoutBounds().getWidth() > 0.4 * width) Helper.adjustTextSize(unitText, width, 0.11 * width);
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()), 0.79 * height);
 
-            thresholdAngle    = (getSkinnable().getThreshold() - minValue) * angleStep;
-            currentValueAngle = (getSkinnable().getCurrentValue() - minValue) * angleStep;
+            thresholdAngle    = (gauge.getThreshold() - minValue) * angleStep;
+            currentValueAngle = (gauge.getCurrentValue() - minValue) * angleStep;
 
             barBackgroundOuterArc.setLargeArcFlag(thresholdAngle > 180);
             barBackgroundInnerArc.setLargeArcFlag(thresholdAngle > 180);
@@ -367,7 +360,7 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             dataBarInnerArc.setX(centerX);
             dataBarInnerArc.setY((height - barWidth));
 
-            double dataBarThresholdAngle = getSkinnable().getCurrentValue() > getSkinnable().getThreshold() ? currentValueAngle : thresholdAngle;
+            double dataBarThresholdAngle = gauge.getCurrentValue() > gauge.getThreshold() ? currentValueAngle : thresholdAngle;
 
             dataBarThresholdStart.setX(centerX + centerX * Math.sin(-Math.toRadians(thresholdAngle)));
             dataBarThresholdStart.setY(centerY + centerX * Math.cos(-Math.toRadians(thresholdAngle)));
@@ -384,29 +377,29 @@ public class SpaceXSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void redraw() {
-        locale                   = getSkinnable().getLocale();
-        formatString             = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * width))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
-        barColor                 = getSkinnable().getBarColor();
-        thresholdColor           = getSkinnable().getThresholdColor();
-        barBackgroundColor       = getSkinnable().getBarBackgroundColor();
+    @Override protected void redraw() {
+        locale                   = gauge.getLocale();
+        formatString             = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * width))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        barColor                 = gauge.getBarColor();
+        thresholdColor           = gauge.getThresholdColor();
+        barBackgroundColor       = gauge.getBarBackgroundColor();
         thresholdBackgroundColor = Color.color(thresholdColor.getRed(), thresholdColor.getGreen(), thresholdColor.getBlue(), 0.25);
         barBackground.setFill(barBackgroundColor);
         thresholdBar.setFill(thresholdBackgroundColor);
         dataBar.setFill(barColor);
         dataBarThreshold.setFill(thresholdColor);
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        titleText.setText(getSkinnable().getTitle());
+        titleText.setFill(gauge.getTitleColor());
+        titleText.setText(gauge.getTitle());
 
-        valueText.setFill(getSkinnable().getValueColor());
-        valueText.setText(String.format(locale, formatString, getSkinnable().getCurrentValue()));
+        valueText.setFill(gauge.getValueColor());
+        valueText.setText(String.format(locale, formatString, gauge.getCurrentValue()));
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
 
-        unitText.setFill(getSkinnable().getUnitColor());
-        unitText.setText(getSkinnable().getUnit());
+        unitText.setFill(gauge.getUnitColor());
+        unitText.setText(gauge.getUnit());
         unitText.relocate((width - unitText.getLayoutBounds().getWidth()), 0.79 * height);
     }
 }

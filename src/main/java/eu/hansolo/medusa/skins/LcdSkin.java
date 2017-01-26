@@ -22,6 +22,7 @@ import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.LcdFont;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
@@ -65,13 +66,13 @@ import java.util.Map;
 /**
  * Created by hansolo on 21.01.16.
  */
-public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double                PREFERRED_WIDTH    = 220;//275;
-    private static final double                PREFERRED_HEIGHT   = 100;
-    private static final double                MINIMUM_WIDTH      = 5;
-    private static final double                MINIMUM_HEIGHT     = 5;
-    private static final double                MAXIMUM_WIDTH      = 1024;
-    private static final double                MAXIMUM_HEIGHT     = 1024;
+public class LcdSkin extends GaugeSkinBase {
+    protected static final double              PREFERRED_WIDTH    = 220;//275;
+    protected static final double              PREFERRED_HEIGHT   = 100;
+    protected static final double              MINIMUM_WIDTH      = 5;
+    protected static final double              MINIMUM_HEIGHT     = 5;
+    protected static final double              MAXIMUM_WIDTH      = 1024;
+    protected static final double              MAXIMUM_HEIGHT     = 1024;
     private static final Color                 DARK_NOISE_COLOR   = Color.rgb(100, 100, 100, 0.10);
     private static final Color                 BRIGHT_NOISE_COLOR = Color.rgb(200, 200, 200, 0.05);
     private static final DropShadow            FOREGROUND_SHADOW  = new DropShadow();
@@ -117,6 +118,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              Locale                locale;
     private              List<Section>         sections;
     private              Map<Section, Color[]> sectionColorMap;
+    private              InvalidationListener  currentValueListener;
 
 
     // ******************** Constructors **************************************
@@ -133,6 +135,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         locale                = gauge.getLocale();
         sections              = gauge.getSections();
         sectionColorMap       = new HashMap<>(sections.size());
+        currentValueListener  = o -> handleEvents("REDRAW");
         updateSectionColors();
         FOREGROUND_SHADOW.setOffsetX(0);
         FOREGROUND_SHADOW.setOffsetY(1);
@@ -148,12 +151,12 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
@@ -179,50 +182,50 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         crystalImage   = Helper.createNoiseImage(PREFERRED_WIDTH, PREFERRED_HEIGHT, DARK_NOISE_COLOR, BRIGHT_NOISE_COLOR, 8);
         crystalOverlay = new ImageView(crystalImage);
         crystalOverlay.setClip(crystalClip);
-        boolean crystalEnabled = getSkinnable().isLcdCrystalEnabled();
+        boolean crystalEnabled = gauge.isLcdCrystalEnabled();
         Helper.enableNode(crystalOverlay, crystalEnabled);
 
         threshold = new Path();
         threshold.setStroke(null);
-        Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
+        Helper.enableNode(threshold, gauge.isThresholdVisible());
 
         average = new Path();
         average.setStroke(null);
-        Helper.enableNode(average, getSkinnable().isAverageVisible());
+        Helper.enableNode(average, gauge.isAverageVisible());
 
-        backgroundText = new Text(String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
-        backgroundText.setFill(getSkinnable().getLcdDesign().lcdBackgroundColor);
-        backgroundText.setOpacity((LcdFont.LCD == getSkinnable().getLcdFont() || LcdFont.ELEKTRA == getSkinnable().getLcdFont()) ? 1 : 0);
+        backgroundText = new Text(String.format(locale, valueFormatString, gauge.getCurrentValue()));
+        backgroundText.setFill(gauge.getLcdDesign().lcdBackgroundColor);
+        backgroundText.setOpacity((LcdFont.LCD == gauge.getLcdFont() || LcdFont.ELEKTRA == gauge.getLcdFont()) ? 1 : 0);
 
-        valueText = new Text(String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
-        valueText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
+        valueText = new Text(String.format(locale, valueFormatString, gauge.getCurrentValue()));
+        valueText.setFill(gauge.getLcdDesign().lcdForegroundColor);
 
-        unitText = new Text(getSkinnable().getUnit());
-        unitText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+        unitText = new Text(gauge.getUnit());
+        unitText.setFill(gauge.getLcdDesign().lcdForegroundColor);
+        Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        title = new Text(getSkinnable().getTitle());
-        title.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        Helper.enableNode(title, !getSkinnable().getTitle().isEmpty());
+        title = new Text(gauge.getTitle());
+        title.setFill(gauge.getLcdDesign().lcdForegroundColor);
+        Helper.enableNode(title, !gauge.getTitle().isEmpty());
 
-        lowerRightText = new Text(getSkinnable().getSubTitle());
-        lowerRightText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        Helper.enableNode(lowerRightText, !getSkinnable().getSubTitle().isEmpty());
+        lowerRightText = new Text(gauge.getSubTitle());
+        lowerRightText.setFill(gauge.getLcdDesign().lcdForegroundColor);
+        Helper.enableNode(lowerRightText, !gauge.getSubTitle().isEmpty());
 
-        upperLeftText = new Text(String.format(locale, otherFormatString, getSkinnable().getMinMeasuredValue()));
-        upperLeftText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        Helper.enableNode(upperLeftText, getSkinnable().isMinMeasuredValueVisible());
+        upperLeftText = new Text(String.format(locale, otherFormatString, gauge.getMinMeasuredValue()));
+        upperLeftText.setFill(gauge.getLcdDesign().lcdForegroundColor);
+        Helper.enableNode(upperLeftText, gauge.isMinMeasuredValueVisible());
 
-        upperRightText = new Text(String.format(locale, otherFormatString, getSkinnable().getMaxMeasuredValue()));
-        upperRightText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        Helper.enableNode(upperRightText, getSkinnable().isMaxMeasuredValueVisible());
+        upperRightText = new Text(String.format(locale, otherFormatString, gauge.getMaxMeasuredValue()));
+        upperRightText.setFill(gauge.getLcdDesign().lcdForegroundColor);
+        Helper.enableNode(upperRightText, gauge.isMaxMeasuredValueVisible());
 
-        lowerCenterText = new Text(String.format(locale, otherFormatString, getSkinnable().getOldValue()));
-        lowerCenterText.setFill(getSkinnable().getLcdDesign().lcdForegroundColor);
-        Helper.enableNode(lowerCenterText, getSkinnable().isOldValueVisible());
+        lowerCenterText = new Text(String.format(locale, otherFormatString, gauge.getOldValue()));
+        lowerCenterText.setFill(gauge.getLcdDesign().lcdForegroundColor);
+        Helper.enableNode(lowerCenterText, gauge.isOldValueVisible());
 
         shadowGroup = new Group();
-        shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? FOREGROUND_SHADOW : null);
+        shadowGroup.setEffect(gauge.isShadowsEnabled() ? FOREGROUND_SHADOW : null);
         shadowGroup.getChildren().setAll(threshold,
                                          average,
                                          valueText,
@@ -234,55 +237,51 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                          lowerCenterText);
 
         pane = new Pane(crystalOverlay, backgroundText, shadowGroup);
-        pane.setEffect(getSkinnable().isShadowsEnabled() ? mainInnerShadow1 : null);
+        pane.setEffect(gauge.isShadowsEnabled() ? mainInnerShadow1 : null);
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(e -> handleEvents("REDRAW"));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.currentValueProperty().addListener(currentValueListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    protected void handleEvents(final String EVENT_TYPE) {
+    @Override protected void handleEvents(final String EVENT_TYPE) {
         if ("REDRAW".equals(EVENT_TYPE)) {
-            pane.setEffect(getSkinnable().isShadowsEnabled() ? mainInnerShadow1 : null);
-            shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? FOREGROUND_SHADOW : null);
+            pane.setEffect(gauge.isShadowsEnabled() ? mainInnerShadow1 : null);
+            shadowGroup.setEffect(gauge.isShadowsEnabled() ? FOREGROUND_SHADOW : null);
             updateLcdDesign(height);
             redraw();
         } else if ("RESIZE".equals(EVENT_TYPE)) {
-            aspectRatio = getSkinnable().getPrefHeight() / getSkinnable().getPrefWidth();
+            aspectRatio = gauge.getPrefHeight() / gauge.getPrefWidth();
             resize();
             redraw();
         } else if ("LCD".equals(EVENT_TYPE)) {
             updateLcdDesign(height);
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(crystalOverlay, getSkinnable().isLcdCrystalEnabled());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            Helper.enableNode(upperLeftText, getSkinnable().isMinMeasuredValueVisible());
-            Helper.enableNode(upperRightText, getSkinnable().isMaxMeasuredValueVisible());
-            Helper.enableNode(lowerRightText, !getSkinnable().getSubTitle().isEmpty());
-            Helper.enableNode(lowerCenterText, getSkinnable().isOldValueVisible());
-            Helper.enableNode(average, getSkinnable().isAverageVisible());
-            Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
+            Helper.enableNode(crystalOverlay, gauge.isLcdCrystalEnabled());
+            Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
+            Helper.enableNode(upperLeftText, gauge.isMinMeasuredValueVisible());
+            Helper.enableNode(upperRightText, gauge.isMaxMeasuredValueVisible());
+            Helper.enableNode(lowerRightText, !gauge.getSubTitle().isEmpty());
+            Helper.enableNode(lowerCenterText, gauge.isOldValueVisible());
+            Helper.enableNode(average, gauge.isAverageVisible());
+            Helper.enableNode(threshold, gauge.isThresholdVisible());
             resize();
             redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
-            sections = getSkinnable().getSections();
+            sections = gauge.getSections();
             updateSectionColors();
             resize();
             redraw();
         }
+    }
+
+    @Override public void dispose() {
+        gauge.currentValueProperty().removeListener(currentValueListener);
+            super.dispose();
     }
 
 
@@ -294,11 +293,11 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void updateLcdDesign(final double HEIGHT) {
-        LcdDesign lcdDesign = getSkinnable().getLcdDesign();
+        LcdDesign lcdDesign = gauge.getLcdDesign();
         Color[]   lcdColors = lcdDesign.getColors();
 
         if (LcdDesign.SECTIONS == lcdDesign) {
-            double currentValue = getSkinnable().getCurrentValue();
+            double currentValue = gauge.getCurrentValue();
             int listSize = sections.size();
             for (int i = 0 ; i < listSize ; i++) {
                 Section section = sections.get(i);
@@ -317,11 +316,11 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                       new Stop(0.5, lcdColors[3]),
                                       new Stop(1.0, lcdColors[4]));
         if (lcdDesign.name().startsWith("FLAT")) {
-            lcdFramePaint = getSkinnable().getBorderPaint();
+            lcdFramePaint = gauge.getBorderPaint();
 
-            lcdPaint      = getSkinnable().getBackgroundPaint();
+            lcdPaint      = gauge.getBackgroundPaint();
 
-            Color lcdForegroundColor = (Color) getSkinnable().getForegroundPaint();
+            Color lcdForegroundColor = (Color) gauge.getForegroundPaint();
             backgroundText.setFill(Color.color(lcdForegroundColor.getRed(), lcdForegroundColor.getGreen(), lcdForegroundColor.getBlue(), 0.1));
             valueText.setFill(lcdForegroundColor);
             upperLeftText.setFill(lcdForegroundColor);
@@ -413,7 +412,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     
     private void updateFonts() {
         digitalFontSizeFactor = 1.0;
-        switch(getSkinnable().getLcdFont()) {
+        switch(gauge.getLcdFont()) {
             case LCD:
                 valueFont = Fonts.digital(0.6 * height);
                 digitalFontSizeFactor = 1.4;
@@ -433,10 +432,10 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 break;
         }
         backgroundText.setFont(valueFont);
-        backgroundText.setOpacity((LcdFont.LCD == getSkinnable().getLcdFont() ||
-                                   LcdFont.DIGITAL == getSkinnable().getLcdFont() ||
-                                   LcdFont.DIGITAL_BOLD == getSkinnable().getLcdFont() ||
-                                   LcdFont.ELEKTRA == getSkinnable().getLcdFont()) ? 1 : 0);
+        backgroundText.setOpacity((LcdFont.LCD == gauge.getLcdFont() ||
+                                   LcdFont.DIGITAL == gauge.getLcdFont() ||
+                                   LcdFont.DIGITAL_BOLD == gauge.getLcdFont() ||
+                                   LcdFont.ELEKTRA == gauge.getLcdFont()) ? 1 : 0);
         valueText.setFont(valueFont);
         unitFont  = Fonts.latoBold(0.26 * height);
         titleFont = Fonts.latoBold(0.1666666667 * height);
@@ -453,20 +452,20 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         // Width of one segment
         oneSegment.setFont(valueFont);
         dotSegment.setText(".");
-        if (LcdFont.LCD == getSkinnable().getLcdFont()) {
+        if (LcdFont.LCD == gauge.getLcdFont()) {
             oneSegment.setText("8");
-        } else if (LcdFont.DIGITAL == getSkinnable().getLcdFont()) {
+        } else if (LcdFont.DIGITAL == gauge.getLcdFont()) {
             oneSegment.setText("_");
-        } else if (LcdFont.DIGITAL_BOLD == getSkinnable().getLcdFont()) {
+        } else if (LcdFont.DIGITAL_BOLD == gauge.getLcdFont()) {
             oneSegment.setText("_");
-        } else if (LcdFont.ELEKTRA == getSkinnable().getLcdFont()) {
+        } else if (LcdFont.ELEKTRA == gauge.getLcdFont()) {
             oneSegment.setText("_");
         }
         oneSegmentWidth = oneSegment.getLayoutBounds().getWidth();
         dotSegmentWidth = dotSegment.getLayoutBounds().getWidth();
         
         // Width of decimals
-        widthOfDecimals = 0 == getSkinnable().getDecimals() ? 0 : getSkinnable().getDecimals() * oneSegmentWidth + (LcdFont.LCD == getSkinnable().getLcdFont() ? oneSegmentWidth : dotSegmentWidth);
+        widthOfDecimals = 0 == gauge.getDecimals() ? 0 : gauge.getDecimals() * oneSegmentWidth + (LcdFont.LCD == gauge.getLcdFont() ? oneSegmentWidth : dotSegmentWidth);
 
         // Available width
         availableWidth = width - (0.0151515152 * width) - (0.0416666667 * height) - 2 - valueOffsetRight - widthOfDecimals;
@@ -476,11 +475,11 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         // Add segments to background text
         backgroundTextBuilder.setLength(0);
-        for (int i = 0 ; i < getSkinnable().getDecimals() ; i++) {
+        for (int i = 0 ; i < gauge.getDecimals() ; i++) {
             backgroundTextBuilder.append(oneSegment.getText());
         }
 
-        if (getSkinnable().getDecimals() != 0) {
+        if (gauge.getDecimals() != 0) {
             backgroundTextBuilder.insert(0, ".");
         }
 
@@ -493,9 +492,9 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         backgroundText.setCacheHint(CacheHint.SCALE);
     }
 
-    private void resize() {
-        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
 
         if (aspectRatio * width > height) {
             width = 1 / (aspectRatio / height);
@@ -505,7 +504,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
-            pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+            pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
 
             updateLcdDesign(height);
 
@@ -613,14 +612,14 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             unitText.setTextOrigin(VPos.BASELINE);
             unitText.setTextAlignment(TextAlignment.RIGHT);
 
-            unitText.setText(getSkinnable().getUnit());
+            unitText.setText(gauge.getUnit());
             if (unitText.visibleProperty().isBound()) {
                 unitText.visibleProperty().unbind();
             }
 
             valueOffsetLeft = height * 0.04;
 
-            if (getSkinnable().getUnit().isEmpty()) {
+            if (gauge.getUnit().isEmpty()) {
                 valueOffsetRight = height * 0.0833333333;
                 valueText.setX((width - valueText.getLayoutBounds().getWidth()) - valueOffsetRight);
             } else {
@@ -634,7 +633,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             // Visualize the lcd semitransparent background text
             updateBackgroundText();
 
-            if (getSkinnable().getUnit().isEmpty()) {
+            if (gauge.getUnit().isEmpty()) {
                 backgroundText.setX((width - backgroundText.getLayoutBounds().getWidth()) - valueOffsetRight);
             } else {
                 backgroundText.setX(width - 2 - backgroundText.getLayoutBounds().getWidth() - valueOffsetRight);
@@ -646,7 +645,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             title.setFont(titleFont);
             title.setTextOrigin(VPos.BASELINE);
             title.setTextAlignment(TextAlignment.CENTER);
-            title.setText(getSkinnable().getTitle());
+            title.setText(gauge.getTitle());
             title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
             title.setY(height * 0.18);
 
@@ -654,7 +653,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             lowerRightText.setFont(smallFont);
             lowerRightText.setTextOrigin(VPos.BASELINE);
             lowerRightText.setTextAlignment(TextAlignment.RIGHT);
-            lowerRightText.setText(getSkinnable().getSubTitle());
+            lowerRightText.setText(gauge.getSubTitle());
             lowerRightText.setX(pane.getLayoutBounds().getMinX() + (pane.getLayoutBounds().getWidth() - lowerRightText.getLayoutBounds().getWidth()) * 0.5);
             lowerRightText.setY(height * 0.94);
 
@@ -680,43 +679,43 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void redraw() {
-        locale            = getSkinnable().getLocale();
-        valueFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        otherFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
+    @Override protected void redraw() {
+        locale            = gauge.getLocale();
+        valueFormatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        otherFormatString = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
 
-        if (getSkinnable().isThresholdVisible()) { threshold.setVisible(Double.compare(getSkinnable().getCurrentValue(), getSkinnable().getThreshold()) >= 0); }
+        if (gauge.isThresholdVisible()) { threshold.setVisible(Double.compare(gauge.getCurrentValue(), gauge.getThreshold()) >= 0); }
 
-        valueText.setText(isNoOfDigitsInvalid() ? "-E-" : String.format(locale, valueFormatString, getSkinnable().getCurrentValue()));
+        valueText.setText(isNoOfDigitsInvalid() ? "-E-" : String.format(locale, valueFormatString, gauge.getCurrentValue()));
 
         updateBackgroundText();
 
         // Visualize the lcd semitransparent background text
-        if (getSkinnable().getUnit().isEmpty()) {
+        if (gauge.getUnit().isEmpty()) {
             backgroundText.setX((width - backgroundText.getLayoutBounds().getWidth()) - valueOffsetRight);
         } else {
             backgroundText.setX(width - 2 - backgroundText.getLayoutBounds().getWidth() - valueOffsetRight);
         }
         backgroundText.setY(height - (backgroundText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
 
-        if (getSkinnable().getUnit().isEmpty()) {
+        if (gauge.getUnit().isEmpty()) {
             valueText.setX((width - valueText.getLayoutBounds().getWidth()) - valueOffsetRight);
         } else {
             valueText.setX((width - 2 - valueText.getLayoutBounds().getWidth()) - valueOffsetRight);
         }
 
         // Update the title
-        title.setText(getSkinnable().getTitle());
+        title.setText(gauge.getTitle());
         title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
 
         // Update the upper left text
-        upperLeftText.setText(String.format(locale, otherFormatString, getSkinnable().getMinMeasuredValue()));
+        upperLeftText.setText(String.format(locale, otherFormatString, gauge.getMinMeasuredValue()));
         if (upperLeftText.getX() + upperLeftText.getLayoutBounds().getWidth() > title.getX()) {
             upperLeftText.setText("...");
         }
 
         // Update the upper right text
-        upperRightText.setText(String.format(locale, otherFormatString, getSkinnable().getMaxMeasuredValue()));
+        upperRightText.setText(String.format(locale, otherFormatString, gauge.getMaxMeasuredValue()));
         upperRightText.setX(width - upperRightText.getLayoutBounds().getWidth() - 0.0416666667 * height);
         if (upperRightText.getX() < title.getX() + title.getLayoutBounds().getWidth()) {
             upperRightText.setText("...");
@@ -724,10 +723,10 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         // Update the lower center text
-        if (getSkinnable().isAverageVisible()) {
-            lowerCenterText.setText(String.format(locale, otherFormatString, getSkinnable().getAverage()));
+        if (gauge.isAverageVisible()) {
+            lowerCenterText.setText(String.format(locale, otherFormatString, gauge.getAverage()));
         } else {
-            lowerCenterText.setText(String.format(locale, otherFormatString, getSkinnable().getOldValue()));
+            lowerCenterText.setText(String.format(locale, otherFormatString, gauge.getOldValue()));
         }
         lowerCenterText.setX((width - lowerCenterText.getLayoutBounds().getWidth()) * 0.5);
         lowerCenterText.setY(0.94 * height);
@@ -735,7 +734,7 @@ public class LcdSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         average.relocate(lowerCenterText.getX() - 0.2 * height, 0.82 * height);
 
         // Update the lower right text
-        lowerRightText.setText(getSkinnable().getSubTitle());
+        lowerRightText.setText(gauge.getSubTitle());
         lowerRightText.setX(width - lowerRightText.getLayoutBounds().getWidth() - 0.0416666667 * height);
         lowerRightText.setY(height * 0.94);
         if (lowerRightText.getX() < lowerCenterText.getX() + lowerCenterText.getLayoutBounds().getWidth()) {

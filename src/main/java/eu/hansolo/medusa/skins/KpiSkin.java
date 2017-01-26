@@ -19,6 +19,7 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.scene.CacheHint;
 import javafx.scene.control.Skin;
@@ -50,44 +51,40 @@ import java.util.Locale;
 /**
  * Created by hansolo on 15.01.16.
  */
-public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double PREFERRED_WIDTH  = 250;
-    private static final double PREFERRED_HEIGHT = 250;
-    private static final double MINIMUM_WIDTH    = 50;
-    private static final double MINIMUM_HEIGHT   = 50;
-    private static final double MAXIMUM_WIDTH    = 1024;
-    private static final double MAXIMUM_HEIGHT   = 1024;
-    private double       size;
-    private double       oldValue;
-    private Arc          barBackground;
-    private Arc          thresholdBar;
-    private Path         needle;
-    private Rotate       needleRotate;
-    private Text         titleText;
-    private Text         valueText;
-    private Text         minValueText;
-    private Text         maxValueText;
-    private Text         thresholdText;
-    private Pane         pane;
-    private double       angleRange;
-    private double       minValue;
-    private double       range;
-    private double       angleStep;
-    private String       formatString;
-    private Locale       locale;
+public class KpiSkin extends GaugeSkinBase {
+    private double               size;
+    private double               oldValue;
+    private Arc                  barBackground;
+    private Arc                  thresholdBar;
+    private Path                 needle;
+    private Rotate               needleRotate;
+    private Text                 titleText;
+    private Text                 valueText;
+    private Text                 minValueText;
+    private Text                 maxValueText;
+    private Text                 thresholdText;
+    private Pane                 pane;
+    private double               angleRange;
+    private double               minValue;
+    private double               range;
+    private double               angleStep;
+    private String               formatString;
+    private Locale               locale;
+    private InvalidationListener currentValueListener;
 
 
     // ******************** Constructors **************************************
     public KpiSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleRange   = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
-        oldValue     = gauge.getValue();
-        minValue     = gauge.getMinValue();
-        range        = gauge.getRange();
-        angleStep    = angleRange / range;
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale       = gauge.getLocale();
+        angleRange           = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
+        oldValue             = gauge.getValue();
+        minValue             = gauge.getMinValue();
+        range                = gauge.getRange();
+        angleStep            = angleRange / range;
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
+        currentValueListener = o -> rotateNeedle(gauge.getCurrentValue());
 
         initGraphics();
         registerListeners();
@@ -99,89 +96,76 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
         barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, angleRange * 0.5 + 90, -angleRange);
         barBackground.setType(ArcType.OPEN);
-        barBackground.setStroke(getSkinnable().getBarColor());
+        barBackground.setStroke(gauge.getBarColor());
         barBackground.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
         barBackground.setStrokeLineCap(StrokeLineCap.BUTT);
         barBackground.setFill(null);
 
         thresholdBar = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, -angleRange * 0.5 + 90, 0);
         thresholdBar.setType(ArcType.OPEN);
-        thresholdBar.setStroke(getSkinnable().getThresholdColor());
+        thresholdBar.setStroke(gauge.getThresholdColor());
         thresholdBar.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
         thresholdBar.setStrokeLineCap(StrokeLineCap.BUTT);
         thresholdBar.setFill(null);
 
-        needleRotate = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
+        needleRotate = new Rotate((gauge.getValue() - oldValue - minValue) * angleStep);
 
         needle = new Path();
         needle.setFillRule(FillRule.EVEN_ODD);
         needle.getTransforms().setAll(needleRotate);
-        needle.setFill(getSkinnable().getNeedleColor());
+        needle.setFill(gauge.getNeedleColor());
         needle.setStrokeWidth(0);
         needle.setStroke(Color.TRANSPARENT);
 
-        titleText = new Text(getSkinnable().getTitle());
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText = new Text(gauge.getTitle());
+        titleText.setFill(gauge.getTitleColor());
+        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
-        valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        valueText = new Text(String.format(locale, formatString, gauge.getCurrentValue()));
+        valueText.setFill(gauge.getValueColor());
+        Helper.enableNode(valueText, gauge.isValueVisible());
 
-        minValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
-        minValueText.setFill(getSkinnable().getTitleColor());
+        minValueText = new Text(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMinValue()));
+        minValueText.setFill(gauge.getTitleColor());
 
-        maxValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
-        maxValueText.setFill(getSkinnable().getTitleColor());
+        maxValueText = new Text(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMaxValue()));
+        maxValueText.setFill(gauge.getTitleColor());
 
-        thresholdText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
-        thresholdText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(thresholdText, Double.compare(getSkinnable().getThreshold(), getSkinnable().getMinValue()) != 0 && Double.compare(getSkinnable().getThreshold(), getSkinnable().getMaxValue()) != 0);
+        thresholdText = new Text(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getThreshold()));
+        thresholdText.setFill(gauge.getTitleColor());
+        Helper.enableNode(thresholdText, Double.compare(gauge.getThreshold(), gauge.getMinValue()) != 0 && Double.compare(gauge.getThreshold(), gauge.getMaxValue()) != 0);
 
         pane = new Pane(barBackground, thresholdBar, needle, titleText, valueText, minValueText, maxValueText, thresholdText);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> rotateNeedle(getSkinnable().getCurrentValue()));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.currentValueProperty().addListener(currentValueListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("RECALC".equals(EVENT_TYPE)) {
-            angleRange = Helper.clamp(90.0, 180.0, getSkinnable().getAngleRange());
-            minValue   = getSkinnable().getMinValue();
-            range      = getSkinnable().getRange();
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("RECALC".equals(EVENT_TYPE)) {
+            angleRange = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
+            minValue   = gauge.getMinValue();
+            range      = gauge.getRange();
             angleStep  = angleRange / range;
             redraw();
         }
@@ -224,6 +208,11 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.getElements().add(new ClosePath());
         needle.setCache(true);
         needle.setCacheHint(CacheHint.ROTATE);
+    }
+
+    @Override public void dispose() {
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        super.dispose();
     }
 
 
@@ -276,7 +265,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdText.setFont(Fonts.latoRegular(fontSize));
         if (thresholdText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(thresholdText, maxWidth, fontSize); }
         textRadius = size * 0.5;
-        textAngle  = (getSkinnable().getThreshold() - minValue) * angleStep;
+        textAngle  = (gauge.getThreshold() - minValue) * angleStep;
         sinValue   = Math.sin(Math.toRadians(180 + angleRange * 0.5 - textAngle));
         cosValue   = Math.cos(Math.toRadians(180 + angleRange * 0.5 - textAngle));
         textX      = size * 0.5 + textRadius * sinValue;
@@ -286,9 +275,9 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         thresholdText.relocate(textX, textY);
     }
 
-    private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        double width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        double height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
         size          = width < height ? width : height;
 
         if (width > 0 && height > 0) {
@@ -314,7 +303,7 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             thresholdBar.setRadiusY(barRadius);
             thresholdBar.setStrokeWidth(barWidth);
             thresholdBar.setStartAngle(90 - angleRange * 0.5);
-            thresholdBar.setLength((getSkinnable().getMaxValue() - getSkinnable().getThreshold()) * angleStep);
+            thresholdBar.setLength((gauge.getMaxValue() - gauge.getThreshold()) * angleStep);
 
             drawNeedle();
 
@@ -327,28 +316,28 @@ public class KpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+    @Override protected void redraw() {
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        locale       = getSkinnable().getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        locale       = gauge.getLocale();
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
-        titleText.setText(getSkinnable().getTitle());
-        minValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
-        maxValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
-        thresholdText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
+        titleText.setText(gauge.getTitle());
+        minValueText.setText(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMinValue()));
+        maxValueText.setText(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMaxValue()));
+        thresholdText.setText(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getThreshold()));
         resizeStaticText();
 
-        barBackground.setStroke(getSkinnable().getBarColor());
-        thresholdBar.setStroke(getSkinnable().getThresholdColor());
-        needle.setFill(getSkinnable().getNeedleColor());
-        titleText.setFill(getSkinnable().getTitleColor());
-        minValueText.setFill(getSkinnable().getTitleColor());
-        maxValueText.setFill(getSkinnable().getTitleColor());
-        thresholdText.setFill(getSkinnable().getTitleColor());
-        valueText.setFill(getSkinnable().getValueColor());
+        barBackground.setStroke(gauge.getBarColor());
+        thresholdBar.setStroke(gauge.getThresholdColor());
+        needle.setFill(gauge.getNeedleColor());
+        titleText.setFill(gauge.getTitleColor());
+        minValueText.setFill(gauge.getTitleColor());
+        maxValueText.setFill(gauge.getTitleColor());
+        thresholdText.setFill(gauge.getTitleColor());
+        valueText.setFill(gauge.getValueColor());
 
-        thresholdText.setVisible(Double.compare(getSkinnable().getThreshold(), getSkinnable().getMinValue()) != 0 && Double.compare(getSkinnable().getThreshold(), getSkinnable().getMaxValue()) != 0);
+        thresholdText.setVisible(Double.compare(gauge.getThreshold(), gauge.getMinValue()) != 0 && Double.compare(gauge.getThreshold(), gauge.getMaxValue()) != 0);
     }
 }

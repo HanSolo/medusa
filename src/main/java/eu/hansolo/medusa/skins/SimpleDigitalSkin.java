@@ -20,12 +20,11 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.scene.CacheHint;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -47,58 +46,56 @@ import java.util.Locale;
 /**
  * Created by hansolo on 09.02.16.
  */
-public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double PREFERRED_WIDTH  = 250;
-    private static final double PREFERRED_HEIGHT = 250;
-    private static final double MINIMUM_WIDTH    = 50;
-    private static final double MINIMUM_HEIGHT   = 50;
-    private static final double MAXIMUM_WIDTH    = 1024;
-    private static final double MAXIMUM_HEIGHT   = 1024;
-    private static final double ANGLE_RANGE      = 300;
-    private double          size;
-    private double          center;
-    private Pane            pane;
-    private Canvas          backgroundCanvas;
-    private GraphicsContext backgroundCtx;
-    private Canvas          barCanvas;
-    private GraphicsContext barCtx;
-    private Text            valueBkgText;
-    private Text            valueText;
-    private Color           barColor;
-    private Color           valueColor;
-    private Color           unitColor;
-    private double          minValue;
-    private double          maxValue;
-    private double          range;
-    private double          angleStep;
-    private boolean         isStartFromZero;
-    private double          barWidth;
-    private String          formatString;
-    private Locale          locale;
-    private boolean         sectionsVisible;
-    private List<Section>   sections;
-    private boolean         thresholdVisible;
-    private Color           thresholdColor;
+public class SimpleDigitalSkin extends GaugeSkinBase {
+    private static final double  ANGLE_RANGE = 300;
+    private double               size;
+    private double               center;
+    private Pane                 pane;
+    private Canvas               backgroundCanvas;
+    private GraphicsContext      backgroundCtx;
+    private Canvas               barCanvas;
+    private GraphicsContext      barCtx;
+    private Text                 valueBkgText;
+    private Text                 valueText;
+    private Color                barColor;
+    private Color                valueColor;
+    private Color                unitColor;
+    private double               minValue;
+    private double               maxValue;
+    private double               range;
+    private double               angleStep;
+    private boolean              isStartFromZero;
+    private double               barWidth;
+    private String               formatString;
+    private Locale               locale;
+    private boolean              sectionsVisible;
+    private List<Section>        sections;
+    private boolean              thresholdVisible;
+    private Color                thresholdColor;
+    private InvalidationListener decimalListener;
+    private InvalidationListener currentValueListener;
 
 
     // ******************** Constructors **************************************
     public SimpleDigitalSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        minValue         = gauge.getMinValue();
-        maxValue         = gauge.getMaxValue();
-        range            = gauge.getRange();
-        angleStep        = ANGLE_RANGE / range;
-        formatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale           = gauge.getLocale();
-        barColor         = gauge.getBarColor();
-        valueColor       = gauge.getValueColor();
-        unitColor        = gauge.getUnitColor();
-        isStartFromZero  = gauge.isStartFromZero();
-        sectionsVisible  = gauge.getSectionsVisible();
-        sections         = gauge.getSections();
-        thresholdVisible = gauge.isThresholdVisible();
-        thresholdColor   = gauge.getThresholdColor();
+        minValue             = gauge.getMinValue();
+        maxValue             = gauge.getMaxValue();
+        range                = gauge.getRange();
+        angleStep            = ANGLE_RANGE / range;
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
+        barColor             = gauge.getBarColor();
+        valueColor           = gauge.getValueColor();
+        unitColor            = gauge.getUnitColor();
+        isStartFromZero      = gauge.isStartFromZero();
+        sectionsVisible      = gauge.getSectionsVisible();
+        sections             = gauge.getSections();
+        thresholdVisible     = gauge.isThresholdVisible();
+        thresholdColor       = gauge.getThresholdColor();
+        decimalListener      = o -> handleEvents("DECIMALS");
+        currentValueListener = o -> setBar(gauge.getCurrentValue());
 
         initGraphics();
         registerListeners();
@@ -110,12 +107,12 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
@@ -128,60 +125,53 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         valueBkgText = new Text();
         valueBkgText.setStroke(null);
         valueBkgText.setFill(Helper.getTranslucentColorFrom(valueColor, 0.1));
-        Helper.enableNode(valueBkgText, getSkinnable().isValueVisible());
+        Helper.enableNode(valueBkgText, gauge.isValueVisible());
 
         valueText = new Text();
         valueText.setStroke(null);
         valueText.setFill(valueColor);
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        Helper.enableNode(valueText, gauge.isValueVisible());
 
         pane = new Pane(backgroundCanvas, barCanvas, valueBkgText, valueText);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().decimalsProperty().addListener(o -> handleEvents("DECIMALS"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> setBar(getSkinnable().getCurrentValue()));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.decimalsProperty().addListener(decimalListener);
+        gauge.currentValueProperty().addListener(currentValueListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("RECALC".equals(EVENT_TYPE)) {
-            minValue  = getSkinnable().getMinValue();
-            maxValue  = getSkinnable().getMaxValue();
-            range     = getSkinnable().getRange();
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("RECALC".equals(EVENT_TYPE)) {
+            minValue  = gauge.getMinValue();
+            maxValue  = gauge.getMaxValue();
+            range     = gauge.getRange();
             angleStep = ANGLE_RANGE / range;
             redraw();
-            setBar(getSkinnable().getCurrentValue());
+            setBar(gauge.getCurrentValue());
         } else if ("SECTIONS".equals(EVENT_TYPE)) {
-            sections = getSkinnable().getSections();
+            sections = gauge.getSections();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(valueBkgText, getSkinnable().isValueVisible());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            sectionsVisible  = getSkinnable().getSectionsVisible();
-            thresholdVisible = getSkinnable().isThresholdVisible();
+            Helper.enableNode(valueBkgText, gauge.isValueVisible());
+            Helper.enableNode(valueText, gauge.isValueVisible());
+            sectionsVisible  = gauge.getSectionsVisible();
+            thresholdVisible = gauge.isThresholdVisible();
         } else if ("DECIMALS".equals(EVENT_TYPE)) {
-            formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+            formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         }
+    }
+
+    @Override public void dispose() {
+        gauge.decimalsProperty().removeListener(decimalListener);
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        super.dispose();
     }
 
 
@@ -203,7 +193,7 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         }
 
-        if (thresholdVisible && VALUE > getSkinnable().getThreshold()) {
+        if (thresholdVisible && VALUE > gauge.getThreshold()) {
             barCtx.setStroke(thresholdColor);
         }
 
@@ -256,25 +246,25 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         // draw the unit
-        if (!getSkinnable().getUnit().isEmpty()) {
+        if (!gauge.getUnit().isEmpty()) {
             backgroundCtx.setTextAlign(TextAlignment.CENTER);
             backgroundCtx.setFont(Fonts.robotoBold(0.09 * size));
             backgroundCtx.setFill(unitColor);
-            backgroundCtx.fillText(getSkinnable().getUnit(), center, size * 0.75, size * 0.4);
+            backgroundCtx.fillText(gauge.getUnit(), center, size * 0.75, size * 0.4);
         }
 
         backgroundCanvas.setCache(true);
         backgroundCanvas.setCacheHint(CacheHint.QUALITY);
 
         // draw the value
-        if (getSkinnable().isValueVisible()) {
+        if (gauge.isValueVisible()) {
             StringBuilder valueBkg = new StringBuilder();
-            int len = String.valueOf((int) getSkinnable().getMaxValue()).length();
-            if (getSkinnable().getMinValue() < 0) { len++; }
+            int len = String.valueOf((int) gauge.getMaxValue()).length();
+            if (gauge.getMinValue() < 0) { len++; }
             for (int i = 0 ; i < len ; i++) { valueBkg.append("8"); }
-            if (getSkinnable().getDecimals() > 0) {
+            if (gauge.getDecimals() > 0) {
                 valueBkg.append(".");
-                len = getSkinnable().getDecimals();
+                len = gauge.getDecimals();
                 for (int i = 0 ; i < len ; i++) { valueBkg.append("8"); }
             }
             valueBkgText.setText(valueBkg.toString());
@@ -284,9 +274,9 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Resizing ******************************************
-    private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        double width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        double height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
         size          = width < height ? width : height;
 
         if (width > 0 && height > 0) {
@@ -309,21 +299,21 @@ public class SimpleDigitalSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             valueText.setY(center + (valueText.getLayoutBounds().getHeight() * 0.325));
 
             drawBackground();
-            setBar(getSkinnable().getCurrentValue());
+            setBar(gauge.getCurrentValue());
         }
     }
 
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        locale          = getSkinnable().getLocale();
-        barColor        = getSkinnable().getBarColor();
-        valueColor      = getSkinnable().getValueColor();
-        unitColor       = getSkinnable().getUnitColor();
-        sectionsVisible = getSkinnable().getSectionsVisible();
+    @Override protected void redraw() {
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        locale          = gauge.getLocale();
+        barColor        = gauge.getBarColor();
+        valueColor      = gauge.getValueColor();
+        unitColor       = gauge.getUnitColor();
+        sectionsVisible = gauge.getSectionsVisible();
         drawBackground();
 
-        setBar(getSkinnable().getCurrentValue());
+        setBar(gauge.getCurrentValue());
 
         valueBkgText.setFill(Helper.getTranslucentColorFrom(valueColor, 0.1));
 

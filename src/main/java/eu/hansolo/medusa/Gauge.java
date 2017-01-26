@@ -5488,6 +5488,7 @@ public class Gauge extends Control {
                 super.setSkin(new GaugeSkin(Gauge.this));
                 break;
         }
+        fireUpdateEvent(RESIZE_EVENT);
     }
 
 

@@ -18,6 +18,8 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Gauge;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -42,7 +44,7 @@ import javafx.scene.paint.Stop;
 /**
  * Created by hansolo on 08.07.16.
  */
-public class ChargeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
+public class ChargeSkin extends GaugeSkinBase {
     private enum BarColor {
         GRAY(Color.rgb(243, 243, 243), Color.rgb(143, 143, 143)),
         RED(Color.rgb(243, 0, 6), Color.rgb(143, 0, 9)),
@@ -57,32 +59,36 @@ public class ChargeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             this.COLOR_TO   = COLOR_TO;
         }
     }
-    private static final double PREFERRED_WIDTH  = 306;
-    private static final double PREFERRED_HEIGHT = 66;
-    private static final double MINIMUM_WIDTH    = 153;
-    private static final double MINIMUM_HEIGHT   = 33;
-    private static final double MAXIMUM_WIDTH    = 918;
-    private static final double MAXIMUM_HEIGHT   = 198;
-    private static double       aspectRatio      = PREFERRED_HEIGHT / PREFERRED_WIDTH;
-    private        Region[]     bars;
-    private        Background[] barBackgrounds;
-    private        Border       barBorder;
-    private        double       width;
-    private        double       height;
-    private        HBox         pane;
-    private        Paint        backgroundPaint;
-    private        Paint        borderPaint;
-    private        double       borderWidth;
+    protected static final double         PREFERRED_WIDTH  = 306;
+    protected static final double         PREFERRED_HEIGHT = 66;
+    protected static final double         MINIMUM_WIDTH    = 153;
+    protected static final double         MINIMUM_HEIGHT   = 33;
+    protected static final double         MAXIMUM_WIDTH    = 918;
+    protected static final double         MAXIMUM_HEIGHT   = 198;
+    private static double                 aspectRatio      = PREFERRED_HEIGHT / PREFERRED_WIDTH;
+    private        Region[]               bars;
+    private        Background[]           barBackgrounds;
+    private        Border                 barBorder;
+    private        double                 width;
+    private        double                 height;
+    private        HBox                   pane;
+    private        Paint                  backgroundPaint;
+    private        Paint                  borderPaint;
+    private        double                 borderWidth;
+    private        InvalidationListener   currentValueListener;
+    private        ChangeListener<Number> paneWidthListener;
 
 
     // ******************** Constructors **************************************
     public ChargeSkin(Gauge gauge) {
         super(gauge);
-        backgroundPaint = Color.TRANSPARENT;
-        borderPaint     = Color.TRANSPARENT;
-        borderWidth     = 0;
-        bars            = new Region[12];
-        barBackgrounds  = new Background[24];
+        backgroundPaint      = Color.TRANSPARENT;
+        borderPaint          = Color.TRANSPARENT;
+        borderWidth          = 0;
+        bars                 = new Region[12];
+        barBackgrounds       = new Background[24];
+        currentValueListener = o -> handleEvents("VALUE");
+        paneWidthListener    = (o, ov, nv) -> { if (ov.intValue() == 0 && nv.intValue() > 0) Platform.runLater(() -> resize()); };
 
         initGraphics();
         registerListeners();
@@ -92,12 +98,12 @@ public class ChargeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
@@ -117,44 +123,37 @@ public class ChargeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> resize());
-        getSkinnable().heightProperty().addListener(o -> resize());
-        getSkinnable().currentValueProperty().addListener(o -> handleEvents("VALUE"));
-        pane.widthProperty().addListener((o, ov, nv) -> { if (ov.intValue() == 0 && nv.intValue() > 0) Platform.runLater(() -> resize()); });
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.currentValueProperty().addListener(currentValueListener);
+        pane.widthProperty().addListener(paneWidthListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
     @Override public void layoutChildren(double x, double y, double w, double h) {
         super.layoutChildren(x, y, w, h);
         if(Double.compare(bars[0].getLayoutBounds().getWidth(), 0) == 0) resize();
     }
-
-
-    // ******************** Private Methods ***********************************
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("VALUE".equals(EVENT_TYPE)) {
+    
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("VALUE".equals(EVENT_TYPE)) {
             redraw();
         }
     }
 
+    @Override public void dispose() {
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        pane.widthProperty().removeListener(paneWidthListener);
+        super.dispose();
+    }
+
 
     // ******************** Resizing ******************************************
-    private void resize() {
-        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
 
         if (aspectRatio * width > height) {
             width = 1 / (aspectRatio / height);
@@ -165,7 +164,7 @@ public class ChargeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (width > 0 && height > 0) {
             pane.setMaxSize(width, height);
             pane.setPrefSize(width, height);
-            pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+            pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
             pane.setSpacing(width * 0.01960784);
 
             double barWidth = 0;
@@ -197,8 +196,8 @@ public class ChargeSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         redraw();
     }
 
-    private void redraw() {
-        int chargedBars = (int) (getSkinnable().getCurrentValue() * 13);
+    @Override protected void redraw() {
+        int chargedBars = (int) (gauge.getCurrentValue() * 13);
         for (int i = 0 ; i < 12 ; i++) {
             bars[i].setBackground(i < chargedBars ? barBackgrounds[i] : barBackgrounds[i + 12]);
             bars[i].setBorder(barBorder);
