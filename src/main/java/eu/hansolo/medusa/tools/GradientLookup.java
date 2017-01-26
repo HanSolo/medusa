@@ -19,7 +19,12 @@ package eu.hansolo.medusa.tools;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 /**

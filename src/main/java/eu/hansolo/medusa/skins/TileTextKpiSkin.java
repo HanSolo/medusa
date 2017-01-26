@@ -20,9 +20,8 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
-import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -35,7 +34,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 import java.util.List;
 import java.util.Locale;
@@ -46,50 +44,46 @@ import static eu.hansolo.medusa.tools.Helper.clamp;
 /**
  * Created by hansolo on 30.11.16.
  */
-public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double        PREFERRED_WIDTH  = 250;
-    private static final double        PREFERRED_HEIGHT = 250;
-    private static final double        MINIMUM_WIDTH    = 50;
-    private static final double        MINIMUM_HEIGHT   = 50;
-    private static final double        MAXIMUM_WIDTH    = 1024;
-    private static final double        MAXIMUM_HEIGHT   = 1024;
-    private              double        size;
-    private              Region        barBackground;
-    private              Rectangle     barClip;
-    private              Rectangle     bar;
-    private              Text          titleText;
-    private              Text          valueText;
-    private              Text          unitText;
-    private              Text          percentageText;
-    private              Text          percentageUnitText;
-    private              Rectangle     maxValueRect;
-    private              Text          maxValueText;
-    private              Text          maxValueUnitText;
-    private              Pane          pane;
-    private              double        minValue;
-    private              double        maxValue;
-    private              double        range;
-    private              double        stepSize;
-    private              String        formatString;
-    private              Locale        locale;
-    private              List<Section> sections;
-    private              boolean       sectionsVisible;
-    private              Color         barColor;
+public class TileTextKpiSkin extends GaugeSkinBase {
+    private              double               size;
+    private              Region               barBackground;
+    private              Rectangle            barClip;
+    private              Rectangle            bar;
+    private              Text                 titleText;
+    private              Text                 valueText;
+    private              Text                 unitText;
+    private              Text                 percentageText;
+    private              Text                 percentageUnitText;
+    private              Rectangle            maxValueRect;
+    private              Text                 maxValueText;
+    private              Text                 maxValueUnitText;
+    private              Pane                 pane;
+    private              double               minValue;
+    private              double               maxValue;
+    private              double               range;
+    private              double               stepSize;
+    private              String               formatString;
+    private              Locale               locale;
+    private              List<Section>        sections;
+    private              boolean              sectionsVisible;
+    private              Color                barColor;
+    private              InvalidationListener currentValueListener;
 
 
     // ******************** Constructors **************************************
     public TileTextKpiSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        minValue        = gauge.getMinValue();
-        maxValue        = gauge.getMaxValue();
-        range           = gauge.getRange();
-        stepSize        = PREFERRED_WIDTH / range;
-        formatString    = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale          = gauge.getLocale();
-        sections        = gauge.getSections();
-        sectionsVisible = gauge.getSectionsVisible();
-        barColor        = gauge.getBarColor();
+        minValue             = gauge.getMinValue();
+        maxValue             = gauge.getMaxValue();
+        range                = gauge.getRange();
+        stepSize             = PREFERRED_WIDTH / range;
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
+        sections             = gauge.getSections();
+        sectionsVisible      = gauge.getSectionsVisible();
+        barColor             = gauge.getBarColor();
+        currentValueListener = o -> setBar(gauge.getCurrentValue());
 
         initGraphics();
         registerListeners();
@@ -101,93 +95,80 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
         barBackground = new Region();
-        barBackground.setBackground(new Background(new BackgroundFill(getSkinnable().getBarBackgroundColor(), new CornerRadii(0.0, 0.0, 0.025, 0.025, true), Insets.EMPTY)));
+        barBackground.setBackground(new Background(new BackgroundFill(gauge.getBarBackgroundColor(), new CornerRadii(0.0, 0.0, 0.025, 0.025, true), Insets.EMPTY)));
 
         barClip = new Rectangle();
 
         bar = new Rectangle();
-        bar.setFill(getSkinnable().getBarColor());
+        bar.setFill(gauge.getBarColor());
         bar.setStroke(null);
         bar.setClip(barClip);
 
         titleText = new Text();
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(gauge.getTitleColor());
+        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
         valueText = new Text();
-        valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        valueText.setFill(gauge.getValueColor());
+        Helper.enableNode(valueText, gauge.isValueVisible());
 
-        unitText = new Text(getSkinnable().getUnit());
-        unitText.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+        unitText = new Text(gauge.getUnit());
+        unitText.setFill(gauge.getUnitColor());
+        Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
         percentageText = new Text();
-        percentageText.setFill(getSkinnable().getBarColor());
+        percentageText.setFill(gauge.getBarColor());
 
         percentageUnitText = new Text("%");
-        percentageUnitText.setFill(getSkinnable().getBarColor());
+        percentageUnitText.setFill(gauge.getBarColor());
 
         maxValueRect = new Rectangle();
-        maxValueRect.setFill(getSkinnable().getThresholdColor());
+        maxValueRect.setFill(gauge.getThresholdColor());
 
-        maxValueText = new Text();
-        maxValueText.setFill(getSkinnable().getBackgroundPaint());
+        maxValueText = new Text(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMaxValue()));
+        maxValueText.setFill(gauge.getBackgroundPaint());
 
-        maxValueUnitText = new Text(getSkinnable().getUnit());
-        maxValueUnitText.setFill(getSkinnable().getBackgroundPaint());
+        maxValueUnitText = new Text(gauge.getUnit());
+        maxValueUnitText.setFill(gauge.getBackgroundPaint());
 
         pane = new Pane(barBackground, bar, titleText, valueText, unitText, percentageText, percentageUnitText, maxValueRect, maxValueText, maxValueUnitText);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(gauge.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> setBar(getSkinnable().getCurrentValue()));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.currentValueProperty().addListener(currentValueListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("RECALC".equals(EVENT_TYPE)) {
-            minValue = getSkinnable().getMinValue();
-            maxValue = getSkinnable().getMaxValue();
-            range    = getSkinnable().getRange();
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("RECALC".equals(EVENT_TYPE)) {
+            minValue = gauge.getMinValue();
+            maxValue = gauge.getMaxValue();
+            range    = gauge.getRange();
             stepSize = size / range;
             redraw();
         } else if ("VISIBLITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
+            Helper.enableNode(valueText, gauge.isValueVisible());
+            Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
         } else if ("SECTION".equals(EVENT_TYPE)) {
-            sections = getSkinnable().getSections();
+            sections = gauge.getSections();
         }
     }
 
@@ -196,7 +177,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         bar.setWidth(targetValue);
         valueText.setText(String.format(locale, formatString, VALUE));
         percentageText.setText(String.format(locale, formatString, ((VALUE - minValue) / range * 100)));
-        maxValueRect.setFill(VALUE > maxValue ? barColor : getSkinnable().getThresholdColor());
+        maxValueRect.setFill(VALUE > maxValue ? barColor : gauge.getThresholdColor());
         resizeDynamicText();
         if (sectionsVisible && !sections.isEmpty()) { setBarColor(VALUE); }
     }
@@ -214,6 +195,11 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         percentageUnitText.setFill(color);
     }
 
+    @Override public void dispose() {
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        super.dispose();
+    }
+    
 
     // ******************** Resizing ******************************************
     private void resizeDynamicText() {
@@ -273,9 +259,9 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         maxValueText.setY(size * 0.855);
     }
 
-    private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        double width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        double height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
         size          = width < height ? width : height;
 
         stepSize      = size / range;
@@ -295,7 +281,7 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             bar.setX(0);
             bar.setY(size * 0.965);
-            bar.setWidth(clamp(minValue, maxValue, getSkinnable().getCurrentValue()) * stepSize);
+            bar.setWidth(clamp(minValue, maxValue, gauge.getCurrentValue()) * stepSize);
             bar.setHeight(size * 0.035);
 
             resizeStaticText();
@@ -310,33 +296,33 @@ public class TileTextKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(size * 0.025), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(size * 0.025), Insets.EMPTY)));
+    @Override protected void redraw() {
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(size * 0.025), new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(size * 0.025), Insets.EMPTY)));
 
-        locale       = getSkinnable().getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        locale       = gauge.getLocale();
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
-        titleText.setText(getSkinnable().getTitle());
-        percentageText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getValue() / range * 100));
-        maxValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
-        maxValueUnitText.setText(getSkinnable().getUnit());
+        titleText.setText(gauge.getTitle());
+        percentageText.setText(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getValue() / range * 100));
+        maxValueText.setText(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMaxValue()));
+        maxValueUnitText.setText(gauge.getUnit());
 
         resizeStaticText();
 
-        barBackground.setBackground(new Background(new BackgroundFill(getSkinnable().getBarBackgroundColor().brighter().brighter(), new CornerRadii(0.0, 0.0, size * 0.025, size * 0.025, false), Insets.EMPTY)));
-        barColor = getSkinnable().getBarColor();
+        barBackground.setBackground(new Background(new BackgroundFill(gauge.getBarBackgroundColor().brighter().brighter(), new CornerRadii(0.0, 0.0, size * 0.025, size * 0.025, false), Insets.EMPTY)));
+        barColor = gauge.getBarColor();
 
         if (sectionsVisible && !sections.isEmpty()) {
-            setBarColor(getSkinnable().getValue());
+            setBarColor(gauge.getValue());
         } else {
             bar.setFill(barColor);
         }
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        maxValueText.setFill(getSkinnable().getBackgroundPaint());
-        maxValueUnitText.setFill(getSkinnable().getBackgroundPaint());
-        valueText.setFill(getSkinnable().getValueColor());
-        unitText.setFill(getSkinnable().getUnitColor());
+        titleText.setFill(gauge.getTitleColor());
+        maxValueText.setFill(gauge.getBackgroundPaint());
+        maxValueUnitText.setFill(gauge.getBackgroundPaint());
+        valueText.setFill(gauge.getValueColor());
+        unitText.setFill(gauge.getUnitColor());
     }
 }

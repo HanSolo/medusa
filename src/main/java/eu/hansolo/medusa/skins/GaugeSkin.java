@@ -17,6 +17,7 @@
 package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
+import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleBehavior;
 import eu.hansolo.medusa.Gauge.NeedleType;
@@ -25,7 +26,6 @@ import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Needle;
 import eu.hansolo.medusa.Section;
-import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.tools.AngleConicalGradient;
 import eu.hansolo.medusa.tools.Helper;

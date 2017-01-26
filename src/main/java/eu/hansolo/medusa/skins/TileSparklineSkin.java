@@ -20,10 +20,9 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.Statistics;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
-import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -57,54 +56,52 @@ import static eu.hansolo.medusa.tools.Helper.clamp;
 /**
  * Created by hansolo on 05.12.16.
  */
-public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double            PREFERRED_WIDTH  = 250;
-    private static final double            PREFERRED_HEIGHT = 250;
-    private static final double            MINIMUM_WIDTH    = 50;
-    private static final double            MINIMUM_HEIGHT   = 50;
-    private static final double            MAXIMUM_WIDTH    = 1024;
-    private static final double            MAXIMUM_HEIGHT   = 1024;
-    private              double            size;
-    private              Text              titleText;
-    private              Text              valueText;
-    private              Text              unitText;
-    private              Text              averageText;
-    private              Text              highText;
-    private              Text              lowText;
-    private              Text              subTitleText;
-    private              Rectangle         graphBounds;
-    private              List<PathElement> pathElements;
-    private              Path              sparkLine;
-    private              Circle            dot;
-    private              Rectangle         stdDeviationArea;
-    private              Line              averageLine;
-    private              Pane              pane;
-    private              double            low;
-    private              double            high;
-    private              double            minValue;
-    private              double            maxValue;
-    private              double            range;
-    private              double            stdDeviation;
-    private              String            formatString;
-    private              Locale            locale;
-    private              int               noOfDatapoints;
-    private              List<Double>      dataList;
+public class TileSparklineSkin extends GaugeSkinBase {
+    private              double               size;
+    private              Text                 titleText;
+    private              Text                 valueText;
+    private              Text                 unitText;
+    private              Text                 averageText;
+    private              Text                 highText;
+    private              Text                 lowText;
+    private              Text                 subTitleText;
+    private              Rectangle            graphBounds;
+    private              List<PathElement>    pathElements;
+    private              Path                 sparkLine;
+    private              Circle               dot;
+    private              Rectangle            stdDeviationArea;
+    private              Line                 averageLine;
+    private              Pane                 pane;
+    private              double               low;
+    private              double               high;
+    private              double               minValue;
+    private              double               maxValue;
+    private              double               range;
+    private              double               stdDeviation;
+    private              String               formatString;
+    private              Locale               locale;
+    private              int                  noOfDatapoints;
+    private              List<Double>         dataList;
+    private              InvalidationListener currentValueListener;
+    private              InvalidationListener averagingListener;
 
 
     // ******************** Constructors **************************************
     public TileSparklineSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        low            = gauge.getMaxValue();
-        high           = gauge.getMinValue();
-        minValue       = gauge.getMinValue();
-        maxValue       = gauge.getMaxValue();
-        range          = gauge.getRange();
-        stdDeviation   = 0;
-        formatString   = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale         = gauge.getLocale();
-        noOfDatapoints = gauge.getAveragingPeriod();
-        dataList       = new LinkedList<>();
+        low                  = gauge.getMaxValue();
+        high                 = gauge.getMinValue();
+        minValue             = gauge.getMinValue();
+        maxValue             = gauge.getMaxValue();
+        range                = gauge.getRange();
+        stdDeviation         = 0;
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
+        noOfDatapoints       = gauge.getAveragingPeriod();
+        dataList             = new LinkedList<>();
+        currentValueListener = o -> handleEvents("VALUE");
+        averagingListener    = o -> handleEvents("AVERAGING_PERIOD");
         for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
 
         // To get smooth lines in the chart we need at least 4 values
@@ -118,52 +115,52 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
         graphBounds = new Rectangle(PREFERRED_WIDTH * 0.05, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.9, PREFERRED_HEIGHT * 0.45);
 
-        titleText = new Text(getSkinnable().getTitle());
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText = new Text(gauge.getTitle());
+        titleText.setFill(gauge.getTitleColor());
+        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
-        valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        valueText = new Text(String.format(locale, formatString, gauge.getValue()));
+        valueText.setFill(gauge.getValueColor());
+        Helper.enableNode(valueText, gauge.isValueVisible());
 
-        unitText = new Text(getSkinnable().getUnit());
-        unitText.setFill(getSkinnable().getUnitColor());
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+        unitText = new Text(gauge.getUnit());
+        unitText.setFill(gauge.getUnitColor());
+        Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        averageText = new Text(String.format(locale, formatString, getSkinnable().getAverage()));
-        averageText.setFill(getSkinnable().getAverageColor());
-        Helper.enableNode(averageText, getSkinnable().isAverageVisible());
+        averageText = new Text(String.format(locale, formatString, gauge.getAverage()));
+        averageText.setFill(gauge.getAverageColor());
+        Helper.enableNode(averageText, gauge.isAverageVisible());
 
         highText = new Text();
         highText.setTextOrigin(VPos.BOTTOM);
-        highText.setFill(getSkinnable().getValueColor());
+        highText.setFill(gauge.getValueColor());
 
         lowText = new Text();
         lowText.setTextOrigin(VPos.TOP);
-        lowText.setFill(getSkinnable().getValueColor());
+        lowText.setFill(gauge.getValueColor());
 
-        subTitleText = new Text(getSkinnable().getSubTitle());
+        subTitleText = new Text(gauge.getSubTitle());
         subTitleText.setTextOrigin(VPos.TOP);
-        subTitleText.setFill(getSkinnable().getSubTitleColor());
+        subTitleText.setFill(gauge.getSubTitleColor());
 
         stdDeviationArea = new Rectangle();
-        Helper.enableNode(stdDeviationArea, getSkinnable().isAverageVisible());
+        Helper.enableNode(stdDeviationArea, gauge.isAverageVisible());
 
         averageLine = new Line();
-        averageLine.setStroke(getSkinnable().getAverageColor());
+        averageLine.setStroke(gauge.getAverageColor());
         averageLine.getStrokeDashArray().addAll(PREFERRED_WIDTH * 0.005, PREFERRED_WIDTH * 0.005);
-        Helper.enableNode(averageLine, getSkinnable().isAverageVisible());
+        Helper.enableNode(averageLine, gauge.isAverageVisible());
 
         pathElements = new ArrayList<>(noOfDatapoints);
         pathElements.add(0, new MoveTo());
@@ -172,70 +169,57 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         sparkLine = new Path();
         sparkLine.getElements().addAll(pathElements);
         sparkLine.setFill(null);
-        sparkLine.setStroke(getSkinnable().getBarColor());
+        sparkLine.setStroke(gauge.getBarColor());
         sparkLine.setStrokeWidth(PREFERRED_WIDTH * 0.0075);
         sparkLine.setStrokeLineCap(StrokeLineCap.ROUND);
         sparkLine.setStrokeLineJoin(StrokeLineJoin.ROUND);
 
         dot = new Circle();
-        dot.setFill(getSkinnable().getBarColor());
+        dot.setFill(gauge.getBarColor());
 
         pane = new Pane(titleText, valueText, unitText, stdDeviationArea, averageLine, sparkLine, dot, averageText, highText, lowText, subTitleText);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(gauge.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> handleEvents("VALUE"));
-        getSkinnable().averagingPeriodProperty().addListener(o -> handleEvents("AVERAGING_PERIOD"));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.currentValueProperty().addListener(currentValueListener);
+        gauge.averagingPeriodProperty().addListener(averagingListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("RECALC".equals(EVENT_TYPE)) {
-            minValue = getSkinnable().getMinValue();
-            maxValue = getSkinnable().getMaxValue();
-            range    = getSkinnable().getRange();
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("RECALC".equals(EVENT_TYPE)) {
+            minValue = gauge.getMinValue();
+            maxValue = gauge.getMaxValue();
+            range    = gauge.getRange();
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
-            Helper.enableNode(averageLine, getSkinnable().isAverageVisible());
-            Helper.enableNode(averageText, getSkinnable().isAverageVisible());
-            Helper.enableNode(stdDeviationArea, getSkinnable().isAverageVisible());
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
+            Helper.enableNode(valueText, gauge.isValueVisible());
+            Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
+            Helper.enableNode(subTitleText, !gauge.getSubTitle().isEmpty());
+            Helper.enableNode(averageLine, gauge.isAverageVisible());
+            Helper.enableNode(averageText, gauge.isAverageVisible());
+            Helper.enableNode(stdDeviationArea, gauge.isAverageVisible());
             redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
 
         } else if ("ALERT".equals(EVENT_TYPE)) {
 
         } else if ("VALUE".equals(EVENT_TYPE)) {
-            if(getSkinnable().isAnimated()) { getSkinnable().setAnimated(false); }
-            if (!getSkinnable().isAveragingEnabled()) { getSkinnable().setAveragingEnabled(true); }
-            double value = clamp(minValue, maxValue, getSkinnable().getValue());
+            if(gauge.isAnimated()) { gauge.setAnimated(false); }
+            if (!gauge.isAveragingEnabled()) { gauge.setAveragingEnabled(true); }
+            double value = clamp(minValue, maxValue, gauge.getValue());
             addData(value);
             drawChart(value);
         } else if ("AVERAGING_PERIOD".equals(EVENT_TYPE)) {
-            noOfDatapoints = getSkinnable().getAveragingPeriod();
+            noOfDatapoints = gauge.getAveragingPeriod();
             // To get smooth lines in the chart we need at least 4 values
             if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
             for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
@@ -273,7 +257,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double stepX = graphBounds.getWidth() / (noOfDatapoints - 1);
         double stepY = graphBounds.getHeight() / range;
 
-        if (getSkinnable().isSmoothing()) {
+        if (gauge.isSmoothing()) {
             smooth(dataList);
         } else {
             MoveTo begin = (MoveTo) pathElements.get(0);
@@ -292,7 +276,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             dot.setCenterY(end.getY());
         }
 
-        double average = getSkinnable().getAverage();
+        double average = gauge.getAverage();
         double averageY = clamp(minY, maxY, maxY - Math.abs(low - average) * stepY);
 
         averageLine.setStartX(minX);
@@ -309,6 +293,12 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         highText.setText(String.format(locale, formatString, high));
         lowText.setText(String.format(locale, formatString, low));
         resizeDynamicText();
+    }
+
+    @Override public void dispose() {
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        gauge.averagingPeriodProperty().removeListener(averagingListener);
+        super.dispose();
     }
 
 
@@ -451,9 +441,9 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         subTitleText.relocate(size * 0.95 - subTitleText.getLayoutBounds().getWidth(), size * 0.9);
     }
 
-    private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        double width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        double height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
         size          = width < height ? width : height;
 
         if (width > 0 && height > 0) {
@@ -467,7 +457,7 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             averageLine.getStrokeDashArray().setAll(graphBounds.getWidth() * 0.01, graphBounds.getWidth() * 0.01);
 
-            drawChart(getSkinnable().getValue());
+            drawChart(gauge.getValue());
             sparkLine.setStrokeWidth(size * 0.01);
             dot.setRadius(size * 0.014);
 
@@ -476,26 +466,26 @@ public class TileSparklineSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(size * 0.025), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(size * 0.025), Insets.EMPTY)));
+    @Override protected void redraw() {
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(size * 0.025), new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(size * 0.025), Insets.EMPTY)));
 
-        locale       = getSkinnable().getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        locale       = gauge.getLocale();
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
-        titleText.setText(getSkinnable().getTitle());
-        subTitleText.setText(getSkinnable().getSubTitle());
+        titleText.setText(gauge.getTitle());
+        subTitleText.setText(gauge.getSubTitle());
         resizeStaticText();
 
-        titleText.setFill(getSkinnable().getTitleColor());
-        valueText.setFill(getSkinnable().getValueColor());
-        averageText.setFill(getSkinnable().getAverageColor());
-        highText.setFill(getSkinnable().getValueColor());
-        lowText.setFill(getSkinnable().getValueColor());
-        subTitleText.setFill(getSkinnable().getSubTitleColor());
-        sparkLine.setStroke(getSkinnable().getBarColor());
-        stdDeviationArea.setFill(Helper.getTranslucentColorFrom(getSkinnable().getAverageColor(), 0.1));
-        averageLine.setStroke(getSkinnable().getAverageColor());
-        dot.setFill(getSkinnable().getBarColor());
+        titleText.setFill(gauge.getTitleColor());
+        valueText.setFill(gauge.getValueColor());
+        averageText.setFill(gauge.getAverageColor());
+        highText.setFill(gauge.getValueColor());
+        lowText.setFill(gauge.getValueColor());
+        subTitleText.setFill(gauge.getSubTitleColor());
+        sparkLine.setStroke(gauge.getBarColor());
+        stdDeviationArea.setFill(Helper.getTranslucentColorFrom(gauge.getAverageColor(), 0.1));
+        averageLine.setStroke(gauge.getAverageColor());
+        dot.setFill(gauge.getBarColor());
     }
 }

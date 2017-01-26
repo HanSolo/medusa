@@ -22,8 +22,6 @@ import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.tools.ConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.beans.InvalidationListener;
-import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
