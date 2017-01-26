@@ -19,6 +19,7 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.control.Skin;
@@ -45,41 +46,36 @@ import java.util.Locale;
 /**
  * Created by hansolo on 27.04.16.
  */
-public class WhiteSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double PREFERRED_WIDTH  = 250;
-    private static final double PREFERRED_HEIGHT = 250;
-    private static final double MINIMUM_WIDTH    = 50;
-    private static final double MINIMUM_HEIGHT   = 50;
-    private static final double MAXIMUM_WIDTH    = 1024;
-    private static final double MAXIMUM_HEIGHT   = 1024;
+public class WhiteSkin extends GaugeSkinBase {
     private static final double ANGLE_RANGE      = 360;
-
-    private double        size;
-    private double        center;
-    private DropShadow    shadow;
-    private DropShadow    textShadow;
-    private Arc           backgroundRing;
-    private Arc           barBackground;
-    private Arc           bar;
-    private Text          valueText;
-    private Text          unitText;
-    private Pane          pane;
-    private double        minValue;
-    private double        range;
-    private double        angleStep;
-    private String        formatString;
-    private Locale        locale;
+    private double               size;
+    private double               center;
+    private DropShadow           shadow;
+    private DropShadow           textShadow;
+    private Arc                  backgroundRing;
+    private Arc                  barBackground;
+    private Arc                  bar;
+    private Text                 valueText;
+    private Text                 unitText;
+    private Pane                 pane;
+    private double               minValue;
+    private double               range;
+    private double               angleStep;
+    private String               formatString;
+    private Locale               locale;
+    private InvalidationListener currentValueListener;
 
 
     // ******************** Constructors **************************************
     public WhiteSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        minValue     = gauge.getMinValue();
-        range        = gauge.getRange();
-        angleStep    = ANGLE_RANGE / range;
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale       = gauge.getLocale();
+        minValue             = gauge.getMinValue();
+        range                = gauge.getRange();
+        angleStep            = ANGLE_RANGE / range;
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
+        currentValueListener = o -> setBar(gauge.getCurrentValue());
 
         initGraphics();
         registerListeners();
@@ -91,33 +87,33 @@ public class WhiteSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
         shadow     = new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 12, 0, 3, 3);
         textShadow = new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 4, 0, 2, 2);
 
-        valueText = new Text(String.format(Locale.US, "%.0f", getSkinnable().getValue()));
+        valueText = new Text(String.format(Locale.US, "%.0f", gauge.getValue()));
         valueText.setFill(Color.WHITE);
         valueText.setFont(Fonts.robotoBold(PREFERRED_WIDTH * 0.20625));
         valueText.setTextOrigin(VPos.CENTER);
         valueText.relocate(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.46875);
         valueText.setEffect(textShadow);
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        Helper.enableNode(valueText, gauge.isValueVisible());
 
-        unitText  = new Text(getSkinnable().getUnit());
+        unitText  = new Text(gauge.getUnit());
         unitText.setFill(Color.WHITE);
         unitText.setFont(Fonts.robotoBold(PREFERRED_WIDTH * 0.0875));
         unitText.setTextOrigin(VPos.CENTER);
         unitText.relocate(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.65625);
         unitText.setEffect(textShadow);
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+        Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
         backgroundRing = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5,
                                  PREFERRED_WIDTH * 0.43125, PREFERRED_HEIGHT * 0.43125,
@@ -138,50 +134,41 @@ public class WhiteSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         bar = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5,
                       PREFERRED_WIDTH * 0.43125, PREFERRED_HEIGHT * 0.43125,
-                      90, -getSkinnable().getAngleStep() * getSkinnable().getValue());
+                      90, -gauge.getAngleStep() * gauge.getValue());
         bar.setFill(null);
         bar.setStroke(Color.WHITE);
         bar.setStrokeWidth(PREFERRED_WIDTH * 0.1375);
         bar.setStrokeLineCap(StrokeLineCap.BUTT);
 
         pane = new Pane(valueText, unitText, backgroundRing, barBackground, bar);
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth()))));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> setBar(getSkinnable().getCurrentValue()));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.currentValueProperty().addListener(currentValueListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
+    @Override protected void handleEvents(final String EVENT_TYPE) {
         if ("RESIZE".equals(EVENT_TYPE)) {
             resize();
             redraw();
         } else if ("REDRAW".equals(EVENT_TYPE)) {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            minValue  = getSkinnable().getMinValue();
-            range     = getSkinnable().getRange();
+            minValue  = gauge.getMinValue();
+            range     = gauge.getRange();
             angleStep = ANGLE_RANGE / range;
             redraw();
-            setBar(getSkinnable().getCurrentValue());
+            setBar(gauge.getCurrentValue());
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+            Helper.enableNode(valueText, gauge.isValueVisible());
+            Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
         }
     }
 
@@ -193,6 +180,11 @@ public class WhiteSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
         valueText.setText(String.format(locale, formatString, VALUE));
         resizeValueText();
+    }
+
+    @Override public void dispose() {
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        super.dispose();
     }
 
 
@@ -212,9 +204,9 @@ public class WhiteSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         unitText.relocate((size - unitText.getLayoutBounds().getWidth()) * 0.5, size * 0.66);
     }
 
-    private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        double width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        double height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
         size          = width < height ? width : height;
 
         if (width > 0 && height > 0) {
@@ -277,17 +269,17 @@ public class WhiteSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void redraw() {
-        locale       = getSkinnable().getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+    @Override protected void redraw() {
+        locale       = gauge.getLocale();
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
 
-        valueText.setFill(getSkinnable().getValueColor());
-        unitText.setFill(getSkinnable().getUnitColor());
+        valueText.setFill(gauge.getValueColor());
+        unitText.setFill(gauge.getUnitColor());
 
-        unitText.setText(getSkinnable().getUnit());
+        unitText.setText(gauge.getUnit());
         resizeUnitText();
     }
 }
