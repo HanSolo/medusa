@@ -23,6 +23,7 @@ import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
@@ -61,48 +62,50 @@ import java.util.Locale;
 /**
  * Created by hansolo on 29.01.16.
  */
-public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double MINIMUM_WIDTH   = 100;
-    private static final double MINIMUM_HEIGHT  = 100;
-    private static final double MAXIMUM_WIDTH   = 1024;
-    private static final double MAXIMUM_HEIGHT  = 1024;
-    private double              preferredWidth  = 140;
-    private double              preferredHeight = 350;
-    private double              aspectRatio     = 2.5;
-    private double              size;
-    private double              width;
-    private double              height;
-    private double              stepSize;
-    private Pane                pane;
-    private Orientation         orientation;
-    private Canvas              ticksAndSectionsCanvas;
-    private GraphicsContext     ticksAndSections;
-    private Text                unitText;
-    private Text                titleText;
-    private Text                valueText;
-    private Line                barBorder1;
-    private Line                barBorder2;
-    private Rectangle           barBackground;
-    private Rectangle           bar;
-    private Rectangle           barHighlight;
-    private double              ledSize;
-    private InnerShadow         ledOnShadow;
-    private InnerShadow         ledOffShadow;
-    private Paint               ledFramePaint;
-    private Paint               ledOnPaint;
-    private Paint               ledOffPaint;
-    private Paint               ledHighlightPaint;
-    private Canvas              ledCanvas;
-    private GraphicsContext     led;
-    private Rectangle           lcd;
-    private String              formatString;
-    private String              tickLabelFormatString;
-    private Locale              locale;
-    private double              minValuePosition;
-    private double              maxValuePosition;
-    private double              zeroPosition;
-    private List<Section>       sections;
-    private List<Section>       areas;
+public class LinearSkin extends GaugeSkinBase {
+    protected static final double MINIMUM_WIDTH   = 100;
+    protected static final double MINIMUM_HEIGHT  = 100;
+    protected static final double MAXIMUM_WIDTH   = 1024;
+    protected static final double MAXIMUM_HEIGHT  = 1024;
+    private double                preferredWidth  = 140;
+    private double                preferredHeight = 350;
+    private double                aspectRatio     = 2.5;
+    private double                size;
+    private double                width;
+    private double                height;
+    private double                stepSize;
+    private Pane                  pane;
+    private Orientation           orientation;
+    private Canvas                ticksAndSectionsCanvas;
+    private GraphicsContext       ticksAndSections;
+    private Text                  unitText;
+    private Text                  titleText;
+    private Text                  valueText;
+    private Line                  barBorder1;
+    private Line                  barBorder2;
+    private Rectangle             barBackground;
+    private Rectangle             bar;
+    private Rectangle             barHighlight;
+    private double                ledSize;
+    private InnerShadow           ledOnShadow;
+    private InnerShadow           ledOffShadow;
+    private Paint                 ledFramePaint;
+    private Paint                 ledOnPaint;
+    private Paint                 ledOffPaint;
+    private Paint                 ledHighlightPaint;
+    private Canvas                ledCanvas;
+    private GraphicsContext       led;
+    private Rectangle             lcd;
+    private String                formatString;
+    private String                tickLabelFormatString;
+    private Locale                locale;
+    private double                minValuePosition;
+    private double                maxValuePosition;
+    private double                zeroPosition;
+    private List<Section>         sections;
+    private List<Section>         areas;
+    private InvalidationListener  currentValueListener;
+    private InvalidationListener  paneSizeListener;
 
 
     // ******************** Constructors **************************************
@@ -115,6 +118,8 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         locale                = gauge.getLocale();
         sections              = gauge.getSections();
         areas                 = gauge.getAreas();
+        currentValueListener  = o -> setBar(gauge.getCurrentValue());
+        paneSizeListener      = o -> handleEvents("RESIZE");
 
         if (Orientation.VERTICAL == orientation) {
             preferredWidth  = 140;
@@ -133,12 +138,12 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(preferredWidth, preferredHeight);
+                gauge.setPrefSize(preferredWidth, preferredHeight);
             }
         }
 
@@ -152,29 +157,29 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         ledCanvas = new Canvas();
         led       = ledCanvas.getGraphicsContext2D();
-        Helper.enableNode(ledCanvas, getSkinnable().isLedVisible());
+        Helper.enableNode(ledCanvas, gauge.isLedVisible());
 
         lcd = new Rectangle(0.3 * preferredWidth, 0.014 * preferredHeight);
         lcd.setArcWidth(0.0125 * preferredHeight);
         lcd.setArcHeight(0.0125 * preferredHeight);
         lcd.relocate((preferredWidth - lcd.getWidth()) * 0.5, 0.44 * preferredHeight);
-        Helper.enableNode(lcd, getSkinnable().isLcdVisible());
+        Helper.enableNode(lcd, gauge.isLcdVisible());
 
         bar = new Rectangle();
         bar.setStroke(null);
 
         barHighlight = new Rectangle();
         barHighlight.setStroke(null);
-        Helper.enableNode(barHighlight, getSkinnable().isBarEffectEnabled());
+        Helper.enableNode(barHighlight, gauge.isBarEffectEnabled());
 
-        titleText = new Text(getSkinnable().getTitle());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText = new Text(gauge.getTitle());
+        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        unitText  = new Text(getSkinnable().getUnit());
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+        unitText  = new Text(gauge.getUnit());
+        Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        valueText = new Text(String.format(locale, formatString, gauge.getCurrentValue()));
+        Helper.enableNode(valueText, gauge.isValueVisible());
 
         pane = new Pane(barBorder1,
                         barBorder2,
@@ -187,79 +192,71 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         valueText,
                         bar,
                         barHighlight);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(e -> setBar(getSkinnable().getCurrentValue()));
-
-        pane.widthProperty().addListener(o -> { resize(); redraw(); });
-        pane.heightProperty().addListener(o -> { resize(); redraw(); });
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.currentValueProperty().addListener(currentValueListener);
+        pane.widthProperty().addListener(paneSizeListener);
+        pane.heightProperty().addListener(paneSizeListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("FINISHED".equals(EVENT_TYPE)) {
+            double currentValue = gauge.getCurrentValue();
 
-    protected void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("FINISHED".equals(EVENT_TYPE)) {
-            double currentValue = getSkinnable().getCurrentValue();
-
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(ledCanvas, getSkinnable().isLedVisible());
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(lcd, (getSkinnable().isLcdVisible() && getSkinnable().isValueVisible()));
-            Helper.enableNode(barHighlight, getSkinnable().isBarEffectEnabled());
+            Helper.enableNode(ledCanvas, gauge.isLedVisible());
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
+            Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
+            Helper.enableNode(valueText, gauge.isValueVisible());
+            Helper.enableNode(lcd, (gauge.isLcdVisible() && gauge.isValueVisible()));
+            Helper.enableNode(barHighlight, gauge.isBarEffectEnabled());
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
-            if (getSkinnable().isLedVisible()) { drawLed(); }
+            if (gauge.isLedVisible()) { drawLed(); }
         } else if ("LCD".equals(EVENT_TYPE)) {
-            if (getSkinnable().isLcdVisible()) redraw();
+            if (gauge.isLcdVisible()) redraw();
         } else if ("SECTION".equals(EVENT_TYPE)) {
-            sections = getSkinnable().getSections();
-            areas    = getSkinnable().getAreas();
+            sections = gauge.getSections();
+            areas    = gauge.getAreas();
             resize();
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             if (Orientation.VERTICAL == orientation) {
                 width    = height / aspectRatio;
-                stepSize = Math.abs(0.67143 * height / getSkinnable().getRange());
+                stepSize = Math.abs(0.67143 * height / gauge.getRange());
             } else {
                 height   = width / aspectRatio;
-                stepSize = Math.abs(0.75 * width / getSkinnable().getRange());
+                stepSize = Math.abs(0.75 * width / gauge.getRange());
             }
             resize();
             redraw();
         }
     }
 
+    @Override public void dispose() {
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        pane.widthProperty().removeListener(paneSizeListener);
+        pane.heightProperty().removeListener(paneSizeListener);
+        super.dispose();
+    }
+    
 
     // ******************** Private Methods ***********************************
     private void drawTickMarks(final GraphicsContext CTX) {
         if (Double.compare(stepSize, 0) <= 0) return;
 
         CTX.setFont(Fonts.robotoLight(0.06 * size));
-        CTX.setStroke(getSkinnable().getTickMarkColor());
-        CTX.setFill(getSkinnable().getTickLabelColor());
+        CTX.setStroke(gauge.getTickMarkColor());
+        CTX.setFill(gauge.getTickLabelColor());
 
         Point2D innerPoint;
         Point2D innerMediumPoint;
@@ -279,12 +276,12 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         double anchorX        = barBackground.getLayoutX() - 0.075 * width;
         double anchorY        = barBackground.getLayoutY() + barBackground.getHeight() + 0.075 * height;
-        double majorTickSpace = getSkinnable().getMajorTickSpace();
-        double minorTickSpace = getSkinnable().getMinorTickSpace();
-        double minValue       = getSkinnable().getMinValue();
-        double maxValue       = getSkinnable().getMaxValue();
+        double majorTickSpace = gauge.getMajorTickSpace();
+        double minorTickSpace = gauge.getMinorTickSpace();
+        double minValue       = gauge.getMinValue();
+        double maxValue       = gauge.getMaxValue();
 
-        if (getSkinnable().getSectionsVisible()) drawSections(CTX);
+        if (gauge.getSectionsVisible()) drawSections(CTX);
 
         int counter = 0;
         for (double i = minPosition ; Double.compare(i, maxPosition + 1) <= 0 ; i += stepSize) {
@@ -328,9 +325,9 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawSections(final GraphicsContext CTX) {
-        if (!getSkinnable().getSectionsVisible() && sections.isEmpty()) return;
+        if (!gauge.getSectionsVisible() && sections.isEmpty()) return;
         int           listSize = sections.size();
-        double        minValue = getSkinnable().getMinValue();
+        double        minValue = gauge.getMinValue();
         double        minPosition;
         CTX.save();
         if (Orientation.VERTICAL == orientation) {
@@ -360,7 +357,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void setBar(final double VALUE) {
         if (Orientation.VERTICAL == orientation) {
             double valueHeight;
-            if (getSkinnable().isStartFromZero()) {
+            if (gauge.isStartFromZero()) {
                 if (VALUE < 0) {
                     valueHeight = Math.abs(VALUE) * stepSize;
                     bar.setLayoutY(0);
@@ -371,14 +368,14 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     barHighlight.setLayoutY(-valueHeight);
                 }
             } else {
-                valueHeight = (VALUE - getSkinnable().getMinValue()) * stepSize;
+                valueHeight = (VALUE - gauge.getMinValue()) * stepSize;
                 bar.setLayoutY(-valueHeight);
                 barHighlight.setLayoutY(-valueHeight);
             }
             bar.setHeight(valueHeight);
             barHighlight.setHeight(valueHeight);
 
-            if (getSkinnable().isLcdVisible()) {
+            if (gauge.isLcdVisible()) {
                 valueText.setText(String.format(locale, formatString, VALUE));
                 valueText.setLayoutX((0.88 * width - valueText.getLayoutBounds().getWidth()));
             } else {
@@ -387,7 +384,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         } else {
             double valueWidth;
-            if (getSkinnable().isStartFromZero()) {
+            if (gauge.isStartFromZero()) {
                 if (VALUE < 0) {
                     valueWidth = Math.abs(VALUE) * stepSize;
                     bar.setLayoutX(-valueWidth);
@@ -398,7 +395,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     barHighlight.setLayoutX(0);
                 }
             } else {
-                valueWidth = (VALUE - getSkinnable().getMinValue()) * stepSize;
+                valueWidth = (VALUE - gauge.getMinValue()) * stepSize;
                 bar.setLayoutX(0);
                 barHighlight.setLayoutX(0);
             }
@@ -412,12 +409,12 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         setBarColor(VALUE);
     }
     private void setBarColor(final double VALUE) {
-        if (!getSkinnable().getAreasVisible() && !getSkinnable().isGradientBarEnabled()) {
-            bar.setFill(getSkinnable().getBarColor());
-        } else if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientBarStops().size() > 1) {
-            bar.setFill(getSkinnable().getGradientLookup().getColorAt((VALUE - getSkinnable().getMinValue()) / getSkinnable().getRange()));
+        if (!gauge.getAreasVisible() && !gauge.isGradientBarEnabled()) {
+            bar.setFill(gauge.getBarColor());
+        } else if (gauge.isGradientBarEnabled() && gauge.getGradientBarStops().size() > 1) {
+            bar.setFill(gauge.getGradientLookup().getColorAt((VALUE - gauge.getMinValue()) / gauge.getRange()));
         } else {
-            bar.setFill(getSkinnable().getBarColor());
+            bar.setFill(gauge.getBarColor());
             int listSize = areas.size();
             for (int i = 0 ; i < listSize ; i++) {
                 Section area = areas.get(i);
@@ -432,7 +429,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void drawLed() {
         led.clearRect(0, 0, ledSize, ledSize);
 
-        boolean isFlatLed = LedType.FLAT == getSkinnable().getLedType();
+        boolean isFlatLed = LedType.FLAT == gauge.getLedType();
 
         if (!isFlatLed) {
             led.setFill(ledFramePaint);
@@ -445,7 +442,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         led.save();
-        if (getSkinnable().isLedOn()) {
+        if (gauge.isLedOn()) {
             led.setEffect(ledOnShadow);
             led.setFill(ledOnPaint);
         } else {
@@ -471,8 +468,8 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             unitText.setFont(Fonts.robotoRegular(0.08 * width));
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.075 * height);
 
-            if (getSkinnable().isLcdVisible()) {
-                switch(getSkinnable().getLcdFont()) {
+            if (gauge.isLcdVisible()) {
+                switch(gauge.getLcdFont()) {
                     case LCD:
                         valueText.setFont(Fonts.digital(0.24 * width));
                         valueText.relocate((0.88 * width - valueText.getLayoutBounds().getWidth()), 0.877 * height);
@@ -506,8 +503,8 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             unitText.setFont(Fonts.robotoRegular(0.1 * height));
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.8 * height);
 
-            if (getSkinnable().isLcdVisible()) {
-                switch(getSkinnable().getLcdFont()) {
+            if (gauge.isLcdVisible()) {
+                switch(gauge.getLcdFont()) {
                     case LCD:
                         valueText.setFont(Fonts.digital(0.24 * height));
                         valueText.relocate((0.98 * width - valueText.getLayoutBounds().getWidth()), 0.052 * height);
@@ -537,25 +534,25 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void resize() {
-        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
 
         if (width > 0 && height > 0) {
-            orientation = getSkinnable().getOrientation();
+            orientation = gauge.getOrientation();
 
-            double  currentValue   = getSkinnable().getCurrentValue();
-            Color   tickMarkColor  = getSkinnable().getTickMarkColor();
+            double  currentValue   = gauge.getCurrentValue();
+            Color   tickMarkColor  = gauge.getTickMarkColor();
             Color   barBorderColor = Color.color(tickMarkColor.getRed(), tickMarkColor.getGreen(), tickMarkColor.getBlue(), 0.5);
-            boolean isFlatLed      = LedType.FLAT == getSkinnable().getLedType();
+            boolean isFlatLed      = LedType.FLAT == gauge.getLedType();
 
             if (Orientation.VERTICAL == orientation) {
                 width    = height / aspectRatio;
                 size     = width < height ? width : height;
-                stepSize = Math.abs((0.66793 * height) / getSkinnable().getRange());
+                stepSize = Math.abs((0.66793 * height) / gauge.getRange());
 
                 pane.setMaxSize(width, height);
-                pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+                pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
 
                 width  = pane.getLayoutBounds().getWidth();
                 height = pane.getLayoutBounds().getHeight();
@@ -573,7 +570,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
                 minValuePosition = barBackground.getLayoutY() + barBackground.getLayoutBounds().getHeight();
                 maxValuePosition = barBackground.getLayoutY();
-                zeroPosition     = minValuePosition + getSkinnable().getMinValue() * stepSize;
+                zeroPosition     = minValuePosition + gauge.getMinValue() * stepSize;
                 zeroPosition     = zeroPosition > minValuePosition ? minValuePosition : zeroPosition;
 
                 barBorder1.setStartX(barBackground.getLayoutX() - 1);
@@ -590,7 +587,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
                 bar.setWidth(0.14286 * width);
                 bar.setTranslateX((width - bar.getWidth()) * 0.5);
-                bar.setTranslateY(getSkinnable().isStartFromZero() ? zeroPosition : minValuePosition);
+                bar.setTranslateY(gauge.isStartFromZero() ? zeroPosition : minValuePosition);
 
                 barHighlight.setWidth(bar.getWidth());
                 barHighlight.setTranslateX(bar.getTranslateX());
@@ -612,7 +609,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 ledCanvas.relocate((width - ledSize) * 0.5, 0.12 * height);
                 ledOffShadow = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
                 ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
-                if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getLedColor(), 0.36 * ledSize, 0, 0, 0));
+                if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));
 
                 lcd.setWidth(0.8 * width);
                 lcd.setHeight(0.22 * width);
@@ -622,10 +619,10 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             } else {
                 height   = width / aspectRatio;
                 size     = width < height ? width : height;
-                stepSize = Math.abs(0.9 * width / getSkinnable().getRange());
+                stepSize = Math.abs(0.9 * width / gauge.getRange());
 
                 pane.setMaxSize(width, height);
-                pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+                pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
 
                 width  = pane.getLayoutBounds().getWidth();
                 height = pane.getLayoutBounds().getHeight();
@@ -643,7 +640,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
                 minValuePosition = barBackground.getLayoutX();
                 maxValuePosition = barBackground.getLayoutX() + barBackground.getLayoutBounds().getWidth();
-                zeroPosition     = minValuePosition - getSkinnable().getMinValue() * stepSize;
+                zeroPosition     = minValuePosition - gauge.getMinValue() * stepSize;
                 zeroPosition     = zeroPosition < minValuePosition ? minValuePosition : zeroPosition;
 
                 barBorder1.setStartX(minValuePosition);
@@ -659,7 +656,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 barBorder2.setStroke(barBorderColor);
 
                 bar.setHeight(0.14286 * height);
-                bar.setTranslateX(getSkinnable().isStartFromZero() ? zeroPosition : minValuePosition);
+                bar.setTranslateX(gauge.isStartFromZero() ? zeroPosition : minValuePosition);
                 bar.setTranslateY((height - bar.getHeight()) * 0.5);
 
                 barHighlight.setHeight(bar.getHeight());
@@ -682,7 +679,7 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 ledCanvas.relocate(0.955 * width, (height - ledSize) * 0.5);
                 ledOffShadow = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
                 ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
-                if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getLedColor(), 0.36 * ledSize, 0, 0, 0));
+                if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));
 
                 lcd.setWidth(0.3 * width);
                 lcd.setHeight(0.22 * height);
@@ -695,16 +692,16 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void redraw() {
-        locale                = getSkinnable().getLocale();
-        formatString          = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getTickLabelDecimals())).append("f").toString();
+    @Override protected void redraw() {
+        locale                = gauge.getLocale();
+        formatString          = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
 
         // Background stroke and fill
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(Orientation.HORIZONTAL == orientation ? getSkinnable().getBorderWidth() / preferredHeight * height : getSkinnable().getBorderWidth() / preferredWidth * width))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(Orientation.HORIZONTAL == orientation ? gauge.getBorderWidth() / preferredHeight * height : gauge.getBorderWidth() / preferredWidth * width))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Color barColor = getSkinnable().getBarColor();
+        Color barColor = gauge.getBarColor();
         bar.setFill(barColor);
         if (Orientation.VERTICAL == orientation) {
             barHighlight.setFill(new LinearGradient(barHighlight.getLayoutX(), 0, barHighlight.getLayoutX() + barHighlight.getWidth(), 0,
@@ -721,9 +718,9 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         // LED
-        if (getSkinnable().isLedVisible()) {
-            final Color LED_COLOR = getSkinnable().getLedColor();
-            switch(getSkinnable().getLedType()) {
+        if (gauge.isLedVisible()) {
+            final Color LED_COLOR = gauge.getLedColor();
+            switch(gauge.getLedType()) {
                 case FLAT:
                     ledFramePaint = Color.WHITE;
                     ledOnPaint = new LinearGradient(0, 0.25 * ledSize,
@@ -780,9 +777,9 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
         // LCD
-        LcdDesign lcdDesign = getSkinnable().getLcdDesign();
+        LcdDesign lcdDesign = gauge.getLcdDesign();
         Color[]   lcdColors = lcdDesign.getColors();
-        if (getSkinnable().isLcdVisible() && getSkinnable().isValueVisible()) {
+        if (gauge.isLcdVisible() && gauge.isValueVisible()) {
             LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
                                                             false, CycleMethod.NO_CYCLE,
                                                             new Stop(0, lcdColors[0]),
@@ -806,11 +803,11 @@ public class LinearSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         // Text
-        titleText.setText(getSkinnable().getTitle());
-        titleText.setFill(getSkinnable().getTitleColor());
-        unitText.setFill(getSkinnable().getUnitColor());
-        unitText.setText(getSkinnable().getUnit());
-        valueText.setFill(getSkinnable().isLcdVisible() ? lcdColors[5] : getSkinnable().getValueColor());
+        titleText.setText(gauge.getTitle());
+        titleText.setFill(gauge.getTitleColor());
+        unitText.setFill(gauge.getUnitColor());
+        unitText.setText(gauge.getUnit());
+        valueText.setFill(gauge.isLcdVisible() ? lcdColors[5] : gauge.getValueColor());
         resizeText();
     }
 }

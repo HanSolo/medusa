@@ -17,10 +17,8 @@
 package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.events.UpdateEventListener;
 import javafx.beans.InvalidationListener;
-import javafx.collections.ListChangeListener;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 

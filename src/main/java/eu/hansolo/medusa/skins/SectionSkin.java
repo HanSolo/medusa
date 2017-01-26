@@ -20,6 +20,7 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
@@ -55,48 +56,46 @@ import java.util.Locale;
 /**
  * Created by hansolo on 12.02.16.
  */
-public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double PREFERRED_WIDTH  = 250;
-    private static final double PREFERRED_HEIGHT = 250;
-    private static final double MINIMUM_WIDTH    = 50;
-    private static final double MINIMUM_HEIGHT   = 50;
-    private static final double MAXIMUM_WIDTH    = 1024;
-    private static final double MAXIMUM_HEIGHT   = 1024;
-    private double              START_ANGLE      = 300;
-    private double              ANGLE_RANGE      = 240;
-    private double          size;
-    private Pane            pane;
-    private Path            ring;
-    private Canvas          sectionsCanvas;
-    private GraphicsContext sectionsCtx;
-    private Circle          mask;
-    private Circle          knob;
-    private Path            needle;
-    private Rotate          needleRotate;
-    private Text            valueText;
-    private Text            titleText;
-    private double          angleStep;
-    private String          formatString;
-    private Locale          locale;
-    private List<Section>   sections;
-    private boolean         highlightSections;
-    private boolean         sectionsVisible;
-    private double          minValue;
-    private double          maxValue;
+public class SectionSkin extends GaugeSkinBase {
+    private double                      START_ANGLE = 300;
+    private double                      ANGLE_RANGE = 240;
+    private double                      size;
+    private Pane                        pane;
+    private Path                        ring;
+    private Canvas                      sectionsCanvas;
+    private GraphicsContext             sectionsCtx;
+    private Circle                      mask;
+    private Circle                      knob;
+    private Path                        needle;
+    private Rotate                      needleRotate;
+    private Text                        valueText;
+    private Text                        titleText;
+    private double                      angleStep;
+    private String                      formatString;
+    private Locale                      locale;
+    private List<Section>               sections;
+    private boolean                     highlightSections;
+    private boolean                     sectionsVisible;
+    private double                      minValue;
+    private double                      maxValue;
+    private ListChangeListener<Section> sectionListener;
+    private InvalidationListener        currentValueListener;
 
 
     // ******************** Constructors **************************************
     public SectionSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleStep         = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
-        formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale            = gauge.getLocale();
-        sections          = gauge.getSections();
-        highlightSections = gauge.isHighlightSections();
-        sectionsVisible   = gauge.getSectionsVisible();
-        minValue          = gauge.getMinValue();
-        maxValue          = gauge.getMaxValue();
+        angleStep            = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
+        sections             = gauge.getSections();
+        highlightSections    = gauge.isHighlightSections();
+        sectionsVisible      = gauge.getSectionsVisible();
+        minValue             = gauge.getMinValue();
+        maxValue             = gauge.getMaxValue();
+        sectionListener      = c -> handleEvents("RESIZE");
+        currentValueListener = o -> rotateNeedle(gauge.getCurrentValue());
 
         initGraphics();
         registerListeners();
@@ -106,12 +105,12 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
@@ -126,14 +125,14 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         mask = new Circle();
         mask.setStroke(null);
-        mask.setFill(getSkinnable().getBackgroundPaint());
+        mask.setFill(gauge.getBackgroundPaint());
 
         knob = new Circle();
         knob.setStroke(null);
-        knob.setFill(getSkinnable().getKnobColor());
+        knob.setFill(gauge.getKnobColor());
 
-        angleStep = ANGLE_RANGE / (getSkinnable().getRange());
-        double targetAngle = 180 - START_ANGLE + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep;
+        angleStep = ANGLE_RANGE / (gauge.getRange());
+        double targetAngle = 180 - START_ANGLE + (gauge.getValue() - gauge.getMinValue()) * angleStep;
 
         needleRotate = new Rotate(180 - START_ANGLE);
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
@@ -143,16 +142,16 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setStroke(null);
         needle.getTransforms().setAll(needleRotate);
 
-        valueText = new Text(String.format(locale, formatString, getSkinnable().getMinValue()) + getSkinnable().getUnit());
+        valueText = new Text(String.format(locale, formatString, gauge.getMinValue()) + gauge.getUnit());
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
-        valueText.setFill(getSkinnable().getValueColor());
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        valueText.setFill(gauge.getValueColor());
+        Helper.enableNode(valueText, gauge.isValueVisible());
 
-        titleText = new Text(getSkinnable().getTitle());
+        titleText = new Text(gauge.getTitle());
         titleText.setTextOrigin(VPos.CENTER);
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText.setFill(gauge.getTitleColor());
+        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
         // Add all nodes
         pane = new Pane(ring, sectionsCanvas, mask, knob, needle, valueText, titleText);
@@ -160,33 +159,19 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().getSections().addListener((ListChangeListener<Section>) change -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(event -> handleEvents(event.eventType.name()));
-
-        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle(getSkinnable().getCurrentValue()));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.getSections().addListener(sectionListener);
+        gauge.currentValueProperty().addListener(currentValueListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    protected void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("FINISHED".equals(EVENT_TYPE)) {
-            if (getSkinnable().getCheckSectionsForValue()) {
-                double currentValue = getSkinnable().getCurrentValue();
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("FINISHED".equals(EVENT_TYPE)) {
+            if (gauge.getCheckSectionsForValue()) {
+                double currentValue = gauge.getCurrentValue();
                 int listSize = sections.size();
                 for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(currentValue); }
             }
@@ -195,29 +180,35 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 drawSections();
             }
         } else if ("RECALC".equals(EVENT_TYPE)) {
-            minValue  = getSkinnable().getMinValue();
-            maxValue  = getSkinnable().getMaxValue();
-            angleStep = ANGLE_RANGE / getSkinnable().getRange();
-            needleRotate.setAngle((180 - START_ANGLE) + (getSkinnable().getValue() - getSkinnable().getMinValue()) * angleStep);
+            minValue  = gauge.getMinValue();
+            maxValue  = gauge.getMaxValue();
+            angleStep = ANGLE_RANGE / gauge.getRange();
+            needleRotate.setAngle((180 - START_ANGLE) + (gauge.getValue() - gauge.getMinValue()) * angleStep);
             resize();
-            rotateNeedle(getSkinnable().getCurrentValue());
+            rotateNeedle(gauge.getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
-            sections          = getSkinnable().getSections();
-            highlightSections = getSkinnable().isHighlightSections();
+            sections          = gauge.getSections();
+            highlightSections = gauge.isHighlightSections();
             resize();
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(valueText, gauge.isValueVisible());
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
         }
+    }
+
+    @Override public void dispose() {
+        gauge.getSections().removeListener(sectionListener);
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        super.dispose();
     }
 
 
     // ******************** Private Methods ***********************************
     private void rotateNeedle(final double VALUE) {
-        double targetAngle = 180 - START_ANGLE + (VALUE - getSkinnable().getMinValue()) * angleStep;
+        double targetAngle = 180 - START_ANGLE + (VALUE - gauge.getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
-        valueText.setText(String.format(locale, formatString, VALUE) + getSkinnable().getUnit());
+        valueText.setText(String.format(locale, formatString, VALUE) + gauge.getUnit());
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         if (valueText.getLayoutBounds().getWidth() > 0.395 * size) { resizeText(); }
     }
@@ -246,17 +237,17 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle.setFill(new LinearGradient(needle.getLayoutBounds().getMinX(), 0,
                                           needle.getLayoutBounds().getMaxX(), 0,
                                           false, CycleMethod.NO_CYCLE,
-                                          new Stop(0.0, getSkinnable().getNeedleColor().darker()),
-                                          new Stop(0.5, getSkinnable().getNeedleColor()),
-                                          new Stop(1.0, getSkinnable().getNeedleColor().darker())));
+                                          new Stop(0.0, gauge.getNeedleColor().darker()),
+                                          new Stop(0.5, gauge.getNeedleColor()),
+                                          new Stop(1.0, gauge.getNeedleColor().darker())));
     }
 
     private void drawSections() {
         sectionsCtx.clearRect(0, 0, size, size);
         if (!sectionsVisible | sections.isEmpty()) return;
-        double value               = getSkinnable().getCurrentValue();
-        boolean sectionTextVisible = getSkinnable().isSectionTextVisible();
-        boolean sectionIconVisible = getSkinnable().getSectionIconsVisible();
+        double value               = gauge.getCurrentValue();
+        boolean sectionTextVisible = gauge.isSectionTextVisible();
+        boolean sectionIconVisible = gauge.getSectionIconsVisible();
         double offset              = START_ANGLE - 90;
         int listSize               = sections.size();
         double xy                  = size * 0.0325;
@@ -264,7 +255,7 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double center              = size * 0.5;
         double textPointX;
         double textPointY;
-        angleStep                  = ANGLE_RANGE / getSkinnable().getRange();
+        angleStep                  = ANGLE_RANGE / gauge.getRange();
         sectionsCtx.setFont(Fonts.robotoCondensedLight(0.05 * size));
         sectionsCtx.setTextAlign(TextAlignment.CENTER);
         sectionsCtx.setTextBaseline(VPos.CENTER);
@@ -344,14 +335,14 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.setTranslateY(size * 0.85);
     }
 
-    private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        double width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        double height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
         size          = width < height ? width : height;
 
         if (size > 0) {
             pane.setMaxSize(size, size);
-            pane.relocate((getSkinnable().getWidth() - size) * 0.5, (getSkinnable().getHeight() - size) * 0.5);
+            pane.relocate((gauge.getWidth() - size) * 0.5, (gauge.getHeight() - size) * 0.5);
 
             ring.getElements().clear();
             ring.getElements().add(new MoveTo(0.5 * size, 0.03 * size));
@@ -391,32 +382,32 @@ public class SectionSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             needleRotate.setPivotX(needle.getLayoutBounds().getWidth() * 0.5);
             needleRotate.setPivotY(needle.getLayoutBounds().getMaxY());
 
-            double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + getSkinnable().getMinValue();
-            valueText.setText(String.format(locale, "%." + getSkinnable().getDecimals() + "f", currentValue) + getSkinnable().getUnit());
-            valueText.setVisible(getSkinnable().isValueVisible());
+            double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + gauge.getMinValue();
+            valueText.setText(String.format(locale, "%." + gauge.getDecimals() + "f", currentValue) + gauge.getUnit());
+            valueText.setVisible(gauge.isValueVisible());
 
-            titleText.setText(getSkinnable().getTitle());
+            titleText.setText(gauge.getTitle());
 
             resizeText();
         }
     }
 
-    private void redraw() {
-        sectionsVisible = getSkinnable().getSectionsVisible();
+    @Override protected void redraw() {
+        sectionsVisible = gauge.getSectionsVisible();
         drawSections();
         needle.setFill(new LinearGradient(needle.getLayoutBounds().getMinX(), 0,
                                           needle.getLayoutBounds().getMaxX(), 0,
                                           false, CycleMethod.NO_CYCLE,
-                                          new Stop(0.0, getSkinnable().getNeedleColor().darker()),
-                                          new Stop(0.5, getSkinnable().getNeedleColor()),
-                                          new Stop(1.0, getSkinnable().getNeedleColor().darker())));
-        titleText.setFill(getSkinnable().getTitleColor());
-        valueText.setFill(getSkinnable().getValueColor());
-        mask.setFill(getSkinnable().getBackgroundPaint());
-        knob.setFill(getSkinnable().getKnobColor());
-        locale       = getSkinnable().getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        titleText.setText(getSkinnable().getTitle());
+                                          new Stop(0.0, gauge.getNeedleColor().darker()),
+                                          new Stop(0.5, gauge.getNeedleColor()),
+                                          new Stop(1.0, gauge.getNeedleColor().darker())));
+        titleText.setFill(gauge.getTitleColor());
+        valueText.setFill(gauge.getValueColor());
+        mask.setFill(gauge.getBackgroundPaint());
+        knob.setFill(gauge.getKnobColor());
+        locale       = gauge.getLocale();
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        titleText.setText(gauge.getTitle());
         resizeText();
     }
 }

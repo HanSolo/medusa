@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.CacheHint;
@@ -57,69 +58,73 @@ import java.util.Locale;
 /**
  * Created by hansolo on 16.01.16.
  */
-public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double PREFERRED_WIDTH  = 250;
-    private static final double PREFERRED_HEIGHT = 165;
-    private static final double MINIMUM_WIDTH    = 50;
-    private static final double MINIMUM_HEIGHT   = 50;
-    private static final double MAXIMUM_WIDTH    = 1024;
-    private static final double MAXIMUM_HEIGHT   = 1024;
-    private static final double ASPECT_RATIO     = 0.59375;
-    private double       width;
-    private double       height;
-    private double       oldValue;
-    private Arc          barBackground;
-    private Pane         sectionLayer;
-    private Arc          bar;
-    private Path         needle;
-    private MoveTo       needleMoveTo1;
-    private CubicCurveTo needleCubicCurveTo2;
-    private CubicCurveTo needleCubicCurveTo3;
-    private CubicCurveTo needleCubicCurveTo4;
-    private CubicCurveTo needleCubicCurveTo5;
-    private CubicCurveTo  needleCubicCurveTo6;
-    private CubicCurveTo  needleCubicCurveTo7;
-    private ClosePath     needleClosePath8;
-    private Rotate        needleRotate;
-    private Text          minValueText;
-    private Text          maxValueText;
-    private Text          titleText;
-    private Pane          pane;
-    private double        angleRange;
-    private double        minValue;
-    private double        range;
-    private double        angleStep;
-    private double        startAngle;
-    private boolean       colorGradientEnabled;
-    private int           noOfGradientStops;
-    private boolean       sectionsAlwaysVisible;
-    private boolean       sectionsVisible;
-    private List<Section> sections;
-    private Tooltip       needleTooltip;
-    private String        formatString;
-    private Locale        locale;
-    private Color         barColor;
-    private Tooltip       barTooltip;
+public class IndicatorSkin extends GaugeSkinBase {
+    protected static final double PREFERRED_WIDTH  = 250;
+    protected static final double PREFERRED_HEIGHT = 165;
+    protected static final double MINIMUM_WIDTH    = 50;
+    protected static final double MINIMUM_HEIGHT   = 50;
+    protected static final double MAXIMUM_WIDTH    = 1024;
+    protected static final double MAXIMUM_HEIGHT   = 1024;
+    private static final double   ASPECT_RATIO     = 0.59375;
+    private double                width;
+    private double                height;
+    private double                oldValue;
+    private Arc                   barBackground;
+    private Pane                  sectionLayer;
+    private Arc                   bar;
+    private Path                  needle;
+    private MoveTo                needleMoveTo1;
+    private CubicCurveTo          needleCubicCurveTo2;
+    private CubicCurveTo          needleCubicCurveTo3;
+    private CubicCurveTo          needleCubicCurveTo4;
+    private CubicCurveTo          needleCubicCurveTo5;
+    private CubicCurveTo          needleCubicCurveTo6;
+    private CubicCurveTo          needleCubicCurveTo7;
+    private ClosePath             needleClosePath8;
+    private Rotate                needleRotate;
+    private Text                  minValueText;
+    private Text                  maxValueText;
+    private Text                  titleText;
+    private Pane                  pane;
+    private double                angleRange;
+    private double                minValue;
+    private double                range;
+    private double                angleStep;
+    private double                startAngle;
+    private boolean               colorGradientEnabled;
+    private int                   noOfGradientStops;
+    private boolean               sectionsAlwaysVisible;
+    private boolean               sectionsVisible;
+    private List<Section>         sections;
+    private Tooltip               needleTooltip;
+    private String                formatString;
+    private Locale                locale;
+    private Color                 barColor;
+    private Tooltip               barTooltip;
+    private InvalidationListener  currentValueListener;
+    private InvalidationListener  sectionAlwaysVisibleListener;
 
 
     // ******************** Constructors **************************************
     public IndicatorSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleRange            = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
-        startAngle            = getStartAngle();
-        oldValue              = gauge.getValue();
-        minValue              = gauge.getMinValue();
-        range                 = gauge.getRange();
-        angleStep             = angleRange / range;
-        colorGradientEnabled  = gauge.isGradientBarEnabled();
-        noOfGradientStops     = gauge.getGradientBarStops().size();
-        sectionsAlwaysVisible = gauge.getSectionsAlwaysVisible();
-        sectionsVisible       = gauge.getSectionsVisible();
-        sections              = gauge.getSections();
-        formatString          = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale                = gauge.getLocale();
-        barColor              = gauge.getBarColor();
+        angleRange                   = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
+        startAngle                   = getStartAngle();
+        oldValue                     = gauge.getValue();
+        minValue                     = gauge.getMinValue();
+        range                        = gauge.getRange();
+        angleStep                    = angleRange / range;
+        colorGradientEnabled         = gauge.isGradientBarEnabled();
+        noOfGradientStops            = gauge.getGradientBarStops().size();
+        sectionsAlwaysVisible        = gauge.getSectionsAlwaysVisible();
+        sectionsVisible              = gauge.getSectionsVisible();
+        sections                     = gauge.getSections();
+        formatString                 = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale                       = gauge.getLocale();
+        barColor                     = gauge.getBarColor();
+        currentValueListener         = o -> rotateNeedle(gauge.getCurrentValue());
+        sectionAlwaysVisibleListener = o -> bar.setVisible(!gauge.getSectionsAlwaysVisible());
 
         initGraphics();
         registerListeners();
@@ -131,18 +136,18 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
         barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, angleRange * 0.5 + 90, -angleRange);
         barBackground.setType(ArcType.OPEN);
-        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
+        barBackground.setStroke(gauge.getBarBackgroundColor());
         barBackground.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
         barBackground.setStrokeLineCap(StrokeLineCap.BUTT);
         barBackground.setFill(null);
@@ -152,14 +157,14 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         bar = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, angleRange * 0.5 + 90, 0);
         bar.setType(ArcType.OPEN);
-        bar.setStroke(getSkinnable().getBarColor());
+        bar.setStroke(gauge.getBarColor());
         bar.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
         bar.setStrokeLineCap(StrokeLineCap.BUTT);
         bar.setFill(null);
         //bar.setMouseTransparent(sectionsAlwaysVisible ? true : false);
         bar.setVisible(!sectionsAlwaysVisible);
 
-        needleRotate = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
+        needleRotate = new Rotate((gauge.getValue() - oldValue - minValue) * angleStep);
 
         needleMoveTo1       = new MoveTo();
         needleCubicCurveTo2 = new CubicCurveTo();
@@ -172,27 +177,27 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         needle = new Path(needleMoveTo1, needleCubicCurveTo2, needleCubicCurveTo3, needleCubicCurveTo4, needleCubicCurveTo5, needleCubicCurveTo6, needleCubicCurveTo7, needleClosePath8);
         needle.setFillRule(FillRule.EVEN_ODD);
         needle.getTransforms().setAll(needleRotate);
-        needle.setFill(getSkinnable().getNeedleColor());
+        needle.setFill(gauge.getNeedleColor());
         needle.setPickOnBounds(false);
         needle.setStrokeType(StrokeType.INSIDE);
         needle.setStrokeWidth(1);
-        needle.setStroke(getSkinnable().getBackgroundPaint());
+        needle.setStroke(gauge.getBackgroundPaint());
 
-        needleTooltip = new Tooltip(String.format(locale, formatString, getSkinnable().getValue()));
+        needleTooltip = new Tooltip(String.format(locale, formatString, gauge.getValue()));
         needleTooltip.setTextAlignment(TextAlignment.CENTER);
         Tooltip.install(needle, needleTooltip);
 
-        minValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
-        minValueText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(minValueText, getSkinnable().getTickLabelsVisible());
+        minValueText = new Text(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMinValue()));
+        minValueText.setFill(gauge.getTitleColor());
+        Helper.enableNode(minValueText, gauge.getTickLabelsVisible());
 
-        maxValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
-        maxValueText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(maxValueText, getSkinnable().getTickLabelsVisible());
+        maxValueText = new Text(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMaxValue()));
+        maxValueText.setFill(gauge.getTitleColor());
+        Helper.enableNode(maxValueText, gauge.getTickLabelsVisible());
 
-        titleText = new Text(getSkinnable().getTitle());
-        titleText.setFill(getSkinnable().getTitleColor());
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText = new Text(gauge.getTitle());
+        titleText.setFill(gauge.getTitleColor());
+        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
         if (!sections.isEmpty() && sectionsVisible && !sectionsAlwaysVisible) {
             barTooltip = new Tooltip();
@@ -201,50 +206,37 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         pane = new Pane(barBackground, sectionLayer, bar, needle, minValueText, maxValueText, titleText);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> rotateNeedle(getSkinnable().getCurrentValue()));
-        getSkinnable().sectionsAlwaysVisibleProperty().addListener(o -> bar.setVisible(!getSkinnable().getSectionsAlwaysVisible()));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.currentValueProperty().addListener(currentValueListener);
+        gauge.sectionsAlwaysVisibleProperty().addListener(sectionAlwaysVisibleListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("RECALC".equals(EVENT_TYPE)) {
-            angleRange = Helper.clamp(90.0, 180.0, getSkinnable().getAngleRange());
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("RECALC".equals(EVENT_TYPE)) {
+            angleRange = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
             startAngle = getStartAngle();
-            minValue   = getSkinnable().getMinValue();
-            range      = getSkinnable().getRange();
-            sections   = getSkinnable().getSections();
+            minValue   = gauge.getMinValue();
+            range      = gauge.getRange();
+            sections   = gauge.getSections();
             angleStep  = angleRange / range;
             redraw();
-            rotateNeedle(getSkinnable().getCurrentValue());
+            rotateNeedle(gauge.getCurrentValue());
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            needleTooltip.setText(String.format(locale, formatString, getSkinnable().getValue()));
-            double value = getSkinnable().getValue();
-            if (getSkinnable().isValueVisible()) {
+            needleTooltip.setText(String.format(locale, formatString, gauge.getValue()));
+            double value = gauge.getValue();
+            if (gauge.isValueVisible()) {
                 Bounds bounds       = pane.localToScreen(pane.getBoundsInLocal());                
-                double xFactor      = value > getSkinnable().getRange() * 0.8 ? 0.0 : 0.25;
+                double xFactor      = value > gauge.getRange() * 0.8 ? 0.0 : 0.25;
                 double tooltipAngle = value * angleStep;
                 double sinValue     = Math.sin(Math.toRadians(180 + angleRange * 0.5 - tooltipAngle));
                 double cosValue     = Math.cos(Math.toRadians(180 + angleRange * 0.5 - tooltipAngle));
@@ -261,12 +253,12 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 }
             }
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
         }
     }
 
     private double getStartAngle() {
-        ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
+        ScaleDirection scaleDirection = gauge.getScaleDirection();
         switch(scaleDirection) {
             //case COUNTER_CLOCKWISE: return 180 - angleRange * 0.5;
             case CLOCKWISE        :
@@ -279,7 +271,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double targetAngle      = (VALUE - minValue) * angleStep - needleStartAngle;
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
-        bar.setLength(-(getSkinnable().getCurrentValue() - minValue) * angleStep);
+        bar.setLength(-(gauge.getCurrentValue() - minValue) * angleStep);
         setBarColor(VALUE);
     }
     
@@ -287,7 +279,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         if (!sectionsVisible && !colorGradientEnabled) {
             bar.setStroke(barColor);
         } else if (colorGradientEnabled && noOfGradientStops > 1) {
-            bar.setStroke(getSkinnable().getGradientLookup().getColorAt((VALUE - minValue) / range));
+            bar.setStroke(gauge.getGradientLookup().getColorAt((VALUE - minValue) / range));
         } else {
             bar.setStroke(barColor);
             for (Section section : sections) {
@@ -297,6 +289,12 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 }
             }
         }
+    }
+
+    @Override public void dispose() {
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        gauge.sectionsAlwaysVisibleProperty().removeListener(sectionAlwaysVisibleListener);
+        super.dispose();
     }
 
 
@@ -319,9 +317,9 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, height * 0.95);
     }
 
-    private void resize() {
-        width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
 
         if (ASPECT_RATIO * width > height) {
             width = 1 / (ASPECT_RATIO / height);
@@ -336,7 +334,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             double barWidth  = width * 0.28472222;
 
             pane.setMaxSize(width, height);
-            pane.relocate((getSkinnable().getWidth() - width) * 0.5, (getSkinnable().getHeight() - height) * 0.5);
+            pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
 
             barBackground.setCenterX(centerX);
             barBackground.setCenterY(centerY);
@@ -357,7 +355,7 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             bar.setRadiusY(barRadius);
             bar.setStrokeWidth(barWidth);
             bar.setStartAngle(angleRange * 0.5 + 90);
-            bar.setLength(-(getSkinnable().getCurrentValue() - minValue) * angleStep);
+            bar.setLength(-(gauge.getCurrentValue() - minValue) * angleStep);
 
             double needleWidth  = height * 0.13157895;
             double needleHeight = height * 0.91315789;
@@ -401,32 +399,32 @@ public class IndicatorSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_HEIGHT * height))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+    @Override protected void redraw() {
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth() / PREFERRED_HEIGHT * height))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        barColor             = getSkinnable().getBarColor();
+        barColor             = gauge.getBarColor();
 
-        locale               = getSkinnable().getLocale();
-        formatString         = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        colorGradientEnabled = getSkinnable().isGradientBarEnabled();
-        noOfGradientStops    = getSkinnable().getGradientBarStops().size();
-        sectionsVisible      = getSkinnable().getSectionsVisible();
+        locale               = gauge.getLocale();
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        colorGradientEnabled = gauge.isGradientBarEnabled();
+        noOfGradientStops    = gauge.getGradientBarStops().size();
+        sectionsVisible      = gauge.getSectionsVisible();
 
-        minValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
-        maxValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
+        minValueText.setText(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMinValue()));
+        maxValueText.setText(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMaxValue()));
         resizeStaticText();
 
-        barBackground.setStroke(getSkinnable().getBarBackgroundColor());
-        bar.setStroke(getSkinnable().getBarColor());
-        needle.setFill(getSkinnable().getNeedleColor());
+        barBackground.setStroke(gauge.getBarBackgroundColor());
+        bar.setStroke(gauge.getBarColor());
+        needle.setFill(gauge.getNeedleColor());
 
-        minValueText.setVisible(getSkinnable().getTickLabelsVisible());
-        maxValueText.setVisible(getSkinnable().getTickLabelsVisible());
+        minValueText.setVisible(gauge.getTickLabelsVisible());
+        maxValueText.setVisible(gauge.getTickLabelsVisible());
 
-        minValueText.setFill(getSkinnable().getTitleColor());
-        maxValueText.setFill(getSkinnable().getTitleColor());
-        titleText.setFill(getSkinnable().getTitleColor());
+        minValueText.setFill(gauge.getTitleColor());
+        maxValueText.setFill(gauge.getTitleColor());
+        titleText.setFill(gauge.getTitleColor());
     }
     
     private void drawSections() {

@@ -20,11 +20,10 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
-import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -61,14 +60,8 @@ import static eu.hansolo.medusa.tools.Helper.enableNode;
 /**
  * Created by hansolo on 29.11.16.
  */
-public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double            PREFERRED_WIDTH  = 250;
-    private static final double            PREFERRED_HEIGHT = 250;
-    private static final double            MINIMUM_WIDTH    = 50;
-    private static final double            MINIMUM_HEIGHT   = 50;
-    private static final double            MAXIMUM_WIDTH    = 1024;
-    private static final double            MAXIMUM_HEIGHT   = 1024;
-    public  static final Color             GRAY             = Color.rgb(139,144,146);
+public class TileKpiSkin extends GaugeSkinBase {
+    public  static final Color             GRAY = Color.rgb(139,144,146);
     private              double            size;
     private              double            oldValue;
     private              Arc               barBackground;
@@ -100,25 +93,27 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private              boolean           highlightSections;
     private              List<Section>     sections;
     private              Map<Section, Arc> sectionMap;
+    private              InvalidationListener currentValueListener;
 
 
     // ******************** Constructors **************************************
     public TileKpiSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        angleRange        = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
-        oldValue          = gauge.getValue();
-        minValue          = gauge.getMinValue();
-        threshold         = gauge.getThreshold();
-        thresholdColor    = gauge.getThresholdColor();
-        range             = gauge.getRange();
-        angleStep         = angleRange / range;
-        formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale            = gauge.getLocale();
-        sectionsVisible   = gauge.getSectionsVisible();
-        highlightSections = gauge.isHighlightSections();
-        sections          = gauge.getSections();
-        sectionMap        = new HashMap<>(sections.size());
+        angleRange           = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
+        oldValue             = gauge.getValue();
+        minValue             = gauge.getMinValue();
+        threshold            = gauge.getThreshold();
+        thresholdColor       = gauge.getThresholdColor();
+        range                = gauge.getRange();
+        angleStep            = angleRange / range;
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale               = gauge.getLocale();
+        sectionsVisible      = gauge.getSectionsVisible();
+        highlightSections    = gauge.isHighlightSections();
+        sections             = gauge.getSections();
+        sectionMap           = new HashMap<>(sections.size());
+        currentValueListener = o -> rotateNeedle(gauge.getCurrentValue());
         for(Section section : sections) { sectionMap.put(section, new Arc()); }
 
         initGraphics();
@@ -131,32 +126,32 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
         barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, angleRange * 0.5 + 90, -angleRange);
         barBackground.setType(ArcType.OPEN);
-        barBackground.setStroke(getSkinnable().getBarColor());
+        barBackground.setStroke(gauge.getBarColor());
         barBackground.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
         barBackground.setStrokeLineCap(StrokeLineCap.BUTT);
         barBackground.setFill(null);
 
         thresholdBar = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.696, PREFERRED_WIDTH * 0.275, PREFERRED_WIDTH * 0.275, -angleRange * 0.5 + 90, 0);
         thresholdBar.setType(ArcType.OPEN);
-        thresholdBar.setStroke(getSkinnable().getThresholdColor());
+        thresholdBar.setStroke(gauge.getThresholdColor());
         thresholdBar.setStrokeWidth(PREFERRED_WIDTH * 0.02819549 * 2);
         thresholdBar.setStrokeLineCap(StrokeLineCap.BUTT);
         thresholdBar.setFill(null);
-        enableNode(thresholdBar, !getSkinnable().getSectionsVisible());
+        enableNode(thresholdBar, !gauge.getSectionsVisible());
 
         sectionPane = new Pane();
-        enableNode(sectionPane, getSkinnable().getSectionsVisible());
+        enableNode(sectionPane, gauge.getSectionsVisible());
 
         if (sectionsVisible) { drawSections(); }
 
@@ -164,105 +159,92 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         alertIcon.setFillRule(FillRule.EVEN_ODD);
         alertIcon.setFill(Color.YELLOW);
         alertIcon.setStroke(null);
-        enableNode(alertIcon, getSkinnable().isAlert());
-        alertTooltip = new Tooltip(getSkinnable().getAlertMessage());
+        enableNode(alertIcon, gauge.isAlert());
+        alertTooltip = new Tooltip(gauge.getAlertMessage());
         Tooltip.install(alertIcon, alertTooltip);
 
-        needleRotate     = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
-        needleRectRotate = new Rotate((getSkinnable().getValue() - oldValue - minValue) * angleStep);
+        needleRotate     = new Rotate((gauge.getValue() - oldValue - minValue) * angleStep);
+        needleRectRotate = new Rotate((gauge.getValue() - oldValue - minValue) * angleStep);
 
         needleRect = new Rectangle();
-        needleRect.setFill(getSkinnable().getBackgroundPaint());
+        needleRect.setFill(gauge.getBackgroundPaint());
         needleRect.getTransforms().setAll(needleRectRotate);
 
         needle = new Path();
         needle.setFillRule(FillRule.EVEN_ODD);
         needle.getTransforms().setAll(needleRotate);
-        needle.setFill(getSkinnable().getNeedleColor());
+        needle.setFill(gauge.getNeedleColor());
         needle.setStrokeWidth(0);
         needle.setStroke(Color.TRANSPARENT);
 
-        titleText = new Text(getSkinnable().getTitle());
-        titleText.setFill(getSkinnable().getTitleColor());
-        enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        titleText = new Text(gauge.getTitle());
+        titleText.setFill(gauge.getTitleColor());
+        enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, getSkinnable().getCurrentValue()));
-        valueText.setFill(getSkinnable().getValueColor());
-        enableNode(valueText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
+        valueText = new Text(String.format(locale, formatString, gauge.getCurrentValue()));
+        valueText.setFill(gauge.getValueColor());
+        enableNode(valueText, gauge.isValueVisible() && !gauge.isAlert());
 
-        unitText = new Text(getSkinnable().getUnit());
-        unitText.setFill(getSkinnable().getUnitColor());
-        enableNode(unitText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
+        unitText = new Text(gauge.getUnit());
+        unitText.setFill(gauge.getUnitColor());
+        enableNode(unitText, gauge.isValueVisible() && !gauge.isAlert());
 
-        minValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
-        minValueText.setFill(getSkinnable().getTitleColor());
+        minValueText = new Text(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMinValue()));
+        minValueText.setFill(gauge.getTitleColor());
 
-        maxValueText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
-        maxValueText.setFill(getSkinnable().getTitleColor());
+        maxValueText = new Text(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMaxValue()));
+        maxValueText.setFill(gauge.getTitleColor());
 
         thresholdRect = new Rectangle();
-        thresholdRect.setFill(sectionsVisible ? GRAY : getSkinnable().getThresholdColor());
-        enableNode(thresholdRect, getSkinnable().isThresholdVisible());
+        thresholdRect.setFill(sectionsVisible ? GRAY : gauge.getThresholdColor());
+        enableNode(thresholdRect, gauge.isThresholdVisible());
 
-        thresholdText = new Text(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
-        thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundPaint());
-        enableNode(thresholdText, getSkinnable().isThresholdVisible());
+        thresholdText = new Text(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getThreshold()));
+        thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : gauge.getBackgroundPaint());
+        enableNode(thresholdText, gauge.isThresholdVisible());
 
         pane = new Pane(barBackground, thresholdBar, sectionPane, alertIcon, needleRect, needle, titleText, valueText, unitText, minValueText, maxValueText, thresholdRect, thresholdText);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(PREFERRED_WIDTH * 0.025), new BorderWidths(gauge.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(PREFERRED_WIDTH * 0.025), Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(o -> rotateNeedle(getSkinnable().getCurrentValue()));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.currentValueProperty().addListener(currentValueListener);
     }
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    private void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
-        } else if ("RECALC".equals(EVENT_TYPE)) {
-            angleRange        = Helper.clamp(90.0, 180.0, getSkinnable().getAngleRange());
-            minValue          = getSkinnable().getMinValue();
-            threshold         = getSkinnable().getThreshold();
-            range             = getSkinnable().getRange();
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("RECALC".equals(EVENT_TYPE)) {
+            angleRange        = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
+            minValue          = gauge.getMinValue();
+            threshold         = gauge.getThreshold();
+            range             = gauge.getRange();
             angleStep         = angleRange / range;
-            highlightSections = getSkinnable().isHighlightSections();
+            highlightSections = gauge.isHighlightSections();
             redraw();
-            rotateNeedle(getSkinnable().getCurrentValue());
+            rotateNeedle(gauge.getCurrentValue());
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            enableNode(valueText, getSkinnable().isValueVisible());
-            enableNode(sectionPane, getSkinnable().getSectionsVisible());
-            enableNode(thresholdRect, getSkinnable().isThresholdVisible());
-            enableNode(thresholdText, getSkinnable().isThresholdVisible());
-            enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            sectionsVisible = getSkinnable().getSectionsVisible();
+            enableNode(titleText, !gauge.getTitle().isEmpty());
+            enableNode(valueText, gauge.isValueVisible());
+            enableNode(sectionPane, gauge.getSectionsVisible());
+            enableNode(thresholdRect, gauge.isThresholdVisible());
+            enableNode(thresholdText, gauge.isThresholdVisible());
+            enableNode(unitText, !gauge.getUnit().isEmpty());
+            sectionsVisible = gauge.getSectionsVisible();
         } else if ("SECTION".equals(EVENT_TYPE)) {
-            sections = getSkinnable().getSections();
+            sections = gauge.getSections();
             sectionMap.clear();
             for(Section section : sections) { sectionMap.put(section, new Arc()); }
         } else if ("ALERT".equals(EVENT_TYPE)) {
-            enableNode(valueText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
-            enableNode(unitText, getSkinnable().isValueVisible() && !getSkinnable().isAlert());
-            enableNode(alertIcon, getSkinnable().isAlert());
-            alertTooltip.setText(getSkinnable().getAlertMessage());
+            enableNode(valueText, gauge.isValueVisible() && !gauge.isAlert());
+            enableNode(unitText, gauge.isValueVisible() && !gauge.isAlert());
+            enableNode(alertIcon, gauge.isAlert());
+            alertTooltip.setText(gauge.getAlertMessage());
         }
     }
 
@@ -302,14 +284,14 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             double  angle   = Helper.clamp(90.0, 270.0, (section.getStop() - minValue) * angleStep + 90.0);
             Line    line    = new Line(centerX + innerRadius * Math.sin(-Math.toRadians(angle)), centerY + innerRadius * Math.cos(-Math.toRadians(angle)),
                                        centerX + outerRadius * Math.sin(-Math.toRadians(angle)), centerY + outerRadius * Math.cos(-Math.toRadians(angle)));
-            line.setStroke(getSkinnable().getBackgroundPaint());
+            line.setStroke(gauge.getBackgroundPaint());
             sectionLines.add(line);
         }
         sectionPane.getChildren().addAll(sectionLines);
 
         double barRadius = size * 0.3;
         double barWidth  = size * 0.045;
-        double maxValue  = getSkinnable().getMaxValue();
+        double maxValue  = gauge.getMaxValue();
         for (Section section : sections) {
             double startAngle = (section.getStart() - minValue) * angleStep - angleRange;
             double length;
@@ -450,6 +432,11 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         alertIcon.setCacheHint(CacheHint.SPEED);
     }
 
+    @Override public void dispose() {
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        super.dispose();
+    }
+
 
     // ******************** Resizing ******************************************
     private void resizeDynamicText() {
@@ -524,9 +511,9 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        double width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        double height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
         size          = width < height ? width : height;
 
         if (width > 0 && height > 0) {
@@ -554,7 +541,7 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             thresholdBar.setRadiusY(barRadius);
             thresholdBar.setStrokeWidth(barWidth);
             thresholdBar.setStartAngle(90 - angleRange * 0.5);
-            thresholdBar.setLength((getSkinnable().getMaxValue() - getSkinnable().getThreshold()) * angleStep);
+            thresholdBar.setLength((gauge.getMaxValue() - gauge.getThreshold()) * angleStep);
 
             if (sectionsVisible) { drawSections(); }
 
@@ -585,36 +572,36 @@ public class TileKpiSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void redraw() {
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(size * 0.025), new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), new CornerRadii(size * 0.025), Insets.EMPTY)));
+    @Override protected void redraw() {
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(size * 0.025), new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(size * 0.025), Insets.EMPTY)));
 
-        locale       = getSkinnable().getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
+        locale       = gauge.getLocale();
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
-        thresholdColor = getSkinnable().getThresholdColor();
+        thresholdColor = gauge.getThresholdColor();
 
-        sectionsVisible = getSkinnable().getSectionsVisible();
+        sectionsVisible = gauge.getSectionsVisible();
         enableNode(sectionPane, sectionsVisible);
 
-        titleText.setText(getSkinnable().getTitle());
-        unitText.setText(getSkinnable().getUnit());
-        minValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMinValue()));
-        maxValueText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getMaxValue()));
-        thresholdText.setText(String.format(locale, "%." + getSkinnable().getTickLabelDecimals() + "f", getSkinnable().getThreshold()));
+        titleText.setText(gauge.getTitle());
+        unitText.setText(gauge.getUnit());
+        minValueText.setText(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMinValue()));
+        maxValueText.setText(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMaxValue()));
+        thresholdText.setText(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getThreshold()));
         resizeStaticText();
 
-        barBackground.setStroke(getSkinnable().getBarColor());
-        thresholdBar.setStroke(getSkinnable().getThresholdColor());
-        needleRect.setFill(getSkinnable().getBackgroundPaint());
-        needle.setFill(getSkinnable().getNeedleColor());
-        titleText.setFill(getSkinnable().getTitleColor());
-        minValueText.setFill(getSkinnable().getTitleColor());
-        maxValueText.setFill(getSkinnable().getTitleColor());
-        thresholdRect.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getValue() > getSkinnable().getThreshold() ? getSkinnable().getThresholdColor() : GRAY);
-        thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : getSkinnable().getBackgroundPaint());
-        valueText.setFill(getSkinnable().getValueColor());
+        barBackground.setStroke(gauge.getBarColor());
+        thresholdBar.setStroke(gauge.getThresholdColor());
+        needleRect.setFill(gauge.getBackgroundPaint());
+        needle.setFill(gauge.getNeedleColor());
+        titleText.setFill(gauge.getTitleColor());
+        minValueText.setFill(gauge.getTitleColor());
+        maxValueText.setFill(gauge.getTitleColor());
+        thresholdRect.setFill(sectionsVisible ? Color.TRANSPARENT : gauge.getValue() > gauge.getThreshold() ? gauge.getThresholdColor() : GRAY);
+        thresholdText.setFill(sectionsVisible ? Color.TRANSPARENT : gauge.getBackgroundPaint());
+        valueText.setFill(gauge.getValueColor());
 
-        highlightSections(getSkinnable().getValue());
+        highlightSections(gauge.getValue());
     }
 }

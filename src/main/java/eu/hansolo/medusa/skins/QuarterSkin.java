@@ -30,6 +30,7 @@ import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.AngleConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
+import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -88,65 +89,61 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by hansolo on 18.01.16.
  */
-public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
-    private static final double       PREFERRED_WIDTH  = 250;
-    private static final double       PREFERRED_HEIGHT = 250;
-    private static final double       MINIMUM_WIDTH    = 50;
-    private static final double       MINIMUM_HEIGHT   = 50;
-    private static final double       MAXIMUM_WIDTH    = 1024;
-    private static final double       MAXIMUM_HEIGHT   = 1024;
-    private static final double       ANGLE_RANGE      = 90;
-    private              Map<Marker, Shape> markerMap  = new ConcurrentHashMap<>();
-    private double                   oldValue;
-    private double                   size;
-    private double                   centerX;
-    private double                   centerY;
-    private Pane                     pane;
-    private InnerShadow              backgroundInnerShadow;
-    private Canvas                   sectionsAndAreasCanvas;
-    private GraphicsContext          sectionsAndAreasCtx;
-    private Canvas                   tickMarkCanvas;
-    private GraphicsContext          tickMarkCtx;
-    private double                   ledSize;
-    private InnerShadow              ledOnShadow;
-    private InnerShadow              ledOffShadow;
-    private Paint                    ledFramePaint;
-    private Paint                    ledOnPaint;
-    private Paint                    ledOffPaint;
-    private Paint                    ledHighlightPaint;
-    private Canvas                   ledCanvas;
-    private GraphicsContext          ledCtx;
-    private Pane                     markerPane;
-    private Path                     threshold;
-    private Rectangle                lcd;
-    private Path                     needle;
-    private Rotate                   needleRotate;
-    private Paint                    needlePaint;
-    private Canvas                   knobCanvas;
-    private GraphicsContext          knobCtx;
-    private Group                    shadowGroup;
-    private DropShadow               dropShadow;
-    private Text                     titleText;
-    private Text                     subTitleText;
-    private Text                     unitText;
-    private Text                     valueText;
-    private double                   startAngle;
-    private double                   angleStep;
-    private EventHandler<MouseEvent> mouseHandler;
-    private Tooltip                  buttonTooltip;
-    private Tooltip                  thresholdTooltip;
-    private String                   formatString;
-    private Locale                   locale;
-    private double                   minValue;
-    private double                   maxValue;
-    private List<Section>            sections;
-    private boolean                  highlightSections;
-    private boolean                  sectionsVisible;
-    private List<Section>            areas;
-    private boolean                  highlightAreas;
-    private boolean                  areasVisible;
-    private TickLabelLocation        tickLabelLocation;
-    private ScaleDirection           scaleDirection;
+public class QuarterSkin extends GaugeSkinBase {
+    private static final double        ANGLE_RANGE = 90;
+    private Map<Marker, Shape>         markerMap   = new ConcurrentHashMap<>();
+    private double                     oldValue;
+    private double                     size;
+    private double                     centerX;
+    private double                     centerY;
+    private Pane                       pane;
+    private InnerShadow                backgroundInnerShadow;
+    private Canvas                     sectionsAndAreasCanvas;
+    private GraphicsContext            sectionsAndAreasCtx;
+    private Canvas                     tickMarkCanvas;
+    private GraphicsContext            tickMarkCtx;
+    private double                     ledSize;
+    private InnerShadow                ledOnShadow;
+    private InnerShadow                ledOffShadow;
+    private Paint                      ledFramePaint;
+    private Paint                      ledOnPaint;
+    private Paint                      ledOffPaint;
+    private Paint                      ledHighlightPaint;
+    private Canvas                     ledCanvas;
+    private GraphicsContext            ledCtx;
+    private Pane                       markerPane;
+    private Path                       threshold;
+    private Rectangle                  lcd;
+    private Path                       needle;
+    private Rotate                     needleRotate;
+    private Paint                      needlePaint;
+    private Canvas                     knobCanvas;
+    private GraphicsContext            knobCtx;
+    private Group                      shadowGroup;
+    private DropShadow                 dropShadow;
+    private Text                       titleText;
+    private Text                       subTitleText;
+    private Text                       unitText;
+    private Text                       valueText;
+    private double                     startAngle;
+    private double                     angleStep;
+    private EventHandler<MouseEvent>   mouseHandler;
+    private Tooltip                    buttonTooltip;
+    private Tooltip                    thresholdTooltip;
+    private String                     formatString;
+    private Locale                     locale;
+    private double                     minValue;
+    private double                     maxValue;
+    private List<Section>              sections;
+    private boolean                    highlightSections;
+    private boolean                    sectionsVisible;
+    private List<Section>              areas;
+    private boolean                    highlightAreas;
+    private boolean                    areasVisible;
+    private TickLabelLocation          tickLabelLocation;
+    private ScaleDirection             scaleDirection;
+    private ListChangeListener<Marker> markerListener;
+    private InvalidationListener       currentValueListener;
 
 
     // ******************** Constructors **************************************
@@ -168,7 +165,12 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         areasVisible      = gauge.getAreasVisible();
         tickLabelLocation = gauge.getTickLabelLocation();
         scaleDirection    = gauge.getScaleDirection();
-        mouseHandler      = event -> handleMouseEvent(event);
+        mouseHandler      = e -> handleMouseEvent(e);
+        markerListener    = c -> {
+            updateMarkers();
+            redraw();
+        };
+        currentValueListener = o -> rotateNeedle(gauge.getCurrentValue());
         updateMarkers();
 
         initGraphics();
@@ -179,12 +181,12 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     // ******************** Initialization ************************************
     private void initGraphics() {
         // Set initial size
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(gauge.getPrefWidth(), 0.0) <= 0 || Double.compare(gauge.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(gauge.getWidth(), 0.0) <= 0 || Double.compare(gauge.getHeight(), 0.0) <= 0) {
+            if (gauge.getPrefWidth() > 0 && gauge.getPrefHeight() > 0) {
+                gauge.setPrefSize(gauge.getPrefWidth(), gauge.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                gauge.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
@@ -198,13 +200,13 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
         ledCanvas = new Canvas();
         ledCtx    = ledCanvas.getGraphicsContext2D();
-        Helper.enableNode(ledCanvas, getSkinnable().isLedVisible());
+        Helper.enableNode(ledCanvas, gauge.isLedVisible());
 
-        thresholdTooltip = new Tooltip("Threshold\n(" + String.format(locale, formatString, getSkinnable().getThreshold()) + ")");
+        thresholdTooltip = new Tooltip("Threshold\n(" + String.format(locale, formatString, gauge.getThreshold()) + ")");
         thresholdTooltip.setTextAlignment(TextAlignment.CENTER);
 
         threshold = new Path();
-        Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
+        Helper.enableNode(threshold, gauge.isThresholdVisible());
         Tooltip.install(threshold, thresholdTooltip);
 
         markerPane = new Pane();
@@ -213,12 +215,12 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         lcd.setArcWidth(0.0125 * PREFERRED_HEIGHT);
         lcd.setArcHeight(0.0125 * PREFERRED_HEIGHT);
         lcd.relocate((PREFERRED_WIDTH - lcd.getWidth()) * 0.5, 0.44 * PREFERRED_HEIGHT);
-        lcd.setManaged(getSkinnable().isLcdVisible());
-        lcd.setVisible(getSkinnable().isLcdVisible());
-        Helper.enableNode(lcd, getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
+        lcd.setManaged(gauge.isLcdVisible());
+        lcd.setVisible(gauge.isLcdVisible());
+        Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
 
         needleRotate = new Rotate(180 - startAngle);
-        needleRotate.setAngle(needleRotate.getAngle() + (getSkinnable().getValue() - oldValue - minValue) * angleStep);
+        needleRotate.setAngle(needleRotate.getAngle() + (gauge.getValue() - oldValue - minValue) * angleStep);
         needle = new Path();
         needle.setFillRule(FillRule.EVEN_ODD);
         needle.getTransforms().setAll(needleRotate);
@@ -231,7 +233,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         knobCanvas = new Canvas();
         knobCtx = knobCanvas.getGraphicsContext2D();
         knobCanvas.setPickOnBounds(false);
-        Helper.enableNode(knobCanvas, getSkinnable().isKnobVisible());
+        Helper.enableNode(knobCanvas, gauge.isKnobVisible());
 
         dropShadow = new DropShadow();
         dropShadow.setColor(Color.rgb(0, 0, 0, 0.25));
@@ -240,32 +242,32 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         dropShadow.setOffsetY(0.015 * PREFERRED_WIDTH);
 
         shadowGroup = new Group(needle, knobCanvas);
-        shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
+        shadowGroup.setEffect(gauge.isShadowsEnabled() ? dropShadow : null);
 
-        titleText = new Text(getSkinnable().getTitle());
+        titleText = new Text(gauge.getTitle());
         titleText.setTextOrigin(VPos.CENTER);
         titleText.setMouseTransparent(true);
-        Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
+        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        subTitleText = new Text(getSkinnable().getSubTitle());
+        subTitleText = new Text(gauge.getSubTitle());
         subTitleText.setTextOrigin(VPos.CENTER);
         subTitleText.setMouseTransparent(true);
-        Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
+        Helper.enableNode(subTitleText, !gauge.getSubTitle().isEmpty());
 
-        unitText = new Text(getSkinnable().getUnit());
+        unitText = new Text(gauge.getUnit());
         unitText.setMouseTransparent(true);
         unitText.setTextOrigin(VPos.CENTER);
         unitText.setMouseTransparent(true);
-        Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
+        Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, getSkinnable().getValue()));
+        valueText = new Text(String.format(locale, formatString, gauge.getValue()));
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setMouseTransparent(true);
-        Helper.enableNode(valueText, getSkinnable().isValueVisible());
+        Helper.enableNode(valueText, gauge.isValueVisible());
 
         // Set initial value
-        double targetAngle = 180 - startAngle + (getSkinnable().getCurrentValue() - minValue) * angleStep;
+        double targetAngle = 180 - startAngle + (gauge.getCurrentValue() - minValue) * angleStep;
         targetAngle        = Helper.clamp(180 - startAngle, 180 - startAngle + ANGLE_RANGE, targetAngle);
         needleRotate.setAngle(targetAngle);
 
@@ -280,22 +282,16 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                         unitText,
                         valueText,
                         shadowGroup);
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth()))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth()))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
 
-    private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().heightProperty().addListener(o -> handleEvents("RESIZE"));
-        getSkinnable().getMarkers().addListener((ListChangeListener<Marker>) c -> {
-            updateMarkers();
-            redraw();
-        });
-
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
-        getSkinnable().currentValueProperty().addListener(e -> rotateNeedle(getSkinnable().getCurrentValue()));
+    @Override protected void registerListeners() {
+        super.registerListeners();
+        gauge.getMarkers().addListener(markerListener);
+        gauge.currentValueProperty().addListener(currentValueListener);
 
         handleEvents("INTERACTIVITY");
         handleEvents("VISIBILITY");
@@ -303,27 +299,18 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
 
     // ******************** Methods *******************************************
-    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
-    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
-    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
-    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
-    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
-
-    protected void handleEvents(final String EVENT_TYPE) {
-        if ("RESIZE".equals(EVENT_TYPE)) {
-            resize();
-            redraw();
-        } else if ("FINISHED".equals(EVENT_TYPE)) {
-            double currentValue = getSkinnable().getCurrentValue();
-            // Check sections for value and fire section events
-            if (getSkinnable().getCheckSectionsForValue()) {
+    @Override protected void handleEvents(final String EVENT_TYPE) {
+        super.handleEvents(EVENT_TYPE);
+        if ("FINISHED".equals(EVENT_TYPE)) {
+            double currentValue = gauge.getCurrentValue();
+            // eu.hansolo.medusa.Check sections for value and fire section events
+            if (gauge.getCheckSectionsForValue()) {
                 int listSize = sections.size();
                 for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(currentValue); }
             }
 
-            // Check areas for value and fire section events
-            if (getSkinnable().getCheckAreasForValue()) {
+            // eu.hansolo.medusa.Check areas for value and fire section events
+            if (gauge.getCheckAreasForValue()) {
                 int listSize = areas.size();
                 for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(currentValue); }
             }
@@ -333,49 +320,47 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 sectionsAndAreasCtx.clearRect(0, 0, size * 1.9, size * 1.9);
                 drawAreasAndSections(sectionsAndAreasCtx);
             }
-        } else if ("REDRAW".equals(EVENT_TYPE)) {
-            redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
-            Helper.enableNode(ledCanvas, getSkinnable().isLedVisible());
-            Helper.enableNode(titleText, !getSkinnable().getTitle().isEmpty());
-            Helper.enableNode(subTitleText, !getSkinnable().getSubTitle().isEmpty());
-            Helper.enableNode(unitText, !getSkinnable().getUnit().isEmpty());
-            Helper.enableNode(valueText, getSkinnable().isValueVisible());
-            Helper.enableNode(lcd, getSkinnable().isLcdVisible() && getSkinnable().isValueVisible());
-            Helper.enableNode(knobCanvas, getSkinnable().isKnobVisible());
-            Helper.enableNode(threshold, getSkinnable().isThresholdVisible());
-            boolean markersVisible = getSkinnable().getMarkersVisible();
+            Helper.enableNode(ledCanvas, gauge.isLedVisible());
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
+            Helper.enableNode(subTitleText, !gauge.getSubTitle().isEmpty());
+            Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
+            Helper.enableNode(valueText, gauge.isValueVisible());
+            Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
+            Helper.enableNode(knobCanvas, gauge.isKnobVisible());
+            Helper.enableNode(threshold, gauge.isThresholdVisible());
+            boolean markersVisible = gauge.getMarkersVisible();
             for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
-            if (getSkinnable().isLedVisible()) { drawLed(); }
+            if (gauge.isLedVisible()) { drawLed(); }
         } else if ("LCD".equals(EVENT_TYPE)) {
-            if (getSkinnable().isLcdVisible()) redraw();
+            if (gauge.isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             startAngle = getStartAngle();
-            minValue  = getSkinnable().getMinValue();
-            maxValue  = getSkinnable().getMaxValue();
-            angleStep = ANGLE_RANGE / getSkinnable().getRange();
-            if (getSkinnable().getValue() < minValue) { oldValue = minValue; }
-            if (getSkinnable().getValue() > maxValue) { oldValue = maxValue; }
+            minValue  = gauge.getMinValue();
+            maxValue  = gauge.getMaxValue();
+            angleStep = ANGLE_RANGE / gauge.getRange();
+            if (gauge.getValue() < minValue) { oldValue = minValue; }
+            if (gauge.getValue() > maxValue) { oldValue = maxValue; }
             resize();
             redraw();
-            rotateNeedle(getSkinnable().getCurrentValue());
+            rotateNeedle(gauge.getCurrentValue());
         } else if ("SECTION".equals(EVENT_TYPE)) {
-            sections          = getSkinnable().getSections();
-            highlightSections = getSkinnable().isHighlightSections();
-            sectionsVisible   = getSkinnable().getSectionsVisible();
-            areas             = getSkinnable().getAreas();
-            highlightAreas    = getSkinnable().isHighlightAreas();
-            areasVisible      = getSkinnable().getAreasVisible();
+            sections          = gauge.getSections();
+            highlightSections = gauge.isHighlightSections();
+            sectionsVisible   = gauge.getSectionsVisible();
+            areas             = gauge.getAreas();
+            highlightAreas    = gauge.isHighlightAreas();
+            areasVisible      = gauge.getAreasVisible();
             resize();
             redraw();
         } else if ("INTERACTIVITY".equals(EVENT_TYPE)) {
-            if (getSkinnable().isInteractive()) {
-                knobCanvas.setOnMousePressed(mouseHandler);
-                knobCanvas.setOnMouseReleased(mouseHandler);
-                if (!getSkinnable().getButtonTooltipText().isEmpty()) {
-                    buttonTooltip.setText(getSkinnable().getButtonTooltipText());
+            if (gauge.isInteractive()) {
+                knobCanvas.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseHandler);
+                knobCanvas.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseHandler);
+                if (!gauge.getButtonTooltipText().isEmpty()) {
+                    buttonTooltip.setText(gauge.getButtonTooltipText());
                     Tooltip.install(knobCanvas, buttonTooltip);
                 }
             } else {
@@ -387,22 +372,32 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     public void handleMouseEvent(final MouseEvent EVENT) {
-        if (getSkinnable().isDisabled()) return;
+        if (gauge.isDisabled()) return;
         final EventType TYPE = EVENT.getEventType();
         if (MouseEvent.MOUSE_PRESSED == TYPE) {
-            getSkinnable().fireEvent(getSkinnable().BTN_PRESSED_EVENT);
+            gauge.fireEvent(gauge.BTN_PRESSED_EVENT);
             drawKnob(true);
         } else if (MouseEvent.MOUSE_RELEASED == TYPE) {
-            getSkinnable().fireEvent(getSkinnable().BTN_RELEASED_EVENT);
+            gauge.fireEvent(gauge.BTN_RELEASED_EVENT);
             drawKnob(false);
         }
+    }
+
+    @Override public void dispose() {
+        gauge.getMarkers().removeListener(markerListener);
+        gauge.currentValueProperty().removeListener(currentValueListener);
+        if (gauge.isInteractive()) {
+            knobCanvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseHandler);
+            knobCanvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseHandler);
+        }
+        super.dispose();
     }
 
 
     // ******************** Private Methods ***********************************
     private double getStartAngle() {
-        ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
-        Pos            knobPosition   = getSkinnable().getKnobPosition();
+        ScaleDirection scaleDirection = gauge.getScaleDirection();
+        Pos            knobPosition   = gauge.getKnobPosition();
         switch(knobPosition) {
             case BOTTOM_LEFT : return ScaleDirection.CLOCKWISE == scaleDirection ? 180 : 90;
             case TOP_LEFT    : return ScaleDirection.CLOCKWISE == scaleDirection ?  90 : 0;
@@ -415,7 +410,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void rotateNeedle(final double VALUE) {
         double startOffsetAngle  = 180 - startAngle;
         double targetAngle;
-        if (ScaleDirection.CLOCKWISE == getSkinnable().getScaleDirection()) {
+        if (ScaleDirection.CLOCKWISE == gauge.getScaleDirection()) {
             targetAngle = startOffsetAngle + (VALUE - minValue) * angleStep;
             targetAngle = Helper.clamp(startOffsetAngle, startOffsetAngle + ANGLE_RANGE, targetAngle);
         } else {
@@ -432,40 +427,40 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double               sinValue;
         double               cosValue;
         double               scaledSize            = size * 1.95;
-        int                  tickLabelDecimals     = getSkinnable().getTickLabelDecimals();
+        int                  tickLabelDecimals     = gauge.getTickLabelDecimals();
         String               tickLabelFormatString = "%." + tickLabelDecimals + "f";
-        double               minorTickSpace        = getSkinnable().getMinorTickSpace();
+        double               minorTickSpace        = gauge.getMinorTickSpace();
         double               tmpAngleStep          = angleStep * minorTickSpace;
-        TickLabelOrientation tickLabelOrientation  = getSkinnable().getTickLabelOrientation();
-        TickLabelLocation    tickLabelLocation     = getSkinnable().getTickLabelLocation();
+        TickLabelOrientation tickLabelOrientation  = gauge.getTickLabelOrientation();
+        TickLabelLocation    tickLabelLocation     = gauge.getTickLabelLocation();
         BigDecimal           minorTickSpaceBD      = BigDecimal.valueOf(minorTickSpace);
-        BigDecimal           majorTickSpaceBD      = BigDecimal.valueOf(getSkinnable().getMajorTickSpace());
+        BigDecimal           majorTickSpaceBD      = BigDecimal.valueOf(gauge.getMajorTickSpace());
         BigDecimal           mediumCheck2          = BigDecimal.valueOf(2 * minorTickSpace);
         BigDecimal           mediumCheck5          = BigDecimal.valueOf(5 * minorTickSpace);
         BigDecimal           counterBD             = BigDecimal.valueOf(minValue);
         double               counter               = minValue;
 
-        List<Section> tickMarkSections             = getSkinnable().getTickMarkSections();
-        List<Section> tickLabelSections            = getSkinnable().getTickLabelSections();
-        Color         tickMarkColor                = getSkinnable().getTickMarkColor();
-        Color         majorTickMarkColor           = getSkinnable().getMajorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMajorTickMarkColor();
-        Color         mediumTickMarkColor          = getSkinnable().getMediumTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMediumTickMarkColor();
-        Color         minorTickMarkColor           = getSkinnable().getMinorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : getSkinnable().getMinorTickMarkColor();
-        Color         tickLabelColor               = getSkinnable().getTickLabelColor();
-        Color         zeroColor                    = getSkinnable().getZeroColor();
+        List<Section> tickMarkSections             = gauge.getTickMarkSections();
+        List<Section> tickLabelSections            = gauge.getTickLabelSections();
+        Color         tickMarkColor                = gauge.getTickMarkColor();
+        Color         majorTickMarkColor           = gauge.getMajorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : gauge.getMajorTickMarkColor();
+        Color         mediumTickMarkColor          = gauge.getMediumTickMarkColor().equals(tickMarkColor) ? tickMarkColor : gauge.getMediumTickMarkColor();
+        Color         minorTickMarkColor           = gauge.getMinorTickMarkColor().equals(tickMarkColor) ? tickMarkColor : gauge.getMinorTickMarkColor();
+        Color         tickLabelColor               = gauge.getTickLabelColor();
+        Color         zeroColor                    = gauge.getZeroColor();
         boolean       isNotZero                    = true;
-        TickMarkType  majorTickMarkType            = getSkinnable().getMajorTickMarkType();
-        TickMarkType  mediumTickMarkType           = getSkinnable().getMediumTickMarkType();
-        TickMarkType  minorTickMarkType            = getSkinnable().getMinorTickMarkType();
-        boolean       tickMarkSectionsVisible      = getSkinnable().getTickMarkSectionsVisible();
-        boolean       tickLabelSectionsVisible     = getSkinnable().getTickLabelSectionsVisible();
-        boolean       majorTickMarksVisible        = getSkinnable().getMajorTickMarksVisible();
-        boolean       mediumTickMarksVisible       = getSkinnable().getMediumTickMarksVisible();
-        boolean       minorTickMarksVisible        = getSkinnable().getMinorTickMarksVisible();
-        boolean       tickLabelsVisible            = getSkinnable().getTickLabelsVisible();
-        boolean       onlyFirstAndLastLabelVisible = getSkinnable().isOnlyFirstAndLastTickLabelVisible();
-        boolean       customTickLabelsEnabled      = getSkinnable().getCustomTickLabelsEnabled();
-        List<String>  customTickLabels             = customTickLabelsEnabled ? getSkinnable().getCustomTickLabels() : null;
+        TickMarkType  majorTickMarkType            = gauge.getMajorTickMarkType();
+        TickMarkType  mediumTickMarkType           = gauge.getMediumTickMarkType();
+        TickMarkType  minorTickMarkType            = gauge.getMinorTickMarkType();
+        boolean       tickMarkSectionsVisible      = gauge.getTickMarkSectionsVisible();
+        boolean       tickLabelSectionsVisible     = gauge.getTickLabelSectionsVisible();
+        boolean       majorTickMarksVisible        = gauge.getMajorTickMarksVisible();
+        boolean       mediumTickMarksVisible       = gauge.getMediumTickMarksVisible();
+        boolean       minorTickMarksVisible        = gauge.getMinorTickMarksVisible();
+        boolean       tickLabelsVisible            = gauge.getTickLabelsVisible();
+        boolean       onlyFirstAndLastLabelVisible = gauge.isOnlyFirstAndLastTickLabelVisible();
+        boolean       customTickLabelsEnabled      = gauge.getCustomTickLabelsEnabled();
+        List<String>  customTickLabels             = customTickLabelsEnabled ? gauge.getCustomTickLabels() : null;
         double        textDisplacementFactor       = majorTickMarkType == TickMarkType.DOT ? (TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.95 : 1.05) : 1.0;
         double        majorDotSize;
         double        majorHalfDotSize;
@@ -566,11 +561,11 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double trapezoidMinorOuterPoint2X;
         double trapezoidMinorOuterPoint2Y;
 
-        ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
+        ScaleDirection scaleDirection = gauge.getScaleDirection();
         
         // Draw tickmark ring
-        if (getSkinnable().isTickMarkRingVisible()) {
-            Pos    knobPosition = getSkinnable().getKnobPosition();
+        if (gauge.isTickMarkRingVisible()) {
+            Pos    knobPosition = gauge.getKnobPosition();
             double xy           = TickLabelLocation.INSIDE == tickLabelLocation ? scaledSize * 0.0125 : scaledSize * 0.1285;
             double wh           = TickLabelLocation.INSIDE == tickLabelLocation ? scaledSize * 0.948 : scaledSize * 0.716;
             double offset       = -90 + startAngle;
@@ -965,23 +960,23 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void drawGradientBar() {
-        Pos                knobPosition      = getSkinnable().getKnobPosition();
-        TickLabelLocation  tickLabelLocation = getSkinnable().getTickLabelLocation();
+        Pos                knobPosition      = gauge.getKnobPosition();
+        TickLabelLocation  tickLabelLocation = gauge.getTickLabelLocation();
         double             scaledSize        = size * 1.9;
         double             xy                = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.105 * scaledSize : 0.03875 * scaledSize;
         double             wh                = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledSize * 0.79 : scaledSize * 0.925;
         double             offsetX           = Pos.TOP_LEFT == knobPosition || Pos.BOTTOM_LEFT == knobPosition ? -scaledSize * 0.475 : 0;
         double             offsetY           = Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.475 : 0;
         double             offset            = 90 - startAngle;
-        ScaleDirection     scaleDirection    = getSkinnable().getScaleDirection();
-        List<Stop>         stops             = getSkinnable().getGradientBarStops();
+        ScaleDirection     scaleDirection    = gauge.getScaleDirection();
+        List<Stop>         stops             = gauge.getGradientBarStops();
         Map<Double, Color> stopAngleMap      = new HashMap<>(stops.size());
         for (Stop stop : stops) { stopAngleMap.put(stop.getOffset() * ANGLE_RANGE, stop.getColor()); }
         double               offsetFactor = ScaleDirection.CLOCKWISE == scaleDirection ? (Pos.TOP_LEFT == knobPosition || Pos.BOTTOM_RIGHT == knobPosition ? startAngle : 180 - startAngle) : (startAngle + 180);
-        AngleConicalGradient gradient     = new AngleConicalGradient(scaledSize * 0.5, scaledSize * 0.5, offsetFactor, stopAngleMap, getSkinnable().getScaleDirection());
+        AngleConicalGradient gradient     = new AngleConicalGradient(scaledSize * 0.5, scaledSize * 0.5, offsetFactor, stopAngleMap, gauge.getScaleDirection());
 
         double barStartAngle  = ScaleDirection.CLOCKWISE == scaleDirection ? -minValue * angleStep : minValue * angleStep;
-        double barAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? getSkinnable().getRange() * angleStep : -getSkinnable().getRange() * angleStep;
+        double barAngleExtend = ScaleDirection.CLOCKWISE == scaleDirection ? gauge.getRange() * angleStep : -gauge.getRange() * angleStep;
         tickMarkCtx.save();
         tickMarkCtx.setStroke(gradient.getImagePattern(new Rectangle(xy - 0.026 * scaledSize + offsetX, xy - 0.026 * scaledSize + offsetY, wh + 0.052 * scaledSize, wh + 0.052 * scaledSize)));
         tickMarkCtx.setLineWidth(scaledSize * 0.052);
@@ -992,8 +987,8 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
     private void drawAreasAndSections(final GraphicsContext CTX) {
         if (areas.isEmpty() && sections.isEmpty()) return;
-        double value        = getSkinnable().getCurrentValue();
-        Pos    knobPosition = getSkinnable().getKnobPosition();
+        double value        = gauge.getCurrentValue();
+        Pos    knobPosition = gauge.getKnobPosition();
         double scaledSize   = size * 1.9;
         double offset       = 90 - startAngle;
         double offsetX;
@@ -1082,7 +1077,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void drawLed() {
         ledCtx.clearRect(0, 0, ledSize, ledSize);
 
-        boolean isFlatLed = LedType.FLAT == getSkinnable().getLedType();
+        boolean isFlatLed = LedType.FLAT == gauge.getLedType();
 
         if (!isFlatLed) {
             ledCtx.setFill(ledFramePaint);
@@ -1095,7 +1090,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         ledCtx.save();
-        if (getSkinnable().isLedOn()) {
+        if (gauge.isLedOn()) {
             ledCtx.setEffect(ledOnShadow);
             ledCtx.setFill(ledOnPaint);
         } else {
@@ -1116,12 +1111,12 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     private void drawMarkers() {
         markerPane.getChildren().setAll(markerMap.values());
         markerPane.getChildren().add(threshold);
-        TickLabelLocation tickLabelLocation = getSkinnable().getTickLabelLocation();
+        TickLabelLocation tickLabelLocation = gauge.getTickLabelLocation();
         double         scaledSize     = size * 1.95;
         double         markerSize     = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0125 * size : 0.015 * size;
         double         pathHalf       = markerSize * 0.3;
-        ScaleDirection scaleDirection = getSkinnable().getScaleDirection();
-        if (getSkinnable().getMarkersVisible()) {
+        ScaleDirection scaleDirection = gauge.getScaleDirection();
+        if (gauge.getMarkersVisible()) {
             for (Map.Entry<Marker, Shape> entry : markerMap.entrySet()) {
                 Marker marker = entry.getKey();
                 Shape  shape  = entry.getValue();
@@ -1225,14 +1220,14 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
         }
 
-        if (getSkinnable().isThresholdVisible()) {
+        if (gauge.isThresholdVisible()) {
             // Draw threshold
             threshold.getElements().clear();
             double thresholdAngle;
             if (ScaleDirection.CLOCKWISE == scaleDirection) {
-                thresholdAngle = startAngle - (getSkinnable().getThreshold() - minValue) * angleStep;
+                thresholdAngle = startAngle - (gauge.getThreshold() - minValue) * angleStep;
             } else {
-                thresholdAngle = startAngle + (getSkinnable().getThreshold() - minValue) * angleStep;
+                thresholdAngle = startAngle + (gauge.getThreshold() - minValue) * angleStep;
             }
             double thresholdSize = Helper.clamp(3.0, 3.5, 0.01 * size);
             double sinValue      = Math.sin(Math.toRadians(thresholdAngle));
@@ -1260,14 +1255,14 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     threshold.getElements().add(new ClosePath());
                     break;
             }
-            threshold.setFill(getSkinnable().getThresholdColor());
-            threshold.setStroke(getSkinnable().getTickMarkColor());
+            threshold.setFill(gauge.getThresholdColor());
+            threshold.setStroke(gauge.getTickMarkColor());
         }
     }
 
     private void updateMarkers() {
         markerMap.clear();
-        for (Marker marker : getSkinnable().getMarkers()) {
+        for (Marker marker : gauge.getMarkers()) {
             switch(marker.getMarkerType()) {
                 case TRIANGLE: markerMap.put(marker, new Path()); break;
                 case DOT     : markerMap.put(marker, new Circle()); break;
@@ -1283,7 +1278,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double h = knobCanvas.getHeight();
         knobCtx.clearRect(0, 0, w, h);
 
-        Color  knobColor = getSkinnable().getKnobColor();
+        Color  knobColor = gauge.getKnobColor();
         double hue       = knobColor.getHue();
         double sat       = knobColor.getSaturation();
         double alp       = knobColor.getOpacity();
@@ -1291,7 +1286,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double gradTop;
         double gradBot;
 
-        switch (getSkinnable().getKnobType()) {
+        switch (gauge.getKnobType()) {
             case PLAIN:
                 knobCtx.setFill(new LinearGradient(0, 0, 0, h, false, CycleMethod.NO_CYCLE,
                                                    new Stop(0.0, Color.rgb(180,180,180)),
@@ -1406,20 +1401,20 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         double maxWidth = 0.4 * size;
 
         titleText.setFont(Fonts.robotoMedium(size * 0.06));
-        titleText.setText(getSkinnable().getTitle());
+        titleText.setText(gauge.getTitle());
         if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, size * 0.06); }
 
         unitText.setFont(Fonts.robotoRegular(size * 0.05));
-        unitText.setText(getSkinnable().getUnit());
+        unitText.setText(gauge.getUnit());
         if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, size * 0.05); }
 
         maxWidth = 0.25 * size;
         subTitleText.setFont(Fonts.robotoRegular(size * 0.05));
-        subTitleText.setText(getSkinnable().getSubTitle());
+        subTitleText.setText(gauge.getSubTitle());
         if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, size * 0.05); }
 
         double offset = size * 0.025;
-        Pos knobPosition = getSkinnable().getKnobPosition();
+        Pos knobPosition = gauge.getKnobPosition();
         switch(knobPosition) {
             case BOTTOM_LEFT :
                 titleText.relocate(offset, size * 0.45);
@@ -1446,9 +1441,9 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
     }
 
     private void resizeValueText() {
-        Pos knobPosition = getSkinnable().getKnobPosition();
-        if (getSkinnable().isLcdVisible()) {
-            switch(getSkinnable().getLcdFont()) {
+        Pos knobPosition = gauge.getKnobPosition();
+        if (gauge.isLcdVisible()) {
+            switch(gauge.getLcdFont()) {
                 case LCD:
                     valueText.setFont(Fonts.digital(0.108 * size));
                     switch(knobPosition) {
@@ -1585,13 +1580,13 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
     }
 
-    private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+    @Override protected void resize() {
+        double width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        double height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
         size          = width < height ? width : height;
 
         if (size > 0) {
-            Pos knobPosition = getSkinnable().getKnobPosition();
+            Pos knobPosition = gauge.getKnobPosition();
             switch(knobPosition) {
                 case BOTTOM_LEFT:
                     centerX = size * 0.05;
@@ -1614,7 +1609,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             }
 
             pane.setMaxSize(size, size);
-            pane.relocate((getSkinnable().getWidth() - size) * 0.5, (getSkinnable().getHeight() - size) * 0.5);
+            pane.relocate((gauge.getWidth() - size) * 0.5, (gauge.getHeight() - size) * 0.5);
 
             dropShadow.setRadius(0.008 * size);
             dropShadow.setOffsetY(0.008 * size);
@@ -1623,7 +1618,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             backgroundInnerShadow.setOffsetY(size * 0.03);
             backgroundInnerShadow.setRadius(size * 0.04);
 
-            pane.setEffect(getSkinnable().isInnerShadowEnabled() ? backgroundInnerShadow : null);
+            pane.setEffect(gauge.isInnerShadowEnabled() ? backgroundInnerShadow : null);
 
             sectionsAndAreasCanvas.setWidth(1.95 * size);
             sectionsAndAreasCanvas.setHeight(1.95 * size);
@@ -1633,16 +1628,16 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
 
             markerPane.setPrefSize(0.9 * size, 0.9 * size);
 
-            boolean isFlatLed = LedType.FLAT == getSkinnable().getLedType();
+            boolean isFlatLed = LedType.FLAT == gauge.getLedType();
             ledSize = isFlatLed ? 0.05 * size : 0.06 * size;
             ledCanvas.setWidth(ledSize);
             ledCanvas.setHeight(ledSize);
             ledOffShadow = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
             ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
-            if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getLedColor(), 0.36 * ledSize, 0, 0, 0));
+            if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));
 
             resizeText();
-            if (getSkinnable().isLcdVisible()) {
+            if (gauge.isLcdVisible()) {
                 lcd.setWidth(0.4 * size);
                 lcd.setHeight(0.114 * size);
                 lcd.setArcWidth(0.0125 * size);
@@ -1653,7 +1648,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
             double needleWidth;
             double needleHeight;
             needle.setCache(false);
-            switch(getSkinnable().getNeedleType()) {
+            switch(gauge.getNeedleType()) {
                 case BIG:
                     needleWidth  = 1.9 * 0.06 * size;
                     needleHeight = TickLabelLocation.INSIDE == tickLabelLocation ? 1.9 * 0.4975 * size : 1.9 * 0.415 * size;
@@ -1687,7 +1682,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     needleRotate.setPivotY(needle.getLayoutBounds().getHeight() * (TickLabelLocation.INSIDE == tickLabelLocation ? 0.78242678 : 0.74757282));
                     break;
                 case VARIOMETER:
-                    needleWidth  = size * getSkinnable().getNeedleSize().FACTOR;
+                    needleWidth  = size * gauge.getNeedleSize().FACTOR;
                     needleHeight = TickLabelLocation.INSIDE == tickLabelLocation ? 1.9 * size * 0.4675 : 1.9 * size * 0.385;
                     Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, NeedleType.VARIOMETER, tickLabelLocation);
                     needle.relocate(centerX - needle.getLayoutBounds().getWidth() * 0.5, centerY - needle.getLayoutBounds().getHeight());
@@ -1696,7 +1691,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     break;
                 case STANDARD:
                 default      :
-                    needleWidth  = size * getSkinnable().getNeedleSize().FACTOR;
+                    needleWidth  = size * gauge.getNeedleSize().FACTOR;
                     needleHeight = TickLabelLocation.INSIDE == tickLabelLocation ? size * 0.9085 : size * 0.75;
                     Needle.INSTANCE.getPath(needle, needleWidth, needleHeight, NeedleType.STANDARD, tickLabelLocation);
                     needle.relocate(centerX - needle.getLayoutBounds().getWidth() * 0.5, centerY - needle.getLayoutBounds().getHeight());
@@ -1734,30 +1729,30 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                     break;
             }
 
-            buttonTooltip.setText(getSkinnable().getButtonTooltipText());
+            buttonTooltip.setText(gauge.getButtonTooltipText());
         }
     }
 
-    private void redraw() {
-        locale       = getSkinnable().getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(getSkinnable().getDecimals())).append("f").toString();
-        shadowGroup.setEffect(getSkinnable().isShadowsEnabled() ? dropShadow : null);
+    @Override protected void redraw() {
+        locale       = gauge.getLocale();
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        shadowGroup.setEffect(gauge.isShadowsEnabled() ? dropShadow : null);
 
         // Background stroke and fill
-        pane.setBorder(new Border(new BorderStroke(getSkinnable().getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(getSkinnable().getBorderWidth() / PREFERRED_WIDTH * size))));
-        pane.setBackground(new Background(new BackgroundFill(getSkinnable().getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
+        pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         // Areas, Sections and Tick Marks
-        tickLabelLocation = getSkinnable().getTickLabelLocation();
-        scaleDirection    = getSkinnable().getScaleDirection();
-        areasVisible      = getSkinnable().getAreasVisible();
-        sectionsVisible   = getSkinnable().getSectionsVisible();
+        tickLabelLocation = gauge.getTickLabelLocation();
+        scaleDirection    = gauge.getScaleDirection();
+        areasVisible      = gauge.getAreasVisible();
+        sectionsVisible   = gauge.getSectionsVisible();
         sectionsAndAreasCtx.clearRect(0, 0, size * 1.9, size * 1.9);
         drawAreasAndSections(sectionsAndAreasCtx);
 
         tickMarkCanvas.setCache(false);
         tickMarkCtx.clearRect(0, 0, size * 1.9, size * 1.9);
-        if (getSkinnable().isGradientBarEnabled() && getSkinnable().getGradientLookup() != null) {
+        if (gauge.isGradientBarEnabled() && gauge.getGradientLookup() != null) {
             drawGradientBar();
         }
         drawTickMarks();
@@ -1765,9 +1760,9 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         tickMarkCanvas.setCacheHint(CacheHint.QUALITY);
 
         // LED
-        if (getSkinnable().isLedVisible()) {
-            final Color LED_COLOR = getSkinnable().getLedColor();
-            switch(getSkinnable().getLedType()) {
+        if (gauge.isLedVisible()) {
+            final Color LED_COLOR = gauge.getLedColor();
+            switch(gauge.getLedType()) {
                 case FLAT:
                     ledFramePaint = Color.WHITE;
                     ledOnPaint = new LinearGradient(0, 0.25 * ledSize,
@@ -1817,9 +1812,9 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         // LCD
-        LcdDesign lcdDesign = getSkinnable().getLcdDesign();
+        LcdDesign lcdDesign = gauge.getLcdDesign();
         Color[]   lcdColors = lcdDesign.getColors();
-        if (getSkinnable().isLcdVisible() && getSkinnable().isValueVisible()) {
+        if (gauge.isLcdVisible() && gauge.isValueVisible()) {
             LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
                                                             false, CycleMethod.NO_CYCLE,
                                                             new Stop(0, lcdColors[0]),
@@ -1843,15 +1838,15 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
         }
 
         // Text
-        titleText.setFill(getSkinnable().getTitleColor());
-        unitText.setFill(getSkinnable().getUnitColor());
-        subTitleText.setFill(getSkinnable().getSubTitleColor());
-        valueText.setFill(getSkinnable().isLcdVisible() ? lcdColors[5] : getSkinnable().getValueColor());
+        titleText.setFill(gauge.getTitleColor());
+        unitText.setFill(gauge.getUnitColor());
+        subTitleText.setFill(gauge.getSubTitleColor());
+        valueText.setFill(gauge.isLcdVisible() ? lcdColors[5] : gauge.getValueColor());
         resizeText();
 
         // Needle
-        Color needleColor = getSkinnable().getNeedleColor();
-        switch(getSkinnable().getNeedleShape()) {
+        Color needleColor = gauge.getNeedleColor();
+        switch(gauge.getNeedleShape()) {
             case ROUND:
                 needlePaint = new LinearGradient(needle.getLayoutBounds().getMinX(), 0,
                                                  needle.getLayoutBounds().getMaxX(), 0,
@@ -1877,7 +1872,7 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                 needle.setStrokeWidth(0);
                 break;
         }
-        if (NeedleType.AVIONIC == getSkinnable().getNeedleType()) {
+        if (NeedleType.AVIONIC == gauge.getNeedleType()) {
             needlePaint = new LinearGradient(0, needle.getLayoutBounds().getMinY(),
                                              0, needle.getLayoutBounds().getMaxY(),
                                              false, CycleMethod.NO_CYCLE,
@@ -1887,13 +1882,13 @@ public class QuarterSkin extends SkinBase<Gauge> implements Skin<Gauge> {
                                              new Stop(1.0, Color.BLACK));
         }
         needle.setFill(needlePaint);
-        needle.setStroke(getSkinnable().getNeedleBorderColor());
+        needle.setStroke(gauge.getNeedleBorderColor());
 
         // Knob
         drawKnob(false);
 
         // Markers
         drawMarkers();
-        thresholdTooltip.setText("Threshold\n(" + String.format(locale, formatString, getSkinnable().getThreshold()) + ")");
+        thresholdTooltip.setText("Threshold\n(" + String.format(locale, formatString, gauge.getThreshold()) + ")");
     }
 }
