@@ -16,6 +16,7 @@
 
 package eu.hansolo.medusa;
 
+import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import eu.hansolo.medusa.skins.GaugeSkin;
 import javafx.scene.control.Skin;
