@@ -65,10 +65,6 @@ import java.util.Locale;
 public class LcdClockSkin extends ClockSkinBase {
     private static final double     PREFERRED_WIDTH    = 220;//190;
     private static final double     PREFERRED_HEIGHT   = 100;
-    private static final double     MINIMUM_WIDTH      = 5;
-    private static final double     MINIMUM_HEIGHT     = 5;
-    private static final double     MAXIMUM_WIDTH      = 1024;
-    private static final double     MAXIMUM_HEIGHT     = 1024;
     private static final Color      DARK_NOISE_COLOR   = Color.rgb(100, 100, 100, 0.10);
     private static final Color      BRIGHT_NOISE_COLOR = Color.rgb(200, 200, 200, 0.05);
     private static final DropShadow FOREGROUND_SHADOW  = new DropShadow();

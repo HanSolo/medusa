@@ -1064,6 +1064,10 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setAverageColor(Color.rgb(238, 238, 238, 0.5));
                     CONTROL.setAnimated(false);
                     break;
+                case GAUGE:
+                    CONTROL.setStartAngle(320);
+                    CONTROL.setAngleRange(280);
+                    break;
             }
         } else {
             CONTROL = new Gauge();

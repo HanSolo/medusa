@@ -5484,6 +5484,8 @@ public class Gauge extends Control {
                 super.setSkin(new TileSparklineSkin(Gauge.this));
                 break;
             case GAUGE:
+                setStartAngle(320);
+                setAngleRange(280);
             default:
                 super.setSkin(new GaugeSkin(Gauge.this));
                 break;

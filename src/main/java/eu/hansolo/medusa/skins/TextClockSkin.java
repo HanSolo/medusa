@@ -48,20 +48,20 @@ public class TextClockSkin extends ClockSkinBase {
     protected static final double            MINIMUM_HEIGHT        = 20;
     protected static final double            MAXIMUM_WIDTH         = 1024;
     protected static final double            MAXIMUM_HEIGHT        = 1024;
-    private static final DateTimeFormatter HHMM_FORMATTER        = DateTimeFormatter.ofPattern("HH:mm");
-    private static final DateTimeFormatter HHMMSS_FORMATTER      = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private static final DateTimeFormatter AMPM_HHMM_FORMATTER   = DateTimeFormatter.ofPattern("hh:mm a");
-    private static final DateTimeFormatter AMPM_HHMMSS_FORMATTER = DateTimeFormatter.ofPattern("hh:mm:ss a");
-    private              double            aspectRatio           = 0.4;
-    private              double            width;
-    private              double            height;
-    private              DateTimeFormatter dateFormat;
-    private              Text              timeText;
-    private              Text              dateText;
-    private              Pane              pane;
-    private              Color             textColor;
-    private              Color             dateColor;
-    private              Font              customFont;
+    private   static final DateTimeFormatter HHMM_FORMATTER        = DateTimeFormatter.ofPattern("HH:mm");
+    private   static final DateTimeFormatter HHMMSS_FORMATTER      = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private   static final DateTimeFormatter AMPM_HHMM_FORMATTER   = DateTimeFormatter.ofPattern("hh:mm a");
+    private   static final DateTimeFormatter AMPM_HHMMSS_FORMATTER = DateTimeFormatter.ofPattern("hh:mm:ss a");
+    private                double            aspectRatio           = 0.4;
+    private                double            width;
+    private                double            height;
+    private                DateTimeFormatter dateFormat;
+    private                Text              timeText;
+    private                Text              dateText;
+    private                Pane              pane;
+    private                Color             textColor;
+    private                Color             dateColor;
+    private                Font              customFont;
 
 
     // ******************** Constructors **************************************
@@ -190,6 +190,8 @@ public class TextClockSkin extends ClockSkinBase {
         pane.setBorder(new Border(new BorderStroke(clock.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(clock.getBorderWidth() / PREFERRED_WIDTH * height))));
         pane.setBackground(new Background(new BackgroundFill(clock.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
         ZonedDateTime time = clock.getTime();
+
+        dateFormat = Helper.getDateFormat(clock.getLocale());
 
         textColor  = clock.getTextColor();
         timeText.setFill(textColor);
