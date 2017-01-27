@@ -822,7 +822,7 @@ public class Clock extends Control {
     public void setSecondsVisible(boolean VISIBLE) { 
         if (null == secondsVisible) {
             _secondsVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireUpdateEvent(VISIBILITY_EVENT);
         } else {
             secondsVisible.set(VISIBLE);
         }
@@ -830,7 +830,7 @@ public class Clock extends Control {
     public BooleanProperty secondsVisibleProperty() { 
         if (null == secondsVisible) {
             secondsVisible = new BooleanPropertyBase(_secondsVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "secondsVisible"; }
             };
@@ -1763,7 +1763,7 @@ public class Clock extends Control {
     public void setLocale(final Locale LOCALE) {
         if (null == locale) {
             _locale = LOCALE;
-            fireUpdateEvent(RECALC_EVENT);
+            fireUpdateEvent(REDRAW_EVENT);
         } else {
             locale.set(LOCALE);
         }
@@ -1771,7 +1771,7 @@ public class Clock extends Control {
     public ObjectProperty<Locale> localeProperty() {
         if (null == locale) {
             locale  = new ObjectPropertyBase<Locale>(_locale) {
-                @Override protected void invalidated() { fireUpdateEvent(RECALC_EVENT); }
+                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "locale"; }
             };
