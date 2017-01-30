@@ -30,6 +30,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.DoubleProperty;
@@ -132,7 +133,7 @@ public class Gauge extends Control {
     private final UpdateEvent    VALUE_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VALUE);
 
     private static volatile Future               blinkFuture;
-    private static ScheduledExecutorService      blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false));
+    private static ScheduledExecutorService      blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", true));
     private static volatile Callable<Void>       blinkTask;
 
     // Update events
@@ -5139,7 +5140,7 @@ public class Gauge extends Control {
         blinkTask = new Callable<Void>() {
             @Override public Void call() throws Exception {
                 try {
-                    setLedOn(!isLedOn());
+                    Platform.runLater(() -> setLedOn(!isLedOn()));
                 } finally {
                     if (!Thread.currentThread().isInterrupted()) {
                         // Schedule the same Callable with the current updateInterval
@@ -5152,7 +5153,7 @@ public class Gauge extends Control {
     }
     private synchronized void startBlinkExecutorService() {
         if (null == blinkTask) { createBlinkTask(); }
-        if (null == blinkService) { blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", false)); }
+        if (null == blinkService) { blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", true)); }
         blinkFuture = blinkService.schedule(blinkTask, LED_BLINK_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
