@@ -81,14 +81,15 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LINEAR)
+                            .skinType(SkinType.VERTICAL)
                             //.prefSize(400, 400)
                             .minValue(-20)
                             .maxValue(100)
                             .animated(true)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
-                            //.lcdVisible(true)
+                            .lcdVisible(true)
+                            //.lcdFont(LcdFont.STANDARD)
                             //.locale(Locale.GERMANY)
                             //.numberFormat(numberFormat)
                             .title("Testing")
