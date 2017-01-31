@@ -89,7 +89,7 @@ public class Test extends Application {
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
                             .lcdVisible(true)
-                            .lcdFont(LcdFont.STANDARD)
+                            //.lcdFont(LcdFont.STANDARD)
                             //.locale(Locale.GERMANY)
                             //.numberFormat(numberFormat)
                             .title("Testing")
