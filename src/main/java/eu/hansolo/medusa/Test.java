@@ -20,6 +20,11 @@ import eu.hansolo.medusa.Clock.ClockSkinType;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEvent.EventType;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
+import java.time.Instant;
+import java.util.Locale;
+import java.util.Random;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
@@ -38,12 +43,6 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
-
-import java.math.RoundingMode;
-import java.text.NumberFormat;
-import java.time.Instant;
-import java.util.Locale;
-import java.util.Random;
 
 
 
@@ -82,10 +81,10 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.GAUGE)
+                            .skinType(SkinType.LINEAR)
                             //.prefSize(400, 400)
                             .minValue(-20)
-                            .maxValue(50)
+                            .maxValue(100)
                             .animated(true)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
@@ -97,12 +96,12 @@ public class Test extends Application {
                             .subTitle("Only")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
-                            .sections(new Section(-20, 0, Color.BLUE),
-                                      new Section(0, 25, Color.YELLOW),
-                                      new Section(25, 50, Color.RED))
+                            .sections(new Section(-20, 0, Color.rgb(0, 0, 255, 0.25), Color.rgb(0, 0, 255, 0.75)),
+                                      new Section(0, 25, Color.rgb(255, 255, 0, 0.25), Color.rgb(255, 255, 0, 0.75)),
+                                      new Section(25, 50, Color.rgb(255, 0, 0, 0.25), Color.rgb(255, 0, 0, 0.75)))
                             .sectionsVisible(true)
                             .highlightSections(true)
-                            .autoScale(false)
+                            .autoScale(true)
                             //.averagingEnabled(true)
                             //.averagingPeriod(10)
                             //.averageVisible(true)
@@ -138,7 +137,7 @@ public class Test extends Application {
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
                 if (now > lastTimerCall + 3_000_000_000l) {
-                    double v = RND.nextDouble() * gauge.getRange() * 1.5 + gauge.getMinValue();
+                    double v = RND.nextDouble() * gauge.getRange() * 1.1 + gauge.getMinValue();
                     value.set(v);
                     //System.out.println(v);
                     //gauge.setValue(v);

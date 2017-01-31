@@ -22,6 +22,8 @@ import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import java.util.List;
+import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -52,8 +54,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-import java.util.List;
-import java.util.Locale;
+import static eu.hansolo.medusa.tools.Helper.clamp;
 
 
 /**
@@ -207,8 +208,9 @@ public class LinearSkin extends GaugeSkinBase {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
         if ("FINISHED".equals(EVENT_TYPE)) {
-            double currentValue = gauge.getCurrentValue();
-
+            if ( gauge.isHighlightSections() ) {
+                redraw();
+            }
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(ledCanvas, gauge.isLedVisible());
             Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
@@ -323,9 +325,10 @@ public class LinearSkin extends GaugeSkinBase {
 
     private void drawSections(final GraphicsContext CTX) {
         if (!gauge.getSectionsVisible() && sections.isEmpty()) return;
-        int           listSize = sections.size();
-        double        minValue = gauge.getMinValue();
-        double        minPosition;
+        double value    = gauge.getCurrentValue();
+        int    listSize = sections.size();
+        double minValue = gauge.getMinValue();
+        double minPosition;
         CTX.save();
         if (Orientation.VERTICAL == orientation) {
             minPosition    = barBackground.getLayoutY() + barBackground.getLayoutBounds().getHeight() - size * 0.0035;
@@ -334,7 +337,11 @@ public class LinearSkin extends GaugeSkinBase {
             for (int i = 0 ; i < listSize ;i++) {
                 Section section = sections.get(i);
                 sectionHeight   = (section.getStop() - section.getStart()) * stepSize;
-                CTX.setFill(section.getColor());
+                if ( gauge.isHighlightSections() ) {
+                    CTX.setFill(section.contains(value) ? section.getHighlightColor() : section.getColor());
+                } else {
+                    CTX.setFill(section.getColor());
+                }
                 CTX.fillRect(anchorX, minPosition - sectionHeight - (section.getStart() - minValue) * stepSize, 0.057 * width, sectionHeight);
             }
         } else {
@@ -344,7 +351,11 @@ public class LinearSkin extends GaugeSkinBase {
             for (int i = 0 ; i < listSize ;i++) {
                 Section section = sections.get(i);
                 sectionWidth    = (section.getStop() - section.getStart()) * stepSize;
-                CTX.setFill(section.getColor());
+                if ( gauge.isHighlightSections() ) {
+                    CTX.setFill(section.contains(value) ? section.getHighlightColor() : section.getColor());
+                } else {
+                    CTX.setFill(section.getColor());
+                }
                 CTX.fillRect(minPosition + (section.getStart() - minValue) * stepSize, anchorY, sectionWidth, 0.059 * height);
             }
         }
@@ -352,20 +363,21 @@ public class LinearSkin extends GaugeSkinBase {
     }
 
     private void setBar(final double VALUE) {
+        double maxValue = (gauge.getMaxValue() - gauge.getMinValue()) * stepSize;
         if (Orientation.VERTICAL == orientation) {
             double valueHeight;
             if (gauge.isStartFromZero()) {
                 if (VALUE < 0) {
-                    valueHeight = Math.abs(VALUE) * stepSize;
+                    valueHeight = clamp(0, maxValue, Math.abs(VALUE) * stepSize);
                     bar.setLayoutY(0);
                     barHighlight.setLayoutY(0);
                 } else {
-                    valueHeight = VALUE * stepSize;
+                    valueHeight = clamp(0, maxValue, VALUE * stepSize);
                     bar.setLayoutY(-valueHeight);
                     barHighlight.setLayoutY(-valueHeight);
                 }
             } else {
-                valueHeight = (VALUE - gauge.getMinValue()) * stepSize;
+                valueHeight = clamp(0, maxValue, (VALUE - gauge.getMinValue()) * stepSize);
                 bar.setLayoutY(-valueHeight);
                 barHighlight.setLayoutY(-valueHeight);
             }
@@ -383,16 +395,16 @@ public class LinearSkin extends GaugeSkinBase {
             double valueWidth;
             if (gauge.isStartFromZero()) {
                 if (VALUE < 0) {
-                    valueWidth = Math.abs(VALUE) * stepSize;
+                    valueWidth = clamp(0, maxValue, Math.abs(VALUE) * stepSize);
                     bar.setLayoutX(-valueWidth);
                     barHighlight.setLayoutX(-valueWidth);
                 } else {
-                    valueWidth = VALUE * stepSize;
+                    valueWidth = clamp(0, maxValue, VALUE * stepSize);
                     bar.setLayoutX(0);
                     barHighlight.setLayoutX(0);
                 }
             } else {
-                valueWidth = (VALUE - gauge.getMinValue()) * stepSize;
+                valueWidth = clamp(0, maxValue, (VALUE - gauge.getMinValue()) * stepSize);
                 bar.setLayoutX(0);
                 barHighlight.setLayoutX(0);
             }
