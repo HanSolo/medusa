@@ -54,6 +54,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
+import static eu.hansolo.medusa.tools.Helper.clamp;
+
 
 /**
  * Created by hansolo on 29.01.16.
@@ -361,20 +363,21 @@ public class LinearSkin extends GaugeSkinBase {
     }
 
     private void setBar(final double VALUE) {
+        double maxValue = (gauge.getMaxValue() - gauge.getMinValue()) * stepSize;
         if (Orientation.VERTICAL == orientation) {
             double valueHeight;
             if (gauge.isStartFromZero()) {
                 if (VALUE < 0) {
-                    valueHeight = Math.abs(VALUE) * stepSize;
+                    valueHeight = clamp(0, maxValue, Math.abs(VALUE) * stepSize);
                     bar.setLayoutY(0);
                     barHighlight.setLayoutY(0);
                 } else {
-                    valueHeight = VALUE * stepSize;
+                    valueHeight = clamp(0, maxValue, VALUE * stepSize);
                     bar.setLayoutY(-valueHeight);
                     barHighlight.setLayoutY(-valueHeight);
                 }
             } else {
-                valueHeight = (VALUE - gauge.getMinValue()) * stepSize;
+                valueHeight = clamp(0, maxValue, (VALUE - gauge.getMinValue()) * stepSize);
                 bar.setLayoutY(-valueHeight);
                 barHighlight.setLayoutY(-valueHeight);
             }
@@ -392,16 +395,16 @@ public class LinearSkin extends GaugeSkinBase {
             double valueWidth;
             if (gauge.isStartFromZero()) {
                 if (VALUE < 0) {
-                    valueWidth = Math.abs(VALUE) * stepSize;
+                    valueWidth = clamp(0, maxValue, Math.abs(VALUE) * stepSize);
                     bar.setLayoutX(-valueWidth);
                     barHighlight.setLayoutX(-valueWidth);
                 } else {
-                    valueWidth = VALUE * stepSize;
+                    valueWidth = clamp(0, maxValue, VALUE * stepSize);
                     bar.setLayoutX(0);
                     barHighlight.setLayoutX(0);
                 }
             } else {
-                valueWidth = (VALUE - gauge.getMinValue()) * stepSize;
+                valueWidth = clamp(0, maxValue, (VALUE - gauge.getMinValue()) * stepSize);
                 bar.setLayoutX(0);
                 barHighlight.setLayoutX(0);
             }

@@ -1135,7 +1135,7 @@ public class VSkin extends GaugeSkinBase {
         // Text
         titleText.setFill(gauge.getTitleColor());
         unitText.setFill(gauge.getUnitColor());
-        valueText.setFill(gauge.getValueColor());
+        valueText.setFill(gauge.isLcdVisible() ? lcdColors[5] : gauge.getValueColor());
         resizeText();
 
         // Needle

@@ -97,9 +97,9 @@ public class Test extends Application {
                             .subTitle("Only")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
-                            .sections(new Section(-20, 0, Color.BLUE.darker().darker(), Color.BLUE),
-                                      new Section(0, 25, Color.YELLOW.darker().darker(), Color.YELLOW),
-                                      new Section(25, 50, Color.RED.darker().darker(), Color.RED))
+                            .sections(new Section(-20, 0, Color.rgb(0, 0, 255, 0.25), Color.rgb(0, 0, 255, 0.75)),
+                                      new Section(0, 25, Color.rgb(255, 255, 0, 0.25), Color.rgb(255, 255, 0, 0.75)),
+                                      new Section(25, 50, Color.rgb(255, 0, 0, 0.25), Color.rgb(255, 0, 0, 0.75)))
                             .sectionsVisible(true)
                             .highlightSections(true)
                             .autoScale(true)
@@ -138,7 +138,7 @@ public class Test extends Application {
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
                 if (now > lastTimerCall + 3_000_000_000l) {
-                    double v = RND.nextDouble() * gauge.getRange() * 1.5 + gauge.getMinValue();
+                    double v = RND.nextDouble() * gauge.getRange() * 1.1 + gauge.getMinValue();
                     value.set(v);
                     //System.out.println(v);
                     //gauge.setValue(v);
