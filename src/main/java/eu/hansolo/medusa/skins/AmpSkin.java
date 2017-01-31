@@ -22,8 +22,11 @@ import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.tools.Helper;
+import java.math.BigDecimal;
+import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -57,9 +60,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
-
-import java.math.BigDecimal;
-import java.util.Locale;
 
 import static eu.hansolo.medusa.tools.Helper.enableNode;
 
@@ -232,7 +232,11 @@ public class AmpSkin extends GaugeSkinBase {
     // ******************** Methods *******************************************
     protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
-        if ("ANGLE".equals(EVENT_TYPE)) {
+         if ("FINISHED".equals(EVENT_TYPE)) {
+            if ( gauge.isHighlightSections() ) {
+                redraw();
+            }
+        } else if ("ANGLE".equals(EVENT_TYPE)) {
             double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + gauge.getMinValue();
             lcdText.setText((String.format(locale, formatString, currentValue)));
             lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
@@ -347,17 +351,20 @@ public class AmpSkin extends GaugeSkinBase {
     }
 
     private void drawSections(final GraphicsContext CTX) {
-        final double x         = width * 0.06;
-        final double y         = width * 0.21;
-        final double w         = width * 0.88;
-        final double h         = height * 1.05;
-        final double MIN_VALUE = gauge.getMinValue();
-        final double MAX_VALUE = gauge.getMaxValue();
-        final double OFFSET    = 90 - START_ANGLE;
+        final double x                         = width * 0.06;
+        final double y                         = width * 0.21;
+        final double w                         = width * 0.88;
+        final double h                         = height * 1.05;
+        final double MIN_VALUE                 = gauge.getMinValue();
+        final double MAX_VALUE                 = gauge.getMaxValue();
+        final double OFFSET                    = 90 - START_ANGLE;
+        final ObservableList<Section> sections = gauge.getSections();
+        final boolean highlightSections        = gauge.isHighlightSections();
 
-        int listSize = gauge.getSections().size();
+        double value    = gauge.getCurrentValue();
+        int    listSize = sections.size();
         for (int i = 0 ; i < listSize ; i++) {
-            final Section SECTION = gauge.getSections().get(i);
+            final Section SECTION = sections.get(i);
             final double  SECTION_START_ANGLE;
             if (Double.compare(SECTION.getStart(), MAX_VALUE) <= 0 && Double.compare(SECTION.getStop(), MIN_VALUE) >= 0) {
                 if (SECTION.getStart() < MIN_VALUE && SECTION.getStop() < MAX_VALUE) {
@@ -373,7 +380,11 @@ public class AmpSkin extends GaugeSkinBase {
                 }
 
                 CTX.save();
-                CTX.setStroke(SECTION.getColor());
+                if (highlightSections) {
+                    CTX.setStroke(SECTION.contains(value) ? SECTION.getHighlightColor() : SECTION.getColor());
+                } else {
+                    CTX.setStroke(SECTION.getColor());
+                }
                 CTX.setLineWidth(height * 0.0415);
                 CTX.setLineCap(StrokeLineCap.BUTT);
                 CTX.strokeArc(x, y, w, h, -(OFFSET + SECTION_START_ANGLE), -SECTION_ANGLE_EXTEND, ArcType.OPEN);
