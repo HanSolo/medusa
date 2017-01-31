@@ -206,11 +206,8 @@ public class LinearSkin extends GaugeSkinBase {
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
         if ("FINISHED".equals(EVENT_TYPE)) {
-            double currentValue = gauge.getCurrentValue();
             if ( gauge.isHighlightSections() ) {
                 redraw();
-//                ticksAndSections.clearRect(0, 0, width, height);
-//                drawTickMarks(ticksAndSections);
             }
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(ledCanvas, gauge.isLedVisible());

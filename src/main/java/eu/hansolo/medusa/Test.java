@@ -81,7 +81,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LINEAR)
+                            .skinType(SkinType.AMP)
                             //.prefSize(400, 400)
                             .minValue(-20)
                             .maxValue(100)
