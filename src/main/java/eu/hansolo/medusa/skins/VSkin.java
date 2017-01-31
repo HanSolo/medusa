@@ -21,12 +21,18 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
+import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Needle;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.tools.AngleConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -72,12 +78,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 /**
  * Created by hansolo on 19.01.16.
@@ -109,6 +109,7 @@ public class VSkin extends GaugeSkinBase {
     private Paint                      ledHighlightPaint;
     private Canvas                     ledCanvas;
     private GraphicsContext            ledCtx;
+    private Rectangle                  lcd;
     private Pane                       markerPane;
     private Path                       threshold;
     private Path                       needle;
@@ -210,6 +211,12 @@ public class VSkin extends GaugeSkinBase {
 
         markerPane = new Pane();
 
+        lcd = new Rectangle(0.3 * PREFERRED_WIDTH, 0.014 * PREFERRED_HEIGHT);
+        lcd.setArcWidth(0.0125 * PREFERRED_HEIGHT);
+        lcd.setArcHeight(0.0125 * PREFERRED_HEIGHT);
+        lcd.relocate((PREFERRED_WIDTH - lcd.getWidth()) * 0.5, 0.44 * PREFERRED_HEIGHT);
+        Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
+
         needleRotate = new Rotate(180 - startAngle);
         needleRotate.setAngle(needleRotate.getAngle() + (gauge.getValue() - oldValue - minValue) * angleStep);
         needle = new Path();
@@ -262,6 +269,7 @@ public class VSkin extends GaugeSkinBase {
                         tickMarkCanvas,
                         markerPane,
                         ledCanvas,
+                        lcd,
                         titleText,
                         unitText,
                         valueText,
@@ -309,6 +317,7 @@ public class VSkin extends GaugeSkinBase {
             Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
             Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
             Helper.enableNode(valueText, gauge.isValueVisible());
+            Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
             Helper.enableNode(knobCanvas, gauge.isKnobVisible());
             Helper.enableNode(threshold, gauge.isThresholdVisible());
             boolean markersVisible = gauge.getMarkersVisible();
@@ -316,6 +325,8 @@ public class VSkin extends GaugeSkinBase {
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (gauge.isLedVisible()) { drawLed(); }
+        } else if ("LCD".equals(EVENT_TYPE)) {
+            if (gauge.isLcdVisible()) redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             angleRange = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
             startAngle = getStartAngle();
@@ -398,7 +409,13 @@ public class VSkin extends GaugeSkinBase {
         }
         needleRotate.setAngle(targetAngle);
         valueText.setText(String.format(locale, formatString, VALUE));
-        valueText.setTranslateX(Pos.CENTER_LEFT == gauge.getKnobPosition() ? width * 0.6 - valueText.getLayoutBounds().getWidth() : width * 0.9 - valueText.getLayoutBounds().getWidth());
+//        if (gauge.isLcdVisible()) {
+//            valueText.setTranslateX((0.9 * width - valueText.getLayoutBounds().getWidth()));
+//        } else {
+            valueText.setTranslateX(Pos.CENTER_LEFT == gauge.getKnobPosition() ?
+                                    width * 0.6 - valueText.getLayoutBounds().getWidth() :
+                                    width * 0.9 - valueText.getLayoutBounds().getWidth());
+//        }
     }
 
     private void drawGradientBar() {
@@ -872,7 +889,12 @@ public class VSkin extends GaugeSkinBase {
             double scaledHeight = height * 0.9;
 
             pane.setMaxSize(width, height);
-            pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
+            pane.relocate(
+//                Pos.CENTER_LEFT == gauge.getKnobPosition() ?
+//                    width * 0.6 - valueText.getLayoutBounds().getWidth() :
+//                    width * 0.9 - valueText.getLayoutBounds().getWidth(),
+                (gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5
+            );
 
             dropShadow.setRadius(0.008 * scaledHeight);
             dropShadow.setOffsetY(0.008 * scaledHeight);
@@ -904,9 +926,42 @@ public class VSkin extends GaugeSkinBase {
 
             resizeText();
 
-            valueText.setFont(Fonts.robotoMedium(scaledHeight * 0.1));
-            valueText.setTranslateX(Pos.CENTER_LEFT == gauge.getKnobPosition() ? width * 0.6 - valueText.getLayoutBounds().getWidth() : width * 0.9 - valueText.getLayoutBounds().getWidth());
-            valueText.setTranslateY(height * 0.6);
+            if ( gauge.isLcdVisible() ) {
+                lcd.setWidth(0.285 * scaledHeight);
+                lcd.setHeight(0.071 * scaledHeight);
+                lcd.setArcWidth(0.0125 * scaledHeight);
+                lcd.setArcHeight(0.0125 * scaledHeight);
+                lcd.relocate((width - lcd.getWidth()) * 0.82, 0.639 * scaledHeight);
+
+                switch(gauge.getLcdFont()) {
+                    case LCD:
+                        valueText.setFont(Fonts.digital(0.12 * width));
+                        valueText.setTranslateY(0.674 * scaledHeight);
+                        break;
+                    case DIGITAL:
+                        valueText.setFont(Fonts.digitalReadout(0.115 * width));
+                        valueText.setTranslateY(0.68 * scaledHeight);
+                        break;
+                    case DIGITAL_BOLD:
+                        valueText.setFont(Fonts.digitalReadoutBold(0.115 * width));
+                        valueText.setTranslateY(0.68 * scaledHeight);
+                        break;
+                    case ELEKTRA:
+                        valueText.setFont(Fonts.elektra(0.1216 * width));
+                        valueText.setTranslateY(0.678 * scaledHeight);
+                        break;
+                    case STANDARD:
+                    default:
+                        valueText.setFont(Fonts.robotoMedium(0.1 * width));
+                        valueText.setTranslateY(0.675 * scaledHeight);
+                        break;
+                }
+                valueText.setTranslateX((0.9 * width - valueText.getLayoutBounds().getWidth()));
+            } else {
+                valueText.setFont(Fonts.robotoMedium(width * 0.1));
+                valueText.setTranslateX(Pos.CENTER_LEFT == gauge.getKnobPosition() ? width * 0.6 - valueText.getLayoutBounds().getWidth() : width * 0.9 - valueText.getLayoutBounds().getWidth());
+                valueText.setTranslateY(height * 0.6);
+            }
 
             double needleWidth;
             double needleHeight;
@@ -1049,6 +1104,32 @@ public class VSkin extends GaugeSkinBase {
                     break;
             }
             drawLed();
+        }
+
+        // LCD
+        LcdDesign lcdDesign = gauge.getLcdDesign();
+        Color[]   lcdColors = lcdDesign.getColors();
+        if (gauge.isLcdVisible() && gauge.isValueVisible()) {
+            LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
+                                                            false, CycleMethod.NO_CYCLE,
+                                                            new Stop(0, lcdColors[0]),
+                                                            new Stop(0.03, lcdColors[1]),
+                                                            new Stop(0.5, lcdColors[2]),
+                                                            new Stop(0.5, lcdColors[3]),
+                                                            new Stop(1.0, lcdColors[4]));
+            Paint lcdFramePaint;
+            if (LcdDesign.FLAT_CUSTOM == lcdDesign) {
+                lcdFramePaint = lcdDesign.lcdForegroundColor;
+            } else {
+                lcdFramePaint = new LinearGradient(0, 0, 0, lcd.getHeight(),
+                                                   false, CycleMethod.NO_CYCLE,
+                                                   new Stop(0.0, Color.rgb(26, 26, 26)),
+                                                   new Stop(0.01, Color.rgb(77, 77, 77)),
+                                                   new Stop(0.99, Color.rgb(77, 77, 77)),
+                                                   new Stop(1.0, Color.rgb(221, 221, 221)));
+            }
+            lcd.setFill(lcdGradient);
+            lcd.setStroke(lcdFramePaint);
         }
 
         // Text
