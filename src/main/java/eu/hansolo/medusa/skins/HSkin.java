@@ -28,6 +28,11 @@ import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.tools.AngleConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -72,12 +77,6 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -936,24 +935,24 @@ public class HSkin extends GaugeSkinBase {
                 switch(gauge.getLcdFont()) {
                     case LCD:
                         valueText.setFont(Fonts.digital(0.108 * scaledWidth));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.32 * height : 0.68 * height);
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.315 * height : 0.67 * height);
                         break;
                     case DIGITAL:
                         valueText.setFont(Fonts.digitalReadout(0.105 * scaledWidth));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.33 * height : 0.69 * height);
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.33 * height : 0.685 * height);
                         break;
                     case DIGITAL_BOLD:
                         valueText.setFont(Fonts.digitalReadoutBold(0.105 * scaledWidth));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.33 * height : 0.69 * height);
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.33 * height : 0.685 * height);
                         break;
                     case ELEKTRA:
                         valueText.setFont(Fonts.elektra(0.1116 * scaledWidth));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.325 * height : 0.685 * height);
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.325 * height : 0.68 * height);
                         break;
                     case STANDARD:
                     default:
                         valueText.setFont(Fonts.robotoMedium(0.09 * scaledWidth));
-                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.32 * height : 0.68 * height);
+                        valueText.setTranslateY(Pos.TOP_CENTER == knobPosition ? 0.32 * height : 0.675 * height);
                         break;
                 }
                 valueText.setTranslateX((0.75 * scaledWidth - valueText.getLayoutBounds().getWidth()));

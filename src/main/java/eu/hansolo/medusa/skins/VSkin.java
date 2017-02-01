@@ -927,11 +927,15 @@ public class VSkin extends GaugeSkinBase {
             resizeText();
 
             if ( gauge.isLcdVisible() ) {
+
                 lcd.setWidth(0.285 * scaledHeight);
                 lcd.setHeight(0.071 * scaledHeight);
                 lcd.setArcWidth(0.0125 * scaledHeight);
                 lcd.setArcHeight(0.0125 * scaledHeight);
-                lcd.relocate((width - lcd.getWidth()) * 0.82, 0.639 * scaledHeight);
+                lcd.relocate(
+                    Pos.CENTER_LEFT == gauge.getKnobPosition() ? (width - lcd.getWidth()) * 0.205 : (width - lcd.getWidth()) * 0.82,
+                    0.639 * scaledHeight
+                );
 
                 switch(gauge.getLcdFont()) {
                     case LCD:
@@ -956,7 +960,10 @@ public class VSkin extends GaugeSkinBase {
                         valueText.setTranslateY(0.675 * scaledHeight);
                         break;
                 }
-                valueText.setTranslateX((0.9 * width - valueText.getLayoutBounds().getWidth()));
+
+//                valueText.setTranslateX((0.9 * width - valueText.getLayoutBounds().getWidth()));
+                valueText.setTranslateX(Pos.CENTER_LEFT == gauge.getKnobPosition() ? width * 0.6 - valueText.getLayoutBounds().getWidth() : width * 0.9 - valueText.getLayoutBounds().getWidth());
+
             } else {
                 valueText.setFont(Fonts.robotoMedium(width * 0.1));
                 valueText.setTranslateX(Pos.CENTER_LEFT == gauge.getKnobPosition() ? width * 0.6 - valueText.getLayoutBounds().getWidth() : width * 0.9 - valueText.getLayoutBounds().getWidth());
