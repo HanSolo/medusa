@@ -409,13 +409,9 @@ public class VSkin extends GaugeSkinBase {
         }
         needleRotate.setAngle(targetAngle);
         valueText.setText(String.format(locale, formatString, VALUE));
-//        if (gauge.isLcdVisible()) {
-//            valueText.setTranslateX((0.9 * width - valueText.getLayoutBounds().getWidth()));
-//        } else {
-            valueText.setTranslateX(Pos.CENTER_LEFT == gauge.getKnobPosition() ?
-                                    width * 0.6 - valueText.getLayoutBounds().getWidth() :
-                                    width * 0.9 - valueText.getLayoutBounds().getWidth());
-//        }
+        valueText.setTranslateX(Pos.CENTER_LEFT == gauge.getKnobPosition() ?
+                                width * 0.6 - valueText.getLayoutBounds().getWidth() :
+                                width * 0.9 - valueText.getLayoutBounds().getWidth());
     }
 
     private void drawGradientBar() {
@@ -889,12 +885,7 @@ public class VSkin extends GaugeSkinBase {
             double scaledHeight = height * 0.9;
 
             pane.setMaxSize(width, height);
-            pane.relocate(
-//                Pos.CENTER_LEFT == gauge.getKnobPosition() ?
-//                    width * 0.6 - valueText.getLayoutBounds().getWidth() :
-//                    width * 0.9 - valueText.getLayoutBounds().getWidth(),
-                (gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5
-            );
+            pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
 
             dropShadow.setRadius(0.008 * scaledHeight);
             dropShadow.setOffsetY(0.008 * scaledHeight);
@@ -961,7 +952,6 @@ public class VSkin extends GaugeSkinBase {
                         break;
                 }
 
-//                valueText.setTranslateX((0.9 * width - valueText.getLayoutBounds().getWidth()));
                 valueText.setTranslateX(Pos.CENTER_LEFT == gauge.getKnobPosition() ? width * 0.6 - valueText.getLayoutBounds().getWidth() : width * 0.9 - valueText.getLayoutBounds().getWidth());
 
             } else {
