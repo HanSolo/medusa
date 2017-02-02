@@ -126,7 +126,6 @@ public class LinearSkin extends GaugeSkinBase {
             preferredWidth  = 350;
             preferredHeight = 140;
         }
-        gauge.setPrefSize(preferredWidth, preferredHeight);
 
         initGraphics();
         registerListeners();
