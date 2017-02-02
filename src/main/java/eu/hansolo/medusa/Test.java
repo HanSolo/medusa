@@ -34,6 +34,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -81,7 +82,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.HORIZONTAL)
+                            .skinType(SkinType.LINEAR)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.CENTER_LEFT)
                             .minValue(-20)
@@ -137,6 +138,10 @@ public class Test extends Application {
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
+
+            private int counter = 0;
+            private boolean changed = false;
+
             @Override public void handle(long now) {
                 if (now > lastTimerCall + 3_000_000_000l) {
                     double v = RND.nextDouble() * gauge.getRange() * 1.1 + gauge.getMinValue();
@@ -154,6 +159,13 @@ public class Test extends Application {
 
                     //epochSeconds+=20;
                     //clock.setTime(epochSeconds);
+
+                    if ( counter++ >= 1 ) {
+                        if ( !changed ) {
+                            changed = true;
+                            gauge.setOrientation(Orientation.HORIZONTAL);
+                        }
+                    }
 
                     lastTimerCall = now;
                 }

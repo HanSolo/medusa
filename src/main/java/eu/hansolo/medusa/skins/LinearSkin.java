@@ -228,12 +228,13 @@ public class LinearSkin extends GaugeSkinBase {
             resize();
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
+            orientation = gauge.getOrientation();
             if (Orientation.VERTICAL == orientation) {
                 width    = height / aspectRatio;
-                stepSize = Math.abs(0.67143 * height / gauge.getRange());
+//                stepSize = Math.abs(0.67143 * height / gauge.getRange());
             } else {
                 height   = width / aspectRatio;
-                stepSize = Math.abs(0.75 * width / gauge.getRange());
+//                stepSize = Math.abs(0.75 * width / gauge.getRange());
             }
             resize();
             redraw();
@@ -246,7 +247,7 @@ public class LinearSkin extends GaugeSkinBase {
         pane.heightProperty().removeListener(paneSizeListener);
         super.dispose();
     }
-    
+
 
     // ******************** Private Methods ***********************************
     private void drawTickMarks(final GraphicsContext CTX) {
@@ -566,7 +567,7 @@ public class LinearSkin extends GaugeSkinBase {
                 height = pane.getLayoutBounds().getHeight();
 
                 barBackground.setWidth(0.14286 * width);
-                barBackground.setHeight( 0.67143 * height);
+                barBackground.setHeight(0.67143 * height);
                 barBackground.relocate((width - barBackground.getWidth()) * 0.5, (height - barBackground.getHeight()) * 0.5);
                 barBackground.setStroke(null);
                 barBackground.setFill(new LinearGradient(0, barBackground.getLayoutBounds().getMinY(),
@@ -594,10 +595,14 @@ public class LinearSkin extends GaugeSkinBase {
                 barBorder2.setStroke(barBorderColor);
 
                 bar.setWidth(0.14286 * width);
+                bar.setLayoutX(0);
+                bar.setLayoutY(0);
                 bar.setTranslateX((width - bar.getWidth()) * 0.5);
                 bar.setTranslateY(gauge.isStartFromZero() ? zeroPosition : minValuePosition);
 
                 barHighlight.setWidth(bar.getWidth());
+                barHighlight.setLayoutX(0);
+                barHighlight.setLayoutY(0);
                 barHighlight.setTranslateX(bar.getTranslateX());
                 barHighlight.setTranslateY(bar.getTranslateY());
 
@@ -664,10 +669,14 @@ public class LinearSkin extends GaugeSkinBase {
                 barBorder2.setStroke(barBorderColor);
 
                 bar.setHeight(0.14286 * height);
+                bar.setLayoutX(0);
+                bar.setLayoutY(0);
                 bar.setTranslateX(gauge.isStartFromZero() ? zeroPosition : minValuePosition);
                 bar.setTranslateY((height - bar.getHeight()) * 0.5);
 
                 barHighlight.setHeight(bar.getHeight());
+                barHighlight.setLayoutX(0);
+                barHighlight.setLayoutY(0);
                 barHighlight.setTranslateX(bar.getTranslateX());
                 barHighlight.setTranslateY(bar.getTranslateY());
 
