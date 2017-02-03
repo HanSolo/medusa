@@ -17,6 +17,7 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Clock.ClockSkinType;
+import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEvent.EventType;
@@ -35,6 +36,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -82,9 +84,9 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LINEAR)
+                            .skinType(SkinType.GAUGE)
                             //.prefSize(400, 400)
-                            //.knobPosition(Pos.CENTER_LEFT)
+                            //.knobPosition(Pos.TOP_RIGHT)
                             .minValue(-20)
                             .maxValue(100)
                             .animated(true)
@@ -108,6 +110,12 @@ public class Test extends Application {
                             //.averagingEnabled(true)
                             //.averagingPeriod(10)
                             //.averageVisible(true)
+                            .ledVisible(true)
+                            //.ledType(LedType.FLAT)
+                            //.threshold(10)
+                            //.checkThreshold(true)
+                            //.onThresholdExceeded(e -> gauge.setLedBlinking(true))
+                            //.onThresholdUnderrun(e -> gauge.setLedBlinking(false))
                             .build();
 
         //gauge.setAlert(true);
@@ -160,12 +168,14 @@ public class Test extends Application {
                     //epochSeconds+=20;
                     //clock.setTime(epochSeconds);
 
+                    /*
                     if ( counter++ >= 1 ) {
                         if ( !changed ) {
                             changed = true;
                             gauge.setOrientation(Orientation.HORIZONTAL);
                         }
                     }
+                    */
 
                     lastTimerCall = now;
                 }
