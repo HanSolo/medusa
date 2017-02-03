@@ -915,7 +915,7 @@ public class HSkin extends GaugeSkinBase {
             markerPane.setPrefSize(width, width);
 
             boolean isFlatLed = LedType.FLAT == gauge.getLedType();
-            ledSize = isFlatLed ? 0.05 * scaledWidth : 0.06 * scaledWidth;
+            ledSize = 0.07 * scaledWidth;
             ledCanvas.setWidth(ledSize);
             ledCanvas.setHeight(ledSize);
             ledCanvas.relocate(0.35 * width, Pos.TOP_CENTER == knobPosition ?  0.025 * width : 0.425 * width);

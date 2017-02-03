@@ -907,10 +907,10 @@ public class VSkin extends GaugeSkinBase {
             markerPane.setPrefSize(height, height);
 
             boolean isFlatLed = LedType.FLAT == gauge.getLedType();
-            ledSize = isFlatLed ? 0.05 * scaledHeight : 0.06 * scaledHeight;
+            ledSize = 0.07 * scaledHeight;
             ledCanvas.setWidth(ledSize);
             ledCanvas.setHeight(ledSize);
-            ledCanvas.relocate(Pos.CENTER_LEFT == knobPosition ? 0.025 * height : 0.425 * height, 0.35 * height);
+            ledCanvas.relocate(Pos.CENTER_LEFT == knobPosition ? 0.02 * height : 0.423 * height, 0.35 * height);
             ledOffShadow = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
             ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
             if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));

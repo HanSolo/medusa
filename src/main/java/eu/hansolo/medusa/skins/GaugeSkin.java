@@ -1008,10 +1008,10 @@ public class GaugeSkin extends GaugeSkinBase {
             markerPane.setPrefSize(size, size);
 
             boolean isFlatLed = LedType.FLAT == gauge.getLedType();
-            ledSize = isFlatLed ? 0.05 * size : 0.06 * size;
+            ledSize = 0.07 * size;
             ledCanvas.setWidth(ledSize);
             ledCanvas.setHeight(ledSize);
-            ledCanvas.relocate(0.65 * size, 0.47 * size);
+            ledCanvas.relocate(0.3 * size, 0.47 * size);
             ledOffShadow = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
             ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
             if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));

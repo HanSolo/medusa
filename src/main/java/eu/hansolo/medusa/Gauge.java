@@ -5522,8 +5522,8 @@ public class Gauge extends Control {
 
     // ******************** Inner Classes *************************************
     public static class ButtonEvent extends Event {
-        public static final EventType<ButtonEvent> BTN_PRESSED  = new EventType(ANY, "BTN_PRESSED");
-        public static final EventType<ButtonEvent> BTN_RELEASED = new EventType(ANY, "BTN_RELEASED");
+        public static final EventType<ButtonEvent> BTN_PRESSED  = new EventType<>(ANY, "BTN_PRESSED");
+        public static final EventType<ButtonEvent> BTN_RELEASED = new EventType<>(ANY, "BTN_RELEASED");
 
 
         // ******************** Constructors **************************************
@@ -5532,8 +5532,8 @@ public class Gauge extends Control {
     }
 
     public static class ThresholdEvent extends Event {
-        public static final EventType<ThresholdEvent> THRESHOLD_EXCEEDED = new EventType(ANY, "THRESHOLD_EXCEEDED");
-        public static final EventType<ThresholdEvent> THRESHOLD_UNDERRUN = new EventType(ANY, "THRESHOLD_UNDERRUN");
+        public static final EventType<ThresholdEvent> THRESHOLD_EXCEEDED = new EventType<>(ANY, "THRESHOLD_EXCEEDED");
+        public static final EventType<ThresholdEvent> THRESHOLD_UNDERRUN = new EventType<>(ANY, "THRESHOLD_UNDERRUN");
 
 
         // ******************** Constructors **************************************
