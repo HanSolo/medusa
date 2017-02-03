@@ -1626,7 +1626,7 @@ public class QuarterSkin extends GaugeSkinBase {
             markerPane.setPrefSize(0.9 * size, 0.9 * size);
 
             boolean isFlatLed = LedType.FLAT == gauge.getLedType();
-            ledSize = isFlatLed ? 0.05 * size : 0.06 * size;
+            ledSize = 0.07 * size;
             ledCanvas.setWidth(ledSize);
             ledCanvas.setHeight(ledSize);
             ledOffShadow = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
@@ -1704,7 +1704,7 @@ public class QuarterSkin extends GaugeSkinBase {
 
             switch(knobPosition) {
                 case BOTTOM_LEFT :
-                    ledCanvas.relocate(size * 0.22, isFlatLed ? size *  0.72: size * 0.732);
+                    ledCanvas.relocate(size * 0.22, size * 0.72);
                     lcd.relocate(size * 0.15, 0.81 * size);
                     knobCanvas.relocate(0, size * 0.9);
                     break;
@@ -1714,13 +1714,13 @@ public class QuarterSkin extends GaugeSkinBase {
                     knobCanvas.relocate(0, 0);
                     break;
                 case TOP_RIGHT   :
-                    ledCanvas.relocate(isFlatLed ? size * 0.72 : size * 0.732, size * 0.22);
+                    ledCanvas.relocate(size * 0.72, size * 0.22);
                     lcd.relocate(size * 0.45, 0.07 * size);
                     knobCanvas.relocate(size * 0.9, 0);
                     break;
                 case BOTTOM_RIGHT:
                 default          :
-                    ledCanvas.relocate(isFlatLed ? size * 0.72 : size * 0.732, isFlatLed ? size * 0.72 : size * 0.732);
+                    ledCanvas.relocate(size * 0.72, size * 0.72);
                     lcd.relocate(size * 0.45, 0.81 * size);
                     knobCanvas.relocate(size * 0.9, size * 0.9);
                     break;
