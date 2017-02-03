@@ -30,6 +30,12 @@ import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TickMarkType;
 import eu.hansolo.medusa.tools.AngleConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -75,13 +81,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
-
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -1447,7 +1446,7 @@ public class QuarterSkin extends GaugeSkinBase {
                     switch(knobPosition) {
                         case BOTTOM_LEFT :
                             valueText.setTranslateX((0.545 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.87 * size);
+                            valueText.setTranslateY(0.865 * size);
                             break;
                         case TOP_LEFT    :
                             valueText.setTranslateX((0.545 * size - valueText.getLayoutBounds().getWidth()));
@@ -1460,7 +1459,7 @@ public class QuarterSkin extends GaugeSkinBase {
                         case BOTTOM_RIGHT:
                         default          :
                             valueText.setTranslateX((0.845 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.87 * size);
+                            valueText.setTranslateY(0.865 * size);
                             break;
                     }
                     break;
@@ -1469,7 +1468,7 @@ public class QuarterSkin extends GaugeSkinBase {
                     switch(knobPosition) {
                         case BOTTOM_LEFT :
                             valueText.setTranslateX((0.545 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.89 * size);
+                            valueText.setTranslateY(0.875 * size);
                             break;
                         case TOP_LEFT    :
                             valueText.setTranslateX((0.545 * size - valueText.getLayoutBounds().getWidth()));
@@ -1482,7 +1481,7 @@ public class QuarterSkin extends GaugeSkinBase {
                         case BOTTOM_RIGHT:
                         default          :
                             valueText.setTranslateX((0.845 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.89 * size);
+                            valueText.setTranslateY(0.875 * size);
                             break;
                     }
                     break;
@@ -1491,7 +1490,7 @@ public class QuarterSkin extends GaugeSkinBase {
                     switch(knobPosition) {
                         case BOTTOM_LEFT :
                             valueText.setTranslateX((0.545 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.89 * size);
+                            valueText.setTranslateY(0.875 * size);
                             break;
                         case TOP_LEFT    :
                             valueText.setTranslateX((0.545 * size - valueText.getLayoutBounds().getWidth()));
@@ -1504,7 +1503,7 @@ public class QuarterSkin extends GaugeSkinBase {
                         case BOTTOM_RIGHT:
                         default          :
                             valueText.setTranslateX((0.845 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.89 * size);
+                            valueText.setTranslateY(0.875 * size);
                             break;
                     }
                     break;
@@ -1513,20 +1512,20 @@ public class QuarterSkin extends GaugeSkinBase {
                     switch(knobPosition) {
                         case BOTTOM_LEFT :
                             valueText.setTranslateX((0.545 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.875 * size);
+                            valueText.setTranslateY(0.87 * size);
                             break;
                         case TOP_LEFT    :
                             valueText.setTranslateX((0.545 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.1355 * size);
+                            valueText.setTranslateY(0.1267 * size);
                             break;
                         case TOP_RIGHT   :
                             valueText.setTranslateX((0.845 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.1355 * size);
+                            valueText.setTranslateY(0.1267 * size);
                             break;
                         case BOTTOM_RIGHT:
                         default          :
                             valueText.setTranslateX((0.845 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.875 * size);
+                            valueText.setTranslateY(0.87 * size);
                             break;
                     }
                     break;
@@ -1536,7 +1535,7 @@ public class QuarterSkin extends GaugeSkinBase {
                     switch(knobPosition) {
                         case BOTTOM_LEFT :
                             valueText.setTranslateX((0.545 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.87 * size);
+                            valueText.setTranslateY(0.865 * size);
                             break;
                         case TOP_LEFT    :
                             valueText.setTranslateX((0.545 * size - valueText.getLayoutBounds().getWidth()));
@@ -1549,7 +1548,7 @@ public class QuarterSkin extends GaugeSkinBase {
                         case BOTTOM_RIGHT:
                         default          :
                             valueText.setTranslateX((0.845 * size - valueText.getLayoutBounds().getWidth()));
-                            valueText.setTranslateY(0.87 * size);
+                            valueText.setTranslateY(0.865 * size);
                             break;
                     }
                     break;
