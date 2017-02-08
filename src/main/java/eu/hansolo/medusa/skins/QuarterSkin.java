@@ -1593,7 +1593,6 @@ public class QuarterSkin extends GaugeSkinBase {
                     centerX = size * 0.05;
                     centerY = size * 0.05;
                     break;
-
                 case TOP_RIGHT:
                     centerX = size * 0.95;
                     centerY = size * 0.05;
@@ -1604,6 +1603,9 @@ public class QuarterSkin extends GaugeSkinBase {
                     centerY = size * 0.95;
                     break;
             }
+
+            startAngle = getStartAngle();
+            rotateNeedle(gauge.getCurrentValue());
 
             pane.setMaxSize(size, size);
             pane.relocate((gauge.getWidth() - size) * 0.5, (gauge.getHeight() - size) * 0.5);

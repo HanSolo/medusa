@@ -884,6 +884,9 @@ public class VSkin extends GaugeSkinBase {
             double centerY      = height * 0.5;
             double scaledHeight = height * 0.9;
 
+            startAngle = getStartAngle();
+            rotateNeedle(gauge.getCurrentValue());
+
             pane.setMaxSize(width, height);
             pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
 
