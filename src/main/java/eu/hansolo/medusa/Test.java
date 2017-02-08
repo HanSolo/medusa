@@ -17,7 +17,6 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Clock.ClockSkinType;
-import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEvent.EventType;
@@ -35,8 +34,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -84,7 +81,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.GAUGE)
+                            .skinType(SkinType.SIMPLE_DIGITAL)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .minValue(-20)
@@ -96,7 +93,7 @@ public class Test extends Application {
                             .lcdFont(LcdFont.LCD)
                             //.locale(Locale.GERMANY)
                             //.numberFormat(numberFormat)
-                            .title("Testing")
+                            .title("Very Large Testing")
                             .unit("\u00B0C")
                             .subTitle("Only")
                             //.interactive(true)

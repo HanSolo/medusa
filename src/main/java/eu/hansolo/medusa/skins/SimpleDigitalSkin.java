@@ -20,6 +20,8 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import java.util.List;
+import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.scene.CacheHint;
@@ -39,9 +41,6 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-import java.util.List;
-import java.util.Locale;
-
 
 /**
  * Created by hansolo on 09.02.16.
@@ -55,6 +54,7 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
     private GraphicsContext      backgroundCtx;
     private Canvas               barCanvas;
     private GraphicsContext      barCtx;
+    private Text                 titleText;
     private Text                 valueBkgText;
     private Text                 valueText;
     private Color                barColor;
@@ -122,6 +122,10 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         barCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
         barCtx    = barCanvas.getGraphicsContext2D();
 
+        titleText = new Text(gauge.getTitle());
+        titleText.setFill(gauge.getTitleColor());
+        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
+
         valueBkgText = new Text();
         valueBkgText.setStroke(null);
         valueBkgText.setFill(Helper.getTranslucentColorFrom(valueColor, 0.1));
@@ -132,7 +136,7 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         valueText.setFill(valueColor);
         Helper.enableNode(valueText, gauge.isValueVisible());
 
-        pane = new Pane(backgroundCanvas, barCanvas, valueBkgText, valueText);
+        pane = new Pane(backgroundCanvas, barCanvas, titleText, valueBkgText, valueText);
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
@@ -161,6 +165,7 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(valueBkgText, gauge.isValueVisible());
             Helper.enableNode(valueText, gauge.isValueVisible());
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
             sectionsVisible  = gauge.getSectionsVisible();
             thresholdVisible = gauge.isThresholdVisible();
         } else if ("DECIMALS".equals(EVENT_TYPE)) {
@@ -274,6 +279,14 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
 
 
     // ******************** Resizing ******************************************
+    private void resizeStaticText() {
+        double maxWidth = size * 0.455;
+        double fontSize = size * 0.08082707;
+        titleText.setFont(Fonts.latoBold(fontSize));
+        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, fontSize); }
+        titleText.relocate((size - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.22180451);
+    }
+
     @Override protected void resize() {
         double width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
         double height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
@@ -298,7 +311,11 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
             valueText.setFont(Fonts.digitalReadoutBold(0.25 * size));
             valueText.setY(center + (valueText.getLayoutBounds().getHeight() * 0.325));
 
+            titleText.setText(gauge.getTitle());
+            titleText.setFill(gauge.getTitleColor());
+
             drawBackground();
+            resizeStaticText();
             setBar(gauge.getCurrentValue());
         }
     }
@@ -312,6 +329,7 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         unitColor       = gauge.getUnitColor();
         sectionsVisible = gauge.getSectionsVisible();
         drawBackground();
+        resizeStaticText();
 
         setBar(gauge.getCurrentValue());
 
