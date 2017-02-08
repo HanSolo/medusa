@@ -20,6 +20,8 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import java.util.List;
+import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -44,9 +46,6 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-
-import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -266,6 +265,7 @@ public class DashboardSkin extends GaugeSkinBase {
         } else if (colorGradientEnabled && noOfGradientStops > 1) {
             dataBar.setFill(gauge.getGradientLookup().getColorAt((VALUE - minValue) / range));
         } else {
+            dataBar.setFill(gauge.getBarColor());
             for (Section section : sections) {
                 if (section.contains(VALUE)) {
                     dataBar.setFill(section.getColor());
