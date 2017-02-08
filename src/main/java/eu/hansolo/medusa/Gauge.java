@@ -863,6 +863,7 @@ public class Gauge extends Control {
         if (null == title) {
             _title = TITLE;
             fireUpdateEvent(VISIBILITY_EVENT);
+            fireUpdateEvent(REDRAW_EVENT);
         } else {
             title.set(TITLE);
         }
@@ -870,7 +871,10 @@ public class Gauge extends Control {
     public StringProperty titleProperty() {
         if (null == title) {
             title  = new StringPropertyBase(_title) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() {
+                    fireUpdateEvent(VISIBILITY_EVENT);
+                    fireUpdateEvent(REDRAW_EVENT);
+                }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "title"; }
             };
@@ -896,6 +900,7 @@ public class Gauge extends Control {
         if (null == subTitle) {
             _subTitle = SUBTITLE;
             fireUpdateEvent(VISIBILITY_EVENT);
+            fireUpdateEvent(REDRAW_EVENT);
         } else {
             subTitle.set(SUBTITLE);
         }
@@ -903,7 +908,10 @@ public class Gauge extends Control {
     public StringProperty subTitleProperty() {
         if (null == subTitle) {
             subTitle  = new StringPropertyBase(_subTitle) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() {
+                    fireUpdateEvent(VISIBILITY_EVENT);
+                    fireUpdateEvent(REDRAW_EVENT);
+                }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "subTitle"; }
             };

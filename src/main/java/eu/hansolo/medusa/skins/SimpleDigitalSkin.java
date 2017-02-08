@@ -333,8 +333,11 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
 
         setBar(gauge.getCurrentValue());
 
-        valueBkgText.setFill(Helper.getTranslucentColorFrom(valueColor, 0.1));
+        titleText.setText(gauge.getTitle());
+        titleText.setFill(gauge.getTitleColor());
+        titleText.relocate((size - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.22180451);
 
+        valueBkgText.setFill(Helper.getTranslucentColorFrom(valueColor, 0.1));
         valueText.setFill(valueColor);
     }
 }
