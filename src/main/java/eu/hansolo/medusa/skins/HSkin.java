@@ -877,8 +877,8 @@ public class HSkin extends GaugeSkinBase {
     }
 
     @Override protected void resize() {
-        width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
-        height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
+        width      = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
+        height     = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
 
         if (ASPECT_RATIO * width > height) {
             width = 1 / (ASPECT_RATIO / height);
@@ -891,7 +891,10 @@ public class HSkin extends GaugeSkinBase {
             double centerX      = width * 0.5;
             double centerY      = Pos.TOP_CENTER == knobPosition ? height * 0.1 : height * 0.9;
             double scaledWidth  = width * 0.9;
-            
+
+            startAngle = getStartAngle();
+            rotateNeedle(gauge.getCurrentValue());
+
             pane.setMaxSize(width, height);
             pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
 
