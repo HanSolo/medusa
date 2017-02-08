@@ -112,7 +112,7 @@ public class SlimSkin extends GaugeSkinBase {
 
         titleText = new Text(gauge.getTitle());
         titleText.setFill(gauge.getTitleColor());
-        Helper.enableNode(titleText, !gauge.getSubTitle().isEmpty());
+        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
         valueText = new Text(String.format(locale, formatString, gauge.getCurrentValue()));
         valueText.setFill(gauge.getValueColor());
