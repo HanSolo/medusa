@@ -132,8 +132,9 @@ public class SimpleSectionSkin extends GaugeSkinBase {
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(valueText, gauge.isValueVisible());
             Helper.enableNode(unitText, gauge.isValueVisible() && !gauge.getUnit().isEmpty());
-        } else if ("SECTIONS".equals(EVENT_TYPE)) {
+        } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = gauge.getSections();
+            resize();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             redraw();
             setBar(gauge.getCurrentValue());
