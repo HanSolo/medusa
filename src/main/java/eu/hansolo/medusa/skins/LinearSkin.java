@@ -718,8 +718,8 @@ public class LinearSkin extends GaugeSkinBase {
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(Orientation.HORIZONTAL == orientation ? gauge.getBorderWidth() / preferredHeight * height : gauge.getBorderWidth() / preferredWidth * width))));
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Color barColor = gauge.getBarColor();
-        bar.setFill(barColor);
+        setBarColor(gauge.getCurrentValue());
+
         if (Orientation.VERTICAL == orientation) {
             barHighlight.setFill(new LinearGradient(barHighlight.getLayoutX(), 0, barHighlight.getLayoutX() + barHighlight.getWidth(), 0,
                                                     false, CycleMethod.NO_CYCLE,
