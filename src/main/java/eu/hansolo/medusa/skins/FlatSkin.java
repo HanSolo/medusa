@@ -20,6 +20,8 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import java.util.List;
+import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
@@ -38,9 +40,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
-
-import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -182,6 +181,8 @@ public class FlatSkin extends GaugeSkinBase {
             bar.setStroke(dynamicColor);
             colorRing.setStroke(dynamicColor);
         } else {
+            bar.setStroke(gauge.getBarColor());
+            colorRing.setStroke(gauge.getBarColor());
             for (Section section : sections) {
                 if (section.contains(VALUE)) {
                     bar.setStroke(section.getColor());
