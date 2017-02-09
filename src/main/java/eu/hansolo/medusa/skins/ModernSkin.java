@@ -21,6 +21,9 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.tools.Helper;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -53,10 +56,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -419,19 +418,19 @@ public class ModernSkin extends GaugeSkinBase {
             counter   = counterBD.doubleValue();
         }
 
-        // Draw black bar overlay
-        double blackBarXY = (size - 0.75 * size) * 0.5;
-        double blackBarWH = size * 0.75;
-        CTX.save();
-        CTX.setStroke(Color.rgb(23, 23, 23));
-        CTX.setLineWidth(size * 0.01666667);
-        CTX.setLineCap(StrokeLineCap.BUTT);
-        CTX.strokeArc(blackBarXY, blackBarXY, blackBarWH, blackBarWH, BAR_START_ANGLE, -ANGLE_RANGE, ArcType.OPEN);
-        CTX.restore();
+//        // Draw black bar overlay
+//        double blackBarXY = (size - 0.75 * size) * 0.5;
+//        double blackBarWH = size * 0.75;
+//        CTX.save();
+//        CTX.setStroke(Color.rgb(23, 23, 23));
+//        CTX.setLineWidth(size * 0.01666667);
+//        CTX.setLineCap(StrokeLineCap.BUTT);
+//        CTX.strokeArc(blackBarXY, blackBarXY, blackBarWH, blackBarWH, BAR_START_ANGLE, -ANGLE_RANGE, ArcType.OPEN);
+//        CTX.restore();
 
         // highlight bar
-        double barXY          = (size - 0.68 * size) * 0.5;
-        double barWH          = size * 0.68;
+        double barXY          = (size - 0.75 * size) * 0.5;
+        double barWH          = size * 0.75;
         double barAngleExtend = (CURRENT_VALUE - minValue) * angleStep;
         CTX.save();
         CTX.setEffect(glow2);
@@ -494,11 +493,11 @@ public class ModernSkin extends GaugeSkinBase {
         mainCtx.restore();
 
         // Draw databar background
-        double barXY = (size - 0.68 * size) * 0.5;
-        double barWH = size * 0.68;
+        double barXY = (size - 0.75 * size) * 0.5;
+        double barWH = size * 0.75;
         mainCtx.save();
         mainCtx.setStroke(Color.rgb(57, 57, 57, 0.75));
-        mainCtx.setLineWidth(size * 0.01666667);
+        mainCtx.setLineWidth(size * 0.01666667 / 1.66666667);
         mainCtx.setLineCap(StrokeLineCap.BUTT);
         mainCtx.strokeArc(barXY, barXY, barWH, barWH, BAR_START_ANGLE, -ANGLE_RANGE, ArcType.OPEN);
         mainCtx.restore();
