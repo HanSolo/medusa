@@ -81,7 +81,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.SIMPLE_DIGITAL)
+                            .skinType(SkinType.MODERN)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .minValue(-20)
