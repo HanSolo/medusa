@@ -182,6 +182,8 @@ public class FlatSkin extends GaugeSkinBase {
             bar.setStroke(dynamicColor);
             colorRing.setStroke(dynamicColor);
         } else {
+            bar.setStroke(gauge.getBarColor());
+            colorRing.setStroke(gauge.getBarColor());
             for (Section section : sections) {
                 if (section.contains(VALUE)) {
                     bar.setStroke(section.getColor());
