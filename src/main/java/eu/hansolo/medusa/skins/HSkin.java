@@ -111,6 +111,7 @@ public class HSkin extends GaugeSkinBase {
     private GraphicsContext            ledCtx;
     private Pane                       markerPane;
     private Path                       threshold;
+    private Path                       average;
     private Rectangle                  lcd;
     private Path                       needle;
     private Rotate                     needleRotate;
@@ -209,6 +210,9 @@ public class HSkin extends GaugeSkinBase {
         threshold = new Path();
         Helper.enableNode(threshold, gauge.isThresholdVisible());
         Tooltip.install(threshold, thresholdTooltip);
+
+        average = new Path();
+        Helper.enableNode(average, gauge.isAverageVisible());
 
         markerPane = new Pane();
 
@@ -328,6 +332,7 @@ public class HSkin extends GaugeSkinBase {
             Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
             Helper.enableNode(knobCanvas, gauge.isKnobVisible());
             Helper.enableNode(threshold, gauge.isThresholdVisible());
+            Helper.enableNode(average, gauge.isAverageVisible());
             boolean markersVisible = gauge.getMarkersVisible();
             for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
             redraw();
@@ -422,6 +427,7 @@ public class HSkin extends GaugeSkinBase {
         } else {
             valueText.setTranslateX((width - valueText.getLayoutBounds().getWidth()) * 0.5);
         }
+        if (gauge.isAverageVisible()) drawAverage();
     }
 
     private void drawGradientBar() {
@@ -564,7 +570,7 @@ public class HSkin extends GaugeSkinBase {
 
     private void drawMarkers() {
         markerPane.getChildren().setAll(markerMap.values());
-        markerPane.getChildren().add(threshold);
+        markerPane.getChildren().addAll(average, threshold);
         double markerSize  = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.0125 * width : 0.015 * width;
         double pathHalf    = markerSize * 0.3;
         double scaledWidth = width * 0.9;
@@ -712,6 +718,48 @@ public class HSkin extends GaugeSkinBase {
             threshold.setFill(gauge.getThresholdColor());
             threshold.setStroke(gauge.getTickMarkColor());
         }
+    }
+
+    private void drawAverage() {
+        double scaledWidth = width * 0.9;
+        double centerX     = width * 0.5;
+        double centerY     = Pos.TOP_CENTER == gauge.getKnobPosition() ? height * 0.1 : height * 0.9;
+        // Draw average
+        average.getElements().clear();
+        double averageAngle;
+        if (ScaleDirection.CLOCKWISE == scaleDirection) {
+            averageAngle = startAngle - (gauge.getAverage() - minValue) * angleStep;
+        } else {
+            averageAngle = startAngle + (gauge.getAverage() - minValue) * angleStep;
+        }
+        double averageSize = Helper.clamp(3.0, 3.5, 0.01 * scaledWidth);
+        double sinValue      = Math.sin(Math.toRadians(averageAngle));
+        double cosValue      = Math.cos(Math.toRadians(averageAngle));
+        switch (tickLabelLocation) {
+            case OUTSIDE:
+                average.getElements().add(new MoveTo(centerX + scaledWidth * 0.38 * sinValue, centerY + scaledWidth * 0.38 * cosValue));
+                sinValue = Math.sin(Math.toRadians(averageAngle - averageSize));
+                cosValue = Math.cos(Math.toRadians(averageAngle - averageSize));
+                average.getElements().add(new LineTo(centerX + scaledWidth * 0.34 * sinValue, centerY + scaledWidth * 0.34 * cosValue));
+                sinValue = Math.sin(Math.toRadians(averageAngle + averageSize));
+                cosValue = Math.cos(Math.toRadians(averageAngle + averageSize));
+                average.getElements().add(new LineTo(centerX + scaledWidth * 0.34 * sinValue, centerY + scaledWidth * 0.34 * cosValue));
+                average.getElements().add(new ClosePath());
+                break;
+            case INSIDE:
+            default:
+                average.getElements().add(new MoveTo(centerX + scaledWidth * 0.465 * sinValue, centerY + scaledWidth * 0.465 * cosValue));
+                sinValue = Math.sin(Math.toRadians(averageAngle - averageSize));
+                cosValue = Math.cos(Math.toRadians(averageAngle - averageSize));
+                average.getElements().add(new LineTo(centerX + scaledWidth * 0.425 * sinValue, centerY + scaledWidth * 0.425 * cosValue));
+                sinValue = Math.sin(Math.toRadians(averageAngle + averageSize));
+                cosValue = Math.cos(Math.toRadians(averageAngle + averageSize));
+                average.getElements().add(new LineTo(centerX + scaledWidth * 0.425 * sinValue, centerY + scaledWidth * 0.425 * cosValue));
+                average.getElements().add(new ClosePath());
+                break;
+        }
+        average.setFill(gauge.getAverageColor());
+        average.setStroke(gauge.getTickMarkColor());
     }
 
     private void updateMarkers() {

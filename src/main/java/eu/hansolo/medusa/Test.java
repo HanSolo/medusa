@@ -81,7 +81,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.MODERN)
+                            .skinType(SkinType.QUARTER)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .minValue(-20)
@@ -104,9 +104,9 @@ public class Test extends Application {
                             .sectionsVisible(true)
                             .highlightSections(true)
                             .autoScale(true)
-                            //.averagingEnabled(true)
-                            //.averagingPeriod(10)
-                            //.averageVisible(true)
+                            .averagingEnabled(true)
+                            .averagingPeriod(10)
+                            .averageVisible(true)
                             .ledVisible(true)
                             //.ledType(LedType.FLAT)
                             //.threshold(10)
