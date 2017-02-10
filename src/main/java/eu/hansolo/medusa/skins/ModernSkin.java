@@ -418,16 +418,6 @@ public class ModernSkin extends GaugeSkinBase {
             counter   = counterBD.doubleValue();
         }
 
-//        // Draw black bar overlay
-//        double blackBarXY = (size - 0.75 * size) * 0.5;
-//        double blackBarWH = size * 0.75;
-//        CTX.save();
-//        CTX.setStroke(Color.rgb(23, 23, 23));
-//        CTX.setLineWidth(size * 0.01666667);
-//        CTX.setLineCap(StrokeLineCap.BUTT);
-//        CTX.strokeArc(blackBarXY, blackBarXY, blackBarWH, blackBarWH, BAR_START_ANGLE, -ANGLE_RANGE, ArcType.OPEN);
-//        CTX.restore();
-
         // highlight bar
         double barXY          = (size - 0.75 * size) * 0.5;
         double barWH          = size * 0.75;
@@ -451,7 +441,7 @@ public class ModernSkin extends GaugeSkinBase {
         double minValue         = gauge.getMinValue();
         double maxValue         = gauge.getMaxValue();
         double offset           = 90 - START_ANGLE;
-        double sectionWidth     = size * 0.05;
+        double sectionWidth     = size * 0.06;
         if (sectionsVisible) {
             int listSize = sections.size();
             for (int i = 0; i < listSize; i++) {
@@ -487,7 +477,7 @@ public class ModernSkin extends GaugeSkinBase {
         // Draw black bar overlay
         mainCtx.save();
         mainCtx.setStroke(Color.rgb(23, 23, 23));
-        mainCtx.setLineWidth(size * 0.01666667);
+        mainCtx.setLineWidth(size * 0.025);
         mainCtx.setLineCap(StrokeLineCap.BUTT);
         mainCtx.strokeArc(sectionsXY, sectionsXY, sectionsWH, sectionsWH, BAR_START_ANGLE, -ANGLE_RANGE, ArcType.OPEN);
         mainCtx.restore();
@@ -497,7 +487,7 @@ public class ModernSkin extends GaugeSkinBase {
         double barWH = size * 0.75;
         mainCtx.save();
         mainCtx.setStroke(Color.rgb(57, 57, 57, 0.75));
-        mainCtx.setLineWidth(size * 0.01666667 / 1.66666667);
+        mainCtx.setLineWidth(size * 0.01666667);
         mainCtx.setLineCap(StrokeLineCap.BUTT);
         mainCtx.strokeArc(barXY, barXY, barWH, barWH, BAR_START_ANGLE, -ANGLE_RANGE, ArcType.OPEN);
         mainCtx.restore();
