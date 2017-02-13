@@ -81,7 +81,9 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.QUARTER)
+                            .skinType(SkinType.MODERN)
+//                            .backgroundPaint(Color.rgb(32, 32, 32))
+                            .backgroundPaint(Color.DARKVIOLET.darker().darker())
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .minValue(-20)

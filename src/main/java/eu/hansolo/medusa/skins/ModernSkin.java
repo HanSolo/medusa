@@ -41,6 +41,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Circle;
@@ -151,7 +152,8 @@ public class ModernSkin extends GaugeSkinBase {
         innerShadow1.setInput(innerShadow0);
 
         background = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.5);
-        background.setFill(Color.rgb(32, 32, 32));
+//        background.setFill(Color.rgb(32, 32, 32));
+        background.setFill(gauge.getBackgroundPaint());
         background.setStroke(null);
         background.setEffect(innerShadow1);
 
@@ -168,7 +170,8 @@ public class ModernSkin extends GaugeSkinBase {
 
         mask = new Path();
         mask.setFillRule(FillRule.EVEN_ODD);
-        mask.setFill(Color.rgb(32, 32, 32));
+//        mask.setFill(Color.rgb(32, 32, 32));
+        mask.setFill(gauge.getBackgroundPaint());
         mask.setStroke(null);
         mask.setEffect(dropShadow4);
 
@@ -294,16 +297,37 @@ public class ModernSkin extends GaugeSkinBase {
         }
     }
 
+
+
     public void handleMouseEvent(final MouseEvent EVENT) {
         if (gauge.isDisabled()) return;
         final EventType TYPE = EVENT.getEventType();
+
+        Paint bgPaint = gauge.getBackgroundPaint();
+        Color darkStop  = ( bgPaint instanceof Color )
+                          ? new Color(
+                              Math.max(((Color) bgPaint).getRed()   - 1.0 / 255.0, 0.0),
+                              Math.max(((Color) bgPaint).getGreen() - 1.0 / 255.0, 0.0),
+                              Math.max(((Color) bgPaint).getBlue()  - 1.0 / 255.0, 0.0),
+                              ((Color) bgPaint).getOpacity()
+                          )
+                          : Color.rgb(31, 31, 31);
+        Color lightStop = ( bgPaint instanceof Color )
+                          ? new Color(
+                              Math.min(((Color) bgPaint).getRed()   + 37.0 / 255.0, 1.0),
+                              Math.min(((Color) bgPaint).getGreen() + 38.0 / 255.0, 1.0),
+                              Math.min(((Color) bgPaint).getBlue()  + 41.0 / 255.0, 1.0),
+                              ((Color) bgPaint).getOpacity()
+                          )
+                          : Color.rgb(69, 70, 73);
+
         if (MouseEvent.MOUSE_PRESSED.equals(TYPE)) {
             gauge.fireEvent(gauge.BTN_PRESSED_EVENT);
             centerKnob.setFill(new LinearGradient(0.5 * size, 0.2708333333333333 * size,
                                                   0.5 * size, 0.7291666666666666 * size,
                                                   false, CycleMethod.NO_CYCLE,
-                                                  new Stop(0.0, Color.rgb(31, 31, 31)),
-                                                  new Stop(1.0, Color.rgb(69, 70, 73))));
+                                                  new Stop(0.0, darkStop),
+                                                  new Stop(1.0, lightStop)));
             valueText.setTranslateY(size * 0.501);
             subTitleText.setTranslateY(size * 0.3525);
             unitText.setTranslateY(size * 0.6675);
@@ -312,8 +336,8 @@ public class ModernSkin extends GaugeSkinBase {
             centerKnob.setFill(new LinearGradient(0.5 * size, 0.2708333333333333 * size,
                                                   0.5 * size, 0.7291666666666666 * size,
                                                   false, CycleMethod.NO_CYCLE,
-                                                  new Stop(0.0, Color.rgb(69, 70, 73)),
-                                                  new Stop(1.0, Color.rgb(31, 31, 31))));
+                                                  new Stop(0.0, lightStop),
+                                                  new Stop(1.0, darkStop)));
             valueText.setTranslateY(size * 0.5);
             subTitleText.setTranslateY(size * 0.35);
             unitText.setTranslateY(size * 0.67);
@@ -738,14 +762,32 @@ public class ModernSkin extends GaugeSkinBase {
             tickMarkCanvas.setHeight(size);
             highlightValue(tickMarkCtx, gauge.getValue());
 
+            Paint bgPaint   = gauge.getBackgroundPaint();
+            Color darkStop  = ( bgPaint instanceof Color )
+                              ? new Color(
+                                  Math.max(((Color) bgPaint).getRed()   - 1.0 / 255.0, 0.0),
+                                  Math.max(((Color) bgPaint).getGreen() - 1.0 / 255.0, 0.0),
+                                  Math.max(((Color) bgPaint).getBlue()  - 1.0 / 255.0, 0.0),
+                                  ((Color) bgPaint).getOpacity()
+                              )
+                              : Color.rgb(31, 31, 31);
+            Color lightStop = ( bgPaint instanceof Color )
+                              ? new Color(
+                                  Math.min(((Color) bgPaint).getRed()   + 37.0 / 255.0, 1.0),
+                                  Math.min(((Color) bgPaint).getGreen() + 38.0 / 255.0, 1.0),
+                                  Math.min(((Color) bgPaint).getBlue()  + 41.0 / 255.0, 1.0),
+                                  ((Color) bgPaint).getOpacity()
+                              )
+                              : Color.rgb(69, 70, 73);
+
             centerKnob.setRadius(0.22916667 * size);
             centerKnob.setCenterX(0.5 * size);
             centerKnob.setCenterY(0.5 * size);
             centerKnob.setFill(new LinearGradient(0.5 * size, 0.2708333333333333 * size,
                                                   0.5 * size, 0.7291666666666666 * size,
                                                   false, CycleMethod.NO_CYCLE,
-                                                  new Stop(0.0, Color.rgb(69,70,73)),
-                                                  new Stop(1.0, Color.rgb(31,31,31))));
+                                                  new Stop(0.0, lightStop),
+                                                  new Stop(1.0, darkStop)));
             centerKnob.setEffect(dropShadow4);
 
             glow1.setRadius(0.085 * size);
