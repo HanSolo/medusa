@@ -152,7 +152,6 @@ public class ModernSkin extends GaugeSkinBase {
         innerShadow1.setInput(innerShadow0);
 
         background = new Circle(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.5);
-//        background.setFill(Color.rgb(32, 32, 32));
         background.setFill(gauge.getBackgroundPaint());
         background.setStroke(null);
         background.setEffect(innerShadow1);
@@ -170,7 +169,6 @@ public class ModernSkin extends GaugeSkinBase {
 
         mask = new Path();
         mask.setFillRule(FillRule.EVEN_ODD);
-//        mask.setFill(Color.rgb(32, 32, 32));
         mask.setFill(gauge.getBackgroundPaint());
         mask.setStroke(null);
         mask.setEffect(dropShadow4);
