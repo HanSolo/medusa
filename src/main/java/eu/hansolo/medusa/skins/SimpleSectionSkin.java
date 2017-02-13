@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.scene.CacheHint;
 import javafx.scene.canvas.Canvas;
@@ -31,8 +32,6 @@ import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
-
-import java.util.List;
 
 
 /**
@@ -214,6 +213,7 @@ public class SimpleSectionSkin extends GaugeSkinBase {
 
         sectionCanvas.setCache(true);
         sectionCanvas.setCacheHint(CacheHint.QUALITY);
+        barBackground.setStroke(gauge.getBarBackgroundColor());
     }
 
 

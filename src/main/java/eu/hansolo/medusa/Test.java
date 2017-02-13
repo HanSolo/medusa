@@ -79,9 +79,9 @@ public class Test extends Application {
                               .gaugeDesign(GaugeDesign.NONE)
                               .build();
 
-
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.QUARTER)
+                            .skinType(SkinType.SIMPLE_SECTION)
+                            .barColor(Color.CORAL)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .minValue(-20)
@@ -165,14 +165,13 @@ public class Test extends Application {
                     //epochSeconds+=20;
                     //clock.setTime(epochSeconds);
 
-                    /*
-                    if ( counter++ >= 1 ) {
+                    if ( counter++ >= 2 ) {
                         if ( !changed ) {
                             changed = true;
-                            gauge.setOrientation(Orientation.HORIZONTAL);
+                            gauge.setBarBackgroundColor(Color.DARKGOLDENROD);
+                            gauge.setBarColor(Color.GREENYELLOW);
                         }
                     }
-                    */
 
                     lastTimerCall = now;
                 }
