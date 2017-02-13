@@ -508,7 +508,7 @@ public class ModernSkin extends GaugeSkinBase {
         double barXY = (size - 0.75 * size) * 0.5;
         double barWH = size * 0.75;
         mainCtx.save();
-        mainCtx.setStroke(Color.rgb(57, 57, 57, 0.75));
+        mainCtx.setStroke(gauge.getBarBackgroundColor());
         mainCtx.setLineWidth(size * 0.01666667);
         mainCtx.setLineCap(StrokeLineCap.BUTT);
         mainCtx.strokeArc(barXY, barXY, barWH, barWH, BAR_START_ANGLE, -ANGLE_RANGE, ArcType.OPEN);

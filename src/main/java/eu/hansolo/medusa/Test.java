@@ -82,7 +82,8 @@ public class Test extends Application {
 
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.MODERN)
-                            .backgroundPaint(Color.DARKVIOLET.darker().darker())
+                            //.backgroundPaint(Color.DARKVIOLET.darker().darker())
+                            .barBackgroundColor(Color.DARKBLUE.deriveColor(0, 1, 1, 0.75))
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .minValue(-20)

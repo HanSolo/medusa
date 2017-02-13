@@ -895,6 +895,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setSubTitleColor(Color.WHITE);
                     CONTROL.setUnitColor(Color.WHITE);
                     CONTROL.setBarColor(Color.rgb(0, 214, 215));
+                    CONTROL.setBarBackgroundColor(Color.rgb(57, 57, 57, 0.75));
                     CONTROL.setNeedleColor(Color.WHITE);
                     CONTROL.setThresholdColor(Color.rgb(204, 0, 0));
                     CONTROL.setTickLabelColor(Color.rgb(151, 151, 151));
