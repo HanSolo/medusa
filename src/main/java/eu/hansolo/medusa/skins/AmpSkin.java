@@ -19,11 +19,14 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.LcdDesign;
+import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.tools.Helper;
 import java.math.BigDecimal;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -36,6 +39,7 @@ import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
@@ -47,6 +51,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.FillRule;
@@ -55,6 +60,7 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
+import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -74,9 +80,10 @@ public class AmpSkin extends GaugeSkinBase {
     protected static final double MINIMUM_HEIGHT   = 26;
     protected static final double MAXIMUM_WIDTH    = 1024;
     protected static final double MAXIMUM_HEIGHT   = 858;
-    private static final double ASPECT_RATIO       = 0.83870968;
-    private static final double START_ANGLE        = 225;
-    private static final double ANGLE_RANGE        = 90;
+    private static final double  ASPECT_RATIO      = 0.83870968;
+    private static final double  START_ANGLE       = 225;
+    private static final double  ANGLE_RANGE       = 90;
+    private Map<Marker, Shape>   markerMap         = new ConcurrentHashMap<>();
     private double          oldValue;
     private double          width;
     private double          height;
@@ -84,6 +91,9 @@ public class AmpSkin extends GaugeSkinBase {
     private SVGPath         foreground;
     private Canvas          ticksAndSectionsCanvas;
     private GraphicsContext ticksAndSections;
+    private Pane            markerPane;
+    private Path            threshold;
+    private Path            average;
     private double          ledSize;
     private InnerShadow     ledOnShadow;
     private InnerShadow     ledOffShadow;
@@ -110,11 +120,13 @@ public class AmpSkin extends GaugeSkinBase {
     private Rectangle       lcd;
     private Label           lcdText;
     private double          angleStep;
+    private Tooltip         thresholdTooltip;
     private String          formatString;
     private Locale          locale;
     private ListChangeListener<Section> sectionListener;
     private InvalidationListener        currentValueListener;
     private InvalidationListener        needleRotateListener;
+    private ListChangeListener<Marker>  markerListener;
 
 
     // ******************** Constructors **************************************
@@ -128,7 +140,12 @@ public class AmpSkin extends GaugeSkinBase {
         sectionListener      = c -> redraw();
         currentValueListener = o -> rotateNeedle();
         needleRotateListener = o -> handleEvents("ANGLE");
+        markerListener       = c -> {
+            updateMarkers();
+            redraw();
+        };
 
+        updateMarkers();
 
         initGraphics();
         registerListeners();
@@ -152,6 +169,18 @@ public class AmpSkin extends GaugeSkinBase {
 
         ledCanvas = new Canvas();
         led       = ledCanvas.getGraphicsContext2D();
+
+        thresholdTooltip = new Tooltip("Threshold\n(" + String.format(locale, formatString, gauge.getThreshold()) + ")");
+        thresholdTooltip.setTextAlignment(TextAlignment.CENTER);
+
+        threshold = new Path();
+        Helper.enableNode(threshold, gauge.isThresholdVisible());
+        Tooltip.install(threshold, thresholdTooltip);
+
+        average = new Path();
+        Helper.enableNode(average, gauge.isAverageVisible());
+
+        markerPane = new Pane();
 
         needleRotate = new Rotate(180 - START_ANGLE);
         needleRotate.setAngle(needleRotate.getAngle() + (gauge.getValue() - oldValue - gauge.getMinValue()) * angleStep);
@@ -209,6 +238,7 @@ public class AmpSkin extends GaugeSkinBase {
         // Add all nodes
         pane = new Pane();
         pane.getChildren().setAll(ticksAndSectionsCanvas,
+                                  markerPane,
                                   ledCanvas,
                                   unitText,
                                   lcd,
@@ -223,6 +253,7 @@ public class AmpSkin extends GaugeSkinBase {
     @Override protected void registerListeners() {
         super.registerListeners();
         
+        gauge.getMarkers().addListener(markerListener);
         gauge.getSections().addListener(sectionListener);
         gauge.currentValueProperty().addListener(currentValueListener);
         needleRotate.angleProperty().addListener(needleRotateListener);
@@ -246,6 +277,10 @@ public class AmpSkin extends GaugeSkinBase {
             enableNode(unitText, !gauge.getUnit().isEmpty());
             enableNode(lcd,gauge.isLcdVisible());
             enableNode(lcdText,gauge.isLcdVisible());
+            enableNode(threshold, gauge.isThresholdVisible());
+            enableNode(average, gauge.isAverageVisible());
+            boolean markersVisible = gauge.getMarkersVisible();
+            for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (gauge.isLedVisible()) { drawLed(led); }
@@ -271,6 +306,130 @@ public class AmpSkin extends GaugeSkinBase {
         double targetAngle = 180 - START_ANGLE + (gauge.getCurrentValue() - gauge.getMinValue()) * angleStep;
         targetAngle        = clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle);
         needleRotate.setAngle(targetAngle);
+        if (gauge.isAverageVisible()) drawAverage();
+    }
+
+    private void drawMarkers() {
+        markerPane.getChildren().setAll(markerMap.values());
+        markerPane.getChildren().addAll(average, threshold);
+        double minValue    = gauge.getMinValue();
+        double markerSize  = 0.0125 * width;
+        double pathHalf    = markerSize * 0.3;
+        double scaledWidth = width * 1.106;
+        double centerX     = width * 0.5;
+        double centerY     = height * 0.77;
+        if (gauge.getMarkersVisible()) {
+            for (Map.Entry<Marker, Shape> entry : markerMap.entrySet()) {
+                Marker marker     = entry.getKey();
+                Shape  shape      = entry.getValue();
+                double valueAngle = START_ANGLE - (marker.getValue() - minValue) * angleStep;
+                double sinValue   = Math.sin(Math.toRadians(valueAngle));
+                double cosValue   = Math.cos(Math.toRadians(valueAngle));
+                switch (marker.getMarkerType()) {
+                    case TRIANGLE:
+                        Path triangle = (Path) shape;
+                        triangle.getElements().clear();
+                        triangle.getElements().add(new MoveTo(centerX + scaledWidth * 0.38 * sinValue, centerY + scaledWidth * 0.38 * cosValue));
+                        sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
+                        cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
+                        triangle.getElements().add(new LineTo(centerX + scaledWidth * 0.4075 * sinValue, centerY + scaledWidth * 0.4075 * cosValue));
+                        sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
+                        cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
+                        triangle.getElements().add(new LineTo(centerX + scaledWidth * 0.4075 * sinValue, centerY + scaledWidth * 0.4075 * cosValue));
+                        triangle.getElements().add(new ClosePath());
+                        break;
+                    case DOT:
+                        Circle dot = (Circle) shape;
+                        dot.setRadius(markerSize);
+                        dot.setCenterX(centerX + scaledWidth * 0.3945 * sinValue);
+                        dot.setCenterY(centerY + scaledWidth * 0.3945 * cosValue);
+                        break;
+                    case STANDARD:
+                    default:
+                        Path standard = (Path) shape;
+                        standard.getElements().clear();
+                        standard.getElements().add(new MoveTo(centerX + scaledWidth * 0.38 * sinValue, centerY + scaledWidth * 0.38 * cosValue));
+                        sinValue = Math.sin(Math.toRadians(valueAngle - pathHalf));
+                        cosValue = Math.cos(Math.toRadians(valueAngle - pathHalf));
+                        standard.getElements().add(new LineTo(centerX + scaledWidth * 0.4075 * sinValue, centerY + scaledWidth * 0.4075 * cosValue));
+                        standard.getElements().add(new LineTo(centerX + scaledWidth * 0.43   * sinValue, centerY + scaledWidth * 0.43   * cosValue));
+                        sinValue = Math.sin(Math.toRadians(valueAngle + pathHalf));
+                        cosValue = Math.cos(Math.toRadians(valueAngle + pathHalf));
+                        standard.getElements().add(new LineTo(centerX + scaledWidth * 0.43   * sinValue, centerY + scaledWidth * 0.43   * cosValue));
+                        standard.getElements().add(new LineTo(centerX + scaledWidth * 0.4075 * sinValue, centerY + scaledWidth * 0.4075 * cosValue));
+                        standard.getElements().add(new ClosePath());
+                        break;
+                }
+                Color markerColor = marker.getColor();
+                shape.setFill(markerColor);
+                shape.setStroke(markerColor.darker());
+                shape.setPickOnBounds(false);
+                Tooltip markerTooltip;
+                if (marker.getText().isEmpty()) {
+                    markerTooltip = new Tooltip(Double.toString(marker.getValue()));
+                } else {
+                    markerTooltip = new Tooltip(new StringBuilder(marker.getText()).append("\n(").append(Double.toString(marker.getValue())).append(")").toString());
+                }
+                markerTooltip.setTextAlignment(TextAlignment.CENTER);
+                Tooltip.install(shape, markerTooltip);
+                shape.setOnMousePressed(e -> marker.fireMarkerEvent(marker.MARKER_PRESSED_EVENT));
+                shape.setOnMouseReleased(e -> marker.fireMarkerEvent(marker.MARKER_RELEASED_EVENT));
+            }
+        }
+
+        if (gauge.isThresholdVisible()) {
+            // Draw threshold
+            threshold.getElements().clear();
+            double thresholdAngle = START_ANGLE - (gauge.getThreshold() - minValue) * angleStep;
+            double thresholdSize  = Helper.clamp(2.0, 2.5, 0.01 * scaledWidth);
+            double sinValue       = Math.sin(Math.toRadians(thresholdAngle));
+            double cosValue       = Math.cos(Math.toRadians(thresholdAngle));
+            threshold.getElements().add(new MoveTo(centerX + scaledWidth * 0.38 * sinValue, centerY + scaledWidth * 0.38 * cosValue));
+            sinValue = Math.sin(Math.toRadians(thresholdAngle - thresholdSize));
+            cosValue = Math.cos(Math.toRadians(thresholdAngle - thresholdSize));
+            threshold.getElements().add(new LineTo(centerX + scaledWidth * 0.35 * sinValue, centerY + scaledWidth * 0.35 * cosValue));
+            sinValue = Math.sin(Math.toRadians(thresholdAngle + thresholdSize));
+            cosValue = Math.cos(Math.toRadians(thresholdAngle + thresholdSize));
+            threshold.getElements().add(new LineTo(centerX + scaledWidth * 0.35 * sinValue, centerY + scaledWidth * 0.35 * cosValue));
+            threshold.getElements().add(new ClosePath());
+            threshold.setFill(gauge.getThresholdColor());
+            threshold.setStroke(gauge.getTickMarkColor());
+        }
+    }
+
+    private void drawAverage() {
+        double scaledWidth = width * 1.106;
+        double centerX     = width * 0.5;
+        double centerY     = height * 0.77;
+        double minValue    = gauge.getMinValue();
+        // Draw average
+        average.getElements().clear();
+        double averageAngle = START_ANGLE - (gauge.getAverage() - minValue) * angleStep;
+        double averageSize  = Helper.clamp(2.0, 2.5, 0.01 * scaledWidth);
+        double sinValue     = Math.sin(Math.toRadians(averageAngle));
+        double cosValue     = Math.cos(Math.toRadians(averageAngle));
+        average.getElements().add(new MoveTo(centerX + scaledWidth * 0.38 * sinValue, centerY + scaledWidth * 0.38 * cosValue));
+        sinValue = Math.sin(Math.toRadians(averageAngle - averageSize));
+        cosValue = Math.cos(Math.toRadians(averageAngle - averageSize));
+        average.getElements().add(new LineTo(centerX + scaledWidth * 0.35 * sinValue, centerY + scaledWidth * 0.35 * cosValue));
+        sinValue = Math.sin(Math.toRadians(averageAngle + averageSize));
+        cosValue = Math.cos(Math.toRadians(averageAngle + averageSize));
+        average.getElements().add(new LineTo(centerX + scaledWidth * 0.35 * sinValue, centerY + scaledWidth * 0.35 * cosValue));
+        average.getElements().add(new ClosePath());
+        average.setFill(gauge.getAverageColor());
+        average.setStroke(gauge.getTickMarkColor());
+    }
+
+    private void updateMarkers() {
+        markerMap.clear();
+        for (Marker marker : gauge.getMarkers()) {
+            switch(marker.getMarkerType()) {
+                case TRIANGLE: markerMap.put(marker, new Path()); break;
+                case DOT     : markerMap.put(marker, new Circle()); break;
+                case STANDARD:
+                default:       markerMap.put(marker, new Path()); break;
+            }
+        }
     }
 
     private void drawTickMarks(final GraphicsContext CTX) {
@@ -458,6 +617,7 @@ public class AmpSkin extends GaugeSkinBase {
     }
 
     @Override public void dispose() {
+        gauge.getMarkers().removeListener(markerListener);
         gauge.getSections().removeListener(sectionListener);
         gauge.currentValueProperty().removeListener(currentValueListener);
         needleRotate.angleProperty().removeListener(needleRotateListener);
@@ -483,6 +643,8 @@ public class AmpSkin extends GaugeSkinBase {
 
             ticksAndSectionsCanvas.setWidth(width);
             ticksAndSectionsCanvas.setHeight(height);
+
+            markerPane.setPrefSize(width, width);
 
             lcd.setWidth(0.3 * width);
             lcd.setHeight(0.1 * height);
@@ -641,5 +803,9 @@ public class AmpSkin extends GaugeSkinBase {
         shadowGroup.setEffect(gauge.isShadowsEnabled() ? dropShadow : null);
 
         foreground.setFill(gauge.getForegroundPaint());
+
+        // Markers
+        drawMarkers();
+        thresholdTooltip.setText("Threshold\n(" + String.format(locale, formatString, gauge.getThreshold()) + ")");
     }
 }
