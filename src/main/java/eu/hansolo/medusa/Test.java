@@ -34,6 +34,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -81,7 +82,8 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.AMP)
+                            .skinType(SkinType.LINEAR)
+                            .orientation(Orientation.HORIZONTAL)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .minValue(-20)
@@ -172,14 +174,13 @@ public class Test extends Application {
                     //epochSeconds+=20;
                     //clock.setTime(epochSeconds);
 
-                    /*
-                    if ( counter++ >= 1 ) {
+                    if ( counter++ >= 3 ) {
                         if ( !changed ) {
                             changed = true;
-                            gauge.setOrientation(Orientation.HORIZONTAL);
+                            gauge.setBarEffectEnabled(false);
+                            System.out.println("EFFECTS CHANGED");
                         }
                     }
-                    */
 
                     lastTimerCall = now;
                 }
