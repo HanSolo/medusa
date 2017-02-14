@@ -34,7 +34,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
-import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -83,7 +82,6 @@ public class Test extends Application {
 
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.LINEAR)
-                            .orientation(Orientation.HORIZONTAL)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .minValue(-20)
