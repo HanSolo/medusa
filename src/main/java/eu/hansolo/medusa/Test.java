@@ -81,7 +81,10 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.AMP)
+                            .skinType(SkinType.BAR)
+                            .barColor(Color.CORAL)
+                            .barEffectEnabled(false)
+                            .backgroundPaint(Color.ANTIQUEWHITE)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .minValue(-20)
