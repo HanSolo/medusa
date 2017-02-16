@@ -21,6 +21,8 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.tools.ConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
+import java.util.List;
+import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
@@ -33,9 +35,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
-
-import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -169,6 +168,8 @@ public class BarSkin extends GaugeSkinBase {
             range     = gauge.getRange();
             angleStep = -ANGLE_RANGE / range;
             redraw();
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
         }
     }
 
