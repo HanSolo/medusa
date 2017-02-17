@@ -169,6 +169,8 @@ public class BarSkin extends GaugeSkinBase {
             range     = gauge.getRange();
             angleStep = -ANGLE_RANGE / range;
             redraw();
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
         }
     }
 
