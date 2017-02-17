@@ -130,6 +130,7 @@ public class SimpleSectionSkin extends GaugeSkinBase {
         super.handleEvents(EVENT_TYPE);
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(valueText, gauge.isValueVisible());
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
             Helper.enableNode(unitText, gauge.isValueVisible() && !gauge.getUnit().isEmpty());
         } else if ("SECTION".equals(EVENT_TYPE)) {
             sections = gauge.getSections();
