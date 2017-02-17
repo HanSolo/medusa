@@ -213,6 +213,7 @@ public class SimpleSectionSkin extends GaugeSkinBase {
 
         sectionCanvas.setCache(true);
         sectionCanvas.setCacheHint(CacheHint.QUALITY);
+        barBackground.setStroke(gauge.getBarBackgroundColor());
     }
 
 
