@@ -79,11 +79,11 @@ public class Test extends Application {
                               .gaugeDesign(GaugeDesign.NONE)
                               .build();
 
-
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.QUARTER)
+                            .skinType(SkinType.LINEAR)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
+                            .decimals(0)
                             .minValue(-20)
                             .maxValue(100)
                             .animated(true)
@@ -98,21 +98,28 @@ public class Test extends Application {
                             .subTitle("Only")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
-                            .sections(new Section(-20, 0, Color.rgb(0, 0, 255, 0.25), Color.rgb(0, 0, 255, 0.75)),
-                                      new Section(0, 25, Color.rgb(255, 255, 0, 0.25), Color.rgb(255, 255, 0, 0.75)),
-                                      new Section(25, 50, Color.rgb(255, 0, 0, 0.25), Color.rgb(255, 0, 0, 0.75)))
+                            .sections(new Section(-20,  0, Color.rgb(  0,   0, 255, 0.25), Color.rgb(  0,   0, 255, 0.75)),
+                                      new Section(  0, 25, Color.rgb(255, 255,   0, 0.25), Color.rgb(255, 255,   0, 0.75)),
+                                      new Section( 25, 50, Color.rgb(255,   0,   0, 0.25), Color.rgb(255, 255,   0, 0.75)))
                             .sectionsVisible(true)
                             .highlightSections(true)
                             .autoScale(true)
                             .averagingEnabled(true)
                             .averagingPeriod(10)
                             .averageVisible(true)
+                            .markers(
+                                new Marker( 0, "M1", Color.rgb(  0,   0, 255, 0.95), Marker.MarkerType.DOT),
+                                new Marker(25, "M2", Color.rgb(255, 255,   0, 0.95), Marker.MarkerType.STANDARD),
+                                new Marker(50, "M3", Color.rgb(255, 255,   0, 0.95), Marker.MarkerType.TRIANGLE)
+                            )
+                            .markersVisible(true)
                             .ledVisible(true)
                             //.ledType(LedType.FLAT)
-                            //.threshold(10)
-                            //.checkThreshold(true)
-                            //.onThresholdExceeded(e -> gauge.setLedBlinking(true))
-                            //.onThresholdUnderrun(e -> gauge.setLedBlinking(false))
+                            .thresholdVisible(true)
+                            .threshold(60)
+                            .checkThreshold(true)
+                            .onThresholdExceeded(e -> gauge.setLedBlinking(true))
+                            .onThresholdUnderrun(e -> gauge.setLedBlinking(false))
                             .build();
 
         //gauge.setAlert(true);
@@ -165,14 +172,13 @@ public class Test extends Application {
                     //epochSeconds+=20;
                     //clock.setTime(epochSeconds);
 
-                    /*
-                    if ( counter++ >= 1 ) {
+                    if ( counter++ >= 3 ) {
                         if ( !changed ) {
                             changed = true;
-                            gauge.setOrientation(Orientation.HORIZONTAL);
+                            gauge.setBarEffectEnabled(false);
+                            System.out.println("EFFECTS CHANGED");
                         }
                     }
-                    */
 
                     lastTimerCall = now;
                 }
