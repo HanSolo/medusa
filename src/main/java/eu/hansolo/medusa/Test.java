@@ -79,13 +79,12 @@ public class Test extends Application {
                               .gaugeDesign(GaugeDesign.NONE)
                               .build();
 
-
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.MODERN)
-                            //.backgroundPaint(Color.DARKVIOLET.darker().darker())
                             .barBackgroundColor(Color.DARKBLUE.deriveColor(0, 1, 1, 0.75))
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
+                            .decimals(0)
                             .minValue(-20)
                             .maxValue(100)
                             .animated(true)
@@ -174,14 +173,13 @@ public class Test extends Application {
                     //epochSeconds+=20;
                     //clock.setTime(epochSeconds);
 
-                    /*
-                    if ( counter++ >= 1 ) {
+                    if ( counter++ >= 3 ) {
                         if ( !changed ) {
                             changed = true;
-                            gauge.setOrientation(Orientation.HORIZONTAL);
+                            gauge.setBarEffectEnabled(false);
+                            System.out.println("EFFECTS CHANGED");
                         }
                     }
-                    */
 
                     lastTimerCall = now;
                 }

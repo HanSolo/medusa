@@ -218,13 +218,15 @@ public class SimpleSectionSkin extends GaugeSkinBase {
 
         sectionCanvas.setCache(true);
         sectionCanvas.setCacheHint(CacheHint.QUALITY);
+        barBackground.setStroke(gauge.getBarBackgroundColor());
     }
 
 
     // ******************** Resizing ******************************************
     private void resizeValueText() {
         double maxWidth = size * 0.86466165;
-        double fontSize = size * 0.2556391;
+        double fontFactor = -0.035 * ( Math.max(1, gauge.getDecimals() ) - 1 ) + 0.2556391;
+        double fontSize = size * fontFactor;
         valueText.setFont(Fonts.latoLight(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
         valueText.relocate((size - valueText.getLayoutBounds().getWidth()) * 0.5, (size - valueText.getLayoutBounds().getHeight()) * 0.5);
