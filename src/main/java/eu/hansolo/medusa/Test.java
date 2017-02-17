@@ -79,11 +79,12 @@ public class Test extends Application {
                               .gaugeDesign(GaugeDesign.NONE)
                               .build();
 
-
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.AMP)
+                            .skinType(SkinType.SIMPLE_SECTION)
+                            .barColor(Color.CORAL)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
+                            .decimals(0)
                             .minValue(-20)
                             .maxValue(100)
                             .animated(true)
