@@ -80,8 +80,7 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.SIMPLE_SECTION)
-                            .barColor(Color.CORAL)
+                            .skinType(SkinType.LINEAR)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .decimals(0)
@@ -173,11 +172,11 @@ public class Test extends Application {
                     //epochSeconds+=20;
                     //clock.setTime(epochSeconds);
 
-                    if ( counter++ >= 2 ) {
+                    if ( counter++ >= 3 ) {
                         if ( !changed ) {
                             changed = true;
-                            gauge.setBarBackgroundColor(Color.DARKGOLDENROD);
-                            gauge.setBarColor(Color.GREENYELLOW);
+                            gauge.setBarEffectEnabled(false);
+                            System.out.println("EFFECTS CHANGED");
                         }
                     }
 
