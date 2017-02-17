@@ -21,6 +21,10 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.tools.Helper;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -41,11 +45,6 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -457,10 +456,10 @@ public class DigitalSkin extends GaugeSkinBase {
             barCanvas.setWidth(size);
             barCanvas.setHeight(size);
 
-            valueBkgText.setFont(Fonts.digital(0.2 * size));
+            valueBkgText.setFont(Fonts.digital(0.18 * size));
             valueBkgText.setY(center + (valueBkgText.getLayoutBounds().getHeight() * 0.5));
 
-            valueText.setFont(Fonts.digital(0.2 * size));
+            valueText.setFont(Fonts.digital(0.18 * size));
             valueText.setY(center + (valueText.getLayoutBounds().getHeight() * 0.5));
 
             drawBackground();
