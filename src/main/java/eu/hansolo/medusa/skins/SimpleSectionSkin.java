@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.scene.CacheHint;
 import javafx.scene.canvas.Canvas;
@@ -31,8 +32,6 @@ import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
-
-import java.util.List;
 
 
 /**
@@ -214,13 +213,15 @@ public class SimpleSectionSkin extends GaugeSkinBase {
 
         sectionCanvas.setCache(true);
         sectionCanvas.setCacheHint(CacheHint.QUALITY);
+        barBackground.setStroke(gauge.getBarBackgroundColor());
     }
 
 
     // ******************** Resizing ******************************************
     private void resizeValueText() {
         double maxWidth = size * 0.86466165;
-        double fontSize = size * 0.2556391;
+        double fontFactor = -0.035 * ( Math.max(1, gauge.getDecimals() ) - 1 ) + 0.2556391;
+        double fontSize = size * fontFactor;
         valueText.setFont(Fonts.latoLight(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
         valueText.relocate((size - valueText.getLayoutBounds().getWidth()) * 0.5, (size - valueText.getLayoutBounds().getHeight()) * 0.5);
