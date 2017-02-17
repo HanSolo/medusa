@@ -25,6 +25,10 @@ import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.tools.GradientLookup;
+import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -48,11 +52,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
-
-import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -1004,6 +1003,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                                                 new Stop(0.75, barColor.deriveColor(-10, 1, 1, 1)),
                                                 new Stop(1.0, barColor.deriveColor(-20, 1, 1, 1)));
                     CONTROL.setBarColor(barColor);
+                    CONTROL.setBarEffectEnabled(true);
                     break;
                 case WHITE:
                     CONTROL.setAnimated(true);
