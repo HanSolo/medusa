@@ -101,9 +101,9 @@ public class Test extends Application {
                             .subTitle("Only")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
-                            .sections(new Section(-20,  0, Color.rgb(  0,   0, 255, 0.25), Color.rgb(  0,   0, 255, 0.75)),
-                                      new Section(  0, 25, Color.rgb(255, 255,   0, 0.25), Color.rgb(255, 255,   0, 0.75)),
-                                      new Section( 25, 50, Color.rgb(255,   0,   0, 0.25), Color.rgb(255, 255,   0, 0.75)))
+                            .sections(new Section(-20,  0, Color.rgb(  0,   0, 255), Color.rgb(  0,   0, 255)),
+                                      new Section(  0, 25, Color.rgb(255, 255,   0), Color.rgb(255, 255,   0)),
+                                      new Section( 25, 50, Color.rgb(255,   0,   0), Color.rgb(255, 255,   0)))
                             .sectionsVisible(true)
                             .highlightSections(true)
                             .autoScale(true)
@@ -174,14 +174,6 @@ public class Test extends Application {
 
                     //epochSeconds+=20;
                     //clock.setTime(epochSeconds);
-
-                    if ( counter++ >= 1 ) {
-                        if ( !changed ) {
-                            changed = true;
-                            gauge.setTitle(gauge.getSkinType().name());
-                            System.out.println("*** CHANGED");
-                        }
-                    }
 
                     lastTimerCall = now;
                 }
