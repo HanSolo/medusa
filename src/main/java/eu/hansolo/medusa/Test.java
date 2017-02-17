@@ -81,7 +81,7 @@ public class Test extends Application {
 
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.DASHBOARD)
+                            .skinType(SkinType.AMP)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .minValue(-20)
