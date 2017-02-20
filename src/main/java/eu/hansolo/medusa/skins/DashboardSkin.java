@@ -227,10 +227,10 @@ public class DashboardSkin extends GaugeSkinBase {
             resize();
             redraw();
             setBar(gauge.getCurrentValue());
-        } else if ("VISBILITY".equals(EVENT_TYPE)) {
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(valueText, gauge.isValueVisible());
             Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
             Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
-            Helper.enableNode(valueText, gauge.isValueVisible());
             boolean tickLabelsVisible = gauge.getTickLabelsVisible();
             Helper.enableNode(minText, tickLabelsVisible);
             Helper.enableNode(maxText, tickLabelsVisible);

@@ -96,7 +96,7 @@ public class Test extends Application {
                             .lcdFont(LcdFont.LCD)
                             //.locale(Locale.GERMANY)
                             //.numberFormat(numberFormat)
-                            .title("Very Large Testing")
+                            .title("")
                             .unit("\u00B0C")
                             .subTitle("Only")
                             //.interactive(true)
