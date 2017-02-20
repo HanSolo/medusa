@@ -396,6 +396,7 @@ public class DashboardSkin extends GaugeSkinBase {
 
         redrawText();
     }
+
     private void redrawText() {
         locale            = gauge.getLocale();
         formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
