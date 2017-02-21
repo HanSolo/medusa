@@ -300,7 +300,6 @@ public class DashboardSkin extends GaugeSkinBase {
 
             double maxWidth = 0.95 * width;
             titleText.setFont(smallFont);
-            titleText.setText(gauge.getTitle());
             if (titleText.getLayoutBounds().getWidth() > maxWidth) Helper.adjustTextSize(titleText, maxWidth, size * 0.12);
             titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.88 * height);
 
@@ -398,6 +397,7 @@ public class DashboardSkin extends GaugeSkinBase {
 
         redrawText();
     }
+
     private void redrawText() {
         locale            = gauge.getLocale();
         formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();

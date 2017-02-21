@@ -80,7 +80,7 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.BAR)
+                            .skinType(SkinType.DASHBOARD)
                             .barColor(Color.CORAL)
                             .barEffectEnabled(false)
                             .backgroundPaint(Color.ANTIQUEWHITE)
@@ -96,7 +96,7 @@ public class Test extends Application {
                             .lcdFont(LcdFont.LCD)
                             //.locale(Locale.GERMANY)
                             //.numberFormat(numberFormat)
-                            .title("")
+                            .title("VERY VERY VERY LONG TITLE")
                             .unit("\u00B0C")
                             .subTitle("Only")
                             //.interactive(true)
