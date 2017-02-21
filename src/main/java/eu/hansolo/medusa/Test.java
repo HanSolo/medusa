@@ -80,10 +80,7 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.BAR)
-                            .barColor(Color.CORAL)
-                            .barEffectEnabled(false)
-                            .backgroundPaint(Color.ANTIQUEWHITE)
+                            .skinType(SkinType.AMP)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .decimals(0)
@@ -174,6 +171,14 @@ public class Test extends Application {
 
                     //epochSeconds+=20;
                     //clock.setTime(epochSeconds);
+
+                    if ( counter++ >= 1 ) {
+                        if ( !changed ) {
+                            changed = true;
+                            gauge.setLcdVisible(false);
+                            System.out.println("*** CHANGED");
+                        }
+                    }
 
                     lastTimerCall = now;
                 }
