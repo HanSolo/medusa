@@ -1005,6 +1005,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                                                 new Stop(0.75, barColor.deriveColor(-10, 1, 1, 1)),
                                                 new Stop(1.0, barColor.deriveColor(-20, 1, 1, 1)));
                     CONTROL.setBarColor(barColor);
+                    CONTROL.setBarEffectEnabled(true);
                     break;
                 case WHITE:
                     CONTROL.setAnimated(true);

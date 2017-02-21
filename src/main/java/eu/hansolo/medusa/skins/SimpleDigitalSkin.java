@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -305,10 +306,10 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
             barCanvas.setWidth(size);
             barCanvas.setHeight(size);
 
-            valueBkgText.setFont(Fonts.digitalReadoutBold(0.25 * size));
+            valueBkgText.setFont(Fonts.digitalReadoutBold(0.215 * size));
             valueBkgText.setY(center + (valueBkgText.getLayoutBounds().getHeight() * 0.325));
 
-            valueText.setFont(Fonts.digitalReadoutBold(0.25 * size));
+            valueText.setFont(Fonts.digitalReadoutBold(0.215 * size));
             valueText.setY(center + (valueText.getLayoutBounds().getHeight() * 0.325));
 
             titleText.setText(gauge.getTitle());

@@ -207,6 +207,8 @@ public class AmpSkin extends GaugeSkinBase {
 
         titleText = new Text(gauge.getTitle());
         titleText.setTextOrigin(VPos.CENTER);
+        titleText.setFill(gauge.getTitleColor());
+        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
         unitText = new Text(gauge.getUnit());
         unitText.setMouseTransparent(true);
@@ -281,6 +283,7 @@ public class AmpSkin extends GaugeSkinBase {
             enableNode(average, gauge.isAverageVisible());
             boolean markersVisible = gauge.getMarkersVisible();
             for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
+            resize();
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (gauge.isLedVisible()) { drawLed(led); }
@@ -578,14 +581,34 @@ public class AmpSkin extends GaugeSkinBase {
         return VALUE;
     }
 
-    private void resizeText() {
-        titleText.setFont(Fonts.robotoMedium(height * 0.11));
+    private void resizeStaticText() {
+
+        double maxWidth = width * 0.9;
+        double fontSize = height * 0.11;
+
+        titleText.setFont(Fonts.robotoMedium(fontSize));
+        titleText.setText(gauge.getTitle());
+        if ( titleText.getLayoutBounds().getWidth() > maxWidth ) {
+            Helper.adjustTextSize(titleText, maxWidth, fontSize);
+        }
         titleText.setTranslateX((width - titleText.getLayoutBounds().getWidth()) * 0.5);
         titleText.setTranslateY(height * 0.76);
 
-        unitText.setFont(Fonts.robotoMedium(height * 0.1));
+        maxWidth = width * 0.3;
+        fontSize = height * 0.1;
+
+        unitText.setFont(Fonts.robotoMedium(fontSize));
+        unitText.setText(gauge.getUnit());
+        if ( unitText.getLayoutBounds().getWidth() > maxWidth ) {
+            Helper.adjustTextSize(unitText, maxWidth, fontSize);
+        }
         unitText.setTranslateX((width - unitText.getLayoutBounds().getWidth()) * 0.5);
         unitText.setTranslateY(height * 0.37);
+
+    }
+
+    private void resizeText() {
+        resizeStaticText();
 
         lcdText.setPadding(new Insets(0, 0.005 * width, 0, 0.005 * width));
 
@@ -770,7 +793,10 @@ public class AmpSkin extends GaugeSkinBase {
         ticksAndSectionsCanvas.setCacheHint(CacheHint.QUALITY);
 
         titleText.setFill(gauge.getTitleColor());
+        titleText.setText(gauge.getTitle());
         unitText.setFill(gauge.getUnitColor());
+        unitText.setText(gauge.getUnit());
+
         if (gauge.isLcdVisible()) {
             LcdDesign lcdDesign = gauge.getLcdDesign();
             Color[] lcdColors = lcdDesign.getColors();
