@@ -216,7 +216,6 @@ public class QuarterSkin extends GaugeSkinBase {
         lcd.setArcWidth(0.0125 * PREFERRED_HEIGHT);
         lcd.setArcHeight(0.0125 * PREFERRED_HEIGHT);
         lcd.relocate((PREFERRED_WIDTH - lcd.getWidth()) * 0.5, 0.44 * PREFERRED_HEIGHT);
-        lcd.setVisible(gauge.isLcdVisible());
         Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
 
         needleRotate = new Rotate(180 - startAngle);

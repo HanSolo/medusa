@@ -160,7 +160,6 @@ public class LinearSkin extends GaugeSkinBase {
         lcd.setArcWidth(0.0125 * preferredHeight);
         lcd.setArcHeight(0.0125 * preferredHeight);
         lcd.relocate((preferredWidth - lcd.getWidth()) * 0.5, 0.44 * preferredHeight);
-        lcd.setVisible(gauge.isLcdVisible());
         Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
 
         bar = new Rectangle();
