@@ -177,7 +177,7 @@ public class Test extends Application {
                     if ( counter++ >= 1 ) {
                         if ( !changed ) {
                             changed = true;
-                            gauge.setLcdVisible(false);
+                            clock.setSecondsVisible(false);
                             System.out.println("*** CHANGED");
                         }
                     }
