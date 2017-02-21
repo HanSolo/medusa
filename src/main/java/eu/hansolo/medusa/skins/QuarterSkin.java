@@ -216,7 +216,6 @@ public class QuarterSkin extends GaugeSkinBase {
         lcd.setArcWidth(0.0125 * PREFERRED_HEIGHT);
         lcd.setArcHeight(0.0125 * PREFERRED_HEIGHT);
         lcd.relocate((PREFERRED_WIDTH - lcd.getWidth()) * 0.5, 0.44 * PREFERRED_HEIGHT);
-        lcd.setManaged(gauge.isLcdVisible());
         lcd.setVisible(gauge.isLcdVisible());
         Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
 
@@ -333,6 +332,7 @@ public class QuarterSkin extends GaugeSkinBase {
             Helper.enableNode(average, gauge.isAverageVisible());
             boolean markersVisible = gauge.getMarkersVisible();
             for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
+            resize();
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (gauge.isLedVisible()) { drawLed(); }
@@ -1681,13 +1681,13 @@ public class QuarterSkin extends GaugeSkinBase {
             ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
             if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));
 
-            resizeText();
             if (gauge.isLcdVisible()) {
                 lcd.setWidth(0.4 * size);
                 lcd.setHeight(0.114 * size);
                 lcd.setArcWidth(0.0125 * size);
                 lcd.setArcHeight(0.0125 * size);
             }
+            resizeText();
             resizeValueText();
 
             double needleWidth;

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.CacheHint;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;

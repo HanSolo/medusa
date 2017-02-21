@@ -160,7 +160,8 @@ public class LinearSkin extends GaugeSkinBase {
         lcd.setArcWidth(0.0125 * preferredHeight);
         lcd.setArcHeight(0.0125 * preferredHeight);
         lcd.relocate((preferredWidth - lcd.getWidth()) * 0.5, 0.44 * preferredHeight);
-        Helper.enableNode(lcd, gauge.isLcdVisible());
+        lcd.setVisible(gauge.isLcdVisible());
+        Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
 
         bar = new Rectangle();
         bar.setStroke(null);
@@ -174,9 +175,11 @@ public class LinearSkin extends GaugeSkinBase {
         Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
         unitText  = new Text(gauge.getUnit());
+        unitText.setFill(gauge.getUnitColor());
         Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
         valueText = new Text(String.format(locale, formatString, gauge.getCurrentValue()));
+        valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
 
         pane = new Pane(barBorder1,
@@ -473,24 +476,18 @@ public class LinearSkin extends GaugeSkinBase {
 
     private void resizeText() {
         if (Orientation.VERTICAL == orientation) {
-
             double maxWidth = width * 0.95;
             double fontSize = width * 0.13;
 
             titleText.setFont(Fonts.robotoRegular(fontSize));
             titleText.setText(gauge.getTitle());
-            if ( titleText.getLayoutBounds().getWidth() > maxWidth ) {
-                Helper.adjustTextSize(titleText, maxWidth, fontSize);
-            }
+            Helper.adjustTextSize(titleText, maxWidth, fontSize);
             titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0);
 
             fontSize = width * 0.08;
-
             unitText.setFont(Fonts.robotoRegular(fontSize));
             unitText.setText(gauge.getUnit());
-            if ( unitText.getLayoutBounds().getWidth() > maxWidth ) {
-                Helper.adjustTextSize(unitText, maxWidth, fontSize);
-            }
+            Helper.adjustTextSize(unitText, maxWidth, fontSize);
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.075 * height);
 
             if (gauge.isLcdVisible()) {
@@ -522,24 +519,18 @@ public class LinearSkin extends GaugeSkinBase {
                 valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, height * 0.877);
             }
         } else {
- 
             double maxWidth = width * 0.8;
             double fontSize = height * 0.15;
 
             titleText.setFont(Fonts.robotoRegular(fontSize));
             titleText.setText(gauge.getTitle());
-            if ( titleText.getLayoutBounds().getWidth() > maxWidth ) {
-                Helper.adjustTextSize(titleText, maxWidth, fontSize);
-            }
+            Helper.adjustTextSize(titleText, maxWidth, fontSize);
             titleText.relocate(0.03571429 * height, 0.03571429 * height);
 
-           fontSize = height * 0.1;
-
-            unitText.setFont(Fonts.robotoRegular(0.1 * height));
+            fontSize = height * 0.1;
+            unitText.setFont(Fonts.robotoRegular(fontSize));
             unitText.setText(gauge.getUnit());
-            if ( unitText.getLayoutBounds().getWidth() > maxWidth ) {
-                Helper.adjustTextSize(unitText, maxWidth, fontSize);
-            }
+            Helper.adjustTextSize(unitText, maxWidth, fontSize);
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.8 * height);
 
             if (gauge.isLcdVisible()) {
@@ -654,11 +645,13 @@ public class LinearSkin extends GaugeSkinBase {
                 ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
                 if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));
 
-                lcd.setWidth(0.8 * width);
-                lcd.setHeight(0.22 * width);
-                lcd.setArcWidth(0.0125 * size);
-                lcd.setArcHeight(0.0125 * size);
-                lcd.relocate((width - lcd.getWidth()) * 0.5, 0.87 * height);
+                if (gauge.isLcdVisible()) {
+                    lcd.setWidth(0.8 * width);
+                    lcd.setHeight(0.22 * width);
+                    lcd.setArcWidth(0.0125 * size);
+                    lcd.setArcHeight(0.0125 * size);
+                    lcd.relocate((width - lcd.getWidth()) * 0.5, 0.87 * height);
+                }
             } else {
                 height   = width / aspectRatio;
                 size     = width < height ? width : height;
@@ -728,11 +721,13 @@ public class LinearSkin extends GaugeSkinBase {
                 ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
                 if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));
 
-                lcd.setWidth(0.3 * width);
-                lcd.setHeight(0.22 * height);
-                lcd.setArcWidth(0.0125 * size);
-                lcd.setArcHeight(0.0125 * size);
-                lcd.relocate((width - lcd.getWidth()) - 0.03571429 * height, 0.03571429 * height);
+                if (gauge.isLcdVisible()) {
+                    lcd.setWidth(0.3 * width);
+                    lcd.setHeight(0.22 * height);
+                    lcd.setArcWidth(0.0125 * size);
+                    lcd.setArcHeight(0.0125 * size);
+                    lcd.relocate((width - lcd.getWidth()) - 0.03571429 * height, 0.03571429 * height);
+                }
             }
 
             resizeText();
