@@ -21,6 +21,10 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.LcdFont;
 import eu.hansolo.medusa.tools.Helper;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.Locale;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
@@ -53,11 +57,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
-import java.util.Locale;
-
 
 /**
  * Created by hansolo on 28.01.16.
@@ -88,7 +87,6 @@ public class LcdClockSkin extends ClockSkinBase {
     private Text                    dayOfWeekText;
     private Path                    alarm;
     private DateTimeFormatter       dateFormat;
-    private double                  valueOffsetRight;
     private double                  digitalFontSizeFactor;
     private Font                    timeFont;
     private Font                    secondFont;
@@ -101,7 +99,6 @@ public class LcdClockSkin extends ClockSkinBase {
     // ******************** Constructors **************************************
     public LcdClockSkin(Clock clock) {
         super(clock);
-        valueOffsetRight      = 0.0;
         digitalFontSizeFactor = 1.0;
         backgroundTextBuilder = new StringBuilder();
         FOREGROUND_SHADOW.setOffsetX(0);
@@ -410,15 +407,35 @@ public class LcdClockSkin extends ClockSkinBase {
         backgroundSecondText.setText(backgroundSegment + backgroundSegment);
     }
 
+    private void updateTimePosition() {
+
+        double secondsWidth = secondText.getLayoutBounds().getWidth();
+        double secodsOffset = height * 0.03;
+        double timeWidth    = timeText.getLayoutBounds().getWidth();
+        double timeX        = ( clock.isSecondsVisible() )
+                            ? ( width - 2 - timeWidth - secodsOffset - secondsWidth ) * 0.5
+                            : ( width - 2 - timeWidth ) * 0.5;
+        double timeY        = height - timeText.getLayoutBounds().getHeight() * digitalFontSizeFactor * 0.5;
+        double secondsX     = timeX + 1 + timeWidth + secodsOffset;
+
+        backgroundTimeText.setX(timeX);
+        backgroundTimeText.setY(timeY);
+        backgroundSecondText.setX(secondsX);
+        backgroundSecondText.setY(timeY);
+
+        timeText.setX(timeX);
+        timeText.setY(timeY);
+        secondText.setX(secondsX);
+        secondText.setY(timeY);
+
+    }
+
     @Override public void updateTime(final ZonedDateTime TIME) {
         timeText.setText(ensureTwoDigits(TIME.getHour()) + ":" + ensureTwoDigits(TIME.getMinute()));
         secondText.setText(ensureTwoDigits(TIME.getSecond()));
+
         updateBackgroundText();
-
-        backgroundTimeText.setX(width - 2 - backgroundTimeText.getLayoutBounds().getWidth() - valueOffsetRight);
-        backgroundTimeText.setY(height - (backgroundTimeText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
-
-        timeText.setX((width - 2 - timeText.getLayoutBounds().getWidth()) - valueOffsetRight);
+        updateTimePosition();
 
         title.setText(clock.getTitle());
         title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);
@@ -582,23 +599,11 @@ public class LcdClockSkin extends ClockSkinBase {
             updateFonts();
 
             updateBackgroundText();
-
-            backgroundTimeText.setX(width - 2 - backgroundTimeText.getLayoutBounds().getWidth() - valueOffsetRight);
-            backgroundTimeText.setY(height - (backgroundTimeText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
-
-            backgroundSecondText.setX((width - 3 - secondText.getLayoutBounds().getWidth()) - height * 0.04);
-            backgroundSecondText.setY(height - (timeText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
+            updateTimePosition();
 
             secondText.setFont(secondFont);
             secondText.setTextOrigin(VPos.BASELINE);
             secondText.setTextAlignment(TextAlignment.RIGHT);
-
-            secondText.setX((width - 3 - secondText.getLayoutBounds().getWidth()) - height * 0.04);
-            secondText.setY(height - (timeText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
-            valueOffsetRight = (secondText.getLayoutBounds().getWidth() + height * 0.0833333333); // distance between value and unit
-
-            timeText.setX(width - 2 - timeText.getLayoutBounds().getWidth() - valueOffsetRight);
-            timeText.setY(height - (timeText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
 
             // Setup the font for the lcd title, number system, min measured, max measure and former value
             // Title
@@ -628,18 +633,11 @@ public class LcdClockSkin extends ClockSkinBase {
 
     @Override protected void redraw() {
         updateBackgroundText();
-
-        backgroundTimeText.setX(width - 2 - backgroundTimeText.getLayoutBounds().getWidth() - valueOffsetRight);
-        backgroundTimeText.setY(height - (backgroundTimeText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
-
-        backgroundSecondText.setX((width - 3 - secondText.getLayoutBounds().getWidth()) - height * 0.04);
-        backgroundSecondText.setY(height - (timeText.getLayoutBounds().getHeight() * digitalFontSizeFactor) * 0.5);
+        updateTimePosition();
 
         ZonedDateTime time = clock.getTime();
         timeText.setText(ensureTwoDigits(time.getHour()) + ":" + ensureTwoDigits(time.getMinute()));
-        timeText.setX(width - 2 - timeText.getLayoutBounds().getWidth() - valueOffsetRight);
         secondText.setText(ensureTwoDigits(time.getSecond()));
-        secondText.setX((width - 3 - secondText.getLayoutBounds().getWidth()) - height * 0.04);
 
         title.setText(clock.getTitle());
         title.setX((width - title.getLayoutBounds().getWidth()) * 0.5);

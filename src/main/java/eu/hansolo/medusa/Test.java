@@ -134,14 +134,16 @@ public class Test extends Application {
         epochSeconds = Instant.now().getEpochSecond();
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.INDUSTRIAL)
+                            .skinType(ClockSkinType.LCD)
                             .locale(Locale.GERMANY)
-                            .shadowsEnabled(true)
+                            .shadowsEnabled(false)
                             //.discreteSeconds(false)
                             //.discreteMinutes(false)
                             .running(true)
                             //.backgroundPaint(Color.web("#1f1e23"))
                             //.hourColor(Color.web("#dad9db"))
+                            .lcdFont(LcdFont.DIGITAL)
+                            .secondsVisible(true)
                             //.minuteColor(Color.web("#dad9db"))
                             //.secondColor(Color.web("#d1222b"))
                             //.hourTickMarkColor(Color.web("#9f9fa1"))
@@ -187,7 +189,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(gauge);
+        StackPane pane = new StackPane(clock);
         pane.setPadding(new Insets(20));
         pane.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
