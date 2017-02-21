@@ -40,6 +40,22 @@ import eu.hansolo.medusa.skins.TextClockSkin;
 import eu.hansolo.medusa.skins.TileClockSkin;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.TimeSectionComparator;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -64,23 +80,6 @@ import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -1732,7 +1731,7 @@ public class Clock extends Control {
     public void setLcdFont(final LcdFont FONT) {
         if (null == lcdFont) {
             _lcdFont = FONT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireUpdateEvent(RESIZE_EVENT);
         } else {
             lcdFont.set(FONT);
         }
@@ -1740,7 +1739,7 @@ public class Clock extends Control {
     public ObjectProperty<LcdFont> lcdFontProperty() {
         if (null == lcdFont) {
             lcdFont  = new ObjectPropertyBase<LcdFont>(_lcdFont) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "lcdFont"; }
             };

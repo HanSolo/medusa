@@ -3373,7 +3373,7 @@ public class Gauge extends Control {
     public void setLcdFont(final LcdFont FONT) {
         if (null == lcdFont) {
             _lcdFont = null == FONT ? LcdFont.DIGITAL_BOLD : FONT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireUpdateEvent(RESIZE_EVENT);
         } else {
             lcdFont.set(FONT);
         }
@@ -3383,7 +3383,7 @@ public class Gauge extends Control {
             lcdFont  = new ObjectPropertyBase<LcdFont>(_lcdFont) {
                 @Override protected void invalidated() {
                     if(null == get()) set(LcdFont.DIGITAL_BOLD);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireUpdateEvent(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "lcdFont"; }
