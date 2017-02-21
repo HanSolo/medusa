@@ -19,18 +19,11 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
-import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.ConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
-import java.util.List;
-import java.util.Locale;
 import javafx.beans.InvalidationListener;
-import javafx.geometry.Insets;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
@@ -40,6 +33,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
+
+import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -63,8 +59,6 @@ public class BarSkin extends GaugeSkinBase {
     private              double          angleStep;
     private              String          formatString;
     private              Locale          locale;
-    private              boolean         sectionsVisible;
-    private              List<Section>   sections;
     private              InvalidationListener currentValueListener;
     private              InvalidationListener barColorListener;
     private              InvalidationListener titleListener;
@@ -79,8 +73,6 @@ public class BarSkin extends GaugeSkinBase {
         angleStep            = -ANGLE_RANGE / range;
         formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         locale               = gauge.getLocale();
-        sectionsVisible      = gauge.getSectionsVisible();
-        sections             = gauge.getSections();
         currentValueListener = o -> redraw();
         barColorListener     = o -> {
             Color barColor = gauge.getBarColor();
@@ -124,10 +116,8 @@ public class BarSkin extends GaugeSkinBase {
 
         shadow = new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.45), 0.01 * PREFERRED_WIDTH, 0, 0.01 * PREFERRED_WIDTH, 0);
 
-        Color barBackgroundColor = gauge.getBarBackgroundColor();
         circle = new Circle();
         circle.setFill(null);
-        circle.setStroke(Color.color(barBackgroundColor.getRed(), barBackgroundColor.getGreen(), barBackgroundColor.getBlue(), 0.13));
 
         arc = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.96, PREFERRED_WIDTH * 0.48, 90, 0);
         arc.setStrokeWidth(PREFERRED_WIDTH * 0.008);
@@ -159,7 +149,6 @@ public class BarSkin extends GaugeSkinBase {
         Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
         pane = new Pane(circle, arc, fakeDot, dot, titleText, valueText, unitText);
-        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
@@ -179,8 +168,9 @@ public class BarSkin extends GaugeSkinBase {
         if ("RECALC".equals(EVENT_TYPE)) {
             range     = gauge.getRange();
             angleStep = -ANGLE_RANGE / range;
-            sections  = gauge.getSections();
             redraw();
+        } else if ("VISIBILITY".equals(EVENT_TYPE)) {
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
         }
     }
 
@@ -192,24 +182,6 @@ public class BarSkin extends GaugeSkinBase {
         super.dispose();
     }
 
-    private void setBarBackgroundColor(final double VALUE) {
-
-        Color barBackgroundColor = gauge.isBarEffectEnabled()
-                                 ? gauge.getBarColor()
-                                 : gauge.getBarBackgroundColor();
-
-        if ( sectionsVisible ) {
-            for (Section section : sections) {
-                if (section.contains(VALUE)) {
-                    barBackgroundColor = section.getColor();
-                    break;
-                }
-            }
-        }
-
-        circle.setStroke(Color.color(barBackgroundColor.getRed(), barBackgroundColor.getGreen(), barBackgroundColor.getBlue(), 0.13));
-            
-    }
 
     // ******************** Resizing ******************************************
     private void resizeTitleText() {
@@ -267,7 +239,7 @@ public class BarSkin extends GaugeSkinBase {
             double     currentValue     = gauge.getCurrentValue();
             List<Stop> gradientBarStops = gauge.getGradientBarStops();
 
-            setBarBackgroundColor(gauge.getCurrentValue());
+            circle.setStroke(Color.color(barColor.getRed(), barColor.getGreen(), barColor.getBlue(), 0.13));
 
             Rectangle bounds = new Rectangle(0, 0, size, size);
 
@@ -295,15 +267,9 @@ public class BarSkin extends GaugeSkinBase {
     }
 
     @Override protected void redraw() {
-        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-
         double currentValue = gauge.getCurrentValue();
         double angle        = currentValue * angleStep;
         double rotate       = angle  < -360 ? angle  + 360 : 0;
-
-        sectionsVisible = gauge.getSectionsVisible();
-
-        setBarBackgroundColor(gauge.getCurrentValue());
 
         arc.setRotate(-rotate);
         arc.setLength(Helper.clamp(-360.0, 0.0, angle));

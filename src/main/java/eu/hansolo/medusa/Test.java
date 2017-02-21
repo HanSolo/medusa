@@ -79,7 +79,6 @@ public class Test extends Application {
                               .gaugeDesign(GaugeDesign.NONE)
                               .build();
 
-
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.BAR)
                             .barColor(Color.CORAL)
@@ -87,6 +86,7 @@ public class Test extends Application {
                             .backgroundPaint(Color.ANTIQUEWHITE)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
+                            .decimals(0)
                             .minValue(-20)
                             .maxValue(100)
                             .animated(true)
@@ -96,14 +96,14 @@ public class Test extends Application {
                             .lcdFont(LcdFont.LCD)
                             //.locale(Locale.GERMANY)
                             //.numberFormat(numberFormat)
-                            .title("Very Large Testing")
+                            .title("")
                             .unit("\u00B0C")
                             .subTitle("Only")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
-                            .sections(new Section(-20,  0, Color.rgb(  0,   0, 255, 0.25), Color.rgb(  0,   0, 255, 0.75)),
-                                      new Section(  0, 25, Color.rgb(255, 255,   0, 0.25), Color.rgb(255, 255,   0, 0.75)),
-                                      new Section( 25, 50, Color.rgb(255,   0,   0, 0.25), Color.rgb(255, 255,   0, 0.75)))
+                            .sections(new Section(-20,  0, Color.rgb(  0,   0, 255), Color.rgb(  0,   0, 255)),
+                                      new Section(  0, 25, Color.rgb(255, 255,   0), Color.rgb(255, 255,   0)),
+                                      new Section( 25, 50, Color.rgb(255,   0,   0), Color.rgb(255, 255,   0)))
                             .sectionsVisible(true)
                             .highlightSections(true)
                             .autoScale(true)
@@ -174,15 +174,6 @@ public class Test extends Application {
 
                     //epochSeconds+=20;
                     //clock.setTime(epochSeconds);
-
-                    /*
-                    if ( counter++ >= 1 ) {
-                        if ( !changed ) {
-                            changed = true;
-                            gauge.setOrientation(Orientation.HORIZONTAL);
-                        }
-                    }
-                    */
 
                     lastTimerCall = now;
                 }

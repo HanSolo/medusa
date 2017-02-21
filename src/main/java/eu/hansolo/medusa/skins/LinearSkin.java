@@ -170,6 +170,7 @@ public class LinearSkin extends GaugeSkinBase {
         Helper.enableNode(barHighlight, gauge.isBarEffectEnabled());
 
         titleText = new Text(gauge.getTitle());
+        titleText.setFill(gauge.getTitleColor());
         Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
         unitText  = new Text(gauge.getUnit());
@@ -217,6 +218,7 @@ public class LinearSkin extends GaugeSkinBase {
             Helper.enableNode(valueText, gauge.isValueVisible());
             Helper.enableNode(lcd, (gauge.isLcdVisible() && gauge.isValueVisible()));
             Helper.enableNode(barHighlight, gauge.isBarEffectEnabled());
+            resize();
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (gauge.isLedVisible()) { drawLed(); }
@@ -471,10 +473,24 @@ public class LinearSkin extends GaugeSkinBase {
 
     private void resizeText() {
         if (Orientation.VERTICAL == orientation) {
-            titleText.setFont(Fonts.robotoRegular(0.13 * width));
+
+            double maxWidth = width * 0.95;
+            double fontSize = width * 0.13;
+
+            titleText.setFont(Fonts.robotoRegular(fontSize));
+            titleText.setText(gauge.getTitle());
+            if ( titleText.getLayoutBounds().getWidth() > maxWidth ) {
+                Helper.adjustTextSize(titleText, maxWidth, fontSize);
+            }
             titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0);
 
-            unitText.setFont(Fonts.robotoRegular(0.08 * width));
+            fontSize = width * 0.08;
+
+            unitText.setFont(Fonts.robotoRegular(fontSize));
+            unitText.setText(gauge.getUnit());
+            if ( unitText.getLayoutBounds().getWidth() > maxWidth ) {
+                Helper.adjustTextSize(unitText, maxWidth, fontSize);
+            }
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.075 * height);
 
             if (gauge.isLcdVisible()) {
@@ -506,10 +522,24 @@ public class LinearSkin extends GaugeSkinBase {
                 valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, height * 0.877);
             }
         } else {
-            titleText.setFont(Fonts.robotoRegular(0.15 * height));
+ 
+            double maxWidth = width * 0.8;
+            double fontSize = height * 0.15;
+
+            titleText.setFont(Fonts.robotoRegular(fontSize));
+            titleText.setText(gauge.getTitle());
+            if ( titleText.getLayoutBounds().getWidth() > maxWidth ) {
+                Helper.adjustTextSize(titleText, maxWidth, fontSize);
+            }
             titleText.relocate(0.03571429 * height, 0.03571429 * height);
 
+           fontSize = height * 0.1;
+
             unitText.setFont(Fonts.robotoRegular(0.1 * height));
+            unitText.setText(gauge.getUnit());
+            if ( unitText.getLayoutBounds().getWidth() > maxWidth ) {
+                Helper.adjustTextSize(unitText, maxWidth, fontSize);
+            }
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.8 * height);
 
             if (gauge.isLcdVisible()) {
