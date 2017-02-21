@@ -23,9 +23,13 @@ import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import java.util.List;
 import javafx.beans.InvalidationListener;
+import javafx.geometry.Insets;
 import javafx.scene.CacheHint;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
@@ -114,6 +118,7 @@ public class SimpleSectionSkin extends GaugeSkinBase {
         Helper.enableNode(unitText, gauge.isValueVisible() && !gauge.getUnit().isEmpty());
 
         pane = new Pane(barBackground, sectionCanvas, titleText, valueText, unitText, bar);
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
         getChildren().setAll(pane);
     }
@@ -271,6 +276,7 @@ public class SimpleSectionSkin extends GaugeSkinBase {
     }
 
     @Override protected void redraw() {
+        pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
         drawBackground();
         setBar(gauge.getCurrentValue());
 

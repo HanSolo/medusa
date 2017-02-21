@@ -888,12 +888,14 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     break;
                 case MODERN      :
                     CONTROL.setKnobPosition(Pos.CENTER);
+                    CONTROL.setBackgroundPaint(Color.rgb(32, 32, 32));
                     CONTROL.setDecimals(0);
                     CONTROL.setValueColor(Color.WHITE);
                     CONTROL.setTitleColor(Color.WHITE);
                     CONTROL.setSubTitleColor(Color.WHITE);
                     CONTROL.setUnitColor(Color.WHITE);
                     CONTROL.setBarColor(Color.rgb(0, 214, 215));
+                    CONTROL.setBarBackgroundColor(Color.rgb(57, 57, 57, 0.75));
                     CONTROL.setNeedleColor(Color.WHITE);
                     CONTROL.setThresholdColor(Color.rgb(204, 0, 0));
                     CONTROL.setTickLabelColor(Color.rgb(151, 151, 151));

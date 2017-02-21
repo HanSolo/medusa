@@ -80,10 +80,8 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.BAR)
-                            .barColor(Color.CORAL)
-                            .barEffectEnabled(false)
-                            .backgroundPaint(Color.ANTIQUEWHITE)
+                            .skinType(SkinType.MODERN)
+                            .barBackgroundColor(Color.DARKBLUE.deriveColor(0, 1, 1, 0.75))
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .decimals(0)
