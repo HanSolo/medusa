@@ -82,6 +82,10 @@ public class Test extends Application {
 
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.QUARTER)
+                            .majorTickMarkType(TickMarkType.PILL)
+                            .barColor(Color.CORAL)
+                            .barEffectEnabled(false)
+                            .backgroundPaint(Color.ANTIQUEWHITE)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)

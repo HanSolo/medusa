@@ -764,12 +764,14 @@ public class QuarterSkin extends GaugeSkinBase {
                     tickMarkType = majorTickMarkType;
                     tickMarkCtx.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
                     tickMarkCtx.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
-                    tickMarkCtx.setLineWidth(size * (TickMarkType.BOX == tickMarkType ? 0.016 : 0.0055));
+                    tickMarkCtx.setLineWidth(size * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.016 : 0.0055));
+                    tickMarkCtx.setLineCap(TickMarkType.PILL == tickMarkType ? StrokeLineCap.ROUND : StrokeLineCap.BUTT);
                 } else if (minorTickMarksVisible) {
                     tickMarkType = minorTickMarkType;
                     tickMarkCtx.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     tickMarkCtx.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
-                    tickMarkCtx.setLineWidth(size * (TickMarkType.BOX == tickMarkType ? 0.007 : 0.00225));
+                    tickMarkCtx.setLineWidth(size * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.007 : 0.00225));
+                    tickMarkCtx.setLineCap(TickMarkType.PILL == tickMarkType ? StrokeLineCap.ROUND : StrokeLineCap.BUTT);
                 }
                 if (fullRange && !isNotZero) {
                     tickMarkCtx.setFill(zeroColor);
