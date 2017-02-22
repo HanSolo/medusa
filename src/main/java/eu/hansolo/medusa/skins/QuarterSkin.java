@@ -216,8 +216,6 @@ public class QuarterSkin extends GaugeSkinBase {
         lcd.setArcWidth(0.0125 * PREFERRED_HEIGHT);
         lcd.setArcHeight(0.0125 * PREFERRED_HEIGHT);
         lcd.relocate((PREFERRED_WIDTH - lcd.getWidth()) * 0.5, 0.44 * PREFERRED_HEIGHT);
-        lcd.setManaged(gauge.isLcdVisible());
-        lcd.setVisible(gauge.isLcdVisible());
         Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
 
         needleRotate = new Rotate(180 - startAngle);
@@ -333,6 +331,7 @@ public class QuarterSkin extends GaugeSkinBase {
             Helper.enableNode(average, gauge.isAverageVisible());
             boolean markersVisible = gauge.getMarkersVisible();
             for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
+            resize();
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (gauge.isLedVisible()) { drawLed(); }
@@ -1040,12 +1039,16 @@ public class QuarterSkin extends GaugeSkinBase {
         
         // Draw Sections
         if (sectionsVisible && !sections.isEmpty()) {
-            xy       = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.105 * scaledSize : 0.03875 * scaledSize;
-            wh       = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledSize * 0.79 : scaledSize * 0.925;
-            offsetX  = Pos.BOTTOM_RIGHT == knobPosition || Pos.TOP_RIGHT == knobPosition ? 0 : -scaledSize * 0.4765;
-            offsetY  = Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.475 : 0;
+            xy       = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.11675 * scaledSize : 0.03265 * scaledSize;
+            wh       = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledSize * 0.7745 : scaledSize * 0.935;
+            offsetX  = TickLabelLocation.OUTSIDE == tickLabelLocation 
+                     ? ( Pos.BOTTOM_RIGHT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.0045 : -scaledSize * 0.4770 )
+                     : ( Pos.BOTTOM_RIGHT == knobPosition || Pos.TOP_RIGHT == knobPosition ? 0 : -scaledSize * 0.4738 );
+            offsetY  = TickLabelLocation.OUTSIDE == tickLabelLocation 
+                     ? ( Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.4770 : -scaledSize * 0.0045 )
+                     : ( Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.4738 : 0 );
             listSize = sections.size();
-            CTX.setLineWidth(scaledSize * 0.052);
+            CTX.setLineWidth(scaledSize * 0.04);
             CTX.setLineCap(StrokeLineCap.BUTT);
             for (int i = 0; i < listSize; i++) {
                 Section section = sections.get(i);
@@ -1683,13 +1686,13 @@ public class QuarterSkin extends GaugeSkinBase {
             ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
             if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));
 
-            resizeText();
             if (gauge.isLcdVisible()) {
                 lcd.setWidth(0.4 * size);
                 lcd.setHeight(0.114 * size);
                 lcd.setArcWidth(0.0125 * size);
                 lcd.setArcHeight(0.0125 * size);
             }
+            resizeText();
             resizeValueText();
 
             double needleWidth;
