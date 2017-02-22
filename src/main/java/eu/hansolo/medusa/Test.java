@@ -34,6 +34,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -80,11 +81,10 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.HORIZONTAL)
-                            .majorTickMarkType(TickMarkType.TRIANGLE)
-                            .tickLabelLocation(TickLabelLocation.OUTSIDE)
+                            .skinType(SkinType.QUARTER)
                             //.prefSize(400, 400)
-                            //.knobPosition(Pos.TOP_RIGHT)
+                            .knobPosition(Pos.BOTTOM_LEFT)
+                            .tickLabelLocation(TickLabelLocation.OUTSIDE)
                             .decimals(0)
                             .minValue(-20)
                             .maxValue(100)
@@ -95,14 +95,14 @@ public class Test extends Application {
                             .lcdFont(LcdFont.LCD)
                             //.locale(Locale.GERMANY)
                             //.numberFormat(numberFormat)
-                            .title("")
+                            .title("Very Large Title")
                             .unit("\u00B0C")
                             .subTitle("Only")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
                             .sections(new Section(-20,  0, Color.rgb(  0,   0, 255), Color.rgb(  0,   0, 255)),
                                       new Section(  0, 25, Color.rgb(255, 255,   0), Color.rgb(255, 255,   0)),
-                                      new Section( 25, 50, Color.rgb(255,   0,   0), Color.rgb(255, 255,   0)))
+                                      new Section( 75,100, Color.rgb(255,   0,   0), Color.rgb(255, 255,   0)))
                             .sectionsVisible(true)
                             .highlightSections(true)
                             .autoScale(true)
@@ -175,6 +175,14 @@ public class Test extends Application {
 
                     //epochSeconds+=20;
                     //clock.setTime(epochSeconds);
+
+//                    if ( counter++ >= 1 ) {
+//                        if ( !changed ) {
+//                            changed = true;
+//                            gauge.setLcdVisible(false);
+//                            System.out.println("*** CHANGED");
+//                        }
+//                    }
 
                     lastTimerCall = now;
                 }
