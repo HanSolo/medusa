@@ -80,10 +80,9 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.BAR)
-                            .barColor(Color.CORAL)
-                            .barEffectEnabled(false)
-                            .backgroundPaint(Color.ANTIQUEWHITE)
+                            .skinType(SkinType.HORIZONTAL)
+                            .majorTickMarkType(TickMarkType.TRIANGLE)
+                            .tickLabelLocation(TickLabelLocation.OUTSIDE)
                             //.prefSize(400, 400)
                             //.knobPosition(Pos.TOP_RIGHT)
                             .decimals(0)
@@ -184,7 +183,7 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        StackPane pane = new StackPane(clock);
+        StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(20));
         pane.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         LinearGradient gradient = new LinearGradient(0, 0, 0, pane.getLayoutBounds().getHeight(),
