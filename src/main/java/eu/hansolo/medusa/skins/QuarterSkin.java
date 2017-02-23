@@ -764,12 +764,14 @@ public class QuarterSkin extends GaugeSkinBase {
                     tickMarkType = majorTickMarkType;
                     tickMarkCtx.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
                     tickMarkCtx.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, majorTickMarkColor) : majorTickMarkColor);
-                    tickMarkCtx.setLineWidth(size * (TickMarkType.BOX == tickMarkType ? 0.016 : 0.0055));
+                    tickMarkCtx.setLineWidth(size * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.016 : 0.0055));
+                    tickMarkCtx.setLineCap(TickMarkType.PILL == tickMarkType ? StrokeLineCap.ROUND : StrokeLineCap.BUTT);
                 } else if (minorTickMarksVisible) {
                     tickMarkType = minorTickMarkType;
                     tickMarkCtx.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     tickMarkCtx.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
-                    tickMarkCtx.setLineWidth(size * (TickMarkType.BOX == tickMarkType ? 0.007 : 0.00225));
+                    tickMarkCtx.setLineWidth(size * (TickMarkType.BOX == tickMarkType || TickMarkType.PILL == tickMarkType ? 0.007 : 0.00225));
+                    tickMarkCtx.setLineCap(TickMarkType.PILL == tickMarkType ? StrokeLineCap.ROUND : StrokeLineCap.BUTT);
                 }
                 if (fullRange && !isNotZero) {
                     tickMarkCtx.setFill(zeroColor);
@@ -1037,12 +1039,16 @@ public class QuarterSkin extends GaugeSkinBase {
         
         // Draw Sections
         if (sectionsVisible && !sections.isEmpty()) {
-            xy       = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.105 * scaledSize : 0.03875 * scaledSize;
-            wh       = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledSize * 0.79 : scaledSize * 0.925;
-            offsetX  = Pos.BOTTOM_RIGHT == knobPosition || Pos.TOP_RIGHT == knobPosition ? 0 : -scaledSize * 0.4765;
-            offsetY  = Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.475 : 0;
+            xy       = TickLabelLocation.OUTSIDE == tickLabelLocation ? 0.11675 * scaledSize : 0.03265 * scaledSize;
+            wh       = TickLabelLocation.OUTSIDE == tickLabelLocation ? scaledSize * 0.7745 : scaledSize * 0.935;
+            offsetX  = TickLabelLocation.OUTSIDE == tickLabelLocation 
+                     ? ( Pos.BOTTOM_RIGHT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.0045 : -scaledSize * 0.4770 )
+                     : ( Pos.BOTTOM_RIGHT == knobPosition || Pos.TOP_RIGHT == knobPosition ? 0 : -scaledSize * 0.4738 );
+            offsetY  = TickLabelLocation.OUTSIDE == tickLabelLocation 
+                     ? ( Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.4770 : -scaledSize * 0.0045 )
+                     : ( Pos.TOP_LEFT == knobPosition || Pos.TOP_RIGHT == knobPosition ? -scaledSize * 0.4738 : 0 );
             listSize = sections.size();
-            CTX.setLineWidth(scaledSize * 0.052);
+            CTX.setLineWidth(scaledSize * 0.04);
             CTX.setLineCap(StrokeLineCap.BUTT);
             for (int i = 0; i < listSize; i++) {
                 Section section = sections.get(i);

@@ -34,6 +34,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -82,7 +83,8 @@ public class Test extends Application {
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.AMP)
                             //.prefSize(400, 400)
-                            //.knobPosition(Pos.TOP_RIGHT)
+                            .knobPosition(Pos.BOTTOM_LEFT)
+                            .tickLabelLocation(TickLabelLocation.OUTSIDE)
                             .decimals(0)
                             .minValue(-20)
                             .maxValue(100)
@@ -93,14 +95,14 @@ public class Test extends Application {
                             .lcdFont(LcdFont.LCD)
                             //.locale(Locale.GERMANY)
                             //.numberFormat(numberFormat)
-                            .title("")
+                            .title("Very Large Title")
                             .unit("\u00B0C")
                             .subTitle("Only")
                             //.interactive(true)
                             //.onButtonPressed(o -> System.out.println("Button pressed"))
                             .sections(new Section(-20,  0, Color.rgb(  0,   0, 255), Color.rgb(  0,   0, 255)),
                                       new Section(  0, 25, Color.rgb(255, 255,   0), Color.rgb(255, 255,   0)),
-                                      new Section( 25, 50, Color.rgb(255,   0,   0), Color.rgb(255, 255,   0)))
+                                      new Section( 75,100, Color.rgb(255,   0,   0), Color.rgb(255, 255,   0)))
                             .sectionsVisible(true)
                             .highlightSections(true)
                             .autoScale(true)
@@ -134,14 +136,16 @@ public class Test extends Application {
         epochSeconds = Instant.now().getEpochSecond();
 
         clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.INDUSTRIAL)
+                            .skinType(ClockSkinType.LCD)
                             .locale(Locale.GERMANY)
-                            .shadowsEnabled(true)
+                            .shadowsEnabled(false)
                             //.discreteSeconds(false)
                             //.discreteMinutes(false)
                             .running(true)
                             //.backgroundPaint(Color.web("#1f1e23"))
                             //.hourColor(Color.web("#dad9db"))
+                            .lcdFont(LcdFont.DIGITAL)
+                            .secondsVisible(true)
                             //.minuteColor(Color.web("#dad9db"))
                             //.secondColor(Color.web("#d1222b"))
                             //.hourTickMarkColor(Color.web("#9f9fa1"))

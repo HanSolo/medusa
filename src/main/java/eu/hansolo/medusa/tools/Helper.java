@@ -27,6 +27,18 @@ import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TickMarkType;
 import eu.hansolo.medusa.TimeSection;
+import java.math.BigDecimal;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.ChronoField;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
@@ -47,19 +59,6 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-
-import java.math.BigDecimal;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.time.temporal.ChronoField;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
 
 
 /**
@@ -620,17 +619,17 @@ public class Helper {
                     triangleMajorInnerPointX    = centerX + SIZE * 0.3585 * sinValue;
                     triangleMajorInnerPointY    = centerY + SIZE * 0.3585 * cosValue;
                     triangleMajorOuterPointX    = centerX + SIZE * 0.4105 * sinValue;
-                    triangleMajorOuterPointY    = centerX + SIZE * 0.4105 * cosValue;
+                    triangleMajorOuterPointY    = centerY + SIZE * 0.4105 * cosValue;
 
                     triangleMediumInnerPointX   = triangleMajorInnerPointX;
                     triangleMediumInnerPointY   = triangleMajorInnerPointY;
                     triangleMediumOuterPointX   = centerX + SIZE * 0.4045 * sinValue;
-                    triangleMediumOuterPointY   = centerX + SIZE * 0.4045 * cosValue;
+                    triangleMediumOuterPointY   = centerY + SIZE * 0.4045 * cosValue;
 
                     triangleMinorInnerPointX    = triangleMajorInnerPointX;
                     triangleMinorInnerPointY    = triangleMajorInnerPointY;
                     triangleMinorOuterPointX    = centerX + SIZE * 0.3975 * sinValue;
-                    triangleMinorOuterPointY    = centerX + SIZE * 0.3975 * cosValue;
+                    triangleMinorOuterPointY    = centerY + SIZE * 0.3975 * cosValue;
                     break;
                 case INSIDE:
                 default:
@@ -697,17 +696,17 @@ public class Helper {
                     trapezoidMinorOuterPoint2Y  = centerY + SIZE * 0.475 * Math.cos(trapezoidMinorOuterAngle2);
 
                     triangleMajorInnerPointX    = centerX + SIZE * 0.423 * sinValue;
-                    triangleMajorInnerPointY    = centerX + SIZE * 0.423 * cosValue;
+                    triangleMajorInnerPointY    = centerY + SIZE * 0.423 * cosValue;
                     triangleMajorOuterPointX    = centerX + SIZE * 0.475 * sinValue;
-                    triangleMajorOuterPointY    = centerX + SIZE * 0.475 * cosValue;
+                    triangleMajorOuterPointY    = centerY + SIZE * 0.475 * cosValue;
 
                     triangleMediumInnerPointX   = centerX + SIZE * 0.43 * sinValue;
-                    triangleMediumInnerPointY   = centerX + SIZE * 0.43 * cosValue;
+                    triangleMediumInnerPointY   = centerY + SIZE * 0.43 * cosValue;
                     triangleMediumOuterPointX   = triangleMajorOuterPointX;
                     triangleMediumOuterPointY   = triangleMajorOuterPointY;
 
                     triangleMinorInnerPointX    = centerX + SIZE * 0.436 * sinValue;
-                    triangleMinorInnerPointY    = centerX + SIZE * 0.436 * cosValue;
+                    triangleMinorInnerPointY    = centerY + SIZE * 0.436 * cosValue;
                     triangleMinorOuterPointX    = triangleMajorOuterPointX;
                     triangleMinorOuterPointY    = triangleMajorOuterPointY;
                     break;
