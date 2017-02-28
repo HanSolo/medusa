@@ -335,6 +335,7 @@ public class HSkin extends GaugeSkinBase {
             Helper.enableNode(average, gauge.isAverageVisible());
             boolean markersVisible = gauge.getMarkersVisible();
             for (Shape shape : markerMap.values()) { Helper.enableNode(shape, markersVisible); }
+            resize();
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (gauge.isLedVisible()) { drawLed(); }
