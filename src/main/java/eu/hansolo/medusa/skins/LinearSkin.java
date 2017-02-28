@@ -160,7 +160,7 @@ public class LinearSkin extends GaugeSkinBase {
         lcd.setArcWidth(0.0125 * preferredHeight);
         lcd.setArcHeight(0.0125 * preferredHeight);
         lcd.relocate((preferredWidth - lcd.getWidth()) * 0.5, 0.44 * preferredHeight);
-        Helper.enableNode(lcd, gauge.isLcdVisible());
+        Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
 
         bar = new Rectangle();
         bar.setStroke(null);
@@ -220,6 +220,7 @@ public class LinearSkin extends GaugeSkinBase {
             Helper.enableNode(valueText, gauge.isValueVisible());
             Helper.enableNode(lcd, (gauge.isLcdVisible() && gauge.isValueVisible()));
             Helper.enableNode(barHighlight, gauge.isBarEffectEnabled());
+            resize();
             redraw();
         } else if ("LED".equals(EVENT_TYPE)) {
             if (gauge.isLedVisible()) { drawLed(); }
@@ -643,11 +644,13 @@ public class LinearSkin extends GaugeSkinBase {
                 ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
                 if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));
 
-                lcd.setWidth(0.8 * width);
-                lcd.setHeight(0.22 * width);
-                lcd.setArcWidth(0.0125 * size);
-                lcd.setArcHeight(0.0125 * size);
-                lcd.relocate((width - lcd.getWidth()) * 0.5, 0.87 * height);
+                if (gauge.isLcdVisible()) {
+                    lcd.setWidth(0.8 * width);
+                    lcd.setHeight(0.22 * width);
+                    lcd.setArcWidth(0.0125 * size);
+                    lcd.setArcHeight(0.0125 * size);
+                    lcd.relocate((width - lcd.getWidth()) * 0.5, 0.87 * height);
+                }
             } else {
                 height   = width / aspectRatio;
                 size     = width < height ? width : height;
@@ -717,11 +720,13 @@ public class LinearSkin extends GaugeSkinBase {
                 ledOnShadow  = isFlatLed ? null : new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 0.07 * ledSize, 0, 0, 0);
                 if (!isFlatLed) ledOnShadow.setInput(new DropShadow(BlurType.TWO_PASS_BOX, gauge.getLedColor(), 0.36 * ledSize, 0, 0, 0));
 
-                lcd.setWidth(0.3 * width);
-                lcd.setHeight(0.22 * height);
-                lcd.setArcWidth(0.0125 * size);
-                lcd.setArcHeight(0.0125 * size);
-                lcd.relocate((width - lcd.getWidth()) - 0.03571429 * height, 0.03571429 * height);
+                if (gauge.isLcdVisible()) {
+                    lcd.setWidth(0.3 * width);
+                    lcd.setHeight(0.22 * height);
+                    lcd.setArcWidth(0.0125 * size);
+                    lcd.setArcHeight(0.0125 * size);
+                    lcd.relocate((width - lcd.getWidth()) - 0.03571429 * height, 0.03571429 * height);
+                }
             }
 
             resizeText();

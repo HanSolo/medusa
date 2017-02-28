@@ -906,6 +906,15 @@ public class QuarterSkin extends GaugeSkinBase {
                             Helper.drawLine(tickMarkCtx, innerMediumPointX, innerMediumPointY, outerPointX, outerPointY);
                         }
                         break;
+                    case PILL:
+                        tickMarkCtx.setLineCap(StrokeLineCap.ROUND);
+                        tickMarkCtx.setLineWidth(size * 0.009);
+                        if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
+                            Helper.drawLine(tickMarkCtx, innerPointX, innerPointY, outerMediumPointX, outerMediumPointY);
+                        } else {
+                            Helper.drawLine(tickMarkCtx, innerMediumPointX, innerMediumPointY, outerPointX, outerPointY);
+                        }
+                        break;
                     case LINE:
                     default:
                         tickMarkCtx.setLineWidth(size * 0.0035);
@@ -937,6 +946,15 @@ public class QuarterSkin extends GaugeSkinBase {
                             Helper.drawDot(tickMarkCtx, dotMinorCenterX - minorHalfDotSize, dotMinorCenterY - minorHalfDotSize, minorDotSize);
                             break;
                         case BOX:
+                            tickMarkCtx.setLineWidth(size * 0.007);
+                            if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
+                                Helper.drawLine(tickMarkCtx, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);
+                            } else {
+                                Helper.drawLine(tickMarkCtx, innerMinorPointX, innerMinorPointY, outerPointX, outerPointY);
+                            }
+                            break;
+                        case PILL:
+                            tickMarkCtx.setLineCap(StrokeLineCap.ROUND);
                             tickMarkCtx.setLineWidth(size * 0.007);
                             if (TickLabelLocation.OUTSIDE == tickLabelLocation) {
                                 Helper.drawLine(tickMarkCtx, innerPointX, innerPointY, outerMinorPointX, outerMinorPointY);

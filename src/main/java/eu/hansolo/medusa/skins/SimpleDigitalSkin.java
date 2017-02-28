@@ -169,6 +169,8 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
             Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
             sectionsVisible  = gauge.getSectionsVisible();
             thresholdVisible = gauge.isThresholdVisible();
+            resize();
+            redraw();
         } else if ("DECIMALS".equals(EVENT_TYPE)) {
             formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         }

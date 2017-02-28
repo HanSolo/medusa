@@ -237,6 +237,7 @@ public class DashboardSkin extends GaugeSkinBase {
             boolean thresholdVisible = gauge.isThresholdVisible();
             Helper.enableNode(threshold, thresholdVisible);
             Helper.enableNode(thresholdText, thresholdVisible);
+            resize();
             redraw();
         }
     }

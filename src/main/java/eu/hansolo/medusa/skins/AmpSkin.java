@@ -218,12 +218,11 @@ public class AmpSkin extends GaugeSkinBase {
         lcd.setArcWidth(0.0125 * PREFERRED_HEIGHT);
         lcd.setArcHeight(0.0125 * PREFERRED_HEIGHT);
         lcd.relocate((PREFERRED_WIDTH - lcd.getWidth()) * 0.5, 0.44 * PREFERRED_HEIGHT);
-        lcd.setManaged(gauge.isLcdVisible());
-        lcd.setVisible(gauge.isLcdVisible());
+        Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
 
         lcdText = new Label(String.format(locale, "%." + gauge.getDecimals() + "f", gauge.getValue()));
         lcdText.setAlignment(Pos.CENTER_RIGHT);
-        lcdText.setVisible(gauge.isLcdVisible());
+        lcdText.setVisible(gauge.isValueVisible());
 
         // Set initial value
         angleStep          = ANGLE_RANGE / gauge.getRange();
@@ -272,13 +271,19 @@ public class AmpSkin extends GaugeSkinBase {
         } else if ("ANGLE".equals(EVENT_TYPE)) {
             double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + gauge.getMinValue();
             lcdText.setText((String.format(locale, formatString, currentValue)));
-            lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
+            if (gauge.isLcdVisible()) {
+                lcdText.setAlignment(Pos.CENTER_RIGHT);
+                lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
+            } else {
+                lcdText.setAlignment(Pos.CENTER);
+                lcdText.setTranslateX((width - lcdText.getLayoutBounds().getWidth()) * 0.5);
+            }
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             enableNode(ledCanvas, gauge.isLedVisible());
             enableNode(titleText, !gauge.getTitle().isEmpty());
             enableNode(unitText, !gauge.getUnit().isEmpty());
             enableNode(lcd,gauge.isLcdVisible());
-            enableNode(lcdText,gauge.isLcdVisible());
+            enableNode(lcdText,gauge.isValueVisible());
             enableNode(threshold, gauge.isThresholdVisible());
             enableNode(average, gauge.isAverageVisible());
             boolean markersVisible = gauge.getMarkersVisible();
@@ -610,33 +615,44 @@ public class AmpSkin extends GaugeSkinBase {
     private void resizeText() {
         resizeStaticText();
 
-        lcdText.setPadding(new Insets(0, 0.005 * width, 0, 0.005 * width));
+        if (gauge.isLcdVisible()) {
 
-        switch(gauge.getLcdFont()) {
-            case LCD:
-                lcdText.setFont(Fonts.digital(0.108 * height));
-                lcdText.setTranslateY(0.45 * height);
-                break;
-            case DIGITAL:
-                lcdText.setFont(Fonts.digitalReadout(0.105 * height));
-                lcdText.setTranslateY(0.44 * height);
-                break;
-            case DIGITAL_BOLD:
-                lcdText.setFont(Fonts.digitalReadoutBold(0.105 * height));
-                lcdText.setTranslateY(0.44 * height);
-                break;
-            case ELEKTRA:
-                lcdText.setFont(Fonts.elektra(0.1116 * height));
-                lcdText.setTranslateY(0.435 * height);
-                break;
-            case STANDARD:
-            default:
-                lcdText.setFont(Fonts.robotoMedium(0.09 * height));
-                lcdText.setTranslateY(0.43 * height);
-                break;
+            lcdText.setPadding(new Insets(0, 0.005 * width, 0, 0.005 * width));
+
+            switch(gauge.getLcdFont()) {
+                case LCD:
+                    lcdText.setFont(Fonts.digital(0.108 * height));
+                    lcdText.setTranslateY(0.45 * height);
+                    break;
+                case DIGITAL:
+                    lcdText.setFont(Fonts.digitalReadout(0.105 * height));
+                    lcdText.setTranslateY(0.44 * height);
+                    break;
+                case DIGITAL_BOLD:
+                    lcdText.setFont(Fonts.digitalReadoutBold(0.105 * height));
+                    lcdText.setTranslateY(0.44 * height);
+                    break;
+                case ELEKTRA:
+                    lcdText.setFont(Fonts.elektra(0.1116 * height));
+                    lcdText.setTranslateY(0.435 * height);
+                    break;
+                case STANDARD:
+                default:
+                    lcdText.setFont(Fonts.robotoMedium(0.09 * height));
+                    lcdText.setTranslateY(0.43 * height);
+                    break;
+            }
+            lcdText.setAlignment(Pos.CENTER_RIGHT);
+            lcdText.setPrefSize(0.3 * width, 0.014 * height);
+            lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
+
+        } else {
+            lcdText.setAlignment(Pos.CENTER);
+            lcdText.setFont(Fonts.robotoMedium(height * 0.1));
+            lcdText.setPrefSize(0.3 * width, 0.014 * height);
+            lcdText.setTranslateY(0.43 * height);
+            lcdText.setTranslateX((width - lcdText.getLayoutBounds().getWidth()) * 0.5);
         }
-        lcdText.setPrefSize(0.3 * width, 0.014 * height);
-        lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
     }
 
     @Override public void dispose() {
