@@ -427,7 +427,14 @@ public class ModernSkin extends GaugeSkinBase {
         CTX.setStroke(CURRENT_VALUE < threshold ? barColor : thresholdColor);
         CTX.setLineWidth(size * 0.01666667);
         CTX.setLineCap(StrokeLineCap.BUTT);
-        CTX.strokeArc(barXY, barXY, barWH, barWH, BAR_START_ANGLE, -barAngleExtend, ArcType.OPEN);
+        if ( gauge.isStartFromZero() ) {
+            double offset = minValue * angleStep;
+            CTX.strokeArc(barXY, barXY, barWH, barWH, BAR_START_ANGLE + offset,
+                          -barAngleExtend - offset,
+                          ArcType.OPEN);
+        } else {
+            CTX.strokeArc(barXY, barXY, barWH, barWH, BAR_START_ANGLE, -barAngleExtend, ArcType.OPEN);
+        }
         CTX.restore();
     }
 
