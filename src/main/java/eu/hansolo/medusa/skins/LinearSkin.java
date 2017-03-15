@@ -367,59 +367,109 @@ public class LinearSkin extends GaugeSkinBase {
     }
 
     private void setBar(final double VALUE) {
-        double maxValue = (gauge.getMaxValue() - gauge.getMinValue()) * stepSize;
+
+        double maxValue = ( gauge.getMaxValue() - gauge.getMinValue() ) * stepSize;
+
         if (Orientation.VERTICAL == orientation) {
-            double valueHeight;
+
+            double valueHeight = 0;
+            double layoutY = 0;
+
             if (gauge.isStartFromZero()) {
-                if (VALUE < 0) {
-                    valueHeight = clamp(0, maxValue, Math.abs(VALUE) * stepSize);
-                    bar.setLayoutY(0);
-                    barHighlight.setLayoutY(0);
-                } else {
-                    valueHeight = clamp(0, maxValue, VALUE * stepSize);
-                    bar.setLayoutY(-valueHeight);
-                    barHighlight.setLayoutY(-valueHeight);
+
+                double maxV = gauge.getMaxValue();
+                double maxY = maxV * stepSize;
+                double minV = gauge.getMinValue();
+                double minY = minV * stepSize;
+                double valY = VALUE * stepSize;
+
+                if ( ( valY > minY || minY < 0 ) && ( valY < maxY || maxY > 0 ) ) {
+
+                    valY = clamp(minY, maxY, valY);
+
+                    if ( maxY < 0 ) {
+                        layoutY = - maxY;
+                        valueHeight = maxY - valY;
+                    } else if ( minY > 0 ) {
+                        layoutY = - valY;
+                        valueHeight = valY - minY;
+                    } else if ( valY < 0 ) {
+                        layoutY = 0;
+                        valueHeight = - valY;
+                    } else {
+                        layoutY = - valY;
+                        valueHeight = valY;
+                    }
+
                 }
+
             } else {
-                valueHeight = clamp(0, maxValue, (VALUE - gauge.getMinValue()) * stepSize);
-                bar.setLayoutY(-valueHeight);
-                barHighlight.setLayoutY(-valueHeight);
+                valueHeight = clamp(0, maxValue, ( VALUE - gauge.getMinValue() ) * stepSize);
+                layoutY = -valueHeight;
             }
+
+            bar.setLayoutY(layoutY);
             bar.setHeight(valueHeight);
+            barHighlight.setLayoutY(layoutY);
             barHighlight.setHeight(valueHeight);
 
+            valueText.setText(String.format(locale, formatString, VALUE));
+
             if (gauge.isLcdVisible()) {
-                valueText.setText(String.format(locale, formatString, VALUE));
                 valueText.setLayoutX((0.88 * width - valueText.getLayoutBounds().getWidth()));
             } else {
-                valueText.setText(String.format(locale, formatString, VALUE));
                 valueText.setLayoutX((width - valueText.getLayoutBounds().getWidth()) * 0.5);
             }
+
         } else {
-            double valueWidth;
+
+            double valueWidth = 0;
+            double layoutX = 0;
+
             if (gauge.isStartFromZero()) {
-                if (VALUE < 0) {
-                    valueWidth = clamp(0, maxValue, Math.abs(VALUE) * stepSize);
-                    bar.setLayoutX(-valueWidth);
-                    barHighlight.setLayoutX(-valueWidth);
-                } else {
-                    valueWidth = clamp(0, maxValue, VALUE * stepSize);
-                    bar.setLayoutX(0);
-                    barHighlight.setLayoutX(0);
+
+                double maxV = gauge.getMaxValue();
+                double maxX = maxV * stepSize;
+                double minV = gauge.getMinValue();
+                double minX = minV * stepSize;
+                double valX = VALUE * stepSize;
+
+                if ( ( valX > minX || minX < 0 ) && ( valX < maxX || maxX > 0 ) ) {
+
+                    valX = clamp(minX, maxX, valX);
+
+                    if ( maxX < 0 ) {
+                        layoutX = valX;
+                        valueWidth = maxX - valX;
+                    } else if ( minX > 0 ) {
+                        layoutX = minX;
+                        valueWidth = valX - minX;
+                    } else if ( valX < 0 ) {
+                        layoutX = valX;
+                        valueWidth = - valX;
+                    } else {
+                        layoutX = 0;
+                        valueWidth = valX;
+                    }
+
                 }
+
             } else {
-                valueWidth = clamp(0, maxValue, (VALUE - gauge.getMinValue()) * stepSize);
-                bar.setLayoutX(0);
-                barHighlight.setLayoutX(0);
+                valueWidth = clamp(0, maxValue, ( VALUE - gauge.getMinValue() ) * stepSize);
             }
+
+            bar.setLayoutX(layoutX);
             bar.setWidth(valueWidth);
+            barHighlight.setLayoutX(layoutX);
             barHighlight.setWidth(valueWidth);
 
             valueText.setText(String.format(locale, formatString, VALUE));
-            valueText.setLayoutX((0.98 * width - valueText.getLayoutBounds().getWidth()));
+            valueText.setLayoutX(( 0.98 * width - valueText.getLayoutBounds().getWidth() ));
+
         }
 
         setBarColor(VALUE);
+
     }
     private void setBarColor(final double VALUE) {
         if (!gauge.getAreasVisible() && !gauge.isGradientBarEnabled()) {
@@ -600,7 +650,7 @@ public class LinearSkin extends GaugeSkinBase {
                 minValuePosition = barBackground.getLayoutY() + barBackground.getLayoutBounds().getHeight();
                 maxValuePosition = barBackground.getLayoutY();
                 zeroPosition     = minValuePosition + gauge.getMinValue() * stepSize;
-                zeroPosition     = zeroPosition > minValuePosition ? minValuePosition : zeroPosition;
+//                zeroPosition     = zeroPosition > minValuePosition ? minValuePosition : zeroPosition;
 
                 barBorder1.setStartX(barBackground.getLayoutX() - 1);
                 barBorder1.setStartY(maxValuePosition);
@@ -676,7 +726,7 @@ public class LinearSkin extends GaugeSkinBase {
                 minValuePosition = barBackground.getLayoutX();
                 maxValuePosition = barBackground.getLayoutX() + barBackground.getLayoutBounds().getWidth();
                 zeroPosition     = minValuePosition - gauge.getMinValue() * stepSize;
-                zeroPosition     = zeroPosition < minValuePosition ? minValuePosition : zeroPosition;
+//                zeroPosition     = zeroPosition < minValuePosition ? minValuePosition : zeroPosition;
 
                 barBorder1.setStartX(minValuePosition);
                 barBorder1.setStartY(barBackground.getLayoutY() - 1);

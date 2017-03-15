@@ -34,6 +34,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -81,13 +82,15 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.AMP)
+                            .skinType(SkinType.LINEAR)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
-                            .decimals(0)
+                            .decimals(2)
                             .minValue(-20)
-                            .maxValue(100)
+                            .maxValue(-10)
+                            .startFromZero(true)
+                            .orientation(Orientation.VERTICAL)
                             .animated(true)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
@@ -127,7 +130,7 @@ public class Test extends Application {
         //gauge.setAlert(true);
 
         // Calling bind() directly sets a value to gauge
-        gauge.valueProperty().bind(value);
+        gauge.valueProperty().bindBidirectional(value);
 
         gauge.getSections().forEach(section -> section.setOnSectionUpdate(sectionEvent -> gauge.fireUpdateEvent(new UpdateEvent(Test.this, EventType.REDRAW))));
 
@@ -160,7 +163,7 @@ public class Test extends Application {
 
             @Override public void handle(long now) {
                 if (now > lastTimerCall + 3_000_000_000l) {
-                    double v = RND.nextDouble() * gauge.getRange() * 1.1 + gauge.getMinValue();
+                    double v = gauge.getRange() * ( RND.nextDouble() * 1.3 - 0.15 ) + gauge.getMinValue();
                     value.set(v);
                     //System.out.println(v);
                     //gauge.setValue(v);
