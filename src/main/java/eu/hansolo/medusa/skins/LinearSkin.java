@@ -650,7 +650,6 @@ public class LinearSkin extends GaugeSkinBase {
                 minValuePosition = barBackground.getLayoutY() + barBackground.getLayoutBounds().getHeight();
                 maxValuePosition = barBackground.getLayoutY();
                 zeroPosition     = minValuePosition + gauge.getMinValue() * stepSize;
-//                zeroPosition     = zeroPosition > minValuePosition ? minValuePosition : zeroPosition;
 
                 barBorder1.setStartX(barBackground.getLayoutX() - 1);
                 barBorder1.setStartY(maxValuePosition);
@@ -726,7 +725,6 @@ public class LinearSkin extends GaugeSkinBase {
                 minValuePosition = barBackground.getLayoutX();
                 maxValuePosition = barBackground.getLayoutX() + barBackground.getLayoutBounds().getWidth();
                 zeroPosition     = minValuePosition - gauge.getMinValue() * stepSize;
-//                zeroPosition     = zeroPosition < minValuePosition ? minValuePosition : zeroPosition;
 
                 barBorder1.setStartX(minValuePosition);
                 barBorder1.setStartY(barBackground.getLayoutY() - 1);
