@@ -152,17 +152,36 @@ public class SlimSkin extends GaugeSkinBase {
         }
     }
 
-    private void setBar(final double VALUE) {
-        if (minValue > 0) {
-            bar.setLength((minValue - VALUE) * angleStep);
+    private void setBar( final double VALUE ) {
+
+        double barLength = 0;
+        double min = gauge.getMinValue();
+        double max = gauge.getMaxValue();
+        double clampedValue = Helper.clamp(min, max, VALUE);
+
+        if ( gauge.isStartFromZero() ) {
+            if ( ( VALUE > min || min < 0 ) && ( VALUE < max || max > 0 ) ) {
+                if ( max < 0 ) {
+                    barLength = ( max - clampedValue ) * angleStep;
+                } else if ( min > 0 ) {
+                    barLength = ( min - clampedValue ) * angleStep;
+                } else {
+                    barLength = - clampedValue * angleStep;
+                }
+            }
         } else {
-            bar.setLength(-VALUE * angleStep);
+            barLength = ( min - clampedValue ) * angleStep;
         }
+
+        bar.setLength(barLength);
+
         setBarColor(VALUE);
         valueText.setText(String.format(locale, formatString, VALUE));
         resizeValueText();
+
     }
-    private void setBarColor(final double VALUE) {
+
+    private void setBarColor( final double VALUE ) {
         if (!sectionsVisible && !colorGradientEnabled) {
             bar.setStroke(gauge.getBarColor());
         } else if (colorGradientEnabled && noOfGradientStops > 1) {

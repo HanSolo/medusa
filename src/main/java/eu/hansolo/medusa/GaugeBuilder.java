@@ -916,6 +916,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 case SLIM        :
                     CONTROL.setKnobPosition(Pos.CENTER);
                     CONTROL.setDecimals(2);
+                    CONTROL.setStartFromZero(true);
                     CONTROL.setBarBackgroundColor(Color.rgb(62, 67, 73));
                     CONTROL.setBarColor(Color.rgb(93,190,205));
                     CONTROL.setTitleColor(Color.rgb(142,147,151));
