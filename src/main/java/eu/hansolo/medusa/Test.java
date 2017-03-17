@@ -81,13 +81,14 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.AMP)
+                            .skinType(SkinType.SIMPLE_DIGITAL)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
-                            .decimals(0)
-                            .minValue(-20)
-                            .maxValue(100)
+                            .decimals(2)
+                            .minValue(-10)
+                            .maxValue(10)
+                            .startFromZero(true)
                             .animated(true)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
@@ -127,7 +128,7 @@ public class Test extends Application {
         //gauge.setAlert(true);
 
         // Calling bind() directly sets a value to gauge
-        gauge.valueProperty().bind(value);
+        gauge.valueProperty().bindBidirectional(value);
 
         gauge.getSections().forEach(section -> section.setOnSectionUpdate(sectionEvent -> gauge.fireUpdateEvent(new UpdateEvent(Test.this, EventType.REDRAW))));
 
@@ -160,7 +161,7 @@ public class Test extends Application {
 
             @Override public void handle(long now) {
                 if (now > lastTimerCall + 3_000_000_000l) {
-                    double v = RND.nextDouble() * gauge.getRange() * 1.1 + gauge.getMinValue();
+                    double v = gauge.getRange() * ( RND.nextDouble() * 1.3 - 0.15 ) + gauge.getMinValue();
                     value.set(v);
                     //System.out.println(v);
                     //gauge.setValue(v);
