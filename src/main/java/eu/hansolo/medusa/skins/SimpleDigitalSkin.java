@@ -215,13 +215,13 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         } else {
             if (Double.compare(VALUE, 0) != 0) {
                 if (VALUE < 0) {
-                    for (int i = (minValueAngle - 1); i >= 0; i--) {
+                    for (int i = Math.min(minValueAngle, 280) - 1; i >= 0; i--) {
                         if (i % 10 == 0 && i > v - 10) {
                             barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, (-i - 139), 9.2, ArcType.OPEN);
                         }
                     }
                 } else {
-                    for (int i = minValueAngle; i < 280; i++) {
+                    for (int i = Math.max(minValueAngle, 0) - 5; i < 280; i++) {
                         if (i % 10 == 0 && i < v) {
                             barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, (-i - 139), 9.2, ArcType.OPEN);
                         }
