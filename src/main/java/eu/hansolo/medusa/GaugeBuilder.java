@@ -852,6 +852,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setDecimals(0);
                     CONTROL.setBarBackgroundColor(Color.LIGHTGRAY);
                     CONTROL.setBarColor(Color.rgb(93,190,205));
+                    CONTROL.setStartFromZero(false);
                     break;
                 case FLAT        :
                     CONTROL.setKnobPosition(Pos.CENTER);
