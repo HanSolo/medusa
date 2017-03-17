@@ -215,7 +215,7 @@ public class DigitalSkin extends GaugeSkinBase {
                         }
                     }
                 } else {
-                    for (int i = minValueAngle; i <= 300; i++) {
+                    for (int i = minValueAngle - 3; i < 300; i++) {
                         if (i % 6 == 0 && i < v) {
                             barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.3, barWidth * 0.5 + barWidth * 0.3, size - barWidth - barWidth * 0.6, size - barWidth - barWidth * 0.6, (-i - 125), 4.6, ArcType.OPEN);
                         }
