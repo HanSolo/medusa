@@ -81,7 +81,7 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.AMP)
+                            .skinType(SkinType.DIGITAL)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
@@ -180,6 +180,8 @@ public class Test extends Application {
                         if ( !changed ) {
                             changed = true;
                             clock.setSecondsVisible(false);
+                            gauge.setTitle("LONG TITLE");
+                            gauge.setUnit("\u00B0CCCCCCCC");
                             System.out.println("*** CHANGED");
                         }
                     }
