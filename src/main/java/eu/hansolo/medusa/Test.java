@@ -88,6 +88,7 @@ public class Test extends Application {
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
                             .decimals(2)
                             .minValue(-20)
+
                             .maxValue(-10)
                             .startFromZero(true)
                             .orientation(Orientation.VERTICAL)
@@ -183,6 +184,8 @@ public class Test extends Application {
                         if ( !changed ) {
                             changed = true;
                             clock.setSecondsVisible(false);
+                            gauge.setTitle("LONG TITLE");
+                            gauge.setUnit("\u00B0CCCCCCCC");
                             System.out.println("*** CHANGED");
                         }
                     }
