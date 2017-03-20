@@ -1025,6 +1025,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setAnimated(true);
                     CONTROL.setStartAngle(150);
                     CONTROL.setAngleRange(300);
+                    CONTROL.setStartFromZero(true);
                     CONTROL.setSectionsVisible(true);
                     CONTROL.setBarBackgroundColor(Color.rgb(150, 150, 150, 0.25));
                     CONTROL.setBarColor(Color.rgb(69, 106, 207));

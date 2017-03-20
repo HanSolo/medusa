@@ -82,16 +82,14 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LINEAR)
+                            .skinType(SkinType.SIMPLE_SECTION)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
                             .decimals(2)
                             .minValue(-20)
-
-                            .maxValue(-10)
+                            .maxValue(100)
                             .startFromZero(true)
-                            .orientation(Orientation.VERTICAL)
                             .animated(true)
                             //.checkThreshold(true)
                             //.onThresholdExceeded(e -> System.out.println("threshold exceeded"))
