@@ -249,17 +249,81 @@ public class DashboardSkin extends GaugeSkinBase {
 
 
     // ******************** Private Methods ***********************************
-    private void setBar(final double VALUE) {
-        currentValueAngle = Helper.clamp(90.0, 270.0, (VALUE - minValue) * angleStep + 90.0);
-        dataBarOuterArc.setX(centerX + (0.675 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
-        dataBarOuterArc.setY(centerX + (0.675 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
-        dataBarLineToInnerArc.setX(centerX + (0.3 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
-        dataBarLineToInnerArc.setY(centerX + (0.3 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
+    private void setBar( final double VALUE ) {
+
+        currentValueAngle = Helper.clamp(90.0, 270.0, ( VALUE - minValue ) * angleStep + 90.0);
+
+        double smallHeight     = 0.675 * height;
+        double tinyHeight      = 0.3 * height;
+        double currentValueSin = Math.sin(-Math.toRadians(currentValueAngle));
+        double currentValueCos = Math.cos(-Math.toRadians(currentValueAngle));
+
+        dataBarOuterArc.setX(centerX + smallHeight * currentValueSin);
+        dataBarOuterArc.setY(centerX + smallHeight * currentValueCos);
+        dataBarLineToInnerArc.setX(centerX + tinyHeight * currentValueSin);
+        dataBarLineToInnerArc.setY(centerX + tinyHeight * currentValueCos);
+
+        if (gauge.isStartFromZero()) {
+
+            double min = gauge.getMinValue();
+            double max = gauge.getMaxValue();
+
+            if ( ( VALUE > min || min < 0 ) && ( VALUE < max || max > 0 ) ) {
+                if ( max < 0 ) {
+                    dataBarStart.setX(centerX + smallHeight);
+                    dataBarStart.setY(smallHeight);
+                    dataBarOuterArc.setSweepFlag(false);
+                    dataBarInnerArc.setX(centerX + tinyHeight);
+                    dataBarInnerArc.setY(smallHeight);
+                    dataBarInnerArc.setSweepFlag(true);
+                } else if ( min > 0 ) {
+                    dataBarStart.setX(0);
+                    dataBarStart.setY(smallHeight);
+                    dataBarOuterArc.setSweepFlag(true);
+                    dataBarInnerArc.setX(0.27778 * width);
+                    dataBarInnerArc.setY(smallHeight);
+                    dataBarInnerArc.setSweepFlag(false);
+                } else {
+
+                    double zeroAngle = Helper.clamp(90.0, 270.0, 90.0 - minValue * angleStep);
+                    double zeroSin   = Math.sin(-Math.toRadians(zeroAngle));
+                    double zeroCos   = Math.cos(-Math.toRadians(zeroAngle));
+
+                    dataBarStart.setX(centerX + smallHeight * zeroSin);
+                    dataBarStart.setY(centerX + smallHeight * zeroCos);
+                    dataBarInnerArc.setX(centerX + tinyHeight * zeroSin);
+                    dataBarInnerArc.setY(centerX + tinyHeight * zeroCos);
+
+                    if ( VALUE < 0 ) {
+                        dataBarOuterArc.setSweepFlag(false);
+                        dataBarInnerArc.setSweepFlag(true);
+                    } else {
+                        dataBarOuterArc.setSweepFlag(true);
+                        dataBarInnerArc.setSweepFlag(false);
+                    }
+
+                }
+            }
+
+        } else {
+            dataBarStart.setX(0);
+            dataBarStart.setY(smallHeight);
+            dataBarOuterArc.setSweepFlag(true);
+            dataBarInnerArc.setX(0.27778 * width);
+            dataBarInnerArc.setY(smallHeight);
+            dataBarInnerArc.setSweepFlag(false);
+        }
+
         setBarColor(VALUE);
+
         valueText.setText(String.format(locale, formatString, VALUE));
-        if (valueText.getLayoutBounds().getWidth() > 0.28 * width) Helper.adjustTextSize(valueText, 0.28 * width, size * 0.24);
-        valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
+        if ( valueText.getLayoutBounds().getWidth() > 0.28 * width ) {
+            Helper.adjustTextSize(valueText, 0.28 * width, size * 0.24);
+        }
+        valueText.relocate(( width - valueText.getLayoutBounds().getWidth() ) * 0.5, 0.615 * height + ( 0.3 * height - valueText.getLayoutBounds().getHeight() ) * 0.5);
+
     }
+
     private void setBarColor(final double VALUE) {
         if (!sectionsVisible && !colorGradientEnabled) {
             dataBar.setFill(gauge.getBarColor());
