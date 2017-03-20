@@ -936,6 +936,7 @@ public class Gauge extends Control {
         if (null == unit) {
             _unit = UNIT;
             fireUpdateEvent(VISIBILITY_EVENT);
+            fireUpdateEvent(REDRAW_EVENT);
         } else {
             unit.set(UNIT);
         }
@@ -943,7 +944,10 @@ public class Gauge extends Control {
     public StringProperty unitProperty() {
         if (null == unit) {
             unit  = new StringPropertyBase(_unit) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { 
+                    fireUpdateEvent(VISIBILITY_EVENT);
+                    fireUpdateEvent(REDRAW_EVENT);
+                }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "unit"; }
             };

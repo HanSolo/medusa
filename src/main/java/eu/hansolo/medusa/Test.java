@@ -181,6 +181,8 @@ public class Test extends Application {
                         if ( !changed ) {
                             changed = true;
                             clock.setSecondsVisible(false);
+                            gauge.setTitle("LONG TITLE");
+                            gauge.setUnit("\u00B0CCCCCCCC");
                             System.out.println("*** CHANGED");
                         }
                     }
