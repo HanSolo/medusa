@@ -863,6 +863,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setUnitColor(Gauge.DARK_COLOR);
                     CONTROL.setBorderPaint(Color.rgb(208, 208, 208));
                     CONTROL.setDecimals(0);
+                    CONTROL.setStartFromZero(true);
                     break;
                 case INDICATOR   :
                     CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
