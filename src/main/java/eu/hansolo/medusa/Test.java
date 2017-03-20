@@ -82,12 +82,12 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.SIMPLE_DIGITAL)
+                            .skinType(SkinType.MODERN)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
                             .decimals(2)
-                            .minValue(-20)
+                            .minValue(20)
                             .maxValue(100)
                             .startFromZero(true)
                             .animated(true)
