@@ -852,6 +852,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setDecimals(0);
                     CONTROL.setBarBackgroundColor(Color.LIGHTGRAY);
                     CONTROL.setBarColor(Color.rgb(93,190,205));
+                    CONTROL.setStartFromZero(false);
                     break;
                 case FLAT        :
                     CONTROL.setKnobPosition(Pos.CENTER);
@@ -862,6 +863,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setUnitColor(Gauge.DARK_COLOR);
                     CONTROL.setBorderPaint(Color.rgb(208, 208, 208));
                     CONTROL.setDecimals(0);
+                    CONTROL.setStartFromZero(true);
                     break;
                 case INDICATOR   :
                     CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
@@ -1024,6 +1026,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setAnimated(true);
                     CONTROL.setStartAngle(150);
                     CONTROL.setAngleRange(300);
+                    CONTROL.setStartFromZero(true);
                     CONTROL.setSectionsVisible(true);
                     CONTROL.setBarBackgroundColor(Color.rgb(150, 150, 150, 0.25));
                     CONTROL.setBarColor(Color.rgb(69, 106, 207));
