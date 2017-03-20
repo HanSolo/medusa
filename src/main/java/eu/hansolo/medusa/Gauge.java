@@ -936,6 +936,7 @@ public class Gauge extends Control {
         if (null == unit) {
             _unit = UNIT;
             fireUpdateEvent(VISIBILITY_EVENT);
+            fireUpdateEvent(REDRAW_EVENT);
         } else {
             unit.set(UNIT);
         }
@@ -943,7 +944,10 @@ public class Gauge extends Control {
     public StringProperty unitProperty() {
         if (null == unit) {
             unit  = new StringPropertyBase(_unit) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { 
+                    fireUpdateEvent(VISIBILITY_EVENT);
+                    fireUpdateEvent(REDRAW_EVENT);
+                }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "unit"; }
             };
@@ -1376,7 +1380,7 @@ public class Gauge extends Control {
     public void setStartFromZero(final boolean IS_TRUE) {
         if (null == startFromZero) {
             _startFromZero = IS_TRUE;
-            setValue(IS_TRUE && getMinValue() < 0 ? 0 : getMinValue());
+            //setValue(IS_TRUE && getMinValue() < 0 ? 0 : getMinValue());
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             startFromZero.set(IS_TRUE);
@@ -1386,7 +1390,7 @@ public class Gauge extends Control {
         if (null == startFromZero) {
             startFromZero = new BooleanPropertyBase(_startFromZero) {
                 @Override protected void invalidated() {
-                    Gauge.this.setValue((get() && getMinValue() < 0) ? 0 : getMinValue());
+                    //Gauge.this.setValue((get() && getMinValue() < 0) ? 0 : getMinValue());
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
