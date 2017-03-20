@@ -82,7 +82,7 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.MODERN)
+                            .skinType(SkinType.SLIM)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
