@@ -354,16 +354,16 @@ public class ModernSkin extends GaugeSkinBase {
         highlightValue(tickMarkCtx, VALUE);
     }
 
-    private void highlightValue(final GraphicsContext CTX, final double CURRENT_VALUE) {
+    private void highlightValue( final GraphicsContext CTX, final double CURRENT_VALUE ) {
+
         CTX.clearRect(0, 0, size, size);
 
         // highlight tickmarks
-        double     sinValue;
-        double     cosValue;
         double     centerX                = size * 0.5;
         double     centerY                = size * 0.5;
         double     minorTickSpace         = gauge.getMinorTickSpace();
         double     minValue               = gauge.getMinValue();
+        double     maxValue               = gauge.getMaxValue();
         double     tmpAngleStep           = angleStep * minorTickSpace;
         BigDecimal minorTickSpaceBD       = BigDecimal.valueOf(minorTickSpace);
         BigDecimal majorTickSpaceBD       = BigDecimal.valueOf(gauge.getMajorTickSpace());
@@ -376,66 +376,97 @@ public class ModernSkin extends GaugeSkinBase {
         double     threshold              = gauge.getThreshold();
         Color      tickMarkColor          = Color.TRANSPARENT;
         Color      highlightColor         = CURRENT_VALUE < gauge.getThreshold() ? barColor : thresholdColor;
-
-        double innerPointX;
-        double innerPointY;
-        double outerPointX;
-        double outerPointY;
-        double innerMediumPointX;
-        double innerMediumPointY;
-        double outerMediumPointX;
-        double outerMediumPointY;
+        boolean    startFromZero          = gauge.isStartFromZero();
 
         CTX.setLineCap(StrokeLineCap.BUTT);
         CTX.setLineWidth(size * 0.0035);
-        for (double angle = 0 ; Double.compare(-ANGLE_RANGE - tmpAngleStep, angle) < 0 ; angle -= tmpAngleStep) {
-            sinValue = Math.sin(Math.toRadians(angle + START_ANGLE));
-            cosValue = Math.cos(Math.toRadians(angle + START_ANGLE));
 
-            innerPointX       = centerX + size * 0.375 * sinValue;
-            innerPointY       = centerY + size * 0.375 * cosValue;
-            outerPointX       = centerX + size * 0.425 * sinValue;
-            outerPointY       = centerY + size * 0.425 * cosValue;
-            innerMediumPointX = centerX + size * 0.35 * sinValue;
-            innerMediumPointY = centerY + size * 0.35 * cosValue;
-            outerMediumPointX = centerX + size * 0.4 * sinValue;
-            outerMediumPointY = centerY + size * 0.4 * cosValue;
+        for (double angle = 0 ; Double.compare(-ANGLE_RANGE - tmpAngleStep, angle) < 0 ; angle -= tmpAngleStep) {
+
+            double  sinValue          = Math.sin(Math.toRadians(angle + START_ANGLE));
+            double  cosValue          = Math.cos(Math.toRadians(angle + START_ANGLE));
+            double  innerPointX       = centerX + size * 0.375 * sinValue;
+            double  innerPointY       = centerY + size * 0.375 * cosValue;
+            double  outerPointX       = centerX + size * 0.425 * sinValue;
+            double  outerPointY       = centerY + size * 0.425 * cosValue;
+            double  innerMediumPointX = centerX + size * 0.35 * sinValue;
+            double  innerMediumPointY = centerY + size * 0.35 * cosValue;
+            double  outerMediumPointX = centerX + size * 0.4 * sinValue;
+            double  outerMediumPointY = centerY + size * 0.4 * cosValue;
+            boolean shouldHighlight   = false;
+
+            if ( startFromZero ) {
+                if ( ( CURRENT_VALUE > minValue || minValue < 0 ) && ( CURRENT_VALUE < maxValue || maxValue > 0 ) ) {
+                    if ( maxValue < 0 ) {
+                        shouldHighlight = counter >= CURRENT_VALUE;
+                    } else if ( minValue > 0 ) {
+                        shouldHighlight = counter <= CURRENT_VALUE;
+                    } else if ( CURRENT_VALUE > 0 ) {
+                        shouldHighlight = counter >= 0 && counter <= CURRENT_VALUE;
+                    } else {
+                        shouldHighlight = counter <= 0 && counter >= CURRENT_VALUE;
+                    }
+                }
+            } else {
+                shouldHighlight = counter <= CURRENT_VALUE;
+            }
 
             if (Double.compare(counterBD.remainder(majorTickSpaceBD).doubleValue(), 0.0) == 0) {
                 // Draw major tick mark
                 if (majorTickMarksVisible) {
-                    CTX.setStroke(counter < CURRENT_VALUE ? highlightColor : tickMarkColor);
+                    CTX.setStroke(shouldHighlight ? highlightColor : tickMarkColor);
                     CTX.strokeLine(innerPointX, innerPointY, outerPointX, outerPointY);
                 }
             } else if (mediumTickMarksVisible &&
                        Double.compare(minorTickSpaceBD.remainder(mediumCheck2).doubleValue(), 0.0) != 0.0 &&
                        Double.compare(counterBD.remainder(mediumCheck5).doubleValue(), 0.0) == 0.0) {
                 // Draw medium tick mark
-                CTX.setStroke(counter < CURRENT_VALUE ? highlightColor : tickMarkColor);
+                CTX.setStroke(shouldHighlight ? highlightColor : tickMarkColor);
                 CTX.strokeLine(innerMediumPointX, innerMediumPointY, outerMediumPointX, outerMediumPointY);
             }
+
             counterBD = counterBD.add(minorTickSpaceBD);
             counter   = counterBD.doubleValue();
+
         }
 
         // highlight bar
-        double barXY          = (size - 0.75 * size) * 0.5;
-        double barWH          = size * 0.75;
-        double barAngleExtend = (CURRENT_VALUE - minValue) * angleStep;
+        double barXY = ( size - 0.75 * size ) * 0.5;
+        double barWH = size * 0.75;
+
         CTX.save();
         CTX.setEffect(glow2);
         CTX.setStroke(CURRENT_VALUE < threshold ? barColor : thresholdColor);
         CTX.setLineWidth(size * 0.01666667);
         CTX.setLineCap(StrokeLineCap.BUTT);
-        if ( gauge.isStartFromZero() ) {
-            double offset = minValue * angleStep;
-            CTX.strokeArc(barXY, barXY, barWH, barWH, BAR_START_ANGLE + offset,
-                          -barAngleExtend - offset,
-                          ArcType.OPEN);
+
+        double barLength    = 0;
+        double barStart     = 0;
+        double clampedValue = Helper.clamp(minValue, maxValue, CURRENT_VALUE);
+
+        if ( startFromZero ) {
+            if ( ( CURRENT_VALUE > minValue || minValue < 0 ) && ( CURRENT_VALUE < maxValue || maxValue > 0 ) ) {
+                if ( maxValue < 0 ) {
+                    barStart = BAR_START_ANGLE - ANGLE_RANGE;
+                    barLength = ( maxValue - clampedValue ) * angleStep;
+                } else if ( minValue > 0 ) {
+                    barStart = BAR_START_ANGLE;
+                    barLength = ( minValue - clampedValue ) * angleStep;
+                } else {
+                    barStart = BAR_START_ANGLE + minValue * angleStep;
+                    barLength = - clampedValue * angleStep;
+                }
+            }
         } else {
-            CTX.strokeArc(barXY, barXY, barWH, barWH, BAR_START_ANGLE, -barAngleExtend, ArcType.OPEN);
+            barStart = BAR_START_ANGLE;
+            barLength = ( minValue - clampedValue ) * angleStep;
         }
+
+        CTX.strokeArc(barXY, barXY, barWH, barWH, barStart, barLength, ArcType.OPEN);
         CTX.restore();
+
+        valueText.setText(String.format(locale, "%." + gauge.getDecimals() + "f", CURRENT_VALUE));
+
     }
 
     private void drawMainCanvas() {
@@ -616,10 +647,8 @@ public class ModernSkin extends GaugeSkinBase {
 
     private void resizeText() {
         double maxWidth = 0.405 * size;
-        double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + gauge.getMinValue();
 
         valueText.setFont(Fonts.latoRegular(size * 0.22));
-        valueText.setText(String.format(locale, "%." + gauge.getDecimals() + "f", currentValue));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, size * 0.22); }
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
 
