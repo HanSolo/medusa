@@ -34,7 +34,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -82,12 +81,14 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.SLIM)
+                            .skinType(SkinType.VERTICAL)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
+                            .tickMarkRingVisible(true)
+                            .scaleDirection(Gauge.ScaleDirection.COUNTER_CLOCKWISE)
                             .decimals(2)
-                            .minValue(20)
+                            .minValue(-20)
                             .maxValue(100)
                             .startFromZero(true)
                             .animated(true)
