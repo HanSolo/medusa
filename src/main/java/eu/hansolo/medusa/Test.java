@@ -34,7 +34,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -82,13 +81,13 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.SLIM)
+                            .skinType(SkinType.MODERN)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
                             .decimals(2)
-                            .minValue(20)
-                            .maxValue(100)
+                            .minValue(-20)
+                            .maxValue(120)
                             .startFromZero(true)
                             .animated(true)
                             //.checkThreshold(true)
@@ -105,7 +104,7 @@ public class Test extends Application {
                             .sections(new Section(-20,  0, Color.rgb(  0,   0, 255), Color.rgb(  0,   0, 255)),
                                       new Section(  0, 25, Color.rgb(255, 255,   0), Color.rgb(255, 255,   0)),
                                       new Section( 75,100, Color.rgb(255,   0,   0), Color.rgb(255, 255,   0)))
-                            .sectionsVisible(true)
+                            .sectionsVisible(false)
                             .highlightSections(true)
                             .autoScale(true)
                             .averagingEnabled(true)
@@ -120,7 +119,7 @@ public class Test extends Application {
                             .ledVisible(true)
                             //.ledType(LedType.FLAT)
                             .thresholdVisible(true)
-                            .threshold(60)
+                            .threshold(40)
                             .checkThreshold(true)
                             .onThresholdExceeded(e -> gauge.setLedBlinking(true))
                             .onThresholdUnderrun(e -> gauge.setLedBlinking(false))
@@ -183,7 +182,6 @@ public class Test extends Application {
                             changed = true;
                             clock.setSecondsVisible(false);
                             gauge.setTitle("LONG TITLE");
-                            gauge.setUnit("\u00B0CCCCCCCC");
                             System.out.println("*** CHANGED");
                         }
                     }
