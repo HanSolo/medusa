@@ -344,7 +344,7 @@ public class ModernSkin extends GaugeSkinBase {
             placeTextVerticaly();
         }
 
-        if (VALUE > gauge.getThreshold()) {
+        if ( gauge.isThresholdVisible() && VALUE > gauge.getThreshold() ) {
             glow2.setColor(thresholdColor);
             bigGlow.setColor(thresholdColor);
         } else {
@@ -375,7 +375,7 @@ public class ModernSkin extends GaugeSkinBase {
         boolean    mediumTickMarksVisible = gauge.getMediumTickMarksVisible();
         double     threshold              = gauge.getThreshold();
         Color      tickMarkColor          = Color.TRANSPARENT;
-        Color      highlightColor         = CURRENT_VALUE < gauge.getThreshold() ? barColor : thresholdColor;
+        Color      highlightColor         = ( !gauge.isThresholdVisible() || CURRENT_VALUE <= gauge.getThreshold() ) ? barColor : thresholdColor;
         boolean    startFromZero          = gauge.isStartFromZero();
 
         CTX.setLineCap(StrokeLineCap.BUTT);
@@ -436,7 +436,7 @@ public class ModernSkin extends GaugeSkinBase {
 
         CTX.save();
         CTX.setEffect(glow2);
-        CTX.setStroke(CURRENT_VALUE < threshold ? barColor : thresholdColor);
+        CTX.setStroke(highlightColor);
         CTX.setLineWidth(size * 0.01666667);
         CTX.setLineCap(StrokeLineCap.BUTT);
 
@@ -534,7 +534,7 @@ public class ModernSkin extends GaugeSkinBase {
         if (gauge.isThresholdVisible()) {
             mainCtx.save();
             mainCtx.translate(size * 0.5, size * 0.5);
-            mainCtx.rotate((gauge.getThreshold() * angleStep) - 120);
+            mainCtx.rotate(((gauge.getThreshold()  - minValue ) * angleStep) - 120);
             mainCtx.beginPath();
             mainCtx.moveTo(0, -size * 0.33);
             mainCtx.lineTo(-size * 0.0125, -size * 0.30833333);

@@ -81,7 +81,7 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.VERTICAL)
+                            .skinType(SkinType.HORIZONTAL)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
@@ -106,7 +106,7 @@ public class Test extends Application {
                             .sections(new Section(-20,  0, Color.rgb(  0,   0, 255), Color.rgb(  0,   0, 255)),
                                       new Section(  0, 25, Color.rgb(255, 255,   0), Color.rgb(255, 255,   0)),
                                       new Section( 75,100, Color.rgb(255,   0,   0), Color.rgb(255, 255,   0)))
-                            .sectionsVisible(true)
+                            .sectionsVisible(false)
                             .highlightSections(true)
                             .autoScale(true)
                             .averagingEnabled(true)
@@ -121,7 +121,7 @@ public class Test extends Application {
                             .ledVisible(true)
                             //.ledType(LedType.FLAT)
                             .thresholdVisible(true)
-                            .threshold(60)
+                            .threshold(40)
                             .checkThreshold(true)
                             .onThresholdExceeded(e -> gauge.setLedBlinking(true))
                             .onThresholdUnderrun(e -> gauge.setLedBlinking(false))
@@ -184,7 +184,6 @@ public class Test extends Application {
                             changed = true;
                             clock.setSecondsVisible(false);
                             gauge.setTitle("LONG TITLE");
-                            gauge.setUnit("\u00B0CCCCCCCC");
                             System.out.println("*** CHANGED");
                         }
                     }
