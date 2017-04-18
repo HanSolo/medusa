@@ -81,13 +81,15 @@ public class Test extends Application {
                               .build();
 
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.MODERN)
+                            .skinType(SkinType.HORIZONTAL)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
+                            .tickMarkRingVisible(true)
+                            .scaleDirection(Gauge.ScaleDirection.COUNTER_CLOCKWISE)
                             .decimals(2)
                             .minValue(-20)
-                            .maxValue(120)
+                            .maxValue(100)
                             .startFromZero(true)
                             .animated(true)
                             //.checkThreshold(true)

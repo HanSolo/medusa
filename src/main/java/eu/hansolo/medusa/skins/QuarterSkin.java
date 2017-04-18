@@ -576,10 +576,10 @@ public class QuarterSkin extends GaugeSkinBase {
             tickMarkCtx.save();
             tickMarkCtx.setStroke(tickMarkColor);
             switch(knobPosition) {
-                case BOTTOM_LEFT: tickMarkCtx.strokeArc((-scaledSize * 0.46) + xy, xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
-                case TOP_LEFT   : tickMarkCtx.strokeArc((-scaledSize * 0.46) + xy, (-scaledSize * 0.46) + xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
-                case TOP_RIGHT  : tickMarkCtx.strokeArc(xy, (-scaledSize * 0.46) + xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
-                default         : tickMarkCtx.strokeArc(xy, xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+                case BOTTOM_LEFT: tickMarkCtx.strokeArc((-scaledSize * 0.46) + xy, xy, wh, wh, offset, ScaleDirection.CLOCKWISE == scaleDirection ? -ANGLE_RANGE : ANGLE_RANGE, ArcType.OPEN); break;
+                case TOP_LEFT   : tickMarkCtx.strokeArc((-scaledSize * 0.46) + xy, (-scaledSize * 0.46) + xy, wh, wh, offset, ScaleDirection.CLOCKWISE == scaleDirection ? -ANGLE_RANGE : ANGLE_RANGE, ArcType.OPEN); break;
+                case TOP_RIGHT  : tickMarkCtx.strokeArc(xy, (-scaledSize * 0.46) + xy, wh, wh, offset, ScaleDirection.CLOCKWISE == scaleDirection ? -ANGLE_RANGE : ANGLE_RANGE, ArcType.OPEN); break;
+                default         : tickMarkCtx.strokeArc(xy, xy, wh, wh, offset, ScaleDirection.CLOCKWISE == scaleDirection ? -ANGLE_RANGE : ANGLE_RANGE, ArcType.OPEN); break;
             }
             tickMarkCtx.restore();
             if (tickMarkSections.size() > 0) {

@@ -508,9 +508,9 @@ public class Helper {
             CTX.save();
             CTX.setStroke(tickMarkColor);
             switch(skinType) {
-                case HORIZONTAL: CTX.strokeArc(xy + horVerOffset, xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
-                case VERTICAL  : CTX.strokeArc(xy, xy + horVerOffset, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
-                default        : CTX.strokeArc(xy, xy, wh, wh, offset, -ANGLE_RANGE, ArcType.OPEN); break;
+                case HORIZONTAL: CTX.strokeArc(xy + horVerOffset, xy, wh, wh, offset, ScaleDirection.CLOCKWISE == scaleDirection ? -ANGLE_RANGE : ANGLE_RANGE, ArcType.OPEN); break;
+                case VERTICAL  : CTX.strokeArc(xy, xy + horVerOffset, wh, wh, offset, ScaleDirection.CLOCKWISE == scaleDirection ? -ANGLE_RANGE : ANGLE_RANGE, ArcType.OPEN); break;
+                default        : CTX.strokeArc(xy, xy, wh, wh, offset, ScaleDirection.CLOCKWISE == scaleDirection ? -ANGLE_RANGE : ANGLE_RANGE, ArcType.OPEN); break;
             }
 
             CTX.restore();
