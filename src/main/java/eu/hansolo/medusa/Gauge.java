@@ -25,6 +25,8 @@ import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.MarkerComparator;
 import eu.hansolo.medusa.tools.MovingAverage;
 import eu.hansolo.medusa.tools.SectionComparator;
+
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.Arrays;
@@ -256,6 +258,8 @@ public class Gauge extends Control {
     private ObjectProperty<Locale>               locale;
     private NumberFormat                         _numberFormat;
     private ObjectProperty<NumberFormat>         numberFormat;
+    private DecimalFormat                        _decimalFormat;
+    private ObjectProperty<DecimalFormat>        decimalFormat;
     private int                                  _decimals;
     private IntegerProperty                      decimals;
     private int                                  _tickLabelDecimals;
@@ -542,6 +546,7 @@ public class Gauge extends Control {
         _minorTickMarkType                  = TickMarkType.LINE;
         _locale                             = Locale.US;
         _numberFormat                       = NumberFormat.getInstance(_locale);
+        _decimalFormat                      = new DecimalFormat("##.#");
         _decimals                           = 1;
         _tickLabelDecimals                  = 0;
         _needleType                         = NeedleType.STANDARD;
@@ -2868,7 +2873,7 @@ public class Gauge extends Control {
      * Returns the number format that will be used to format the value
      * in the gauge (NOT USED AT THE MOMENT)
      *
-     * @return the number format that will bused to format the value
+     * @return the number format that will be used to format the value
      */
     public NumberFormat getNumberFormat() { return null == numberFormat ? _numberFormat : numberFormat.get(); }
     /**
@@ -2898,6 +2903,38 @@ public class Gauge extends Control {
             _numberFormat = null;
         }
         return numberFormat;
+    }
+
+    /**
+     * Returns the decimal format that will be used to format the value
+     * in the gauge (NOT USED AT THE MOMENT)
+     *
+     * @return the decimal format that will be used to format the value
+     */
+    public DecimalFormat getDecimalFormat() { return null == decimalFormat ? _decimalFormat : decimalFormat.get(); }
+    /**
+     * Defines the decimal format that will be used to format the value
+     * in the gauge (NOT USED AT THE MOMENT)
+     *
+     * @param FORMAT
+     */
+    public void setDecimalFormat(final DecimalFormat FORMAT) {
+        if (null == decimalFormat) {
+            _decimalFormat = FORMAT;
+            fireUpdateEvent(RESIZE_EVENT);
+        } else {
+            decimalFormat.set(FORMAT);
+        }
+    }
+    public ObjectProperty<DecimalFormat> decimalFormatProperty() {
+        if (null == decimalFormat) {
+            decimalFormat = new ObjectPropertyBase<DecimalFormat>(_decimalFormat) {
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "decimalFormat"; }
+            };
+            _decimalFormat = null;
+        }
+        return decimalFormat;
     }
 
     /**
