@@ -27,7 +27,6 @@ import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.tools.GradientLookup;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -294,11 +293,6 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
 
     public final B locale(final Locale LOCALE) {
         properties.put("locale", new SimpleObjectProperty<>(LOCALE));
-        return (B)this;
-    }
-
-    public final B numberFormat(final NumberFormat FORMAT) {
-        properties.put("numberFormat", new SimpleObjectProperty<>(FORMAT));
         return (B)this;
     }
 
@@ -1264,8 +1258,6 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setTickLabelLocation(((ObjectProperty<TickLabelLocation>) properties.get(key)).get());
             } else if("locale".equals(key)) {
                 CONTROL.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
-            } else if("numberFormat".equals(key)) {
-                CONTROL.setNumberFormat(((ObjectProperty<NumberFormat>) properties.get(key)).get());
             } else if("decimalFormat".equals(key)) {
                 CONTROL.setDecimalFormat(((ObjectProperty<DecimalFormat>) properties.get(key)).get());
             } else if("majorTickSpace".equals(key)) {
