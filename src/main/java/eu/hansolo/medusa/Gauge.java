@@ -26,7 +26,6 @@ import eu.hansolo.medusa.tools.MarkerComparator;
 import eu.hansolo.medusa.tools.MovingAverage;
 import eu.hansolo.medusa.tools.SectionComparator;
 
-import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -255,8 +254,6 @@ public class Gauge extends Control {
     private ObjectProperty<TickMarkType>         minorTickMarkType;
     private Locale                               _locale;
     private ObjectProperty<Locale>               locale;
-    private DecimalFormat                        _decimalFormat;
-    private ObjectProperty<DecimalFormat>        decimalFormat;
     private int                                  _decimals;
     private IntegerProperty                      decimals;
     private int                                  _tickLabelDecimals;
@@ -387,6 +384,7 @@ public class Gauge extends Control {
     private StringProperty                       alertMessage;
     private boolean                              _smoothing;
     private BooleanProperty                      smoothing;
+    private String                               formatString;
 
     // others
     private double   originalMinValue;
@@ -542,7 +540,6 @@ public class Gauge extends Control {
         _mediumTickMarkType                 = TickMarkType.LINE;
         _minorTickMarkType                  = TickMarkType.LINE;
         _locale                             = Locale.US;
-        _decimalFormat                      = new DecimalFormat("##.0");
         _decimals                           = 1;
         _tickLabelDecimals                  = 0;
         _needleType                         = NeedleType.STANDARD;
@@ -608,6 +605,7 @@ public class Gauge extends Control {
         _alert                              = false;
         _alertMessage                       = "";
         _smoothing                          = false;
+        formatString                        = "%.2f";
 
         originalMinValue                    = -Double.MAX_VALUE;
         originalMaxValue                    = Double.MAX_VALUE;
@@ -704,6 +702,7 @@ public class Gauge extends Control {
             if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = _minValue;
             if (isStartFromZero() && _minValue < 0) setValue(0);
             if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(_minValue, getMaxValue(), originalThreshold)); }
+            updateFormatString();
             fireUpdateEvent(RECALC_EVENT);
             if (!valueProperty().isBound()) Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
         } else {
@@ -720,6 +719,7 @@ public class Gauge extends Control {
                     if (Double.compare(originalMinValue, -Double.MAX_VALUE) == 0) originalMinValue = VALUE;
                     if (isStartFromZero() && _minValue < 0) Gauge.this.setValue(0);
                     if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(VALUE, getMaxValue(), originalThreshold)); }
+                    updateFormatString();
                     fireUpdateEvent(RECALC_EVENT);
                     if (!valueProperty().isBound()) Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
                 }
@@ -750,7 +750,10 @@ public class Gauge extends Control {
             setRange(_maxValue - getMinValue());
             if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = _maxValue;
             if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(Helper.clamp(getMinValue(), _maxValue, originalThreshold)); }
+
             if (!valueProperty().isBound()) Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
+            updateFormatString();
+            fireUpdateEvent(RECALC_EVENT);
         } else {
             maxValue.set(VALUE);
         }
@@ -764,6 +767,7 @@ public class Gauge extends Control {
                     setRange(VALUE - getMinValue());
                     if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = VALUE;
                     if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(Helper.clamp(getMinValue(), VALUE, originalThreshold)); }
+                    updateFormatString();
                     fireUpdateEvent(RECALC_EVENT);
                     if (!valueProperty().isBound()) Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
                 }
@@ -2866,39 +2870,6 @@ public class Gauge extends Control {
     }
 
     /**
-     * Returns the decimal format that will be used to format the value
-     * in the gauge (NOT USED AT THE MOMENT)
-     *
-     * @return the decimal format that will be used to format the value
-     */
-    public DecimalFormat getDecimalFormat() { return null == decimalFormat ? _decimalFormat : decimalFormat.get(); }
-    /**
-     * Defines the decimal format that will be used to format the value
-     * in the gauge (NOT USED AT THE MOMENT)
-     *
-     * @param FORMAT
-     */
-    public void setDecimalFormat(final DecimalFormat FORMAT) {
-        if (null == decimalFormat) {
-            _decimalFormat = FORMAT;
-            fireUpdateEvent(RESIZE_EVENT);
-        } else {
-            decimalFormat.set(FORMAT);
-        }
-    }
-    public ObjectProperty<DecimalFormat> decimalFormatProperty() {
-        if (null == decimalFormat) {
-            decimalFormat = new ObjectPropertyBase<DecimalFormat>(_decimalFormat) {
-                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
-                @Override public Object getBean() { return Gauge.this; }
-                @Override public String getName() { return "decimalFormat"; }
-            };
-            _decimalFormat = null;
-        }
-        return decimalFormat;
-    }
-
-    /**
      * Returns the number of decimals that will be used to format the
      * value of the gauge. The number of decimals will be clamped to
      * a value between 0-3.
@@ -2916,6 +2887,7 @@ public class Gauge extends Control {
     public void setDecimals(final int DECIMALS) {
         if (null == decimals) {
             _decimals = Helper.clamp(0, MAX_NO_OF_DECIMALS, DECIMALS);
+            updateFormatString();
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             decimals.set(DECIMALS);
@@ -2927,6 +2899,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final int VALUE = get();
                     if (VALUE < 0 || VALUE > MAX_NO_OF_DECIMALS) set(Helper.clamp(0, MAX_NO_OF_DECIMALS, VALUE));
+                    updateFormatString();
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -5127,6 +5100,19 @@ public class Gauge extends Control {
             };
         }
         return smoothing;
+    }
+
+    public String getFormatString() { return formatString; }
+    private void updateFormatString() {
+        StringBuilder formatBuilder = new StringBuilder("%.").append(getDecimals()).append("f");
+        String        format        = formatBuilder.toString();
+        int           minLength     = String.format(Locale.US, format, getMinValue()).length();
+        int           maxLength     = String.format(Locale.US, format, getMaxValue()).length();
+        int           length        = Math.max(minLength, maxLength);
+        formatBuilder.setLength(0);
+        formatBuilder.append("%").append(length).append(".").append(getDecimals()).append("f");
+        formatString = formatBuilder.toString();
+        fireUpdateEvent(RESIZE_EVENT);
     }
 
     /**

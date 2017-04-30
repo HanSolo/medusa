@@ -1084,4 +1084,34 @@ public class Helper {
             }
         }
     }
+
+    public static String formatNumber(final Gauge GAUGE) {
+        double value = GAUGE.getCurrentValue();
+        if (value > 0) {
+            value = Math.floor(value * Math.pow(10, GAUGE.getDecimals())) / Math.pow(10, GAUGE.getDecimals());
+        } else if (value < 0) {
+            value = Math.ceil(value * Math.pow(10, GAUGE.getDecimals())) / Math.pow(10, GAUGE.getDecimals());
+        }
+        return String.format(Locale.US, GAUGE.getFormatString(), value);
+    }
+
+    public static String formatNumber(final double MIN_VALUE, final double MAX_VALUE, final int DECIMALS, final double VALUE) {
+        StringBuilder sb        = new StringBuilder("%.").append(DECIMALS).append("f");
+        String        f         = sb.toString();
+        int           minLength = String.format(Locale.US, f, MIN_VALUE).length();
+        int           maxLength = String.format(Locale.US, f, MAX_VALUE).length();
+        int           length    = Math.max(minLength, maxLength);
+
+        StringBuilder formatStringBuilder = new StringBuilder("%").append(length).append(".").append(DECIMALS).append("f");
+        String        formatString        = formatStringBuilder.toString();
+
+        double value = VALUE;
+        if (value > 0) {
+            value = Math.floor(VALUE * Math.pow(10, DECIMALS)) / Math.pow(10, DECIMALS);
+        } else if (value < 0) {
+            value = Math.ceil(VALUE * Math.pow(10, DECIMALS)) / Math.pow(10, DECIMALS);
+        }
+
+        return String.format(Locale.US, formatString, value);
+    }
 }
