@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static eu.hansolo.medusa.tools.Helper.clamp;
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
 
 
 /**
@@ -175,7 +176,7 @@ public class TileTextKpiSkin extends GaugeSkinBase {
     private void setBar(final double VALUE) {
         double targetValue = (clamp(minValue, maxValue, VALUE) - minValue) * stepSize;
         bar.setWidth(targetValue);
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
         percentageText.setText(String.format(locale, formatString, ((VALUE - minValue) / range * 100)));
         maxValueRect.setFill(VALUE > maxValue ? barColor : gauge.getThresholdColor());
         resizeDynamicText();

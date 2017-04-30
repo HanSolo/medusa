@@ -82,6 +82,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 18.01.16.
@@ -259,7 +261,7 @@ public class QuarterSkin extends GaugeSkinBase {
         unitText.setMouseTransparent(true);
         Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, gauge.getValue()));
+        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setMouseTransparent(true);
@@ -419,7 +421,7 @@ public class QuarterSkin extends GaugeSkinBase {
             targetAngle = Helper.clamp(startOffsetAngle - ANGLE_RANGE, startOffsetAngle, targetAngle);
         }
         needleRotate.setAngle(targetAngle);
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
         resizeValueText();
         if (gauge.isAverageVisible()) drawAverage();
     }

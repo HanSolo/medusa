@@ -50,6 +50,8 @@ import javafx.scene.transform.Rotate;
 import java.util.List;
 import java.util.Locale;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 12.02.16.
@@ -69,8 +71,6 @@ public class SectionSkin extends GaugeSkinBase {
     private Text                        valueText;
     private Text                        titleText;
     private double                      angleStep;
-    private String                      formatString;
-    private Locale                      locale;
     private List<Section>               sections;
     private boolean                     highlightSections;
     private boolean                     sectionsVisible;
@@ -85,8 +85,6 @@ public class SectionSkin extends GaugeSkinBase {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleStep            = ANGLE_RANGE / (gauge.getMaxValue() - gauge.getMinValue());
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale               = gauge.getLocale();
         sections             = gauge.getSections();
         highlightSections    = gauge.isHighlightSections();
         sectionsVisible      = gauge.getSectionsVisible();
@@ -140,7 +138,7 @@ public class SectionSkin extends GaugeSkinBase {
         needle.setStroke(null);
         needle.getTransforms().setAll(needleRotate);
 
-        valueText = new Text(String.format(locale, formatString, gauge.getMinValue()) + gauge.getUnit());
+        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getMinValue()) + gauge.getUnit());
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(gauge.getValueColor());
@@ -206,7 +204,7 @@ public class SectionSkin extends GaugeSkinBase {
     private void rotateNeedle(final double VALUE) {
         double targetAngle = 180 - START_ANGLE + (VALUE - gauge.getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
-        valueText.setText(String.format(locale, formatString, VALUE) + gauge.getUnit());
+        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE) + gauge.getUnit());
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         if (valueText.getLayoutBounds().getWidth() > 0.395 * size) { resizeText(); }
     }
@@ -381,7 +379,7 @@ public class SectionSkin extends GaugeSkinBase {
             needleRotate.setPivotY(needle.getLayoutBounds().getMaxY());
 
             double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + gauge.getMinValue();
-            valueText.setText(String.format(locale, "%." + gauge.getDecimals() + "f", currentValue) + gauge.getUnit());
+            valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()) + gauge.getUnit());
             valueText.setVisible(gauge.isValueVisible());
 
             titleText.setText(gauge.getTitle());
@@ -403,8 +401,6 @@ public class SectionSkin extends GaugeSkinBase {
         valueText.setFill(gauge.getValueColor());
         mask.setFill(gauge.getBackgroundPaint());
         knob.setFill(gauge.getKnobColor());
-        locale       = gauge.getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         titleText.setText(gauge.getTitle());
         resizeText();
     }

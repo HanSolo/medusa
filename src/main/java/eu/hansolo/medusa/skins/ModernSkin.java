@@ -57,6 +57,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 01.01.16.
@@ -100,7 +102,6 @@ public class ModernSkin extends GaugeSkinBase {
     private double                      angleStep;
     private EventHandler<MouseEvent>    mouseHandler;
     private Tooltip                     buttonTooltip;
-    private String                      formatString;
     private Locale                      locale;
     private boolean                     sectionsVisible;
     private List<Section>               sections;
@@ -118,7 +119,6 @@ public class ModernSkin extends GaugeSkinBase {
         angleStep            = ANGLE_RANGE / (gauge.getRange());
         mouseHandler         = event -> handleMouseEvent(event);
         buttonTooltip        = new Tooltip();
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         locale               = gauge.getLocale();
         sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
@@ -231,7 +231,7 @@ public class ModernSkin extends GaugeSkinBase {
         unitText.setMouseTransparent(true);
         Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, gauge.getMinValue()) + gauge.getUnit());
+        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(gauge.getValueColor());
@@ -337,7 +337,7 @@ public class ModernSkin extends GaugeSkinBase {
         angleStep          = ANGLE_RANGE / gauge.getRange();
         double targetAngle = 180 - START_ANGLE + (VALUE - gauge.getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         if (valueText.getLayoutBounds().getWidth() > 0.395 * size) {
             resizeText();
@@ -465,7 +465,7 @@ public class ModernSkin extends GaugeSkinBase {
         CTX.strokeArc(barXY, barXY, barWH, barWH, barStart, barLength, ArcType.OPEN);
         CTX.restore();
 
-        valueText.setText(String.format(locale, "%." + gauge.getDecimals() + "f", CURRENT_VALUE));
+        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), CURRENT_VALUE));
 
     }
 
@@ -796,7 +796,6 @@ public class ModernSkin extends GaugeSkinBase {
     @Override protected void redraw() {
         sectionsVisible = gauge.getSectionsVisible();
         locale          = gauge.getLocale();
-        formatString    = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         barColor        = gauge.getBarColor();
         thresholdColor  = gauge.getThresholdColor();
         needle.setFill(gauge.getNeedleColor());

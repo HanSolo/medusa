@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static eu.hansolo.medusa.tools.Helper.clamp;
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
 
 
 /**
@@ -287,7 +288,7 @@ public class TileSparklineSkin extends GaugeSkinBase {
         stdDeviationArea.setY(averageLine.getStartY() - (stdDeviation * 0.5 * stepY));
         stdDeviationArea.setHeight(stdDeviation * stepY);
 
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
         averageText.setText(String.format(locale, formatString, average));
 
         highText.setText(String.format(locale, formatString, high));

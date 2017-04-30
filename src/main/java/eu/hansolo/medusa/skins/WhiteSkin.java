@@ -40,6 +40,8 @@ import javafx.scene.text.Text;
 
 import java.util.Locale;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 27.04.16.
@@ -59,8 +61,6 @@ public class WhiteSkin extends GaugeSkinBase {
     private double               minValue;
     private double               range;
     private double               angleStep;
-    private String               formatString;
-    private Locale               locale;
     private InvalidationListener currentValueListener;
 
 
@@ -71,8 +71,6 @@ public class WhiteSkin extends GaugeSkinBase {
         minValue             = gauge.getMinValue();
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale               = gauge.getLocale();
         currentValueListener = o -> setBar(gauge.getCurrentValue());
 
         initGraphics();
@@ -97,7 +95,7 @@ public class WhiteSkin extends GaugeSkinBase {
         shadow     = new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 12, 0, 3, 3);
         textShadow = new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 4, 0, 2, 2);
 
-        valueText = new Text(String.format(Locale.US, "%.0f", gauge.getValue()));
+        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setFill(Color.WHITE);
         valueText.setFont(Fonts.robotoBold(PREFERRED_WIDTH * 0.20625));
         valueText.setTextOrigin(VPos.CENTER);
@@ -176,7 +174,7 @@ public class WhiteSkin extends GaugeSkinBase {
         } else {
             bar.setLength(-VALUE * angleStep);
         }
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
         resizeValueText();
     }
 
@@ -268,9 +266,6 @@ public class WhiteSkin extends GaugeSkinBase {
     }
 
     @Override protected void redraw() {
-        locale       = gauge.getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
 

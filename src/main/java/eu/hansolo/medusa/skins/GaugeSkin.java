@@ -78,6 +78,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Rotate;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 11.12.15.
@@ -256,7 +258,7 @@ public class GaugeSkin extends GaugeSkinBase {
         unitText.setMouseTransparent(true);
         Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, gauge.getValue()));
+        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setMouseTransparent(true);
@@ -421,7 +423,7 @@ public class GaugeSkin extends GaugeSkinBase {
         }
 
         needleRotate.setAngle(targetAngle);
-        valueText.setText(String.format(locale, formatString, value));
+        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), value));
         if (gauge.isLcdVisible()) {
             valueText.setTranslateX((0.691 * size - valueText.getLayoutBounds().getWidth()));
         } else {

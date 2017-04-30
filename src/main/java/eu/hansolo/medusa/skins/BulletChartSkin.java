@@ -48,31 +48,31 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 25.12.15.
  */
 public class BulletChartSkin extends GaugeSkinBase {
-    private              double          preferredWidth  = 400;
-    private              double          preferredHeight = 64;
-    private              Pane            pane;
-    private              double          width;
-    private              double          height;
-    private              double          aspectRatio;
-    private              Orientation     orientation;
-    private              Canvas          tickMarkCanvas;
-    private              GraphicsContext tickMarksCtx;
-    private              Canvas          sectionsCanvas;
-    private              GraphicsContext sectionsCtx;
-    private              Text            titleText;
-    private              Text            unitText;
-    private              Rectangle       barRect;
-    private              Rectangle       thresholdRect;
-    private              double          stepSize;
-    private              Tooltip         barTooltip;
-    private              Tooltip         thresholdTooltip;
-    private              String          formatString;
-    private              Locale          locale;
+    private              double                      preferredWidth  = 400;
+    private              double                      preferredHeight = 64;
+    private              Pane                        pane;
+    private              double                      width;
+    private              double                      height;
+    private              double                      aspectRatio;
+    private              Orientation                 orientation;
+    private              Canvas                      tickMarkCanvas;
+    private              GraphicsContext             tickMarksCtx;
+    private              Canvas                      sectionsCanvas;
+    private              GraphicsContext             sectionsCtx;
+    private              Text                        titleText;
+    private              Text                        unitText;
+    private              Rectangle                   barRect;
+    private              Rectangle                   thresholdRect;
+    private              double                      stepSize;
+    private              Tooltip                     barTooltip;
+    private              Tooltip                     thresholdTooltip;
     private              ListChangeListener<Section> sectionListener;
     private              ListChangeListener<Marker>  markerListener;
     private              InvalidationListener        currentValueListener;
@@ -87,8 +87,6 @@ public class BulletChartSkin extends GaugeSkinBase {
         orientation              = gauge.getOrientation();
         barTooltip               = new Tooltip();
         thresholdTooltip         = new Tooltip();
-        formatString             = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale                   = gauge.getLocale();
         sectionListener          = c -> redraw();
         markerListener           = c -> redraw();
         currentValueListener     = o -> updateBar();
@@ -193,7 +191,7 @@ public class BulletChartSkin extends GaugeSkinBase {
             redraw();
             updateBar();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            barTooltip.setText(String.format(locale, formatString, gauge.getValue()));
+            barTooltip.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getValue()));
         }
     }
 
@@ -346,7 +344,6 @@ public class BulletChartSkin extends GaugeSkinBase {
         height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
 
         double currentValue = gauge.getCurrentValue();
-        formatString        = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
         orientation = gauge.getOrientation();
         if (Orientation.VERTICAL == orientation) {
@@ -426,13 +423,12 @@ public class BulletChartSkin extends GaugeSkinBase {
     }
 
     @Override protected void redraw() {
-        locale = gauge.getLocale();
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
         drawTickMarks(tickMarksCtx);
         drawSections(sectionsCtx);
         thresholdRect.setFill(gauge.getThresholdColor());
-        thresholdTooltip.setText(String.format(locale, formatString, gauge.getThreshold()));
+        thresholdTooltip.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getThreshold()));
         barRect.setFill(gauge.getBarColor());
         titleText.setFill(gauge.getTitleColor());
         unitText.setFill(gauge.getUnitColor());

@@ -55,6 +55,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 import static eu.hansolo.medusa.tools.Helper.clamp;
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
 
 
 /**
@@ -94,7 +95,6 @@ public class LinearSkin extends GaugeSkinBase {
     private Canvas                ledCanvas;
     private GraphicsContext       led;
     private Rectangle             lcd;
-    private String                formatString;
     private String                tickLabelFormatString;
     private Locale                locale;
     private double                minValuePosition;
@@ -111,7 +111,6 @@ public class LinearSkin extends GaugeSkinBase {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         orientation           = gauge.getOrientation();
-        formatString          = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
         locale                = gauge.getLocale();
         sections              = gauge.getSections();
@@ -177,7 +176,7 @@ public class LinearSkin extends GaugeSkinBase {
         unitText.setFill(gauge.getUnitColor());
         Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, gauge.getCurrentValue()));
+        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
 
@@ -413,7 +412,7 @@ public class LinearSkin extends GaugeSkinBase {
             barHighlight.setLayoutY(layoutY);
             barHighlight.setHeight(valueHeight);
 
-            valueText.setText(String.format(locale, formatString, VALUE));
+            valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
 
             if (gauge.isLcdVisible()) {
                 valueText.setLayoutX((0.88 * width - valueText.getLayoutBounds().getWidth()));
@@ -463,7 +462,7 @@ public class LinearSkin extends GaugeSkinBase {
             barHighlight.setLayoutX(layoutX);
             barHighlight.setWidth(valueWidth);
 
-            valueText.setText(String.format(locale, formatString, VALUE));
+            valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
             valueText.setLayoutX(( 0.98 * width - valueText.getLayoutBounds().getWidth() ));
 
         }
@@ -783,7 +782,6 @@ public class LinearSkin extends GaugeSkinBase {
 
     @Override protected void redraw() {
         locale                = gauge.getLocale();
-        formatString          = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         tickLabelFormatString = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
 
         // Background stroke and fill

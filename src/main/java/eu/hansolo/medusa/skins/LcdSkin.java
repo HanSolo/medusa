@@ -60,6 +60,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 21.01.16.
@@ -684,7 +686,7 @@ public class LcdSkin extends GaugeSkinBase {
 
         if (gauge.isThresholdVisible()) { threshold.setVisible(Double.compare(gauge.getCurrentValue(), gauge.getThreshold()) >= 0); }
 
-        valueText.setText(isNoOfDigitsInvalid() ? "-E-" : String.format(locale, valueFormatString, gauge.getCurrentValue()));
+        valueText.setText(isNoOfDigitsInvalid() ? "-E-" : formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
 
         updateBackgroundText();
 

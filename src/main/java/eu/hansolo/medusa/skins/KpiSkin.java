@@ -45,6 +45,8 @@ import javafx.scene.transform.Rotate;
 
 import java.util.Locale;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 15.01.16.
@@ -66,7 +68,6 @@ public class KpiSkin extends GaugeSkinBase {
     private double               minValue;
     private double               range;
     private double               angleStep;
-    private String               formatString;
     private Locale               locale;
     private InvalidationListener currentValueListener;
 
@@ -80,7 +81,6 @@ public class KpiSkin extends GaugeSkinBase {
         minValue             = gauge.getMinValue();
         range                = gauge.getRange();
         angleStep            = angleRange / range;
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         locale               = gauge.getLocale();
         currentValueListener = o -> rotateNeedle(gauge.getCurrentValue());
 
@@ -130,7 +130,7 @@ public class KpiSkin extends GaugeSkinBase {
         titleText.setFill(gauge.getTitleColor());
         Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, gauge.getCurrentValue()));
+        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
 
@@ -174,7 +174,7 @@ public class KpiSkin extends GaugeSkinBase {
         double targetAngle = (VALUE - minValue) * angleStep - needleStartAngle;
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
         resizeValueText();
     }
 
@@ -318,8 +318,7 @@ public class KpiSkin extends GaugeSkinBase {
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        locale       = gauge.getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale = gauge.getLocale();
 
         titleText.setText(gauge.getTitle());
         minValueText.setText(String.format(locale, "%." + gauge.getTickLabelDecimals() + "f", gauge.getMinValue()));
