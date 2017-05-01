@@ -140,7 +140,7 @@ public class SpaceXSkin extends GaugeSkinBase {
         titleText.setFill(gauge.getTitleColor());
         Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getValue()));
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
@@ -271,7 +271,7 @@ public class SpaceXSkin extends GaugeSkinBase {
         dataBarThresholdInnerArc.setX(centerX + (centerX - barWidth) * Math.sin(-Math.toRadians(thresholdAngle)));
         dataBarThresholdInnerArc.setY(centerY + (centerX - barWidth) * Math.cos(-Math.toRadians(thresholdAngle)));
 
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         if (valueText.getLayoutBounds().getWidth() > 0.64 * width) Helper.adjustTextSize(valueText, width, 0.21 * width);
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
     }
@@ -391,7 +391,7 @@ public class SpaceXSkin extends GaugeSkinBase {
         titleText.setText(gauge.getTitle());
 
         valueText.setFill(gauge.getValueColor());
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
 
         unitText.setFill(gauge.getUnitColor());

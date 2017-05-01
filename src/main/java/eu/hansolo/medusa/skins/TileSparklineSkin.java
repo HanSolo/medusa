@@ -288,7 +288,7 @@ public class TileSparklineSkin extends GaugeSkinBase {
         stdDeviationArea.setY(averageLine.getStartY() - (stdDeviation * 0.5 * stepY));
         stdDeviationArea.setHeight(stdDeviation * stepY);
 
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         averageText.setText(String.format(locale, formatString, average));
 
         highText.setText(String.format(locale, formatString, high));

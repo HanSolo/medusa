@@ -265,7 +265,7 @@ public class HSkin extends GaugeSkinBase {
         unitText.setMouseTransparent(true);
         Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setMouseTransparent(true);
@@ -424,7 +424,7 @@ public class HSkin extends GaugeSkinBase {
             targetAngle = Helper.clamp(startOffsetAngle - angleRange, startOffsetAngle, targetAngle);
         }
         needleRotate.setAngle(targetAngle);
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         if (gauge.isLcdVisible()) {
             valueText.setTranslateX((0.675 * width - valueText.getLayoutBounds().getWidth()));
         } else {

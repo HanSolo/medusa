@@ -130,7 +130,7 @@ public class KpiSkin extends GaugeSkinBase {
         titleText.setFill(gauge.getTitleColor());
         Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
 
@@ -174,7 +174,7 @@ public class KpiSkin extends GaugeSkinBase {
         double targetAngle = (VALUE - minValue) * angleStep - needleStartAngle;
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         resizeValueText();
     }
 

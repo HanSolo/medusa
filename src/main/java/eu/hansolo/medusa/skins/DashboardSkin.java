@@ -148,7 +148,7 @@ public class DashboardSkin extends GaugeSkinBase {
         titleText.setFill(gauge.getTitleColor());
         Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
@@ -320,7 +320,7 @@ public class DashboardSkin extends GaugeSkinBase {
 
         setBarColor(VALUE);
 
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         if ( valueText.getLayoutBounds().getWidth() > 0.28 * width ) {
             Helper.adjustTextSize(valueText, 0.28 * width, size * 0.24);
         }
@@ -476,7 +476,7 @@ public class DashboardSkin extends GaugeSkinBase {
         titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.88 * height);
 
         valueText.setFill(gauge.getValueColor());
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
 
         minText.setFill(gauge.getValueColor());

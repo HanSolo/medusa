@@ -255,7 +255,7 @@ public class TileKpiSkin extends GaugeSkinBase {
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
         needleRectRotate.setAngle(targetAngle);
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         thresholdRect.setFill(VALUE > threshold ? thresholdColor : GRAY);
         resizeDynamicText();
         highlightSections(VALUE);

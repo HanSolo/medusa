@@ -189,7 +189,7 @@ public class SimpleSectionSkin extends GaugeSkinBase {
             }
         }
 
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         valueText.setLayoutX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
 
     }

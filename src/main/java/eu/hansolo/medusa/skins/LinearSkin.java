@@ -176,7 +176,7 @@ public class LinearSkin extends GaugeSkinBase {
         unitText.setFill(gauge.getUnitColor());
         Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
 
@@ -412,7 +412,7 @@ public class LinearSkin extends GaugeSkinBase {
             barHighlight.setLayoutY(layoutY);
             barHighlight.setHeight(valueHeight);
 
-            valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+            valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
 
             if (gauge.isLcdVisible()) {
                 valueText.setLayoutX((0.88 * width - valueText.getLayoutBounds().getWidth()));
@@ -462,7 +462,7 @@ public class LinearSkin extends GaugeSkinBase {
             barHighlight.setLayoutX(layoutX);
             barHighlight.setWidth(valueWidth);
 
-            valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+            valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
             valueText.setLayoutX(( 0.98 * width - valueText.getLayoutBounds().getWidth() ));
 
         }

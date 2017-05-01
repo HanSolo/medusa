@@ -1085,17 +1085,17 @@ public class Helper {
         }
     }
 
-    public static String formatNumber(final String FORMAT_STRING, final int DECIMALS, final double VALUE) {
+    public static String formatNumber(final Locale LOCALE, final String FORMAT_STRING, final int DECIMALS, final double VALUE) {
         double value = VALUE;
         if (value > 0) {
             value = Math.floor(value * Math.pow(10, DECIMALS)) / Math.pow(10, DECIMALS);
         } else if (value < 0) {
             value = Math.ceil(value * Math.pow(10, DECIMALS)) / Math.pow(10, DECIMALS);
         }
-        return String.format(Locale.US, FORMAT_STRING, value);
+        return String.format(LOCALE, FORMAT_STRING, value);
     }
 
-    public static String formatNumber(final double MIN_VALUE, final double MAX_VALUE, final int DECIMALS, final double VALUE) {
+    public static String formatNumber(final Locale LOCALE, final double MIN_VALUE, final double MAX_VALUE, final int DECIMALS, final double VALUE) {
         StringBuilder sb        = new StringBuilder("%.").append(DECIMALS).append("f");
         String        f         = sb.toString();
         int           minLength = String.format(Locale.US, f, MIN_VALUE).length();
@@ -1112,6 +1112,6 @@ public class Helper {
             value = Math.ceil(VALUE * Math.pow(10, DECIMALS)) / Math.pow(10, DECIMALS);
         }
 
-        return String.format(Locale.US, formatString, value);
+        return String.format(LOCALE, formatString, value);
     }
 }

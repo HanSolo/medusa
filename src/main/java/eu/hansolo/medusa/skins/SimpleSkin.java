@@ -138,7 +138,7 @@ public class SimpleSkin extends GaugeSkinBase {
         needle.setStrokeLineCap(StrokeLineCap.ROUND);
         needle.setStrokeLineJoin(StrokeLineJoin.BEVEL);
 
-        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getMinValue()) + gauge.getUnit());
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getMinValue()) + gauge.getUnit());
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(gauge.getValueColor());
@@ -210,7 +210,7 @@ public class SimpleSkin extends GaugeSkinBase {
     private void rotateNeedle(final double VALUE) {
         double targetAngle = 180 - START_ANGLE + (VALUE - gauge.getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE) + gauge.getUnit());
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE) + gauge.getUnit());
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
         if (valueText.getLayoutBounds().getWidth() > 0.395 * size) { resizeText(); }
     }
@@ -369,7 +369,7 @@ public class SimpleSkin extends GaugeSkinBase {
             needleRotate.setPivotY(size * 0.5);
 
             double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + gauge.getMinValue();
-            valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), currentValue) + gauge.getUnit());
+            valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), currentValue) + gauge.getUnit());
             valueText.setVisible(gauge.isValueVisible());
 
             titleText.setText(gauge.getTitle());

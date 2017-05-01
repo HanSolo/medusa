@@ -176,7 +176,7 @@ public class TileTextKpiSkin extends GaugeSkinBase {
     private void setBar(final double VALUE) {
         double targetValue = (clamp(minValue, maxValue, VALUE) - minValue) * stepSize;
         bar.setWidth(targetValue);
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         percentageText.setText(String.format(locale, formatString, ((VALUE - minValue) / range * 100)));
         maxValueRect.setFill(VALUE > maxValue ? barColor : gauge.getThresholdColor());
         resizeDynamicText();

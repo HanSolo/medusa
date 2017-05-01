@@ -686,7 +686,7 @@ public class LcdSkin extends GaugeSkinBase {
 
         if (gauge.isThresholdVisible()) { threshold.setVisible(Double.compare(gauge.getCurrentValue(), gauge.getThreshold()) >= 0); }
 
-        valueText.setText(isNoOfDigitsInvalid() ? "-E-" : formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText.setText(isNoOfDigitsInvalid() ? "-E-" : formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
 
         updateBackgroundText();
 

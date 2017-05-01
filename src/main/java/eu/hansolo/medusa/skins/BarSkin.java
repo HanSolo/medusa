@@ -136,7 +136,7 @@ public class BarSkin extends GaugeSkinBase {
         titleText.setFill(gauge.getTitleColor());
         Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setFont(Fonts.robotoRegular(PREFERRED_WIDTH * 0.27333));
         valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
@@ -287,7 +287,7 @@ public class BarSkin extends GaugeSkinBase {
         valueText.setFill(gauge.getValueColor());
         unitText.setFill(gauge.getUnitColor());
 
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         resizeValueText();
     }
 }

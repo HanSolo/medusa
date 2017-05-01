@@ -191,7 +191,7 @@ public class BulletChartSkin extends GaugeSkinBase {
             redraw();
             updateBar();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            barTooltip.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getValue()));
+            barTooltip.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getValue()));
         }
     }
 
@@ -428,7 +428,7 @@ public class BulletChartSkin extends GaugeSkinBase {
         drawTickMarks(tickMarksCtx);
         drawSections(sectionsCtx);
         thresholdRect.setFill(gauge.getThresholdColor());
-        thresholdTooltip.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getThreshold()));
+        thresholdTooltip.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getThreshold()));
         barRect.setFill(gauge.getBarColor());
         titleText.setFill(gauge.getTitleColor());
         unitText.setFill(gauge.getUnitColor());

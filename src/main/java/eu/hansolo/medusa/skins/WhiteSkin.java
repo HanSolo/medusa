@@ -95,7 +95,7 @@ public class WhiteSkin extends GaugeSkinBase {
         shadow     = new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 12, 0, 3, 3);
         textShadow = new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 4, 0, 2, 2);
 
-        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setFill(Color.WHITE);
         valueText.setFont(Fonts.robotoBold(PREFERRED_WIDTH * 0.20625));
         valueText.setTextOrigin(VPos.CENTER);
@@ -174,7 +174,7 @@ public class WhiteSkin extends GaugeSkinBase {
         } else {
             bar.setLength(-VALUE * angleStep);
         }
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         resizeValueText();
     }
 

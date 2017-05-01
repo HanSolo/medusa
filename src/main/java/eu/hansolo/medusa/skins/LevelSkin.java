@@ -191,7 +191,7 @@ public class LevelSkin extends GaugeSkinBase {
             Helper.enableNode(titleText, !gauge.getUnit().isEmpty());
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            StringBuilder content = new StringBuilder(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getValue()))
+            StringBuilder content = new StringBuilder(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getValue()))
                 .append("\n(").append(valueText.getText()).append(")");
             barTooltip.setText(content.toString());
         }

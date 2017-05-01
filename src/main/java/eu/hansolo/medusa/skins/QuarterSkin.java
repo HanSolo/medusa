@@ -261,7 +261,7 @@ public class QuarterSkin extends GaugeSkinBase {
         unitText.setMouseTransparent(true);
         Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
 
-        valueText = new Text(formatNumber(gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setMouseTransparent(true);
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setMouseTransparent(true);
@@ -421,7 +421,7 @@ public class QuarterSkin extends GaugeSkinBase {
             targetAngle = Helper.clamp(startOffsetAngle - ANGLE_RANGE, startOffsetAngle, targetAngle);
         }
         needleRotate.setAngle(targetAngle);
-        valueText.setText(formatNumber(gauge.getFormatString(), gauge.getDecimals(), VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         resizeValueText();
         if (gauge.isAverageVisible()) drawAverage();
     }
