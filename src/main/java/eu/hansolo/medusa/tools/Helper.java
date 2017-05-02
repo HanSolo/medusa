@@ -1085,6 +1085,10 @@ public class Helper {
         }
     }
 
+    public static String formatNumber(final Gauge GAUGE, final double VALUE) {
+        return formatNumber(GAUGE.getLocale(), GAUGE.getFormatString(), GAUGE.getDecimals(), VALUE);
+    }
+
     public static String formatNumber(final Locale LOCALE, final String FORMAT_STRING, final int DECIMALS, final double VALUE) {
         double value = VALUE;
         if (value > 0) {
