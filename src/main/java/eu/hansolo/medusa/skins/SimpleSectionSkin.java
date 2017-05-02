@@ -33,6 +33,8 @@ import javafx.scene.shape.ArcType;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 25.07.16.
@@ -49,7 +51,6 @@ public class SimpleSectionSkin extends GaugeSkinBase {
     private Text                 unitText;
     private Pane                 pane;
     private List<Section>        sections;
-    private String               formatString;
     private InvalidationListener decimalListener;
     private InvalidationListener currentValueListener;
 
@@ -58,7 +59,6 @@ public class SimpleSectionSkin extends GaugeSkinBase {
     public SimpleSectionSkin(Gauge gauge) {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         sections             = gauge.getSections();
         decimalListener      = o -> handleEvents("DECIMALS");
         currentValueListener = o -> setBar(gauge.getCurrentValue());
@@ -138,8 +138,6 @@ public class SimpleSectionSkin extends GaugeSkinBase {
         } else if ("RECALC".equals(EVENT_TYPE)) {
             redraw();
             setBar(gauge.getCurrentValue());
-        } else if ("DECIMALS".equals(EVENT_TYPE)) {
-            formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         }
     }
 
@@ -191,7 +189,7 @@ public class SimpleSectionSkin extends GaugeSkinBase {
             }
         }
 
-        valueText.setText(String.format(gauge.getLocale(), formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         valueText.setLayoutX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
 
     }

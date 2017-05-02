@@ -41,6 +41,8 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 09.02.16.
@@ -66,8 +68,6 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
     private double               angleStep;
     private boolean              isStartFromZero;
     private double               barWidth;
-    private String               formatString;
-    private Locale               locale;
     private boolean              sectionsVisible;
     private List<Section>        sections;
     private boolean              thresholdVisible;
@@ -84,8 +84,6 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         maxValue             = gauge.getMaxValue();
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale               = gauge.getLocale();
         barColor             = gauge.getBarColor();
         valueColor           = gauge.getValueColor();
         unitColor            = gauge.getUnitColor();
@@ -170,8 +168,6 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
             thresholdVisible = gauge.isThresholdVisible();
             resize();
             redraw();
-        } else if ("DECIMALS".equals(EVENT_TYPE)) {
-            formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         }
     }
 
@@ -229,7 +225,7 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
                 }
             }
         }
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         valueText.setLayoutX(valueBkgText.getLayoutBounds().getMaxX() - valueText.getLayoutBounds().getWidth());
     }
 
@@ -325,7 +321,6 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
     @Override protected void redraw() {
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        locale          = gauge.getLocale();
         barColor        = gauge.getBarColor();
         valueColor      = gauge.getValueColor();
         unitColor       = gauge.getUnitColor();

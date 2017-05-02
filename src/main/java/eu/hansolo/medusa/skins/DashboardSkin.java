@@ -22,6 +22,8 @@ import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
+
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -46,6 +48,8 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
 
 
 /**
@@ -144,7 +148,7 @@ public class DashboardSkin extends GaugeSkinBase {
         titleText.setFill(gauge.getTitleColor());
         Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, gauge.getValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
@@ -316,7 +320,7 @@ public class DashboardSkin extends GaugeSkinBase {
 
         setBarColor(VALUE);
 
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         if ( valueText.getLayoutBounds().getWidth() > 0.28 * width ) {
             Helper.adjustTextSize(valueText, 0.28 * width, size * 0.24);
         }
@@ -472,7 +476,7 @@ public class DashboardSkin extends GaugeSkinBase {
         titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.88 * height);
 
         valueText.setFill(gauge.getValueColor());
-        valueText.setText(String.format(locale, formatString, gauge.getCurrentValue()));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, 0.615 * height + (0.3 * height - valueText.getLayoutBounds().getHeight()) * 0.5);
 
         minText.setFill(gauge.getValueColor());

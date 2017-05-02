@@ -48,6 +48,8 @@ import javafx.scene.text.TextAlignment;
 import java.util.List;
 import java.util.Locale;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 25.01.16.
@@ -74,7 +76,6 @@ public class LevelSkin extends GaugeSkinBase {
     private Text          valueText;
     private Text          titleText;
     private Tooltip       barTooltip;
-    private String        formatString;
     private Locale        locale;
     private List<Section> sections;
     private InvalidationListener currentValueListener;
@@ -84,7 +85,6 @@ public class LevelSkin extends GaugeSkinBase {
     // ******************** Constructors **************************************
     public LevelSkin(Gauge gauge) {
         super(gauge);
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         locale               = gauge.getLocale();
         sections             = gauge.getSections();
         barTooltip           = new Tooltip();
@@ -191,7 +191,7 @@ public class LevelSkin extends GaugeSkinBase {
             Helper.enableNode(titleText, !gauge.getUnit().isEmpty());
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            StringBuilder content = new StringBuilder(String.format(locale, formatString, gauge.getValue()))
+            StringBuilder content = new StringBuilder(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getValue()))
                 .append("\n(").append(valueText.getText()).append(")");
             barTooltip.setText(content.toString());
         }
@@ -357,8 +357,7 @@ public class LevelSkin extends GaugeSkinBase {
     }
 
     @Override protected void redraw() {
-        locale       = gauge.getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
+        locale = gauge.getLocale();
 
         // Background stroke and fill
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * width))));

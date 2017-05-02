@@ -37,28 +37,28 @@ import javafx.scene.text.Text;
 import java.util.List;
 import java.util.Locale;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 11.04.16.
  */
 public class BarSkin extends GaugeSkinBase {
-    private static final double          ANGLE_RANGE      = 360;
-    private              double          size;
-    private              Text            titleText;
-    private              Text            valueText;
-    private              Text            unitText;
-    private              Circle          dot;
-    private              Circle          fakeDot;
-    private              Arc             arc;
-    private              Circle          circle;
-    private              Pane            pane;
-    private              DropShadow      shadow;
-    private              ConicalGradient gradient;
-    private              double          center;
-    private              double          range;
-    private              double          angleStep;
-    private              String          formatString;
-    private              Locale          locale;
+    private static final double               ANGLE_RANGE      = 360;
+    private              double               size;
+    private              Text                 titleText;
+    private              Text                 valueText;
+    private              Text                 unitText;
+    private              Circle               dot;
+    private              Circle               fakeDot;
+    private              Arc                  arc;
+    private              Circle               circle;
+    private              Pane                 pane;
+    private              DropShadow           shadow;
+    private              ConicalGradient      gradient;
+    private              double               center;
+    private              double               range;
+    private              double               angleStep;
     private              InvalidationListener currentValueListener;
     private              InvalidationListener barColorListener;
     private              InvalidationListener titleListener;
@@ -71,8 +71,6 @@ public class BarSkin extends GaugeSkinBase {
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         range                = gauge.getRange();
         angleStep            = -ANGLE_RANGE / range;
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale               = gauge.getLocale();
         currentValueListener = o -> redraw();
         barColorListener     = o -> {
             Color barColor = gauge.getBarColor();
@@ -138,7 +136,7 @@ public class BarSkin extends GaugeSkinBase {
         titleText.setFill(gauge.getTitleColor());
         Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, gauge.getCurrentValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setFont(Fonts.robotoRegular(PREFERRED_WIDTH * 0.27333));
         valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
@@ -216,9 +214,6 @@ public class BarSkin extends GaugeSkinBase {
             pane.setPrefSize(size, size);
             pane.relocate((width - size) * 0.5, (height - size) * 0.5);
 
-            locale       = gauge.getLocale();
-            formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-
             center = size * 0.5;
 
             circle.setCenterX(center);
@@ -292,7 +287,7 @@ public class BarSkin extends GaugeSkinBase {
         valueText.setFill(gauge.getValueColor());
         unitText.setFill(gauge.getUnitColor());
 
-        valueText.setText(String.format(gauge.getLocale(), formatString, currentValue));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         resizeValueText();
     }
 }

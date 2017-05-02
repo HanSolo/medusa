@@ -46,6 +46,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 08.02.16.
@@ -73,7 +75,6 @@ public class DigitalSkin extends GaugeSkinBase {
     private double               angleStep;
     private boolean              isStartFromZero;
     private double               barWidth;
-    private String               formatString;
     private Locale               locale;
     private boolean              sectionsVisible;
     private List<Section>        sections;
@@ -90,7 +91,6 @@ public class DigitalSkin extends GaugeSkinBase {
         maxValue             = gauge.getMaxValue();
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         locale               = gauge.getLocale();
         barColor             = gauge.getBarColor();
         valueColor           = gauge.getValueColor();
@@ -223,7 +223,7 @@ public class DigitalSkin extends GaugeSkinBase {
                 }
             }
         }
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         valueText.setLayoutX(valueBkgText.getLayoutBounds().getMaxX() - valueText.getLayoutBounds().getWidth());
     }
 
@@ -472,7 +472,6 @@ public class DigitalSkin extends GaugeSkinBase {
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
         
         locale          = gauge.getLocale();
-        formatString    = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         barColor        = gauge.getBarColor();
         valueColor      = gauge.getValueColor();
         titleColor      = gauge.getTitleColor();

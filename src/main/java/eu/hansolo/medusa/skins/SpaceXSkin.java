@@ -41,6 +41,8 @@ import javafx.scene.text.Text;
 
 import java.util.Locale;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 29.12.15.
@@ -93,8 +95,6 @@ public class SpaceXSkin extends GaugeSkinBase {
     private              Color                barBackgroundColor;
     private              Color                thresholdBackgroundColor;
     private              double               minValue;
-    private              String               formatString;
-    private              Locale               locale;
     private              InvalidationListener currentValueListener;
 
 
@@ -106,8 +106,6 @@ public class SpaceXSkin extends GaugeSkinBase {
         angleStep            = ANGLE_RANGE / range;
         minValue             = gauge.getMinValue();
         currentValueAngle    = 0;
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale               = gauge.getLocale();
         currentValueListener = o -> setBar(gauge.getCurrentValue());
 
         initGraphics();
@@ -142,7 +140,7 @@ public class SpaceXSkin extends GaugeSkinBase {
         titleText.setFill(gauge.getTitleColor());
         Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, gauge.getValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getValue()));
         valueText.setTextOrigin(VPos.CENTER);
         valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
@@ -273,7 +271,7 @@ public class SpaceXSkin extends GaugeSkinBase {
         dataBarThresholdInnerArc.setX(centerX + (centerX - barWidth) * Math.sin(-Math.toRadians(thresholdAngle)));
         dataBarThresholdInnerArc.setY(centerY + (centerX - barWidth) * Math.cos(-Math.toRadians(thresholdAngle)));
 
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         if (valueText.getLayoutBounds().getWidth() > 0.64 * width) Helper.adjustTextSize(valueText, width, 0.21 * width);
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
     }
@@ -378,8 +376,6 @@ public class SpaceXSkin extends GaugeSkinBase {
     }
 
     @Override protected void redraw() {
-        locale                   = gauge.getLocale();
-        formatString             = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * width))));
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
         barColor                 = gauge.getBarColor();
@@ -395,7 +391,7 @@ public class SpaceXSkin extends GaugeSkinBase {
         titleText.setText(gauge.getTitle());
 
         valueText.setFill(gauge.getValueColor());
-        valueText.setText(String.format(locale, formatString, gauge.getCurrentValue()));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
 
         unitText.setFill(gauge.getUnitColor());

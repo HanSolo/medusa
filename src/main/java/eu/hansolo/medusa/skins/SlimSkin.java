@@ -37,6 +37,8 @@ import javafx.scene.shape.ArcType;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
+
 
 /**
  * Created by hansolo on 13.01.16.
@@ -57,8 +59,6 @@ public class SlimSkin extends GaugeSkinBase {
     private int                  noOfGradientStops;
     private boolean              sectionsVisible;
     private List<Section>        sections;
-    private String               formatString;
-    private Locale               locale;
     private InvalidationListener currentValueListener;
 
 
@@ -73,8 +73,6 @@ public class SlimSkin extends GaugeSkinBase {
         noOfGradientStops    = gauge.getGradientBarStops().size();
         sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        locale               = gauge.getLocale();
         currentValueListener = o -> setBar(gauge.getCurrentValue());
 
         initGraphics();
@@ -114,7 +112,7 @@ public class SlimSkin extends GaugeSkinBase {
         titleText.setFill(gauge.getTitleColor());
         Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
-        valueText = new Text(String.format(locale, formatString, gauge.getCurrentValue()));
+        valueText = new Text(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
         valueText.setFill(gauge.getValueColor());
         Helper.enableNode(valueText, gauge.isValueVisible());
 
@@ -176,7 +174,7 @@ public class SlimSkin extends GaugeSkinBase {
         bar.setLength(barLength);
 
         setBarColor(VALUE);
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         resizeValueText();
 
     }
@@ -251,8 +249,6 @@ public class SlimSkin extends GaugeSkinBase {
     @Override protected void redraw() {
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        locale               = gauge.getLocale();
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         colorGradientEnabled = gauge.isGradientBarEnabled();
         noOfGradientStops    = gauge.getGradientBarStops().size();
         sectionsVisible      = gauge.getSectionsVisible();

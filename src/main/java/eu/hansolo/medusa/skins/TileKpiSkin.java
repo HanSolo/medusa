@@ -55,6 +55,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import static eu.hansolo.medusa.tools.Helper.enableNode;
+import static eu.hansolo.medusa.tools.Helper.formatNumber;
 
 
 /**
@@ -254,7 +255,7 @@ public class TileKpiSkin extends GaugeSkinBase {
         targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
         needleRectRotate.setAngle(targetAngle);
-        valueText.setText(String.format(locale, formatString, VALUE));
+        valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
         thresholdRect.setFill(VALUE > threshold ? thresholdColor : GRAY);
         resizeDynamicText();
         highlightSections(VALUE);

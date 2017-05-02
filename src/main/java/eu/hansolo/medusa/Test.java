@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEvent.EventType;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.Locale;
@@ -66,13 +67,6 @@ public class Test extends Application {
 
 
     @Override public void init() {
-        NumberFormat numberFormat = NumberFormat.getInstance(new Locale("da", "DK"));
-        numberFormat.setRoundingMode(RoundingMode.HALF_DOWN);
-        numberFormat.setMinimumIntegerDigits(3);
-        numberFormat.setMaximumIntegerDigits(3);
-        numberFormat.setMinimumFractionDigits(0);
-        numberFormat.setMaximumFractionDigits(0);
-
         value  = new SimpleDoubleProperty(0);
         toggle = new SimpleBooleanProperty(false);
 
@@ -80,8 +74,9 @@ public class Test extends Application {
                               .gaugeDesign(GaugeDesign.NONE)
                               .build();
 
+
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.MODERN)
+                            .skinType(SkinType.DASHBOARD)
                             //.prefSize(400, 400)
                             .knobPosition(Pos.BOTTOM_LEFT)
                             .tickLabelLocation(TickLabelLocation.OUTSIDE)
@@ -95,7 +90,6 @@ public class Test extends Application {
                             .lcdVisible(true)
                             .lcdFont(LcdFont.LCD)
                             //.locale(Locale.GERMANY)
-                            //.numberFormat(numberFormat)
                             .title("Very Large Title")
                             .unit("\u00B0C")
                             .subTitle("Only")
