@@ -325,7 +325,6 @@ public class DashboardSkin extends GaugeSkinBase {
             Helper.adjustTextSize(valueText, 0.28 * width, size * 0.24);
         }
         valueText.relocate(( width - valueText.getLayoutBounds().getWidth() ) * 0.5, 0.615 * height + ( 0.3 * height - valueText.getLayoutBounds().getHeight() ) * 0.5);
-
     }
 
     private void setBarColor(final double VALUE) {
