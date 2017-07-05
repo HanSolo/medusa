@@ -77,6 +77,7 @@ public class LevelSkin extends GaugeSkinBase {
     private Text          titleText;
     private Tooltip       barTooltip;
     private Locale        locale;
+    private String        formatString;
     private List<Section> sections;
     private InvalidationListener currentValueListener;
 
@@ -88,6 +89,7 @@ public class LevelSkin extends GaugeSkinBase {
         locale               = gauge.getLocale();
         sections             = gauge.getSections();
         barTooltip           = new Tooltip();
+        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f%%").toString();
         currentValueListener = o -> setBar(gauge.getCurrentValue());
         barTooltip.setTextAlignment(TextAlignment.CENTER);
 
@@ -152,12 +154,11 @@ public class LevelSkin extends GaugeSkinBase {
         fluidTop = new Ellipse();
         fluidTop.setStroke(null);
 
-        valueText = new Text(String.format(locale, "%.0f%%", gauge.getCurrentValue()));
+        valueText = new Text(String.format(locale, formatString, gauge.getCurrentValue()));
         valueText.setMouseTransparent(true);
         Helper.enableNode(valueText, gauge.isValueVisible());
 
         titleText = new Text(gauge.getTitle());
-        Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
 
         // Add all nodes
         pane = new Pane(tubeBottom, fluidBody, fluidTop, tube, tubeTop, valueText, titleText);
@@ -188,7 +189,7 @@ public class LevelSkin extends GaugeSkinBase {
             redraw();
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(valueText, gauge.isValueVisible());
-            Helper.enableNode(titleText, !gauge.getUnit().isEmpty());
+            Helper.enableNode(titleText, !gauge.getTitle().isEmpty());
             redraw();
         } else if ("FINISHED".equals(EVENT_TYPE)) {
             StringBuilder content = new StringBuilder(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getValue()))
@@ -238,7 +239,7 @@ public class LevelSkin extends GaugeSkinBase {
         fluidUpperLeft.setControlY2(centerY + 0.06666667 * height);
         fluidUpperLeft.setY(centerY);
 
-        valueText.setText(String.format(locale, "%.0f%%", factor * 100));
+        valueText.setText(String.format(locale, formatString, factor * 100));
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()) * 0.5, (height - valueText.getLayoutBounds().getHeight()) * 0.5);
     }
 
@@ -357,7 +358,8 @@ public class LevelSkin extends GaugeSkinBase {
     }
 
     @Override protected void redraw() {
-        locale = gauge.getLocale();
+        locale       = gauge.getLocale();
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f%%").toString();
 
         // Background stroke and fill
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * width))));
