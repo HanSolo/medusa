@@ -40,22 +40,6 @@ import eu.hansolo.medusa.skins.TextClockSkin;
 import eu.hansolo.medusa.skins.TileClockSkin;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.TimeSectionComparator;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -80,6 +64,23 @@ import javafx.scene.control.Skin;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -329,6 +330,7 @@ public class Clock extends Control {
      * @return the current time of the clock
      */
     public ZonedDateTime getTime() { return time.get(); }
+    public long getTimeMs() { return time.get().toInstant().toEpochMilli(); }
     /**
      * Defines the current time of the clock.
      * @param TIME
@@ -336,6 +338,9 @@ public class Clock extends Control {
     public void setTime(final ZonedDateTime TIME) { time.set(TIME); }
     public void setTime(final long EPOCH_SECONDS) {
         time.set(ZonedDateTime.ofInstant(Instant.ofEpochSecond(EPOCH_SECONDS), getZoneId()));
+    }
+    public void setTimeMs(final long EPOCH_MILLI_SECONDS) {
+        time.set(ZonedDateTime.ofInstant(Instant.ofEpochMilli(EPOCH_MILLI_SECONDS), getZoneId()));
     }
     public ObjectProperty<ZonedDateTime> timeProperty() { return time; }
 
