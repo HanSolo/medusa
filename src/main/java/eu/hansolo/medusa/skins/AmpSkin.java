@@ -19,6 +19,7 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.LcdDesign;
+import eu.hansolo.medusa.LcdField;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.TickLabelOrientation;
@@ -117,8 +118,7 @@ public class AmpSkin extends GaugeSkinBase {
     private DropShadow                  dropShadow;
     private Text                        titleText;
     private Text                        unitText;
-    private Rectangle                   lcd;
-    private Label                       lcdText;
+    private LcdField                    lcdField;
     private double                      angleStep;
     private Tooltip                     thresholdTooltip;
     private String                      formatString;
@@ -213,16 +213,9 @@ public class AmpSkin extends GaugeSkinBase {
         unitText = new Text(gauge.getUnit());
         unitText.setMouseTransparent(true);
         unitText.setTextOrigin(VPos.CENTER);
-
-        lcd = new Rectangle(0.3 * PREFERRED_WIDTH, 0.1 * PREFERRED_HEIGHT);
-        lcd.setArcWidth(0.0125 * PREFERRED_HEIGHT);
-        lcd.setArcHeight(0.0125 * PREFERRED_HEIGHT);
-        lcd.relocate((PREFERRED_WIDTH - lcd.getWidth()) * 0.5, 0.44 * PREFERRED_HEIGHT);
-        Helper.enableNode(lcd, gauge.isLcdVisible() && gauge.isValueVisible());
-
-        lcdText = new Label(String.format(locale, "%." + gauge.getDecimals() + "f", gauge.getValue()));
-        lcdText.setAlignment(Pos.CENTER_RIGHT);
-        lcdText.setVisible(gauge.isValueVisible());
+        String format="%." + gauge.getDecimals() + "f";
+        lcdField=new LcdField(gauge.getValue(),locale,format,PREFERRED_WIDTH,PREFERRED_HEIGHT,gauge.isValueVisible());
+        Helper.enableNode(lcdField.getLcd(), gauge.isLcdVisible() && gauge.isValueVisible());
 
         // Set initial value
         angleStep          = ANGLE_RANGE / gauge.getRange();
@@ -242,8 +235,8 @@ public class AmpSkin extends GaugeSkinBase {
                                   markerPane,
                                   ledCanvas,
                                   unitText,
-                                  lcd,
-                                  lcdText,
+                                  lcdField.getLcd(),
+                                  lcdField.getLcdText(),
                                   shadowGroup,
                                   foreground,
                                   titleText);
@@ -270,20 +263,13 @@ public class AmpSkin extends GaugeSkinBase {
             }
         } else if ("ANGLE".equals(EVENT_TYPE)) {
             double currentValue = (needleRotate.getAngle() + START_ANGLE - 180) / angleStep + gauge.getMinValue();
-            lcdText.setText((String.format(locale, formatString, currentValue)));
-            if (gauge.isLcdVisible()) {
-                lcdText.setAlignment(Pos.CENTER_RIGHT);
-                lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
-            } else {
-                lcdText.setAlignment(Pos.CENTER);
-                lcdText.setTranslateX((width - lcdText.getLayoutBounds().getWidth()) * 0.5);
-            }
+            lcdField.setValue(width,locale,formatString,currentValue,gauge.isLcdVisible());
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             enableNode(ledCanvas, gauge.isLedVisible());
             enableNode(titleText, !gauge.getTitle().isEmpty());
             enableNode(unitText, !gauge.getUnit().isEmpty());
-            enableNode(lcd,gauge.isLcdVisible());
-            enableNode(lcdText,gauge.isValueVisible());
+            enableNode(lcdField.getLcd(),gauge.isLcdVisible());
+            enableNode(lcdField.getLcdText(),gauge.isValueVisible());
             enableNode(threshold, gauge.isThresholdVisible());
             enableNode(average, gauge.isAverageVisible());
             boolean markersVisible = gauge.getMarkersVisible();
@@ -614,45 +600,9 @@ public class AmpSkin extends GaugeSkinBase {
 
     private void resizeText() {
         resizeStaticText();
-
-        if (gauge.isLcdVisible()) {
-
-            lcdText.setPadding(new Insets(0, 0.005 * width, 0, 0.005 * width));
-
-            switch(gauge.getLcdFont()) {
-                case LCD:
-                    lcdText.setFont(Fonts.digital(0.108 * height));
-                    lcdText.setTranslateY(0.45 * height);
-                    break;
-                case DIGITAL:
-                    lcdText.setFont(Fonts.digitalReadout(0.105 * height));
-                    lcdText.setTranslateY(0.44 * height);
-                    break;
-                case DIGITAL_BOLD:
-                    lcdText.setFont(Fonts.digitalReadoutBold(0.105 * height));
-                    lcdText.setTranslateY(0.44 * height);
-                    break;
-                case ELEKTRA:
-                    lcdText.setFont(Fonts.elektra(0.1116 * height));
-                    lcdText.setTranslateY(0.435 * height);
-                    break;
-                case STANDARD:
-                default:
-                    lcdText.setFont(Fonts.robotoMedium(0.09 * height));
-                    lcdText.setTranslateY(0.43 * height);
-                    break;
-            }
-            lcdText.setAlignment(Pos.CENTER_RIGHT);
-            lcdText.setPrefSize(0.3 * width, 0.014 * height);
-            lcdText.setTranslateX((width - lcdText.getPrefWidth()) * 0.5);
-
-        } else {
-            lcdText.setAlignment(Pos.CENTER);
-            lcdText.setFont(Fonts.robotoMedium(height * 0.1));
-            lcdText.setPrefSize(0.3 * width, 0.014 * height);
-            lcdText.setTranslateY(0.43 * height);
-            lcdText.setTranslateX((width - lcdText.getLayoutBounds().getWidth()) * 0.5);
-        }
+        lcdField.resize(width,height,gauge.getLcdFont(),gauge.isLcdVisible());
+        
+       
     }
 
     @Override public void dispose() {
@@ -685,11 +635,7 @@ public class AmpSkin extends GaugeSkinBase {
 
             markerPane.setPrefSize(width, width);
 
-            lcd.setWidth(0.3 * width);
-            lcd.setHeight(0.1 * height);
-            lcd.setArcWidth(0.0125 * height);
-            lcd.setArcHeight(0.0125 * height);
-            lcd.relocate((width - lcd.getWidth()) * 0.5, 0.44 * height);
+            lcdField.resize(width,height);
 
             ledSize = 0.06 * height;
             final Color LED_COLOR = gauge.getLedColor();
@@ -813,33 +759,8 @@ public class AmpSkin extends GaugeSkinBase {
         unitText.setFill(gauge.getUnitColor());
         unitText.setText(gauge.getUnit());
 
-        if (gauge.isLcdVisible()) {
-            LcdDesign lcdDesign = gauge.getLcdDesign();
-            Color[] lcdColors = lcdDesign.getColors();
-            LinearGradient lcdGradient = new LinearGradient(0, 1, 0, lcd.getHeight() - 1,
-                                                            false, CycleMethod.NO_CYCLE,
-                                                            new Stop(0, lcdColors[0]),
-                                                            new Stop(0.03, lcdColors[1]),
-                                                            new Stop(0.5, lcdColors[2]),
-                                                            new Stop(0.5, lcdColors[3]),
-                                                            new Stop(1.0, lcdColors[4]));
-            Paint lcdFramePaint;
-            if (lcdDesign.name().startsWith("FLAT")) {
-                lcdFramePaint = Color.WHITE;
-            } else {
-                lcdFramePaint = new LinearGradient(0, 0, 0, lcd.getHeight(),
-                                                   false, CycleMethod.NO_CYCLE,
-                                                   new Stop(0.0, Color.rgb(26, 26, 26)),
-                                                   new Stop(0.01, Color.rgb(77, 77, 77)),
-                                                   new Stop(0.99, Color.rgb(77, 77, 77)),
-                                                   new Stop(1.0, Color.rgb(221, 221, 221)));
-            }
-            lcd.setFill(lcdGradient);
-            lcd.setStroke(lcdFramePaint);
-
-            lcdText.setTextFill(lcdColors[5]);
-        }
-
+        lcdField.redraw(gauge.isLcdVisible(),gauge.getLcdDesign());
+ 
         if (gauge.isLedVisible()) drawLed(led);
 
         shadowGroup.setEffect(gauge.isShadowsEnabled() ? dropShadow : null);
