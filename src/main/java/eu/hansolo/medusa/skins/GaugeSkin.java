@@ -269,6 +269,8 @@ public class GaugeSkin extends GaugeSkinBase {
         targetAngle        = Helper.clamp(180 - startAngle, 180 - startAngle + angleRange, targetAngle);
         needleRotate.setAngle(targetAngle);
 
+        rotateNeedle(gauge.getCurrentValue());
+
         // Add all nodes
         pane = new Pane(sectionsAndAreasCanvas,
                         tickMarkCanvas,
