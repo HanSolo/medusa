@@ -303,24 +303,32 @@ public class LinearSkin extends GaugeSkinBase {
 
             if (counter % majorTickSpace == 0) {
                 // Draw major tickmark
-                CTX.setLineWidth(size * 0.007);
-                CTX.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
+                if (gauge.getMajorTickMarksVisible()) {
+                    CTX.setLineWidth(size * 0.007);
+                    CTX.strokeLine(innerPoint.getX(), innerPoint.getY(), outerPoint.getX(), outerPoint.getY());
+                }
 
                 // Draw text
-                CTX.setTextBaseline(VPos.CENTER);
-                if (Orientation.VERTICAL == orientation) {
-                    CTX.setTextAlign(TextAlignment.RIGHT);
-                    CTX.fillText(String.format(locale, tickLabelFormatString, (maxValue -= majorTickSpace) + majorTickSpace), textPoint.getX(), textPoint.getY());
-                } else {
-                    CTX.setTextAlign(TextAlignment.CENTER);
-                    CTX.fillText(String.format(locale, tickLabelFormatString, (minValue += majorTickSpace) - majorTickSpace), textPoint.getX(), textPoint.getY());
+                if (gauge.getTickLabelsVisible()) {
+                    CTX.setTextBaseline(VPos.CENTER);
+                    if (Orientation.VERTICAL == orientation) {
+                        CTX.setTextAlign(TextAlignment.RIGHT);
+                        CTX.fillText(String.format(locale, tickLabelFormatString, (maxValue -= majorTickSpace) + majorTickSpace), textPoint.getX(), textPoint.getY());
+                    } else {
+                        CTX.setTextAlign(TextAlignment.CENTER);
+                        CTX.fillText(String.format(locale, tickLabelFormatString, (minValue += majorTickSpace) - majorTickSpace), textPoint.getX(), textPoint.getY());
+                    }
                 }
             } else if (minorTickSpace % 2 != 0 && counter % 5 == 0) {
-                CTX.setLineWidth(size * 0.006);
-                CTX.strokeLine(innerMediumPoint.getX(), innerMediumPoint.getY(), outerPoint.getX(), outerPoint.getY());
+                if (gauge.getMediumTickMarksVisible()) {
+                    CTX.setLineWidth(size * 0.006);
+                    CTX.strokeLine(innerMediumPoint.getX(), innerMediumPoint.getY(), outerPoint.getX(), outerPoint.getY());
+                }
             } else if (counter % minorTickSpace == 0) {
-                CTX.setLineWidth(size * 0.005);
-                CTX.strokeLine(innerMinorPoint.getX(), innerMinorPoint.getY(), outerPoint.getX(), outerPoint.getY());
+                if (gauge.getMinorTickMarksVisible()) {
+                    CTX.setLineWidth(size * 0.005);
+                    CTX.strokeLine(innerMinorPoint.getX(), innerMinorPoint.getY(), outerPoint.getX(), outerPoint.getY());
+                }
             }
             counter++;
         }
