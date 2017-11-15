@@ -544,6 +544,10 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setTitleVisible(true);
                     CONTROL.setTitleColor(Color.rgb(238, 238, 238));
                     break;
+                case DIGI:
+                    CONTROL.setTextVisible(true);
+                    CONTROL.setDateVisible(true);
+                    break;
             }
         } else {
             CONTROL = new Clock();
