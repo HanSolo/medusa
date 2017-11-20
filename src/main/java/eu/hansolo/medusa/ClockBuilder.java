@@ -163,6 +163,11 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B)this;
     }
 
+    public final B dayVisible(final boolean VISIBLE) {
+        properties.put("dayVisible", new SimpleBooleanProperty(VISIBLE));
+        return (B)this;
+    }
+
     public final B nightMode(final boolean MODE) {
         properties.put("nightMode", new SimpleBooleanProperty(MODE));
         return (B)this;
@@ -476,6 +481,7 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 case SLIM:
                     CONTROL.setSecondsVisible(true);
                     CONTROL.setDateVisible(true);
+                    CONTROL.setDayVisible(true);
                     CONTROL.setHourColor(Color.WHITE);
                     CONTROL.setMinuteColor(Color.rgb(0,191,255));
                     CONTROL.setSecondColor(Color.WHITE);
@@ -646,6 +652,8 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                 CONTROL.setTextVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("dateVisible".equals(key)) {
                 CONTROL.setDateVisible(((BooleanProperty) properties.get(key)).get());
+            } else if ("dayVisible".equals(key)) {
+                CONTROL.setDayVisible(((BooleanProperty) properties.get(key)).get());
             } else if ("nightMode".equals(key)) {
                 CONTROL.setNightMode(((BooleanProperty) properties.get(key)).get());
             } else if ("autoNightMode".equals(key)) {

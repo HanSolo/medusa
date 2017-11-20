@@ -135,6 +135,8 @@ public class Clock extends Control {
     private BooleanProperty                   textVisible;
     private boolean                           _dateVisible;
     private BooleanProperty                   dateVisible;
+    private boolean                           _dayVisible;
+    private BooleanProperty                   dayVisible;
     private boolean                           _nightMode;
     private BooleanProperty                   nightMode;
     private boolean                           _running;
@@ -272,6 +274,7 @@ public class Clock extends Control {
         _titleVisible           = false;
         _textVisible            = false;
         _dateVisible            = false;
+        _dayVisible             = false;
         _nightMode              = false;
         _running                = false;
         _autoNightMode          = false;
@@ -913,6 +916,26 @@ public class Clock extends Control {
             };
         }
         return dateVisible;
+    }
+
+    public boolean isDayVisible() { return null == dayVisible ? _dayVisible : dayVisible.get(); }
+    public void setDayVisible(final boolean VISIBLE) {
+        if (null == dayVisible) {
+            _dayVisible = VISIBLE;
+            fireUpdateEvent(VISIBILITY_EVENT);
+        } else {
+            dayVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty dayVisibleProperty() {
+        if (null == dayVisible) {
+            dayVisible = new BooleanPropertyBase(_dayVisible) {
+                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Clock.this; }
+                @Override public String getName() { return "dayVisible"; }
+            };
+        }
+        return dayVisible;
     }
 
     /**
@@ -2154,6 +2177,7 @@ public class Clock extends Control {
             case SLIM:
                 setSecondsVisible(true);
                 setDateVisible(true);
+                setDayVisible(true);
                 setHourColor(Color.WHITE);
                 setMinuteColor(Color.rgb(0,191,255));
                 setSecondColor(Color.WHITE);
