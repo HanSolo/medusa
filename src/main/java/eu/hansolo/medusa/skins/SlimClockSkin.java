@@ -43,24 +43,25 @@ import java.time.temporal.ChronoField;
  * Created by hansolo on 11.02.16.
  */
 public class SlimClockSkin extends ClockSkinBase {
-    private static final DateTimeFormatter  DATE_TEXT_FORMATTER = DateTimeFormatter.ofPattern("cccc");
-    private static final DateTimeFormatter  HOUR_FORMATTER      = DateTimeFormatter.ofPattern("HH");
-    private static final DateTimeFormatter  MINUTE_FORMATTER    = DateTimeFormatter.ofPattern("mm");
-    private DateTimeFormatter  dateNumberFormatter;
-    private double            size;
-    private Circle            secondBackgroundCircle;
-    private Text              dateText;
-    private Text              dateNumbers;
-    private Text              hour;
-    private Text              minute;
-    private Arc               secondArc;
-    private Pane              pane;
+    private static final DateTimeFormatter HOUR_FORMATTER    = DateTimeFormatter.ofPattern("HH");
+    private static final DateTimeFormatter MINUTE_FORMATTER  = DateTimeFormatter.ofPattern("mm");
+    private              DateTimeFormatter dateTextFormatter;
+    private              DateTimeFormatter dateNumberFormatter;
+    private              double            size;
+    private              Circle            secondBackgroundCircle;
+    private              Text              dateText;
+    private              Text              dateNumbers;
+    private              Text              hour;
+    private              Text              minute;
+    private              Arc               secondArc;
+    private              Pane              pane;
 
 
     // ******************** Constructors **************************************
     public SlimClockSkin(Clock clock) {
         super(clock);
 
+        dateTextFormatter   = DateTimeFormatter.ofPattern("cccc", clock.getLocale());
         dateNumberFormatter = Helper.getLocalizedDateFormat(clock.getLocale());
 
         initGraphics();
@@ -91,9 +92,9 @@ public class SlimClockSkin extends ClockSkinBase {
         secondBackgroundCircle.setVisible(clock.isSecondsVisible());
         secondBackgroundCircle.setManaged(clock.isSecondsVisible());
 
-        dateText = new Text(DATE_TEXT_FORMATTER.format(time));
-        dateText.setVisible(clock.isDateVisible());
-        dateText.setManaged(clock.isDateVisible());
+        dateText = new Text(dateTextFormatter.format(time));
+        dateText.setVisible(clock.isDayVisible());
+        dateText.setManaged(clock.isDayVisible());
 
         dateNumbers = new Text(dateNumberFormatter.format(time));
         dateNumbers.setVisible(clock.isDateVisible());
@@ -131,8 +132,9 @@ public class SlimClockSkin extends ClockSkinBase {
         super.handleEvents(EVENT_TYPE);
         if ("VISIBILITY".equals(EVENT_TYPE)) {
             boolean isDateVisible = clock.isDateVisible();
-            dateText.setVisible(isDateVisible);
-            dateText.setManaged(isDateVisible);
+            boolean isDayVisible  = clock.isDayVisible();
+            dateText.setVisible(isDayVisible);
+            dateText.setManaged(isDayVisible);
             dateNumbers.setVisible(isDateVisible);
             dateNumbers.setManaged(isDateVisible);
             boolean isSecondsVisible = clock.isSecondsVisible();
@@ -149,10 +151,11 @@ public class SlimClockSkin extends ClockSkinBase {
     // ******************** Graphics ******************************************
     @Override public void updateTime(final ZonedDateTime TIME) {
         if (dateText.isVisible()) {
-            dateText.setText(DATE_TEXT_FORMATTER.format(TIME));
+            dateText.setText(dateTextFormatter.format(TIME));
             Helper.adjustTextSize(dateText, 0.6 * size, size * 0.08);
             dateText.relocate((size - dateText.getLayoutBounds().getWidth()) * 0.5, size * 0.22180451);
-
+        }
+        if (dateNumbers.isVisible()) {
             dateNumbers.setText(dateNumberFormatter.format(TIME));
             Helper.adjustTextSize(dateNumbers, 0.6 * size, size * 0.08);
             dateNumbers.relocate((size -dateNumbers.getLayoutBounds().getWidth()) * 0.5, size * 0.68984962);

@@ -17,6 +17,10 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Clock.ClockSkinType;
+import eu.hansolo.medusa.Gauge.KnobType;
+import eu.hansolo.medusa.Gauge.NeedleBehavior;
+import eu.hansolo.medusa.Gauge.NeedleShape;
+import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEvent.EventType;
@@ -57,38 +61,22 @@ import javafx.stage.Stage;
 public class Test extends Application {
     private static final Random          RND       = new Random();
     private static       int             noOfNodes = 0;
-    private              Gauge           gauge1;
-    private              Gauge           gauge2;
+    private              Clock           clock;
     private              long            lastTimerCall;
     private              AnimationTimer  timer;
 
 
     @Override public void init() {
-        gauge1 = GaugeBuilder.create()
-                             .skinType(SkinType.SIMPLE_SECTION)
-                             .decimals(2)
-                             .minValue(0)
-                             .maxValue(120)
-                             .animated(true)
-                             .build();
 
-        gauge2 = GaugeBuilder.create()
-                             .skinType(SkinType.SIMPLE_SECTION)
-                             .decimals(2)
-                             .minValue(0)
-                             .maxValue(120)
-                             .animated(true)
-                             .build();
-
+        clock = ClockBuilder.create()
+                            .skinType(ClockSkinType.DIGI)
+                            .running(true)
+                            .build();
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
                 if (now > lastTimerCall + 2_000_000_000l) {
-                    double v1 = gauge1.getRange() * ( RND.nextDouble() * 1.3 - 0.15 ) + gauge1.getMinValue();
-                    double v2 = gauge2.getRange() * ( RND.nextDouble() * 1.3 - 0.15 ) + gauge2.getMinValue();
-                    gauge1.setValue(v1);
-                    gauge2.setValue(v2);
 
                     lastTimerCall = now;
                 }
@@ -97,12 +85,10 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-        VBox pane = new VBox(gauge1, gauge2);
-        pane.setPadding(new Insets(20));
-        pane.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+
+        StackPane pane = new StackPane(clock);
 
         Scene scene = new Scene(pane);
-        scene.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
 
         stage.setTitle("Medusa");
         stage.setScene(scene);
@@ -112,7 +98,7 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        timer.start();
+        //timer.start();
     }
 
     @Override public void stop() {

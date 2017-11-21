@@ -512,10 +512,15 @@ public class LcdSkin extends GaugeSkinBase {
             mainInnerShadow1.setRadius(0.04166667 * height);
 
             if (crystalOverlay.isVisible()) {
-                crystalClip.setWidth(width);
-                crystalClip.setHeight(height);
+                double frameWidth = 0.02083333 * height;
+                double imgWidth   = width - (2 * frameWidth);
+                double imgHeight  = height - (2 * frameWidth);
+
+                crystalClip.setWidth(imgWidth);
+                crystalClip.setHeight(imgHeight);
                 crystalOverlay.setImage(Helper.createNoiseImage(width, height, DARK_NOISE_COLOR, BRIGHT_NOISE_COLOR, 8));
                 crystalOverlay.setCache(true);
+                crystalOverlay.relocate(frameWidth, frameWidth);
             }
 
             double tSize = 0.2 * height;

@@ -24,20 +24,7 @@ import eu.hansolo.medusa.events.TimeEventListener;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEvent.EventType;
 import eu.hansolo.medusa.events.UpdateEventListener;
-import eu.hansolo.medusa.skins.ClockSkin;
-import eu.hansolo.medusa.skins.DBClockSkin;
-import eu.hansolo.medusa.skins.DesignClockSkin;
-import eu.hansolo.medusa.skins.DigitalClockSkin;
-import eu.hansolo.medusa.skins.FatClockSkin;
-import eu.hansolo.medusa.skins.IndustrialClockSkin;
-import eu.hansolo.medusa.skins.LcdClockSkin;
-import eu.hansolo.medusa.skins.MinimalClockSkin;
-import eu.hansolo.medusa.skins.PearClockSkin;
-import eu.hansolo.medusa.skins.PlainClockSkin;
-import eu.hansolo.medusa.skins.RoundLcdClockSkin;
-import eu.hansolo.medusa.skins.SlimClockSkin;
-import eu.hansolo.medusa.skins.TextClockSkin;
-import eu.hansolo.medusa.skins.TileClockSkin;
+import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.TimeSectionComparator;
 import javafx.animation.KeyFrame;
@@ -87,7 +74,8 @@ import java.util.concurrent.TimeUnit;
  * Created by hansolo on 28.01.16.
  */
 public class Clock extends Control {
-    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT, ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT, DESIGN, INDUSTRIAL, TILE }
+    public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT,
+        ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT, DESIGN, INDUSTRIAL, TILE, DIGI }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -147,6 +135,8 @@ public class Clock extends Control {
     private BooleanProperty                   textVisible;
     private boolean                           _dateVisible;
     private BooleanProperty                   dateVisible;
+    private boolean                           _dayVisible;
+    private BooleanProperty                   dayVisible;
     private boolean                           _nightMode;
     private BooleanProperty                   nightMode;
     private boolean                           _running;
@@ -284,6 +274,7 @@ public class Clock extends Control {
         _titleVisible           = false;
         _textVisible            = false;
         _dateVisible            = false;
+        _dayVisible             = false;
         _nightMode              = false;
         _running                = false;
         _autoNightMode          = false;
@@ -925,6 +916,26 @@ public class Clock extends Control {
             };
         }
         return dateVisible;
+    }
+
+    public boolean isDayVisible() { return null == dayVisible ? _dayVisible : dayVisible.get(); }
+    public void setDayVisible(final boolean VISIBLE) {
+        if (null == dayVisible) {
+            _dayVisible = VISIBLE;
+            fireUpdateEvent(VISIBILITY_EVENT);
+        } else {
+            dayVisible.set(VISIBLE);
+        }
+    }
+    public BooleanProperty dayVisibleProperty() {
+        if (null == dayVisible) {
+            dayVisible = new BooleanPropertyBase(_dayVisible) {
+                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override public Object getBean() { return Clock.this; }
+                @Override public String getName() { return "dayVisible"; }
+            };
+        }
+        return dayVisible;
     }
 
     /**
@@ -2092,6 +2103,7 @@ public class Clock extends Control {
             case DESIGN    : return new DesignClockSkin(Clock.this);
             case INDUSTRIAL: return new IndustrialClockSkin(Clock.this);
             case TILE      : return new TileClockSkin(Clock.this);
+            case DIGI      : return new DigitalClockSkin(Clock.this);
             case CLOCK     :
             default        : return new ClockSkin(Clock.this);
         }
@@ -2165,6 +2177,7 @@ public class Clock extends Control {
             case SLIM:
                 setSecondsVisible(true);
                 setDateVisible(true);
+                setDayVisible(true);
                 setHourColor(Color.WHITE);
                 setMinuteColor(Color.rgb(0,191,255));
                 setSecondColor(Color.WHITE);
@@ -2239,6 +2252,11 @@ public class Clock extends Control {
                 setTitleVisible(true);
                 setTitleColor(Color.rgb(238, 238, 238));
                 super.setSkin(new TileClockSkin(Clock.this));
+                break;
+            case DIGI:
+                setTextVisible(true);
+                setDateVisible(true);
+                super.setSkin(new DigitalClockSkin(Clock.this));
                 break;
             case CLOCK:
                 setHourTickMarkColor(Color.rgb(255, 255, 255));
