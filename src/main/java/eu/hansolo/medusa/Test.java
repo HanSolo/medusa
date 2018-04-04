@@ -16,68 +16,64 @@
 
 package eu.hansolo.medusa;
 
-import eu.hansolo.medusa.Clock.ClockSkinType;
-import eu.hansolo.medusa.Gauge.KnobType;
-import eu.hansolo.medusa.Gauge.NeedleBehavior;
-import eu.hansolo.medusa.Gauge.NeedleShape;
-import eu.hansolo.medusa.Gauge.NeedleType;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.events.UpdateEvent;
-import eu.hansolo.medusa.events.UpdateEvent.EventType;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.Instant;
-import java.util.Locale;
-import java.util.Random;
+import eu.hansolo.medusa.events.UpdateEventListener;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.NodeOrientation;
-import javafx.geometry.Pos;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 
+import java.util.Random;
 
 
-/**
- * User: hansolo
- * Date: 04.01.16
- * Time: 06:31
- */
 public class Test extends Application {
-    private static final Random          RND       = new Random();
-    private static       int             noOfNodes = 0;
-    private              Clock           clock;
-    private              long            lastTimerCall;
-    private              AnimationTimer  timer;
+    private static final Random         RND       = new Random();
+    private static       int            noOfNodes = 0;
+    private              Gauge          gauge;
+    private              long           lastTimerCall;
+    private              AnimationTimer timer;
 
 
     @Override public void init() {
-
-        clock = ClockBuilder.create()
-                            .skinType(ClockSkinType.DIGI)
-                            .running(true)
+        gauge = GaugeBuilder.create()
+                            .skinType(Gauge.SkinType.LINEAR)
+                            .orientation(Orientation.VERTICAL)
+                            .title("Input")
+                            .returnToZero(false)
+                            .animated(true)
+                            .animationDuration(25)
+                            .smoothing(true)
+                            //.needleBehavior(Gauge.NeedleBehavior.STANDARD)
+                            .prefHeight(200)
+                            .barColor(Color.CORNFLOWERBLUE)
                             .build();
 
-        lastTimerCall = System.nanoTime();
-        timer = new AnimationTimer() {
-            @Override public void handle(long now) {
-                if (now > lastTimerCall + 2_000_000_000l) {
+        gauge.currentValueProperty().addListener(o -> {
+            double currentValue = gauge.getCurrentValue();
+            if (currentValue > 3) {
+                gauge.setBarColor(Color.rgb(200, 80, 0));
+            } else if (currentValue < -3) {
+                gauge.setBarColor(Color.rgb(0, 80, 200));
+            } else {
+                gauge.setBarColor(Color.rgb(0, 200, 0));
+            }
+        });
 
+        lastTimerCall = System.nanoTime();
+        timer         = new AnimationTimer() {
+            @Override public void handle(final long now) {
+                if (now > lastTimerCall + 1_000_000_000l) {
+                    double value = RND.nextDouble() * 100;
+                    System.out.println(value);
+                    gauge.setValue(value);
                     lastTimerCall = now;
                 }
             }
@@ -85,12 +81,12 @@ public class Test extends Application {
     }
 
     @Override public void start(Stage stage) {
-
-        StackPane pane = new StackPane(clock);
+        StackPane pane = new StackPane(gauge);
+        pane.setPadding(new Insets(10));
 
         Scene scene = new Scene(pane);
 
-        stage.setTitle("Medusa");
+        stage.setTitle("Test");
         stage.setScene(scene);
         stage.show();
 
@@ -98,7 +94,7 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        //timer.start();
+        timer.start();
     }
 
     @Override public void stop() {
