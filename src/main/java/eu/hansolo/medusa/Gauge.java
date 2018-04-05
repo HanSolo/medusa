@@ -425,7 +425,7 @@ public class Gauge extends Control {
                     final KeyValue KEY_VALUE;
                     if (NeedleBehavior.STANDARD == getNeedleBehavior()) {
                         KEY_VALUE = new KeyValue(currentValue, VALUE, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
-                    } else {
+                    } else { // Optimized only useful in a gauge where the angle range is 360 deg and the shorter way has to be calculated.
                         double ov  = getOldValue();
                         double min = getMinValue();
                         double max = getMaxValue();
