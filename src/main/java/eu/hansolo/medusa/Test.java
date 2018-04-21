@@ -44,18 +44,19 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skinType(Gauge.SkinType.LINEAR)
-                            .orientation(Orientation.VERTICAL)
+                            .skinType(Gauge.SkinType.MODERN)
                             .title("Input")
                             .returnToZero(false)
                             .animated(true)
                             .animationDuration(25)
                             .smoothing(true)
-                            //.needleBehavior(Gauge.NeedleBehavior.STANDARD)
+                            .decimals(0)
+                            .needleBehavior(Gauge.NeedleBehavior.STANDARD)
                             .prefHeight(200)
                             .barColor(Color.CORNFLOWERBLUE)
                             .build();
 
+        /*
         gauge.currentValueProperty().addListener(o -> {
             double currentValue = gauge.getCurrentValue();
             if (currentValue > 3) {
@@ -66,13 +67,14 @@ public class Test extends Application {
                 gauge.setBarColor(Color.rgb(0, 200, 0));
             }
         });
+        */
 
         lastTimerCall = System.nanoTime();
         timer         = new AnimationTimer() {
             @Override public void handle(final long now) {
-                if (now > lastTimerCall + 1_000_000_000l) {
+                if (now > lastTimerCall + 100_000_000l) {
                     double value = RND.nextDouble() * 100;
-                    System.out.println(value);
+                    //System.out.println(value);
                     gauge.setValue(value);
                     lastTimerCall = now;
                 }

@@ -5110,7 +5110,8 @@ public class Gauge extends Control {
         int           maxLength     = String.format(Locale.US, format, getMaxValue()).length();
         int           length        = Math.max(minLength, maxLength);
         formatBuilder.setLength(0);
-        formatBuilder.append("%").append(length).append(".").append(getDecimals()).append("f");
+        //formatBuilder.append("%").append(length).append(".").append(getDecimals()).append("f");
+        formatBuilder.append("%").append(".").append(getDecimals()).append("f");
         formatString = formatBuilder.toString();
         fireUpdateEvent(RESIZE_EVENT);
     }
