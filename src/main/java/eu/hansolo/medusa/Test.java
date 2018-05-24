@@ -24,6 +24,7 @@ import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -44,7 +45,7 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skinType(Gauge.SkinType.MODERN)
+                            .skinType(SkinType.LCD)
                             .title("Input")
                             .returnToZero(false)
                             .animated(true)
@@ -55,6 +56,8 @@ public class Test extends Application {
                             .prefHeight(200)
                             .barColor(Color.CORNFLOWERBLUE)
                             .build();
+
+        gauge = new Gauge(SkinType.LCD);
 
         /*
         gauge.currentValueProperty().addListener(o -> {
@@ -72,7 +75,7 @@ public class Test extends Application {
         lastTimerCall = System.nanoTime();
         timer         = new AnimationTimer() {
             @Override public void handle(final long now) {
-                if (now > lastTimerCall + 100_000_000l) {
+                if (now > lastTimerCall + 1_000_000_000l) {
                     double value = RND.nextDouble() * 100;
                     //System.out.println(value);
                     gauge.setValue(value);
