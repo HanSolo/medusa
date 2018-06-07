@@ -235,9 +235,9 @@ public class IndicatorSkin extends GaugeSkinBase {
             if (gauge.isValueVisible()) {
                 Bounds bounds       = pane.localToScreen(pane.getBoundsInLocal());                
                 double xFactor      = value > gauge.getRange() * 0.8 ? 0.0 : 0.25;
-                double tooltipAngle = value * angleStep;
-                double sinValue     = Math.sin(Math.toRadians(180 + angleRange * 0.5 - tooltipAngle));
-                double cosValue     = Math.cos(Math.toRadians(180 + angleRange * 0.5 - tooltipAngle));
+                double tooltipAngle = needleRotate.getAngle();
+                double sinValue     = Math.sin(Math.toRadians(90 + angleRange * 0.5 - tooltipAngle));
+                double cosValue     = Math.cos(Math.toRadians(90 + angleRange * 0.5 - tooltipAngle));
                 double needleTipX   = bounds.getMinX() + bounds.getWidth() * 0.5 + bounds.getHeight() * sinValue;
                 double needleTipY   = bounds.getMinY() + bounds.getHeight() * 0.72 + bounds.getHeight() * cosValue;
                 needleTooltip.show(needle, needleTipX, needleTipY);
@@ -266,10 +266,9 @@ public class IndicatorSkin extends GaugeSkinBase {
 
     private void rotateNeedle(final double VALUE) {
         double needleStartAngle = angleRange * 0.5;
-        double targetAngle      = (VALUE - minValue) * angleStep - needleStartAngle;
-        targetAngle = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, targetAngle);
+        double targetAngle      = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, ((gauge.getCurrentValue() - minValue) * angleStep - needleStartAngle));
         needleRotate.setAngle(targetAngle);
-        bar.setLength(-(gauge.getCurrentValue() - minValue) * angleStep);
+        bar.setLength(-90 - targetAngle);
         setBarColor(VALUE);
     }
     
@@ -347,13 +346,16 @@ public class IndicatorSkin extends GaugeSkinBase {
                 drawSections();
             }
 
+            double needleStartAngle = angleRange * 0.5;
+            double targetAngle      = Helper.clamp(-needleStartAngle, -needleStartAngle + angleRange, ((gauge.getCurrentValue() - minValue) * angleStep - needleStartAngle));
+
             bar.setCenterX(centerX);
             bar.setCenterY(centerY);
             bar.setRadiusX(barRadius);
             bar.setRadiusY(barRadius);
             bar.setStrokeWidth(barWidth);
             bar.setStartAngle(angleRange * 0.5 + 90);
-            bar.setLength(-(gauge.getCurrentValue() - minValue) * angleStep);
+            bar.setLength(-90 - targetAngle);
 
             double needleWidth  = height * 0.13157895;
             double needleHeight = height * 0.91315789;
