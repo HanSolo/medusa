@@ -230,18 +230,20 @@ public class IndicatorSkin extends GaugeSkinBase {
             redraw();
             rotateNeedle(gauge.getCurrentValue());
         } else if ("FINISHED".equals(EVENT_TYPE)) {
-            needleTooltip.setText(String.format(locale, formatString, gauge.getValue()));
+            String text = String.format(locale, formatString, gauge.getValue());
+            needleTooltip.setText(text);
             double value = gauge.getValue();
             if (gauge.isValueVisible()) {
-                Bounds bounds       = pane.localToScreen(pane.getBoundsInLocal());                
-                double xFactor      = value > gauge.getRange() * 0.8 ? 0.0 : 0.25;
+                Bounds bounds       = barBackground.localToScreen(barBackground.getBoundsInLocal());
                 double tooltipAngle = needleRotate.getAngle();
                 double sinValue     = Math.sin(Math.toRadians(90 + angleRange * 0.5 - tooltipAngle));
                 double cosValue     = Math.cos(Math.toRadians(90 + angleRange * 0.5 - tooltipAngle));
                 double needleTipX   = bounds.getMinX() + bounds.getWidth() * 0.5 + bounds.getHeight() * sinValue;
-                double needleTipY   = bounds.getMinY() + bounds.getHeight() * 0.72 + bounds.getHeight() * cosValue;
+                double needleTipY   = bounds.getMinY() + bounds.getHeight() * 0.8 + bounds.getHeight() * cosValue;
+                if (value < (gauge.getMinValue() + (gauge.getRange() * 0.5))) {
+                    needleTipX -= text.length() * 7;
+                }
                 needleTooltip.show(needle, needleTipX, needleTipY);
-                needleTooltip.setAnchorX(needleTooltip.getX() - needleTooltip.getWidth() * xFactor);
             }
             if (sections.isEmpty() || sectionsAlwaysVisible) return;
             for (Section section : sections) {
