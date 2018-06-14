@@ -233,6 +233,8 @@ public class DigitalSkin extends GaugeSkinBase {
         backgroundCtx.setLineCap(StrokeLineCap.BUTT);
         backgroundCtx.clearRect(0, 0, size, size);
 
+        boolean shadowsEnabled = gauge.isShadowsEnabled();
+
         // draw translucent background
         backgroundCtx.setStroke(Color.rgb(0, 12, 6, 0.1));
         Color bColor = Helper.getTranslucentColorFrom(barColor, 0.1);
@@ -257,7 +259,7 @@ public class DigitalSkin extends GaugeSkinBase {
             String title        = gauge.getTitle();
             char[] bkgTitleChrs = new char[title.length()];
             Arrays.fill(bkgTitleChrs, '8');
-            backgroundCtx.setFill(Helper.getTranslucentColorFrom(titleColor, 0.1));
+            backgroundCtx.setFill(shadowsEnabled ? Helper.getTranslucentColorFrom(titleColor, 0.1) : Color.TRANSPARENT);
             backgroundCtx.setFont(Fonts.digitalReadoutBold(0.09 * size));
             backgroundCtx.setTextBaseline(VPos.CENTER);
             backgroundCtx.setTextAlign(TextAlignment.CENTER);
@@ -271,7 +273,7 @@ public class DigitalSkin extends GaugeSkinBase {
             String subTitle        = gauge.getSubTitle();
             char[] bkgSubTitleChrs = new char[subTitle.length()];
             Arrays.fill(bkgSubTitleChrs, '8');
-            backgroundCtx.setFill(Helper.getTranslucentColorFrom(subTitleColor, 0.1));
+            backgroundCtx.setFill(shadowsEnabled ? Helper.getTranslucentColorFrom(subTitleColor, 0.1) : Color.TRANSPARENT);
             backgroundCtx.setFont(Fonts.digital(0.09 * size));
             backgroundCtx.fillText(new String(bkgSubTitleChrs), center, size * 0.66);
             backgroundCtx.setFill(subTitleColor);
@@ -283,7 +285,7 @@ public class DigitalSkin extends GaugeSkinBase {
             String unit        = gauge.getUnit();
             char[] bkgUnitChrs = new char[unit.length()];
             Arrays.fill(bkgUnitChrs, '8');
-            backgroundCtx.setFill(Helper.getTranslucentColorFrom(unitColor, 0.1));
+            backgroundCtx.setFill(shadowsEnabled ? Helper.getTranslucentColorFrom(unitColor, 0.1) : Color.TRANSPARENT);
             backgroundCtx.setFont(Fonts.digital(0.09 * size));
             backgroundCtx.fillText(new String(bkgUnitChrs), center, size * 0.88);
             backgroundCtx.setFill(unitColor);
@@ -482,7 +484,7 @@ public class DigitalSkin extends GaugeSkinBase {
 
         setBar(gauge.getCurrentValue());
 
-        valueBkgText.setFill(Helper.getTranslucentColorFrom(valueColor, 0.1));
+        valueBkgText.setFill(gauge.isShadowsEnabled() ? Helper.getTranslucentColorFrom(valueColor, 0.1) : Color.TRANSPARENT);
 
         valueText.setFill(valueColor);
     }
