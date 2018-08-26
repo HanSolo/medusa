@@ -45,8 +45,8 @@ import java.util.Locale;
 
 
 public class MorphingClockSkin extends ClockSkinBase {
-    protected static final double            PREFERRED_WIDTH       = 830;
-    protected static final double            PREFERRED_HEIGHT      = 220;
+    protected static final double            PREFERRED_WIDTH       = 415;
+    protected static final double            PREFERRED_HEIGHT      = 110;
     protected static final double            MINIMUM_WIDTH         = 50;
     protected static final double            MINIMUM_HEIGHT        = 20;
     protected static final double            MAXIMUM_WIDTH         = 4096;
