@@ -554,6 +554,8 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
                     CONTROL.setTextVisible(true);
                     CONTROL.setDateVisible(true);
                     break;
+                case MORPHING:
+                    break;
             }
         } else {
             CONTROL = new Clock();
