@@ -5204,7 +5204,13 @@ public class Gauge extends Control {
     }
 
     private void setupBinding() {
-        showing = Bindings.selectBoolean(sceneProperty(), "window", "showing");
+        showing = Bindings.createBooleanBinding(() -> {
+            if (getScene() != null && getScene().getWindow() != null) {
+                return getScene().getWindow().isShowing();
+            } else {
+                return false;
+            }
+        }, sceneProperty(), getScene().windowProperty(), getScene().getWindow().showingProperty());
         showing.addListener((o, ov, nv) -> {
             if (nv) {
                 while(updateEventQueue.peek() != null) {
