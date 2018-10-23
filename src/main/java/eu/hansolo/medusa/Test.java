@@ -17,22 +17,16 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Gauge.SkinType;
-import eu.hansolo.medusa.events.UpdateEvent;
-import eu.hansolo.medusa.events.UpdateEventListener;
+import java.util.Random;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
-import java.util.Random;
 
 
 public class Test extends Application {
@@ -45,19 +39,13 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.LCD)
-                            .title("Input")
-                            .returnToZero(false)
-                            .animated(true)
-                            .animationDuration(25)
-                            .smoothing(true)
-                            .decimals(0)
-                            .needleBehavior(Gauge.NeedleBehavior.STANDARD)
-                            .prefHeight(200)
-                            .barColor(Color.CORNFLOWERBLUE)
+                            .skinType(SkinType.GAUGE)
+                            .title("Disappearing Ticks")
+							.minValue(-100)
+							.maxValue(100)
+							.minorTickSpace(0.9)
+							.majorTickSpace(10)
                             .build();
-
-        gauge = new Gauge(SkinType.LCD);
 
         /*
         gauge.currentValueProperty().addListener(o -> {

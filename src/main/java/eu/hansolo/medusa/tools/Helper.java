@@ -899,7 +899,7 @@ public class Helper {
                         }
                         break;
                 }
-            } else if (minorTickMarksVisible && Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0.0) == 0) {
+            } else if (minorTickMarksVisible) {
                 // Draw minor tick mark
                 if (TickMarkType.TICK_LABEL != majorTickMarkType) {
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
