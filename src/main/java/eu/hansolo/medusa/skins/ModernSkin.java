@@ -110,6 +110,10 @@ public class ModernSkin extends GaugeSkinBase {
     private InvalidationListener        animatedListener;
     private ListChangeListener<Section> sectionListener;
     private InvalidationListener        currentValueListener;
+    private int                         titleLength;
+    private int                         subTitleLength;
+    private int                         valueLength;
+    private int                         unitLength;
 
 
     // ******************** Constructors **************************************
@@ -127,6 +131,10 @@ public class ModernSkin extends GaugeSkinBase {
         animatedListener     = o -> handleEvents("ANIMATED");
         sectionListener      = c -> handleEvents("RESIZE");
         currentValueListener = o -> rotateNeedle(gauge.getCurrentValue());
+        titleLength          = 0;
+        subTitleLength       = 0;
+        valueLength          = 0;
+        unitLength           = 0;
 
         initGraphics();
         registerListeners();
@@ -338,11 +346,10 @@ public class ModernSkin extends GaugeSkinBase {
         double targetAngle = 180 - START_ANGLE + (VALUE - gauge.getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
         valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
-        valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
-        if (valueText.getLayoutBounds().getWidth() > 0.395 * size) {
-            resizeText();
-            placeTextVerticaly();
-        }
+        //valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
+
+        resizeText();
+        placeTextVerticaly();
 
         if ( gauge.isThresholdVisible() && VALUE > gauge.getThreshold() ) {
             glow2.setColor(thresholdColor);
@@ -648,25 +655,34 @@ public class ModernSkin extends GaugeSkinBase {
     private void resizeText() {
         double maxWidth = 0.405 * size;
 
-        valueText.setFont(Fonts.latoRegular(size * 0.22));
-        if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, size * 0.22); }
-        valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
-
-        titleText.setFont(Fonts.robotoCondensedRegular(size * 0.062));
         titleText.setText(gauge.getTitle());
-        if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, size * 0.062); }
+        if (titleText.getText().length() > titleLength) {
+            if (titleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(titleText, maxWidth, size * 0.062); }
+        }
         titleText.setTranslateX((size - titleText.getLayoutBounds().getWidth()) * 0.5);
 
+        if (valueText.getText().length() > valueLength) {
+            if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, size * 0.22); }
+        }
+        valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
+
         maxWidth = 0.28 * size;
-        subTitleText.setFont(Fonts.robotoCondensedLight(size * 0.047));
         subTitleText.setText(gauge.getSubTitle());
-        if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, size * 0.047); }
+        if (subTitleText.getText().length() > subTitleLength) {
+            if (subTitleText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(subTitleText, maxWidth, size * 0.047); }
+        }
         subTitleText.setTranslateX((size - subTitleText.getLayoutBounds().getWidth()) * 0.5);
 
-        unitText.setFont(Fonts.robotoCondensedRegular(size * 0.047));
         unitText.setText(gauge.getUnit());
-        if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, size * 0.047); }
+        if (unitText.getText().length() > unitLength) {
+            if (unitText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(unitText, maxWidth, size * 0.047); }
+        }
         unitText.setTranslateX((size - unitText.getLayoutBounds().getWidth()) * 0.5);
+
+        titleLength    = titleText.getText().length();
+        subTitleLength = subTitleText.getText().length();
+        valueLength    = valueText.getText().length();
+        unitLength     = unitText.getText().length();
     }
 
     private void placeTextVerticaly() {
@@ -787,6 +803,11 @@ public class ModernSkin extends GaugeSkinBase {
             glow1.setRadius(0.085 * size);
             glow2.setRadius(0.085 * size);
             bigGlow.setRadius(0.25 * size);
+
+            titleText.setFont(Fonts.robotoCondensedRegular(size * 0.062));
+            subTitleText.setFont(Fonts.robotoCondensedLight(size * 0.047));
+            valueText.setFont(Fonts.latoRegular(size * 0.22));
+            unitText.setFont(Fonts.robotoCondensedRegular(size * 0.047));
 
             resizeText();
             placeTextVerticaly();

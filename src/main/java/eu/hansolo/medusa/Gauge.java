@@ -35,6 +35,7 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +45,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.DoubleProperty;
@@ -135,8 +138,11 @@ public class Gauge extends Control {
     private static ScheduledExecutorService      blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", true));
     private static volatile Callable<Void>       blinkTask;
 
+    private        BooleanBinding                showing;
+
     // Update events
-    private List<UpdateEventListener>            listenerList = new CopyOnWriteArrayList<>();
+    private              Queue<UpdateEvent>      updateEventQueue = new LinkedBlockingQueue<>();
+    private List<UpdateEventListener>            listenerList     = new CopyOnWriteArrayList<>();
 
     // Data related
     private DoubleProperty                       value;
@@ -399,13 +405,15 @@ public class Gauge extends Control {
     public Gauge() {
         this(SkinType.GAUGE);
     }
-    public Gauge(final SkinType SKIN) {
+    public Gauge(final SkinType SKIN_TYPE) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-        skinType = SKIN;
+        skinType = SKIN_TYPE;
         getStyleClass().add("gauge");
 
         init();
         registerListeners();
+
+        setSkinType(SKIN_TYPE);
     }
 
 
@@ -626,6 +634,21 @@ public class Gauge extends Control {
     private void registerListeners() {
         disabledProperty().addListener(o -> setOpacity(isDisabled() ? 0.4 : 1));
         valueProperty().addListener((o, ov, nv) -> oldValue.set(ov.doubleValue()));
+        if (null != getScene()) {
+            setupBinding();
+        } else {
+            sceneProperty().addListener((o1, ov1, nv1) -> {
+                if (null == nv1) { return; }
+                if (null != getScene().getWindow()) {
+                    setupBinding();
+                } else {
+                    sceneProperty().get().windowProperty().addListener((o2, ov2, nv2) -> {
+                        if (null == nv2) { return; }
+                        setupBinding();
+                    });
+                }
+            });
+        }
     }
 
 
@@ -5110,7 +5133,8 @@ public class Gauge extends Control {
         int           maxLength     = String.format(Locale.US, format, getMaxValue()).length();
         int           length        = Math.max(minLength, maxLength);
         formatBuilder.setLength(0);
-        formatBuilder.append("%").append(length).append(".").append(getDecimals()).append("f");
+        //formatBuilder.append("%").append(length).append(".").append(getDecimals()).append("f");
+        formatBuilder.append("%").append(".").append(getDecimals()).append("f");
         formatString = formatBuilder.toString();
         fireUpdateEvent(RESIZE_EVENT);
     }
@@ -5177,6 +5201,24 @@ public class Gauge extends Control {
             .append("\"minMeasuredValue\":").append(getMinMeasuredValue()).append(",")
             .append("\"maxMeasuredValue\":").append(getMaxMeasuredValue())
             .append("}").toString();
+    }
+
+    private void setupBinding() {
+        showing = Bindings.createBooleanBinding(() -> {
+            if (getScene() != null && getScene().getWindow() != null) {
+                return getScene().getWindow().isShowing();
+            } else {
+                return false;
+            }
+        }, sceneProperty(), getScene().windowProperty(), getScene().getWindow().showingProperty());
+        showing.addListener((o, ov, nv) -> {
+            if (nv) {
+                while(updateEventQueue.peek() != null) {
+                    UpdateEvent event = updateEventQueue.poll();
+                    for (UpdateEventListener listener : listenerList) { listener.onUpdateEvent(event); }
+                }
+            }
+        });
     }
 
 
@@ -5497,8 +5539,11 @@ public class Gauge extends Control {
     public void removeUpdateEventListener(final UpdateEventListener LISTENER) { if (listenerList.contains(LISTENER)) listenerList.remove(LISTENER); }
 
     public void fireUpdateEvent(final UpdateEvent EVENT) {
-        int listSize = listenerList.size();
-        for (int i = 0; i < listSize; i++) { listenerList.get(i).onUpdateEvent(EVENT); }
+        if (null != showing && showing.get()) {
+            for (UpdateEventListener listener : listenerList) { listener.onUpdateEvent(EVENT); }
+        } else {
+            updateEventQueue.add(EVENT);
+        }
     }
 
 

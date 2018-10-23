@@ -75,7 +75,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Clock extends Control {
     public enum ClockSkinType { CLOCK, YOTA2, LCD, PEAR, PLAIN, DB, FAT,
-        ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT, DESIGN, INDUSTRIAL, TILE, DIGI }
+        ROUND_LCD, SLIM, MINIMAL, DIGITAL, TEXT, DESIGN, INDUSTRIAL, TILE, DIGI, MORPHING }
 
     public  static final int                  SHORT_INTERVAL   = 20;
     public  static final int                  LONG_INTERVAL    = 1000;
@@ -2104,6 +2104,7 @@ public class Clock extends Control {
             case INDUSTRIAL: return new IndustrialClockSkin(Clock.this);
             case TILE      : return new TileClockSkin(Clock.this);
             case DIGI      : return new DigitalClockSkin(Clock.this);
+            case MORPHING  : return new MorphingClockSkin(Clock.this);
             case CLOCK     :
             default        : return new ClockSkin(Clock.this);
         }
@@ -2257,6 +2258,9 @@ public class Clock extends Control {
                 setTextVisible(true);
                 setDateVisible(true);
                 super.setSkin(new DigitalClockSkin(Clock.this));
+                break;
+            case MORPHING:
+                super.setSkin(new MorphingClockSkin(Clock.this));
                 break;
             case CLOCK:
                 setHourTickMarkColor(Color.rgb(255, 255, 255));

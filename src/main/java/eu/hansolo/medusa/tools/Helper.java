@@ -44,6 +44,7 @@ import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
@@ -175,11 +176,22 @@ public class Helper {
         }
     }
 
-    public static final void adjustTextSize(final Text TEXT, final double MAX_WIDTH, double fontSize) {
-        final String FONT_NAME = TEXT.getFont().getName();
-        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && fontSize > 0) {
-            fontSize -= 0.005;
-            TEXT.setFont(new Font(FONT_NAME, fontSize));
+    public static final void adjustTextSize(final Text TEXT, final double MAX_WIDTH, final double FONT_SIZE) {
+        final String FONT_NAME          = TEXT.getFont().getName();
+        double       adjustableFontSize = FONT_SIZE;
+
+        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && adjustableFontSize > 0) {
+            adjustableFontSize -= 0.05;
+            TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
+        }
+    }
+    public static final void adjustTextSize(final Label TEXT, final double MAX_WIDTH, final double FONT_SIZE) {
+        final String FONT_NAME          = TEXT.getFont().getName();
+        double       adjustableFontSize = FONT_SIZE;
+
+        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && adjustableFontSize > 0) {
+            adjustableFontSize -= 0.05;
+            TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
     }
 
@@ -956,7 +968,7 @@ public class Helper {
         final double        ALPHA_VARIATION         = alphaVariationInPercent / 100;
         for (int y = 0 ; y < height ; y++) {
             for (int x = 0 ; x < width ; x++) {
-                final Color  NOISE_COLOR = BW_RND.nextBoolean() == true ? BRIGHT_COLOR : DARK_COLOR;
+                final Color  NOISE_COLOR = BW_RND.nextBoolean() ? BRIGHT_COLOR : DARK_COLOR;
                 final double NOISE_ALPHA = Helper.clamp(0.0, 1.0, ALPHA_START + ALPHA_RND.nextDouble() * ALPHA_VARIATION);
                 PIXEL_WRITER.setColor(x, y, Color.color(NOISE_COLOR.getRed(), NOISE_COLOR.getGreen(), NOISE_COLOR.getBlue(), NOISE_ALPHA));
             }

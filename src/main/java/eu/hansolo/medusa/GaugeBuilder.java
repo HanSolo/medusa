@@ -977,6 +977,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     break;
                 case DIGITAL:
                     CONTROL.setBarColor(Gauge.DARK_COLOR);
+                    CONTROL.setShadowsEnabled(true);
                     break;
                 case SIMPLE_DIGITAL:
                     CONTROL.setBarColor(Gauge.DARK_COLOR);

@@ -208,11 +208,13 @@ public class TileTextKpiSkin extends GaugeSkinBase {
         double fontSize = 0.24 * size;
         valueText.setFont(Fonts.latoRegular(fontSize));
         if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
+        /*
         if (unitText.isVisible()) {
             valueText.relocate(size * 0.925 - valueText.getLayoutBounds().getWidth() - unitText.getLayoutBounds().getWidth(), size * 0.15);
         } else {
             valueText.relocate(size * 0.95 - valueText.getLayoutBounds().getWidth(), size * 0.15);
         }
+        */
 
         percentageUnitText.relocate(percentageText.getLayoutBounds().getMaxX() + size * 0.075, size * 0.75);
     }
@@ -252,10 +254,10 @@ public class TileTextKpiSkin extends GaugeSkinBase {
         fontSize = size * 0.08;
         maxValueText.setFont(Fonts.latoRegular(fontSize));
         if (maxValueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(maxValueText, maxWidth, fontSize); }
-        if (unitText.isVisible()) {
-            maxValueText.setX((size * 0.925) - (size * 0.01 + maxValueText.getLayoutBounds().getWidth() + maxValueUnitText.getLayoutBounds().getWidth()));
-        } else {
+        if (maxValueUnitText.getText().isEmpty()) {
             maxValueText.setX((size * 0.925) - maxValueText.getLayoutBounds().getWidth());
+        } else {
+            maxValueText.setX((size * 0.925) - (size * 0.01 + maxValueText.getLayoutBounds().getWidth() + maxValueUnitText.getLayoutBounds().getWidth()));
         }
         maxValueText.setY(size * 0.855);
     }
