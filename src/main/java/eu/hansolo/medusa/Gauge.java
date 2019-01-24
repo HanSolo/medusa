@@ -45,6 +45,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -405,7 +406,7 @@ public class Gauge extends Control {
     public Gauge() {
         this(SkinType.GAUGE);
     }
-    public Gauge(final SkinType SKIN_TYPE) {
+    public Gauge(@NamedArg("SKIN_TYPE") final SkinType SKIN_TYPE) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         skinType = SKIN_TYPE;
         getStyleClass().add("gauge");

@@ -31,6 +31,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.NamedArg;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.DoubleProperty;
@@ -210,18 +211,18 @@ public class Clock extends Control {
     public Clock() {
         this(ClockSkinType.CLOCK, ZonedDateTime.now());
     }
-    public Clock(final ClockSkinType SKIN) {
-        this(SKIN, ZonedDateTime.now());
+    public Clock(@NamedArg("SKIN_TYPE") final ClockSkinType SKIN_TYPE) {
+        this(SKIN_TYPE, ZonedDateTime.now());
     }
-    public Clock(final ZonedDateTime TIME) {
+    public Clock(@NamedArg("TIME") final ZonedDateTime TIME) {
         this(ClockSkinType.CLOCK, TIME);
     }
-    public Clock(final long EPOCH_SECONDS) {
+    public Clock(@NamedArg("EPOCH_SECONDS") final long EPOCH_SECONDS) {
         this(ClockSkinType.CLOCK, ZonedDateTime.ofInstant(Instant.ofEpochSecond(EPOCH_SECONDS), ZoneId.systemDefault()));
     }
-    public Clock(final ClockSkinType SKIN, final ZonedDateTime TIME) {
+    public Clock(@NamedArg("SKIN_TYPE") final ClockSkinType SKIN_TYPE, @NamedArg("TIME") final ZonedDateTime TIME) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-        skinType = SKIN;
+        skinType = SKIN_TYPE;
         getStyleClass().add("clock");
 
         init(TIME);
