@@ -837,6 +837,15 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setLcdVisible(true);
                     CONTROL.setShadowsEnabled(true);
                     break;
+                case PLAIN_AMP:
+                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
+                    CONTROL.setTitleColor(Color.WHITE);
+                    CONTROL.setLedVisible(true);
+                    CONTROL.setBackgroundPaint(Color.WHITE);
+                    CONTROL.setForegroundPaint(Color.BLACK);
+                    CONTROL.setLcdVisible(true);
+                    CONTROL.setShadowsEnabled(true);
+                    break;
                 case BULLET_CHART:
                     CONTROL.setKnobPosition(Pos.CENTER);
                     CONTROL.setBarColor(Color.BLACK);

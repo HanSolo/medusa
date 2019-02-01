@@ -108,7 +108,7 @@ public class Gauge extends Control {
     public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE, LEFT_TO_RIGHT, RIGHT_TO_LEFT, BOTTOM_TO_TOP, TOP_TO_BOTTOM }
 
     public enum SkinType {
-        AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
+        AMP, PLAIN_AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
         MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL,
         LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL, SIMPLE_DIGITAL, SECTION,
         BAR, WHITE, CHARGE, SIMPLE_SECTION, TILE_KPI, TILE_TEXT_KPI, TILE_SPARK_LINE
@@ -5227,6 +5227,7 @@ public class Gauge extends Control {
     @Override protected Skin createDefaultSkin() {
         switch (skinType) {
             case AMP            : return new AmpSkin(Gauge.this);
+            case PLAIN_AMP      : return new PlainAmpSkin(Gauge.this);
             case BULLET_CHART   : return new BulletChartSkin(Gauge.this);
             case DASHBOARD      : return new DashboardSkin(Gauge.this);
             case FLAT           : return new FlatSkin(Gauge.this);
@@ -5274,6 +5275,16 @@ public class Gauge extends Control {
                 setLcdVisible(true);
                 setShadowsEnabled(true);
                 super.setSkin(new AmpSkin(Gauge.this));
+                break;
+            case PLAIN_AMP:
+                setKnobPosition(Pos.BOTTOM_CENTER);
+                setTitleColor(Color.WHITE);
+                setLedVisible(true);
+                setBackgroundPaint(Color.WHITE);
+                setForegroundPaint(Color.BLACK);
+                setLcdVisible(true);
+                setShadowsEnabled(true);
+                super.setSkin(new PlainAmpSkin(Gauge.this));
                 break;
             case BULLET_CHART:
                 setKnobPosition(Pos.CENTER);

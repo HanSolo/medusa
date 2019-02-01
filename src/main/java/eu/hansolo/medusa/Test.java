@@ -45,9 +45,10 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .prefSize(200, 100)
-                            .skinType(SkinType.LCD)
+                            .prefSize(600, 300)
+                            .skinType(SkinType.PLAIN_AMP)
                             .title("Input")
+                            .unit("µV")
                             .returnToZero(false)
                             .animated(true)
                             .animationDuration(25)
@@ -57,6 +58,7 @@ public class Test extends Application {
                             .needleBehavior(Gauge.NeedleBehavior.STANDARD)
                             .prefHeight(200)
                             .barColor(Color.CORNFLOWERBLUE)
+                            .lcdFont(LcdFont.LCD)
                             .build();
 
         /*
