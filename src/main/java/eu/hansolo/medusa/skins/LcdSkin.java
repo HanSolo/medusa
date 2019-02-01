@@ -130,8 +130,8 @@ public class LcdSkin extends GaugeSkinBase {
         valueOffsetRight      = 0.0;
         digitalFontSizeFactor = 1.0;
         backgroundTextBuilder = new StringBuilder();
-        valueFormatString     = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        otherFormatString     = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
+        valueFormatString     = new StringBuilder("%.").append(gauge.getDecimals()).append("f").toString();
+        otherFormatString     = new StringBuilder("%.").append(gauge.getTickLabelDecimals()).append("f").toString();
         locale                = gauge.getLocale();
         sections              = gauge.getSections();
         sectionColorMap       = new HashMap<>(sections.size());
@@ -687,12 +687,13 @@ public class LcdSkin extends GaugeSkinBase {
 
     @Override protected void redraw() {
         locale            = gauge.getLocale();
-        valueFormatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        otherFormatString = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
+        valueFormatString = new StringBuilder("%.").append(gauge.getDecimals()).append("f").toString();
+        otherFormatString = new StringBuilder("%.").append(gauge.getTickLabelDecimals()).append("f").toString();
 
         if (gauge.isThresholdVisible()) { threshold.setVisible(Double.compare(gauge.getCurrentValue(), gauge.getThreshold()) >= 0); }
 
-        valueText.setText(isNoOfDigitsInvalid() ? "-E-" : formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        //valueText.setText(isNoOfDigitsInvalid() ? "-E-" : formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
+        valueText.setText(isNoOfDigitsInvalid() ? "-E-" : String.format(Locale.US, valueFormatString, gauge.getCurrentValue()));
 
         updateBackgroundText();
 
