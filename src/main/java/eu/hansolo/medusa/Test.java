@@ -45,19 +45,19 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
+                            .prefSize(200, 100)
                             .skinType(SkinType.LCD)
                             .title("Input")
                             .returnToZero(false)
                             .animated(true)
                             .animationDuration(25)
                             .smoothing(true)
-                            .decimals(0)
+                            .decimals(1)
+                            .tickLabelDecimals(1)
                             .needleBehavior(Gauge.NeedleBehavior.STANDARD)
                             .prefHeight(200)
                             .barColor(Color.CORNFLOWERBLUE)
                             .build();
-
-        gauge = new Gauge(SkinType.LCD);
 
         /*
         gauge.currentValueProperty().addListener(o -> {
