@@ -262,6 +262,7 @@ public class LcdSkin extends GaugeSkinBase {
             updateLcdDesign(height);
         } else if ("VISIBILITY".equals(EVENT_TYPE)) {
             Helper.enableNode(crystalOverlay, gauge.isLcdCrystalEnabled());
+            Helper.enableNode(title, !gauge.getTitle().isEmpty());
             Helper.enableNode(unitText, !gauge.getUnit().isEmpty());
             Helper.enableNode(upperLeftText, gauge.isMinMeasuredValueVisible());
             Helper.enableNode(upperRightText, gauge.isMaxMeasuredValueVisible());
