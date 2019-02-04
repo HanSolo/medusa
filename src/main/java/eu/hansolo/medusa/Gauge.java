@@ -2157,8 +2157,18 @@ public class Gauge extends Control {
                 originalMaxValue = getMaxValue();
                 calcAutoScale();
             } else {
-                setMinValue(Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ? getMinValue() : originalMinValue);
-                setMaxValue(Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ? getMaxValue() : originalMaxValue);
+                if (Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ||
+                    Double.compare(originalMinValue, getMinValue()) != 0) {
+                    setMinValue(getMinValue());
+                } else {
+                    setMinValue(originalMinValue);
+                }
+                if (Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ||
+                    Double.compare(originalMaxValue, getMaxValue()) != 0) {
+                    setMaxValue(getMaxValue());
+                } else {
+                    setMaxValue(originalMaxValue);
+                }
             }
             fireUpdateEvent(RECALC_EVENT);
         } else {
@@ -2172,8 +2182,18 @@ public class Gauge extends Control {
                     if (get()) {
                         calcAutoScale();
                     } else {
-                        setMinValue(originalMinValue);
-                        setMaxValue(originalMaxValue);
+                        if (Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ||
+                            Double.compare(originalMinValue, getMinValue()) != 0) {
+                            setMinValue(getMinValue());
+                        } else {
+                            setMinValue(originalMinValue);
+                        }
+                        if (Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ||
+                            Double.compare(originalMaxValue, getMaxValue()) != 0) {
+                            setMaxValue(getMaxValue());
+                        } else {
+                            setMaxValue(originalMaxValue);
+                        }
                     }
                     fireUpdateEvent(RECALC_EVENT);
                 }
