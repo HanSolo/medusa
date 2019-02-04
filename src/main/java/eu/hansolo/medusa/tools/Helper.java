@@ -344,7 +344,7 @@ public class Helper {
         return PATTERN;
     }
 
-    public static void drawTrapezoid(final GraphicsContext CTX,
+    public static final void drawTrapezoid(final GraphicsContext CTX,
                               final double PI1X, final double PI1Y, final double PI2X, final double PI2Y,
                               final double PO1X, final double PO1Y, final double PO2X, final double PO2Y) {
         CTX.beginPath();
@@ -355,7 +355,7 @@ public class Helper {
         CTX.closePath();
         CTX.fill();
     }
-    public static void drawTriangle(final GraphicsContext CTX,
+    public static final void drawTriangle(final GraphicsContext CTX,
                                     final double PIX, final double PIY, final double PO1X, final double PO1Y, final double PO2X, final double PO2Y) {
         CTX.beginPath();
         CTX.moveTo(PIX, PIY);
@@ -364,18 +364,18 @@ public class Helper {
         CTX.closePath();
         CTX.fill();
     }
-    public static void drawDot(final GraphicsContext CTX, final double CENTER_X, final double CENTER_Y, final double SIZE) {
+    public static final void drawDot(final GraphicsContext CTX, final double CENTER_X, final double CENTER_Y, final double SIZE) {
         CTX.fillOval(CENTER_X, CENTER_Y, SIZE, SIZE);
     }
-    public static void drawLine(final GraphicsContext CTX, final double P1X, final double P1Y, final double P2X, final double P2Y) {
+    public static final void drawLine(final GraphicsContext CTX, final double P1X, final double P1Y, final double P2X, final double P2Y) {
         CTX.strokeLine(P1X, P1Y, P2X, P2Y);
     }
 
-    public static boolean isMonochrome(final Color COLOR) {
+    public static final boolean isMonochrome(final Color COLOR) {
         return Double.compare(COLOR.getRed(), COLOR.getGreen()) == 0 && Double.compare(COLOR.getGreen(), COLOR.getBlue()) == 0;
     }
 
-    public static double colorDistance(final Color COLOR_1, final Color COLOR_2) {
+    public static final double colorDistance(final Color COLOR_1, final Color COLOR_2) {
         final double DELTA_R = (COLOR_2.getRed() - COLOR_1.getRed());
         final double DELTA_G = (COLOR_2.getGreen() - COLOR_1.getGreen());
         final double DELTA_B = (COLOR_2.getBlue() - COLOR_1.getBlue());
@@ -383,8 +383,8 @@ public class Helper {
         return Math.sqrt(DELTA_R * DELTA_R + DELTA_G * DELTA_G + DELTA_B * DELTA_B);
     }
 
-    public static boolean isBright(final Color COLOR) { return !isDark(COLOR); }
-    public static boolean isDark(final Color COLOR) {
+    public static final boolean isBright(final Color COLOR) { return !isDark(COLOR); }
+    public static final boolean isDark(final Color COLOR) {
         final double DISTANCE_TO_WHITE = colorDistance(COLOR, Color.WHITE);
         final double DISTANCE_TO_BLACK = colorDistance(COLOR, Color.BLACK);
         return DISTANCE_TO_BLACK < DISTANCE_TO_WHITE;
@@ -394,7 +394,7 @@ public class Helper {
         return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), Helper.clamp(0.0, 1.0, FACTOR));
     }
 
-    public static void drawRadialTickMarks(final Gauge GAUGE, final GraphicsContext CTX,
+    public static final void drawRadialTickMarks(final Gauge GAUGE, final GraphicsContext CTX,
                                            final double MIN_VALUE, final double MAX_VALUE,
                                            final double START_ANGLE, final double ANGLE_RANGE, final double ANGLE_STEP,
                                            final double CENTER_X, final double CENTER_Y, final double SIZE) {
@@ -1009,7 +1009,7 @@ public class Helper {
         }
     }
 
-    public static Image createNoiseImage(final double WIDTH, final double HEIGHT, final Color DARK_COLOR, final Color BRIGHT_COLOR, final double ALPHA_VARIATION_IN_PERCENT) {
+    public static final Image createNoiseImage(final double WIDTH, final double HEIGHT, final Color DARK_COLOR, final Color BRIGHT_COLOR, final double ALPHA_VARIATION_IN_PERCENT) {
         if (Double.compare(WIDTH, 0) <= 0 || Double.compare(HEIGHT, 0) <= 0) return null;
         int                 width                   = (int) WIDTH;
         int                 height                  = (int) HEIGHT;
@@ -1030,7 +1030,7 @@ public class Helper {
         return IMAGE;
     }
 
-    public static void drawTimeSections(final Clock CLOCK, final GraphicsContext CTX, final List<TimeSection> SECTIONS, final double SIZE,
+    public static final void drawTimeSections(final Clock CLOCK, final GraphicsContext CTX, final List<TimeSection> SECTIONS, final double SIZE,
                                         final double XY_INSIDE, final double XY_OUTSIDE, final double WH_INSIDE, final double WH_OUTSIDE,
                                         final double LINE_WIDTH) {
         if (SECTIONS.isEmpty()) return;
@@ -1070,7 +1070,7 @@ public class Helper {
         }
     }
 
-    public static void drawTimeAreas(final Clock CLOCK, final GraphicsContext CTX, final List<TimeSection> AREAS, final double SIZE,
+    public static final void drawTimeAreas(final Clock CLOCK, final GraphicsContext CTX, final List<TimeSection> AREAS, final double SIZE,
                                      final double XY_INSIDE, final double XY_OUTSIDE, final double WH_INSIDE, final double WH_OUTSIDE) {
         if (AREAS.isEmpty()) return;
         TickLabelLocation tickLabelLocation = CLOCK.getTickLabelLocation();
@@ -1107,7 +1107,7 @@ public class Helper {
         }
     }
 
-    public static void drawAlarms(final Clock CLOCK, final double SIZE, final double ALARM_MARKER_SIZE, final double ALARM_MARKER_RADIUS, final Map<Alarm, Circle> ALARM_MAP, final DateTimeFormatter DATE_TIME_FORMATTER, final ZonedDateTime TIME) {
+    public static final void drawAlarms(final Clock CLOCK, final double SIZE, final double ALARM_MARKER_SIZE, final double ALARM_MARKER_RADIUS, final Map<Alarm, Circle> ALARM_MAP, final DateTimeFormatter DATE_TIME_FORMATTER, final ZonedDateTime TIME) {
         if (CLOCK.isAlarmsVisible()) {
             double alarmSize = ALARM_MARKER_SIZE * SIZE;
             double center    = SIZE * 0.5;
@@ -1151,11 +1151,11 @@ public class Helper {
         }
     }
 
-    public static String formatNumber(final Gauge GAUGE, final double VALUE) {
+    public static final String formatNumber(final Gauge GAUGE, final double VALUE) {
         return formatNumber(GAUGE.getLocale(), GAUGE.getFormatString(), GAUGE.getDecimals(), VALUE);
     }
 
-    public static String formatNumber(final Locale LOCALE, final String FORMAT_STRING, final int DECIMALS, final double VALUE) {
+    public static final String formatNumber(final Locale LOCALE, final String FORMAT_STRING, final int DECIMALS, final double VALUE) {
         double value = VALUE;
         if (value > 0) {
             value = Math.floor(value * Math.pow(10, DECIMALS)) / Math.pow(10, DECIMALS);
@@ -1165,7 +1165,7 @@ public class Helper {
         return String.format(LOCALE, FORMAT_STRING, value);
     }
 
-    public static String formatNumber(final Locale LOCALE, final double MIN_VALUE, final double MAX_VALUE, final int DECIMALS, final double VALUE) {
+    public static final String formatNumber(final Locale LOCALE, final double MIN_VALUE, final double MAX_VALUE, final int DECIMALS, final double VALUE) {
         StringBuilder sb        = new StringBuilder("%.").append(DECIMALS).append("f");
         String        f         = sb.toString();
         int           minLength = String.format(Locale.US, f, MIN_VALUE).length();
