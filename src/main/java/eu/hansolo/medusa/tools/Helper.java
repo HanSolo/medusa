@@ -27,20 +27,6 @@ import eu.hansolo.medusa.TickLabelLocation;
 import eu.hansolo.medusa.TickLabelOrientation;
 import eu.hansolo.medusa.TickMarkType;
 import eu.hansolo.medusa.TimeSection;
-import java.math.BigDecimal;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.time.temporal.ChronoField;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
@@ -62,6 +48,20 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+
+import java.math.BigDecimal;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.ChronoField;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 
 
 /**
@@ -93,6 +93,40 @@ public class Helper {
         if (Double.compare(VALUE, MIN) < 0) return MIN;
         if (Double.compare(VALUE, MAX) > 0) return MAX;
         return VALUE;
+    }
+
+    public static final double clampMin(final double MIN, final double VALUE) {
+        if (VALUE < MIN) return MIN;
+        return VALUE;
+    }
+    public static final double clampMax(final double MAX, final double VALUE) {
+        if (VALUE > MAX) return MAX;
+        return VALUE;
+    }
+
+    public static final double round(final double VALUE, final int PRECISION) {
+        final int SCALE = (int) Math.pow(10, PRECISION);
+        return (double) Math.round(VALUE * SCALE) / SCALE;
+    }
+
+    public static final double roundTo(final double VALUE, final double TARGET) { return TARGET * (Math.round(VALUE / TARGET)); }
+
+    public static final double roundToHalf(final double VALUE) { return Math.round(VALUE * 2) / 2.0; }
+
+
+    public static final double nearest(final double SMALLER, final double VALUE, final double LARGER) {
+        return (VALUE - SMALLER) < (LARGER - VALUE) ? SMALLER : LARGER;
+    }
+
+    public static final int roundDoubleToInt(final double VALUE){
+        double dAbs = Math.abs(VALUE);
+        int    i      = (int) dAbs;
+        double result = dAbs - (double) i;
+        if (result < 0.5) {
+            return VALUE < 0 ? -i : i;
+        } else {
+            return VALUE < 0 ? -(i + 1) : i + 1;
+        }
     }
 
     public static final double[] calcAutoScale(final double MIN_VALUE, final double MAX_VALUE) {
@@ -161,6 +195,36 @@ public class Helper {
         double niceRange = niceMax - niceMin;
 
         return new double[] { niceMin, niceMax, niceRange, niceStep };
+    }
+
+    /**
+     * Can be used to implement discrete steps e.g. on a slider.
+     * @param MIN_VALUE          The min value of the range
+     * @param MAX_VALUE          The max value of the range
+     * @param VALUE              The value to snap
+     * @param MINOR_TICK_COUNT   The number of ticks between 2 major tick marks
+     * @param MAJOR_TICK_UNIT    The distance between 2 major tick marks
+     * @return The value snapped to the next tick mark defined by the given parameters
+     */
+    public static final double snapToTicks(final double MIN_VALUE, final double MAX_VALUE, final double VALUE, final int MINOR_TICK_COUNT, final double MAJOR_TICK_UNIT) {
+        double v = VALUE;
+        int    minorTickCount = clamp(0, 10, MINOR_TICK_COUNT);
+        double majorTickUnit  = Double.compare(MAJOR_TICK_UNIT, 0.0) <= 0 ? 0.25 : MAJOR_TICK_UNIT;
+        double tickSpacing;
+
+        if (minorTickCount != 0) {
+            tickSpacing = majorTickUnit / (Math.max(minorTickCount, 0) + 1);
+        } else {
+            tickSpacing = majorTickUnit;
+        }
+
+        int    prevTick      = (int) ((v - MIN_VALUE) / tickSpacing);
+        double prevTickValue = prevTick * tickSpacing + MIN_VALUE;
+        double nextTickValue = (prevTick + 1) * tickSpacing + MIN_VALUE;
+
+        v = nearest(prevTickValue, v, nextTickValue);
+
+        return clamp(MIN_VALUE, MAX_VALUE, v);
     }
 
     /**
@@ -249,7 +313,7 @@ public class Helper {
         }
     }
 
-    public static DateTimeFormatter getDateFormat(final Locale LOCALE) {
+    public static final DateTimeFormatter getDateFormat(final Locale LOCALE) {
         if (Locale.US == LOCALE) {
             return DateTimeFormatter.ofPattern("MM/dd/YYYY");
         } else if (Locale.CHINA == LOCALE) {
@@ -258,11 +322,11 @@ public class Helper {
             return DateTimeFormatter.ofPattern("dd.MM.YYYY");
         }
     }
-    public static DateTimeFormatter getLocalizedDateFormat(final Locale LOCALE) {
+    public static final DateTimeFormatter getLocalizedDateFormat(final Locale LOCALE) {
         return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(LOCALE);
     }
 
-    public static void enableNode(final Node NODE, final boolean ENABLE) {
+    public static final void enableNode(final Node NODE, final boolean ENABLE) {
         NODE.setManaged(ENABLE);
         NODE.setVisible(ENABLE);
     }
@@ -345,8 +409,8 @@ public class Helper {
     }
 
     public static final void drawTrapezoid(final GraphicsContext CTX,
-                              final double PI1X, final double PI1Y, final double PI2X, final double PI2Y,
-                              final double PO1X, final double PO1Y, final double PO2X, final double PO2Y) {
+                                           final double PI1X, final double PI1Y, final double PI2X, final double PI2Y,
+                                           final double PO1X, final double PO1Y, final double PO2X, final double PO2Y) {
         CTX.beginPath();
         CTX.moveTo(PI2X, PI2Y);
         CTX.lineTo(PI1X, PI1Y);
@@ -356,7 +420,7 @@ public class Helper {
         CTX.fill();
     }
     public static final void drawTriangle(final GraphicsContext CTX,
-                                    final double PIX, final double PIY, final double PO1X, final double PO1Y, final double PO2X, final double PO2Y) {
+                                          final double PIX, final double PIY, final double PO1X, final double PO1Y, final double PO2X, final double PO2Y) {
         CTX.beginPath();
         CTX.moveTo(PIX, PIY);
         CTX.lineTo(PO1X, PO1Y);
@@ -390,14 +454,14 @@ public class Helper {
         return DISTANCE_TO_BLACK < DISTANCE_TO_WHITE;
     }
 
-    public static Color getTranslucentColorFrom(final Color COLOR, final double FACTOR) {
+    public static final Color getTranslucentColorFrom(final Color COLOR, final double FACTOR) {
         return Color.color(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), Helper.clamp(0.0, 1.0, FACTOR));
     }
 
     public static final void drawRadialTickMarks(final Gauge GAUGE, final GraphicsContext CTX,
-                                           final double MIN_VALUE, final double MAX_VALUE,
-                                           final double START_ANGLE, final double ANGLE_RANGE, final double ANGLE_STEP,
-                                           final double CENTER_X, final double CENTER_Y, final double SIZE) {
+                                                 final double MIN_VALUE, final double MAX_VALUE,
+                                                 final double START_ANGLE, final double ANGLE_RANGE, final double ANGLE_STEP,
+                                                 final double CENTER_X, final double CENTER_Y, final double SIZE) {
         double               sinValue;
         double               cosValue;
         double               centerX               = CENTER_X;
@@ -1031,8 +1095,8 @@ public class Helper {
     }
 
     public static final void drawTimeSections(final Clock CLOCK, final GraphicsContext CTX, final List<TimeSection> SECTIONS, final double SIZE,
-                                        final double XY_INSIDE, final double XY_OUTSIDE, final double WH_INSIDE, final double WH_OUTSIDE,
-                                        final double LINE_WIDTH) {
+                                              final double XY_INSIDE, final double XY_OUTSIDE, final double WH_INSIDE, final double WH_OUTSIDE,
+                                              final double LINE_WIDTH) {
         if (SECTIONS.isEmpty()) return;
         TickLabelLocation tickLabelLocation = CLOCK.getTickLabelLocation();
         ZonedDateTime     time              = CLOCK.getTime();
@@ -1071,7 +1135,7 @@ public class Helper {
     }
 
     public static final void drawTimeAreas(final Clock CLOCK, final GraphicsContext CTX, final List<TimeSection> AREAS, final double SIZE,
-                                     final double XY_INSIDE, final double XY_OUTSIDE, final double WH_INSIDE, final double WH_OUTSIDE) {
+                                           final double XY_INSIDE, final double XY_OUTSIDE, final double WH_INSIDE, final double WH_OUTSIDE) {
         if (AREAS.isEmpty()) return;
         TickLabelLocation tickLabelLocation = CLOCK.getTickLabelLocation();
         ZonedDateTime     time              = CLOCK.getTime();
