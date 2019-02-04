@@ -71,16 +71,16 @@ import static eu.hansolo.medusa.tools.Helper.enableNode;
 
 
 public class PlainAmpSkin extends GaugeSkinBase {
-    protected static final double                      PREFERRED_WIDTH  = 310;
-    protected static final double                      PREFERRED_HEIGHT = 260;
-    protected static final double                      MINIMUM_WIDTH    = 31;
-    protected static final double                      MINIMUM_HEIGHT = 26;
-    protected static final double                      MAXIMUM_WIDTH  = 1024;
-    protected static final double                      MAXIMUM_HEIGHT = 858;
-    private static final   double                      ASPECT_RATIO   = 0.5;//0.83870968;
-    private static final   double                      START_ANGLE    = 225;
-    private static final   double                      ANGLE_RANGE    = 90;
-    private                Map<Marker, Shape>          markerMap      = new ConcurrentHashMap<>();
+    protected static final double                      PREFERRED_WIDTH  = 300;
+    protected static final double                      PREFERRED_HEIGHT = 150;
+    protected static final double                      MINIMUM_WIDTH    = 30;
+    protected static final double                      MINIMUM_HEIGHT   = 15;
+    protected static final double                      MAXIMUM_WIDTH    = 1024;
+    protected static final double                      MAXIMUM_HEIGHT   = 858;
+    private static final   double                      ASPECT_RATIO     = 0.5;
+    private static final   double                      START_ANGLE      = 225;
+    private static final   double                      ANGLE_RANGE      = 90;
+    private                Map<Marker, Shape>          markerMap        = new ConcurrentHashMap<>();
     private                double                      oldValue;
     private                double                      width;
     private                double                      height;
