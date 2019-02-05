@@ -242,21 +242,21 @@ public class Helper {
         double fraction = RANGE / Math.pow(10, exponent);  // fractional part of range
 
         if (ROUND) {
-            if (Double.compare(fraction, 1.5) < 0) {
+            if (fraction < 1.5) {
                 niceFraction = 1;
-            } else if (Double.compare(fraction, 3)  < 0) {
+            } else if (fraction < 3) {
                 niceFraction = 2;
-            } else if (Double.compare(fraction, 7) < 0) {
+            } else if (fraction < 7) {
                 niceFraction = 5;
             } else {
                 niceFraction = 10;
             }
         } else {
-            if (Double.compare(fraction, 1) <= 0) {
+            if (fraction <= 1) {
                 niceFraction = 1;
-            } else if (Double.compare(fraction, 2) <= 0) {
+            } else if (fraction <= 2) {
                 niceFraction = 2;
-            } else if (Double.compare(fraction, 5) <= 0) {
+            } else if (fraction <= 5) {
                 niceFraction = 5;
             } else {
                 niceFraction = 10;
