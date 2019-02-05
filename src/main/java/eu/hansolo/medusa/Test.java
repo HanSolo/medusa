@@ -51,7 +51,7 @@ public class Test extends Application {
                             .unit("µV")
                             .returnToZero(false)
                             .animated(true)
-                            .animationDuration(25)
+                            .animationDuration(800)
                             .smoothing(true)
                             .decimals(1)
                             .tickLabelDecimals(1)
@@ -59,6 +59,11 @@ public class Test extends Application {
                             .prefHeight(200)
                             .barColor(Color.CORNFLOWERBLUE)
                             .lcdFont(LcdFont.LCD)
+                            .sections(new Section(0, 30, Color.GREEN),
+                                      new Section(30, 60, Color.YELLOW),
+                                      new Section(60, 100, Color.RED))
+                            .sectionsVisible(true)
+                            .value(60)
                             .build();
 
         /*
@@ -77,7 +82,7 @@ public class Test extends Application {
         lastTimerCall = System.nanoTime();
         timer         = new AnimationTimer() {
             @Override public void handle(final long now) {
-                if (now > lastTimerCall + 1_000_000_000l) {
+                if (now > lastTimerCall + 2_000_000_000l) {
                     double value = RND.nextDouble() * 100;
                     //System.out.println(value);
                     gauge.setValue(value);
@@ -101,7 +106,7 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        timer.start();
+        //timer.start();
     }
 
     @Override public void stop() {
