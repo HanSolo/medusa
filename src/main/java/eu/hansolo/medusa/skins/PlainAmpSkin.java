@@ -498,10 +498,10 @@ public class PlainAmpSkin extends GaugeSkinBase {
     }
 
     private void drawSections(final GraphicsContext CTX) {
-        final double                  x                 = width * 0.06;
-        final double                  y                 = width * 0.21;
-        final double                  w                 = width * 0.88;
-        final double                  h                 = height * 1.05;
+        final double                  x                 = -width * 0.03;
+        final double                  y                 = height * 0.345;
+        final double                  w                 = width * 1.06;
+        final double                  h                 = height * 2.085;
         final double                  MIN_VALUE         = gauge.getMinValue();
         final double                  MAX_VALUE         = gauge.getMaxValue();
         final double                  OFFSET            = 90 - START_ANGLE;
