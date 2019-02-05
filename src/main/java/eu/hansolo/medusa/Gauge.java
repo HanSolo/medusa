@@ -18,27 +18,42 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEventListener;
-import eu.hansolo.medusa.skins.*;
+import eu.hansolo.medusa.skins.AmpSkin;
+import eu.hansolo.medusa.skins.BarSkin;
+import eu.hansolo.medusa.skins.BatterySkin;
+import eu.hansolo.medusa.skins.BulletChartSkin;
+import eu.hansolo.medusa.skins.ChargeSkin;
+import eu.hansolo.medusa.skins.DashboardSkin;
+import eu.hansolo.medusa.skins.DigitalSkin;
+import eu.hansolo.medusa.skins.FlatSkin;
+import eu.hansolo.medusa.skins.GaugeSkin;
+import eu.hansolo.medusa.skins.HSkin;
+import eu.hansolo.medusa.skins.IndicatorSkin;
+import eu.hansolo.medusa.skins.KpiSkin;
+import eu.hansolo.medusa.skins.LcdSkin;
+import eu.hansolo.medusa.skins.LevelSkin;
+import eu.hansolo.medusa.skins.LinearSkin;
+import eu.hansolo.medusa.skins.ModernSkin;
+import eu.hansolo.medusa.skins.PlainAmpSkin;
+import eu.hansolo.medusa.skins.QuarterSkin;
+import eu.hansolo.medusa.skins.SectionSkin;
+import eu.hansolo.medusa.skins.SimpleDigitalSkin;
+import eu.hansolo.medusa.skins.SimpleSectionSkin;
+import eu.hansolo.medusa.skins.SimpleSkin;
+import eu.hansolo.medusa.skins.SlimSkin;
+import eu.hansolo.medusa.skins.SpaceXSkin;
+import eu.hansolo.medusa.skins.TileKpiSkin;
+import eu.hansolo.medusa.skins.TileSparklineSkin;
+import eu.hansolo.medusa.skins.TileTextKpiSkin;
+import eu.hansolo.medusa.skins.TinySkin;
+import eu.hansolo.medusa.skins.VSkin;
+import eu.hansolo.medusa.skins.WhiteSkin;
 import eu.hansolo.medusa.tools.Data;
 import eu.hansolo.medusa.tools.GradientLookup;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.MarkerComparator;
 import eu.hansolo.medusa.tools.MovingAverage;
 import eu.hansolo.medusa.tools.SectionComparator;
-
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Queue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -77,6 +92,20 @@ import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
+
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -435,11 +464,22 @@ public class Gauge extends Control {
                     if (NeedleBehavior.STANDARD == getNeedleBehavior()) {
                         KEY_VALUE = new KeyValue(currentValue, VALUE, Interpolator.SPLINE(0.5, 0.4, 0.4, 1.0));
                     } else { // Optimized only useful in a gauge where the angle range is 360 deg and the shorter way has to be calculated.
-                        double ov  = getOldValue();
-                        double min = getMinValue();
-                        double max = getMaxValue();
-                        double cv  = getCurrentValue();
+                        double ov         = getOldValue();
+                        double min        = getMinValue();
+                        double max        = getMaxValue();
+                        double halfRange  = getRange() * 0.5;
+                        double cv         = getCurrentValue();
+                        double delta      = VALUE - getCurrentValue();
+
+                        if (delta < -halfRange) {
+                            double kv1 = max - cv;
+                            double kv2 = VALUE;
+                        } else if (delta > halfRange) {
+
+                        }
+
                         double tmpValue;
+
                         if (Math.abs(VALUE - ov) > getRange() * 0.5) {
                             if (ov < VALUE) {
                                 tmpValue = min - max + VALUE;
@@ -2157,18 +2197,8 @@ public class Gauge extends Control {
                 originalMaxValue = getMaxValue();
                 calcAutoScale();
             } else {
-                if (Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ||
-                    Double.compare(originalMinValue, getMinValue()) != 0) {
-                    setMinValue(getMinValue());
-                } else {
-                    setMinValue(originalMinValue);
-                }
-                if (Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ||
-                    Double.compare(originalMaxValue, getMaxValue()) != 0) {
-                    setMaxValue(getMaxValue());
-                } else {
-                    setMaxValue(originalMaxValue);
-                }
+                setMinValue(Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ? getMinValue() : originalMinValue);
+                setMaxValue(Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ? getMaxValue() : originalMaxValue);
             }
             fireUpdateEvent(RECALC_EVENT);
         } else {
@@ -2182,18 +2212,8 @@ public class Gauge extends Control {
                     if (get()) {
                         calcAutoScale();
                     } else {
-                        if (Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ||
-                            Double.compare(originalMinValue, getMinValue()) != 0) {
-                            setMinValue(getMinValue());
-                        } else {
-                            setMinValue(originalMinValue);
-                        }
-                        if (Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ||
-                            Double.compare(originalMaxValue, getMaxValue()) != 0) {
-                            setMaxValue(getMaxValue());
-                        } else {
-                            setMaxValue(originalMaxValue);
-                        }
+                        setMinValue(Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ? getMinValue() : originalMinValue);
+                        setMaxValue(Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ? getMaxValue() : originalMaxValue);
                     }
                     fireUpdateEvent(RECALC_EVENT);
                 }
@@ -5166,10 +5186,13 @@ public class Gauge extends Control {
     public void calcAutoScale() {
         double maxNoOfMajorTicks = 10;
         double maxNoOfMinorTicks = 10;
-        double niceRange         = (Helper.calcNiceNumber(getRange(), false));
+        double minValue          = getMinValue();
+        double maxValue          = getMaxValue();
+        double range             = maxValue - minValue;
+        double niceRange         = (Helper.calcNiceNumber(range, false));
         setMajorTickSpace(Helper.calcNiceNumber(niceRange / (maxNoOfMajorTicks - 1), true));
-        double niceMinValue = (Math.floor(getMinValue() / getMajorTickSpace()) * getMajorTickSpace());
-        double niceMaxValue = (Math.ceil(getMaxValue() / getMajorTickSpace()) * getMajorTickSpace());
+        double niceMinValue      = (Math.floor(minValue / getMajorTickSpace()) * getMajorTickSpace());
+        double niceMaxValue      = (Math.ceil(maxValue / getMajorTickSpace()) * getMajorTickSpace());
         setMinorTickSpace(Helper.calcNiceNumber(getMajorTickSpace() / (maxNoOfMinorTicks - 1), true));
         setMinValue(niceMinValue);
         setMaxValue(niceMaxValue);
@@ -5227,6 +5250,12 @@ public class Gauge extends Control {
     private void setupBinding() {
         showing = Bindings.createBooleanBinding(() -> {
             if (getScene() != null && getScene().getWindow() != null) {
+                if (getScene().getWindow().isShowing()) {
+                    while(updateEventQueue.peek() != null) {
+                        UpdateEvent event = updateEventQueue.poll();
+                        for (UpdateEventListener listener : listenerList) { listener.onUpdateEvent(event); }
+                    }
+                }
                 return getScene().getWindow().isShowing();
             } else {
                 return false;
