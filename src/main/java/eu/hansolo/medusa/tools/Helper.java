@@ -1017,9 +1017,18 @@ public class Helper {
                         }
                         break;
                 }
-            } else if (minorTickMarksVisible && Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0.0) == 0) {
+            } else if (minorTickMarksVisible) {
+                boolean drawMinorTicks = false;
+                if (minorTickSpaceBD.stripTrailingZeros().scale() <= 0) {
+                    if (Double.compare(counterBD.remainder(minorTickSpaceBD).doubleValue(), 0.0) == 0) {
+                        drawMinorTicks = true;
+                    }
+                } else {
+                    drawMinorTicks = true;
+                }
+
                 // Draw minor tick mark
-                if (TickMarkType.TICK_LABEL != majorTickMarkType) {
+                if (drawMinorTicks && TickMarkType.TICK_LABEL != majorTickMarkType) {
                     CTX.setFill(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     CTX.setStroke(tickMarkSectionsVisible ? Helper.getColorOfSection(tickMarkSections, counter, minorTickMarkColor) : minorTickMarkColor);
                     switch (minorTickMarkType) {
