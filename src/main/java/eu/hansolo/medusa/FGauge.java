@@ -72,13 +72,9 @@ public class FGauge extends Region {
         gaugeBackground = BACKGROUND;
 
         Skin skin = gauge.getSkin();
-        /*
-        if (null != skin && gauge.getSkin().getClass() != GaugeSkin.class) {
-            throw new RuntimeException("Please change Skin to GaugeSkin.");
-        }
-        */
-        if (null != skin) {
-            throw new RuntimeException("Please change Skin to a valid Skin.");
+
+        if (null == skin) {
+            throw new RuntimeException("Please use a valid Skin.");
         }
 
         init();
