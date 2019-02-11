@@ -28,6 +28,7 @@ import javafx.scene.paint.Color;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 
 /**
@@ -207,8 +208,8 @@ public class Alarm {
 
     // ******************** Inner Classes *************************************
     public static class AlarmMarkerEvent extends Event {;
-        public static final EventType<AlarmMarkerEvent> ALARM_MARKER_PRESSED  = new EventType(ANY, "ALARM_MARKER_PRESSED");
-        public static final EventType<AlarmMarkerEvent> ALARM_MARKER_RELEASED = new EventType(ANY, "ALARM_MARKER_RELEASED");
+        public static final EventType<AlarmMarkerEvent> ALARM_MARKER_PRESSED  = new EventType(ANY, "ALARM_MARKER_PRESSED" + UUID.randomUUID().toString());
+        public static final EventType<AlarmMarkerEvent> ALARM_MARKER_RELEASED = new EventType(ANY, "ALARM_MARKER_RELEASED" + UUID.randomUUID().toString());
 
 
         // ******************** Constructors **************************************

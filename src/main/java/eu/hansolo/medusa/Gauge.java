@@ -99,6 +99,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
@@ -5624,8 +5625,8 @@ public class Gauge extends Control {
 
     // ******************** Inner Classes *************************************
     public static class ButtonEvent extends Event {
-        public static final EventType<ButtonEvent> BTN_PRESSED  = new EventType<>(ANY, "BTN_PRESSED");
-        public static final EventType<ButtonEvent> BTN_RELEASED = new EventType<>(ANY, "BTN_RELEASED");
+        public static final EventType<ButtonEvent> BTN_PRESSED  = new EventType<>(ANY, "BTN_PRESSED" + UUID.randomUUID().toString());
+        public static final EventType<ButtonEvent> BTN_RELEASED = new EventType<>(ANY, "BTN_RELEASED" + UUID.randomUUID().toString());
 
 
         // ******************** Constructors **************************************
@@ -5634,8 +5635,8 @@ public class Gauge extends Control {
     }
 
     public static class ThresholdEvent extends Event {
-        public static final EventType<ThresholdEvent> THRESHOLD_EXCEEDED = new EventType<>(ANY, "THRESHOLD_EXCEEDED");
-        public static final EventType<ThresholdEvent> THRESHOLD_UNDERRUN = new EventType<>(ANY, "THRESHOLD_UNDERRUN");
+        public static final EventType<ThresholdEvent> THRESHOLD_EXCEEDED = new EventType<>(ANY, "THRESHOLD_EXCEEDED" + UUID.randomUUID().toString());
+        public static final EventType<ThresholdEvent> THRESHOLD_UNDERRUN = new EventType<>(ANY, "THRESHOLD_UNDERRUN" + UUID.randomUUID().toString());
 
 
         // ******************** Constructors **************************************
