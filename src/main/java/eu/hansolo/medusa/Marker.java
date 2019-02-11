@@ -16,6 +16,8 @@
 
 package eu.hansolo.medusa;
 
+import java.util.UUID;
+
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -322,14 +324,14 @@ public class Marker implements Comparable<Marker>{
 
     // ******************** Inner Classes *************************************
     public static class MarkerEvent extends Event {
-        public static final EventType<MarkerEvent> MARKER_EXCEEDED = new EventType(ANY, "MARKER_EXCEEDED");
-        public static final EventType<MarkerEvent> MARKER_UNDERRUN = new EventType(ANY, "MARKER_UNDER_RUN");
-        public static final EventType<MarkerEvent> MARKER_PRESSED  = new EventType(ANY, "MARKER_PRESSED");
-        public static final EventType<MarkerEvent> MARKER_RELEASED = new EventType(ANY, "MARKER_RELEASED");
-        public static final EventType<MarkerEvent> VALUE_CHANGED   = new EventType(ANY, "VALUE_CHANGED");
-        public static final EventType<MarkerEvent> COLOR_CHANGED   = new EventType(ANY, "COLOR_CHANGED");
-        public static final EventType<MarkerEvent> TEXT_CHANGED    = new EventType(ANY, "TEXT_CHANGED");
-        public static final EventType<MarkerEvent> TYPE_CHANGED    = new EventType(ANY, "TYPE_CHANGED");
+        public static final EventType<MarkerEvent> MARKER_EXCEEDED = new EventType(ANY, "MARKER_EXCEEDED" + UUID.randomUUID().toString());
+        public static final EventType<MarkerEvent> MARKER_UNDERRUN = new EventType(ANY, "MARKER_UNDER_RUN" + UUID.randomUUID().toString());
+        public static final EventType<MarkerEvent> MARKER_PRESSED  = new EventType(ANY, "MARKER_PRESSED" + UUID.randomUUID().toString());
+        public static final EventType<MarkerEvent> MARKER_RELEASED = new EventType(ANY, "MARKER_RELEASED" + UUID.randomUUID().toString());
+        public static final EventType<MarkerEvent> VALUE_CHANGED   = new EventType(ANY, "VALUE_CHANGED" + UUID.randomUUID().toString());
+        public static final EventType<MarkerEvent> COLOR_CHANGED   = new EventType(ANY, "COLOR_CHANGED" + UUID.randomUUID().toString());
+        public static final EventType<MarkerEvent> TEXT_CHANGED    = new EventType(ANY, "TEXT_CHANGED" + UUID.randomUUID().toString());
+        public static final EventType<MarkerEvent> TYPE_CHANGED    = new EventType(ANY, "TYPE_CHANGED" + UUID.randomUUID().toString());
 
 
         // ******************** Constructors **************************************
