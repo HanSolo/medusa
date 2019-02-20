@@ -93,6 +93,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
+import javax.xml.ws.soap.MTOM;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -144,8 +145,8 @@ public class Gauge extends Control {
         BAR, WHITE, CHARGE, SIMPLE_SECTION, TILE_KPI, TILE_TEXT_KPI, TILE_SPARK_LINE
     }
 
-    public static final  Color   DARK_COLOR          = Color.rgb(36, 36, 36);
-    public static final  Color   BRIGHT_COLOR        = Color.rgb(223, 223, 223);
+    public static final  Color   DARK_COLOR          = Color.rgb(36, 36, 36);    // #242424
+    public static final  Color   BRIGHT_COLOR        = Color.rgb(223, 223, 223); // #dfdfdf
     private static final long    LED_BLINK_INTERVAL  = 500l;
     private static final int     MAX_NO_OF_DECIMALS  = 3;
 
@@ -436,7 +437,7 @@ public class Gauge extends Control {
     public Gauge() {
         this(SkinType.GAUGE);
     }
-    public Gauge(@NamedArg("SKIN_TYPE") final SkinType SKIN_TYPE) {
+    public Gauge(@NamedArg("skinType") final SkinType SKIN_TYPE) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         skinType = SKIN_TYPE;
         getStyleClass().add("gauge");
@@ -445,6 +446,117 @@ public class Gauge extends Control {
         registerListeners();
 
         setSkinType(SKIN_TYPE);
+    }
+    public Gauge(@NamedArg(value="skinType", defaultValue="SkinType.GAUGE") SkinType skinType,
+                 @NamedArg(value="minValue", defaultValue="0") double minValue,
+                 @NamedArg(value="maxValue", defaultValue="100") double maxValue,
+                 @NamedArg(value="value", defaultValue="0") double value,
+                 @NamedArg(value="threshold", defaultValue="100") double threshold,
+                 @NamedArg(value="title", defaultValue="") String title,
+                 @NamedArg(value="subTitle", defaultValue="") String subTitle,
+                 @NamedArg(value="unit", defaultValue="") String unit,
+                 @NamedArg(value="averagingEnabled", defaultValue="false") boolean averagingEnabled,
+                 @NamedArg(value="startFromZero", defaultValue="false") boolean startFromZero,
+                 @NamedArg(value="returnToZero", defaultValue="false") boolean returnToZero,
+                 @NamedArg(value="zeroColor", defaultValue="#242424") Color zeroColor,
+                 @NamedArg(value="minMeasuredValueVisible", defaultValue="false") boolean minMeasuredValueVisible,
+                 @NamedArg(value="maxMeasuredValueVisible", defaultValue="false") boolean maxMeasuredValueVisible,
+                 @NamedArg(value="oldValueVisible", defaultValue="false") boolean oldValueVisible,
+                 @NamedArg(value="valueVisible", defaultValue="true") boolean valueVisible,
+                 @NamedArg(value="backgroundPaint", defaultValue="#00000000") Paint backgroundPaint,
+                 @NamedArg(value="borderPaint", defaultValue="#00000000") Paint borderPaint,
+                 @NamedArg(value="foregroundPaint", defaultValue="#00000000") Paint foregroundPaint,
+                 @NamedArg(value="borderWidth", defaultValue="1") double borderWidth,
+                 @NamedArg(value="knobColor", defaultValue="#cccccc") Color knobColor,
+                 @NamedArg(value="knobType", defaultValue="KnobType.STANDARD") KnobType knobType,
+                 @NamedArg(value="knobVisible", defaultValue="true") boolean knobVisible,
+                 @NamedArg(value="animated", defaultValue="false") boolean animated,
+                 @NamedArg(value="animationDuration", defaultValue="800") double animationDuration,
+                 @NamedArg(value="startAngle", defaultValue="320") double startAngle,
+                 @NamedArg(value="angleRange", defaultValue="280") double angleRange,
+                 @NamedArg(value="autoScale", defaultValue="true") boolean autoScale,
+                 @NamedArg(value="shadowsEnabled", defaultValue="false") boolean shadowsEnabled,
+                 @NamedArg(value="barEffectEnabled", defaultValue="false") boolean barEffectEnabled,
+                 @NamedArg(value="scaleDirection", defaultValue="ScaleDiretion.CLOCKWISE") ScaleDirection scaleDirection,
+                 @NamedArg(value="tickLabelLocation", defaultValue="TickLabelLocation.INSIDE") TickLabelLocation tickLabelLocation,
+                 @NamedArg(value="tickLabelOrientation", defaultValue="TickLabelOrientation.HORIZONTAL") TickLabelOrientation tickLabelOrientation,
+                 @NamedArg(value="tickLabelColor", defaultValue="#242424") Color tickLabelColor,
+                 @NamedArg(value="tickMarkColor", defaultValue="#242424") Color tickMarkColor,
+                 @NamedArg(value="majorTickMarkColor", defaultValue="#242424") Color majorTickMarkColor,
+                 @NamedArg(value="mediumTickMarkColor", defaultValue="#242424") Color mediumTickMarkColor,
+                 @NamedArg(value="minorTickMarkColor", defaultValue="#242424") Color minorTickMarkColor,
+                 @NamedArg(value="majorTickMarkType", defaultValue="TickMarkType.LINE") TickMarkType majorTickMarkType,
+                 @NamedArg(value="mediumTickMarkType", defaultValue="TickMarkType.LINE") TickMarkType mediumTickMarkType,
+                 @NamedArg(value="minorTickMarkType", defaultValue="TickMarkType.LINE") TickMarkType minorTickMarkType,
+                 @NamedArg(value="locale", defaultValue="Locale.US") Locale locale,
+                 @NamedArg(value="decimals", defaultValue="1") int decimals,
+                 @NamedArg(value="tickLabelDecimals", defaultValue="0") int tickLabelDecimals,
+                 @NamedArg(value="needleType", defaultValue="NeedleType.STANDARD") NeedleType needleType,
+                 @NamedArg(value="needleShape", defaultValue="NeedleShape.ANGLED") NeedleShape needleShape,
+                 @NamedArg(value="needleSize", defaultValue="NeedleSize.STANDARD") NeedleSize needleSize,
+                 @NamedArg(value="needleBehavior", defaultValue="NeedleBehavior.STANDARD") NeedleBehavior needleBehavior,
+                 @NamedArg(value="needleColor", defaultValue="#c80000") Color needleColor,
+                 @NamedArg(value="needleBorderColor", defaultValue="#00000000") Color needleBorderColor,
+                 @NamedArg(value="barColor", defaultValue="#dfdfdf") Color barColor,
+                 @NamedArg(value="barBorderColor", defaultValue="#00000000") Color barBorderColor,
+                 @NamedArg(value="barBackgroundColor", defaultValue="#242424") Color barBackgroundColor,
+                 @NamedArg(value="lcdDesign", defaultValue="LcdDesign.STANDARD") LcdDesign lcdDesign,
+                 @NamedArg(value="lcdFont", defaultValue="LcdFont.DIGITAL_BOLD") LcdFont lcdFont,
+                 @NamedArg(value="ledColor", defaultValue="#ff0000") Color ledColor,
+                 @NamedArg(value="ledType", defaultValue="LedType.STANDARD") LedType ledType,
+                 @NamedArg(value="titleColor", defaultValue="#242424") Color titleColor,
+                 @NamedArg(value="subTitleColor", defaultValue="#242424") Color subTitleColor,
+                 @NamedArg(value="unitColor", defaultValue="#242424") Color unitColor,
+                 @NamedArg(value="valueColor", defaultValue="#242424") Color valueColor,
+                 @NamedArg(value="thresholdColor", defaultValue="#dc143c") Color thresholdColor,
+                 @NamedArg(value="averageColor", defaultValue="#ff00ff") Color averageColor,
+                 @NamedArg(value="checkSectionsForValue", defaultValue="false") boolean checkSectionsForValue,
+                 @NamedArg(value="checkAreasForValue", defaultValue="false") boolean checkAreasForValue,
+                 @NamedArg(value="checkTreshold", defaultValue="false") boolean checkThreshold,
+                 @NamedArg(value="innerShadowEnabled", defaultValue="false") boolean innerShadowVisible,
+                 @NamedArg(value="thresholdVisible", defaultValue="false") boolean thresholdVisible,
+                 @NamedArg(value="averageVisible", defaultValue="false") boolean averageVisible,
+                 @NamedArg(value="sectionsVisible", defaultValue="false") boolean sectionsVisible,
+                 @NamedArg(value="sectionsAlwaysVisible", defaultValue="false") boolean sectionsAlwaysVisible,
+                 @NamedArg(value="sectionTextVisible", defaultValue="false") boolean sectionTextVisible,
+                 @NamedArg(value="sectionIconsVisible", defaultValue="false") boolean sectionIconsVisible,
+                 @NamedArg(value="highlightSections", defaultValue="false") boolean highlightSections,
+                 @NamedArg(value="areasVisible", defaultValue="false") boolean areasVisible,
+                 @NamedArg(value="areaTextVisible", defaultValue="false") boolean areaTextVisible,
+                 @NamedArg(value="areaIconsVisible", defaultValue="false") boolean areaIconsVisible,
+                 @NamedArg(value="highlightAreas", defaultValue="false") boolean highlightAreas,
+                 @NamedArg(value="tickMarkSectionsVisible", defaultValue="false") boolean tickMarkSectionsVisible,
+                 @NamedArg(value="tickLabelSectionsVisible", defaultValue="false") boolean tickLabelSectionsVisible,
+                 @NamedArg(value="markersVisible", defaultValue="false") boolean markersVisible,
+                 @NamedArg(value="tickLabelsVisible", defaultValue="true") boolean tickLabelsVisible,
+                 @NamedArg(value="onlyFirstAndLastTickLabelVisible", defaultValue="false") boolean onlyFirstAndLastTickLabelVisible,
+                 @NamedArg(value="majorTickMarksVisible", defaultValue="true") boolean majorTickMarksVisible,
+                 @NamedArg(value="mediumTickMarksVisible", defaultValue="true") boolean mediumTickMarksVisible,
+                 @NamedArg(value="minorTickMarksVisible", defaultValue="true") boolean minorTickMarksVisible,
+                 @NamedArg(value="tickMarkRingVisible", defaultValue="false") boolean tickMarkRingVisible,
+                 @NamedArg(value="lcdVisible", defaultValue="false") boolean lcdVisible,
+                 @NamedArg(value="lcdCrystalEnalbed", defaultValue="false") boolean lcdCrystalEnabled,
+                 @NamedArg(value="ledVisible", defaultValue="false") boolean ledVisible,
+                 @NamedArg(value="orientation", defaultValue="Orientation.HORIZONTAL") Orientation orientation,
+                 @NamedArg(value="gradientBarEnabled", defaultValue="false") boolean gradientBarEnabled,
+                 @NamedArg(value="customTickLabelsEnabled", defaultValue="false") boolean customTickLabelsEnabled,
+                 @NamedArg(value="customTickLabelFontSize", defaultValue="18") double customTickLabelFontSize,
+                 @NamedArg(value="interactive", defaultValue="false") boolean interactive,
+                 @NamedArg(value="buttonTooltipText", defaultValue="") String buttonTooltipText,
+                 @NamedArg(value="customFontEnabled", defaultValue="false") boolean customFontEnabled,
+                 @NamedArg(value="customFont", defaultValue="Fonts.robotoRegular(12)") Font customFont,
+                 @NamedArg(value="alert", defaultValue="false") boolean alert,
+                 @NamedArg(value="alertMessage", defaultValue="") String alertMessage,
+                 @NamedArg(value="smoothing", defaultValue="false") boolean smoothing
+                 ) {
+        setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+        this.skinType = skinType;
+        getStyleClass().add("gauge");
+
+        init();
+        registerListeners();
+
+        setSkinType(skinType);
     }
 
 
@@ -5319,21 +5431,21 @@ public class Gauge extends Control {
             case AMP:
                 setKnobPosition(Pos.BOTTOM_CENTER);
                 setTitleColor(Color.WHITE);
-                setLedVisible(true);
+                setLedVisible(isLedVisible());
                 setBackgroundPaint(Color.WHITE);
                 setForegroundPaint(Color.BLACK);
-                setLcdVisible(true);
-                setShadowsEnabled(true);
+                setLcdVisible(isLcdVisible());
+                setShadowsEnabled(isShadowsEnabled());
                 super.setSkin(new AmpSkin(Gauge.this));
                 break;
             case PLAIN_AMP:
                 setKnobPosition(Pos.BOTTOM_CENTER);
                 setTitleColor(Color.WHITE);
-                setLedVisible(true);
+                setLedVisible(isLedVisible());
                 setBackgroundPaint(Color.WHITE);
                 setForegroundPaint(Color.BLACK);
-                setLcdVisible(true);
-                setShadowsEnabled(true);
+                setLcdVisible(isLcdVisible());
+                setShadowsEnabled(isShadowsEnabled());
                 super.setSkin(new PlainAmpSkin(Gauge.this));
                 break;
             case BULLET_CHART:
@@ -5453,9 +5565,9 @@ public class Gauge extends Control {
             case LCD:
                 setDecimals(1);
                 setTickLabelDecimals(1);
-                setMinMeasuredValueVisible(true);
-                setMaxMeasuredValueVisible(true);
-                setOldValueVisible(true);
+                setMinMeasuredValueVisible(isMinMeasuredValueVisible());
+                setMaxMeasuredValueVisible(isMaxMeasuredValueVisible());
+                setOldValueVisible(isOldValueVisible());
                 setBorderPaint(Color.WHITE);
                 setForegroundPaint(Color.WHITE);
                 super.setSkin(new LcdSkin(Gauge.this));
