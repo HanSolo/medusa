@@ -471,7 +471,7 @@ public class Gauge extends Control {
                  @NamedArg(value="knobType", defaultValue="KnobType.STANDARD") KnobType knobType,
                  @NamedArg(value="knobVisible", defaultValue="true") boolean knobVisible,
                  @NamedArg(value="animated", defaultValue="false") boolean animated,
-                 @NamedArg(value="animationDuration", defaultValue="800") double animationDuration,
+                 @NamedArg(value="animationDuration", defaultValue="800") long animationDuration,
                  @NamedArg(value="startAngle", defaultValue="320") double startAngle,
                  @NamedArg(value="angleRange", defaultValue="280") double angleRange,
                  @NamedArg(value="autoScale", defaultValue="true") boolean autoScale,
