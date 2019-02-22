@@ -211,21 +211,78 @@ public class Clock extends Control {
     public Clock() {
         this(ClockSkinType.CLOCK, ZonedDateTime.now());
     }
-    public Clock(@NamedArg("SKIN_TYPE") final ClockSkinType SKIN_TYPE) {
-        this(SKIN_TYPE, ZonedDateTime.now());
+    public Clock(@NamedArg("skinType") final ClockSkinType skinType) {
+        this(skinType, ZonedDateTime.now());
     }
-    public Clock(@NamedArg("TIME") final ZonedDateTime TIME) {
-        this(ClockSkinType.CLOCK, TIME);
+    public Clock(@NamedArg("time") final ZonedDateTime time) {
+        this(ClockSkinType.CLOCK, time);
     }
-    public Clock(@NamedArg("EPOCH_SECONDS") final long EPOCH_SECONDS) {
-        this(ClockSkinType.CLOCK, ZonedDateTime.ofInstant(Instant.ofEpochSecond(EPOCH_SECONDS), ZoneId.systemDefault()));
+    public Clock(@NamedArg("epochSeconds") final long epochSeconds) {
+        this(ClockSkinType.CLOCK, ZonedDateTime.ofInstant(Instant.ofEpochSecond(epochSeconds), ZoneId.systemDefault()));
     }
-    public Clock(@NamedArg("SKIN_TYPE") final ClockSkinType SKIN_TYPE, @NamedArg("TIME") final ZonedDateTime TIME) {
+    public Clock(@NamedArg("skinType") final ClockSkinType skinType, @NamedArg("time") final ZonedDateTime time) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-        skinType = SKIN_TYPE;
+        this.skinType = skinType;
         getStyleClass().add("clock");
 
-        init(TIME);
+        init(time);
+        registerListeners();
+    }
+    public Clock(@NamedArg(value="skinType", defaultValue="ClockSkinType.CLOCK") ClockSkinType skinType,
+                 @NamedArg(value="updateInterval", defaultValue="1000") int updateInterval,
+                 @NamedArg(value="checkSectionsForValue", defaultValue="false") boolean checkSectionsForValue,
+                 @NamedArg(value="checkAreasForValue", defaultValue="false") boolean checkAreasForValue,
+                 @NamedArg(value="sectionsVisible", defaultValue="false") boolean sectionsVisible,
+                 @NamedArg(value="highlightSections", defaultValue="false") boolean highlightSections,
+                 @NamedArg(value="areasVisible ", defaultValue="false") boolean areasVisible,
+                 @NamedArg(value="highlightAreas", defaultValue="false") boolean highlightAreas,
+                 @NamedArg(value="text", defaultValue="") String text,
+                 @NamedArg(value="discreteSeconds", defaultValue="true") boolean discreteSeconds,
+                 @NamedArg(value="discreteMinutes", defaultValue="true") boolean discreteMinutes,
+                 @NamedArg(value="discreteHours", defaultValue="false") boolean discreteHours,
+                 @NamedArg(value="secondsVisible", defaultValue="false") boolean secondsVisible,
+                 @NamedArg(value="titleVisible", defaultValue="false") boolean titleVisible,
+                 @NamedArg(value="textVisible", defaultValue="false") boolean textVisible,
+                 @NamedArg(value="dateVisible", defaultValue="false") boolean dateVisible,
+                 @NamedArg(value="dayVisible", defaultValue="false") boolean dayVisible,
+                 @NamedArg(value="nightMode", defaultValue="false") boolean nightMode,
+                 @NamedArg(value="running", defaultValue="false") boolean running,
+                 @NamedArg(value="autoNightMode", defaultValue="false") boolean autoNightMode,
+                 @NamedArg(value="backgroundPaint", defaultValue="#00000000") Color backgroundPaint,
+                 @NamedArg(value="borderPaint", defaultValue="#00000000") Color borderPaint,
+                 @NamedArg(value="borderWidth", defaultValue="1") double borderWidth,
+                 @NamedArg(value="foregroundPaint", defaultValue="#00000000") Color foregroundPaint,
+                 @NamedArg(value="titleColor", defaultValue="#242424") Color titleColor,
+                 @NamedArg(value="textColor", defaultValue="#242424") Color textColor,
+                 @NamedArg(value="dateColor", defaultValue="#242424") Color dateColor,
+                 @NamedArg(value="hourTickMarkColor", defaultValue="#242424") Color hourTickMarkColor,
+                 @NamedArg(value="minuteTickMarkColor", defaultValue="#242424") Color minuteTickMarkColor,
+                 @NamedArg(value="tickLabelColor", defaultValue="#242424") Color tickLabelColor,
+                 @NamedArg(value="alarmColor", defaultValue="#242424") Color alarmColor,
+                 @NamedArg(value="hourTickMarksVisible", defaultValue="true") boolean hourTickMarksVisible,
+                 @NamedArg(value="minuteTickMarksVisible", defaultValue="true") boolean minuteTickMarksVisible,
+                 @NamedArg(value="tickLabelsVisible", defaultValue="true") boolean tickLabelsVisible,
+                 @NamedArg(value="hourColor", defaultValue="#242424") Color hourColor,
+                 @NamedArg(value="minuteColor", defaultValue="#242424") Color minuteColor,
+                 @NamedArg(value="secondColor", defaultValue="#242424") Color secondColor,
+                 @NamedArg(value="knobColor", defaultValue="#242424") Color knobColor,
+                 @NamedArg(value="lcdDesign", defaultValue="LcdDesign.STANDARD") LcdDesign lcdDesign,
+                 @NamedArg(value="alarmsEnabled", defaultValue="false") boolean alarmsEnabled,
+                 @NamedArg(value="alarmsVisible", defaultValue="false") boolean alarmsVisible,
+                 @NamedArg(value="lcdCrystalEnabled", defaultValue="false") boolean lcdCrystalEnabled,
+                 @NamedArg(value="shadowsEnabled", defaultValue="false") boolean shadowsEnabled,
+                 @NamedArg(value="lcdFont", defaultValue="LcdFont.DIGITAL_BOLD") LcdFont lcdFont,
+                 @NamedArg(value="locale", defaultValue="Locale.US") Locale locale,
+                 @NamedArg(value="tickLabelLocation", defaultValue="TickLabelLocation.INSIDE") TickLabelLocation tickLabelLocation,
+                 @NamedArg(value="animated", defaultValue="false") boolean animated,
+                 @NamedArg(value="animationDuration", defaultValue="10000") long animationDuration,
+                 @NamedArg(value="customFontEnabled", defaultValue="false") boolean customFontEnabled,
+                 @NamedArg(value="customFont", defaultValue="Fonts.robotoRegular(12)") Font customFont) {
+        setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+        this.skinType = skinType;
+        getStyleClass().add("clock");
+
+        init(ZonedDateTime.now());
         registerListeners();
     }
 
