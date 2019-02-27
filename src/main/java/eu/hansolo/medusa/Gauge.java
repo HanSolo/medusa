@@ -437,7 +437,7 @@ public class Gauge extends Control {
     public Gauge() {
         this(SkinType.GAUGE);
     }
-    public Gauge(@NamedArg("skinType") final SkinType SKIN_TYPE) {
+    public Gauge(@NamedArg(value="skinType", defaultValue="SkinType.GAUGE") final SkinType SKIN_TYPE) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         skinType = SKIN_TYPE;
         getStyleClass().add("gauge");
@@ -459,6 +459,8 @@ public class Gauge extends Control {
                  @NamedArg(value="startFromZero", defaultValue="false") boolean startFromZero,
                  @NamedArg(value="returnToZero", defaultValue="false") boolean returnToZero,
                  @NamedArg(value="zeroColor", defaultValue="#242424") Color zeroColor,
+                 @NamedArg(value="minMeasuredValue", defaultValue="100") double minMeasuredValue,
+                 @NamedArg(value="maxMeasuredValue", defaultValue="0") double maxMeasuredValue,
                  @NamedArg(value="minMeasuredValueVisible", defaultValue="false") boolean minMeasuredValueVisible,
                  @NamedArg(value="maxMeasuredValueVisible", defaultValue="false") boolean maxMeasuredValueVisible,
                  @NamedArg(value="oldValueVisible", defaultValue="false") boolean oldValueVisible,
@@ -538,6 +540,7 @@ public class Gauge extends Control {
                  @NamedArg(value="lcdCrystalEnalbed", defaultValue="false") boolean lcdCrystalEnabled,
                  @NamedArg(value="ledVisible", defaultValue="false") boolean ledVisible,
                  @NamedArg(value="orientation", defaultValue="Orientation.HORIZONTAL") Orientation orientation,
+                 @NamedArg(value="keepAspect", defaultValue="true") boolean keepAspect,
                  @NamedArg(value="gradientBarEnabled", defaultValue="false") boolean gradientBarEnabled,
                  @NamedArg(value="customTickLabelsEnabled", defaultValue="false") boolean customTickLabelsEnabled,
                  @NamedArg(value="customTickLabelFontSize", defaultValue="18") double customTickLabelFontSize,
