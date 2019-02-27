@@ -272,10 +272,27 @@ public class SpaceXSkin extends GaugeSkinBase {
         dataBarThresholdInnerArc.setY(centerY + (centerX - barWidth) * Math.cos(-Math.toRadians(thresholdAngle)));
 
         valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
+        resizeValueText();
+    }
+    
+    private void resizeValueText()
+    {
+        valueText.setFont(Fonts.robotoRegular(0.21 * width));
         if (valueText.getLayoutBounds().getWidth() > 0.64 * width) Helper.adjustTextSize(valueText, width, 0.21 * width);
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
     }
 
+    private void resizeStaticText()
+    {
+        titleText.setFont(Fonts.robotoMedium(0.13 * width));
+        if (titleText.getLayoutBounds().getWidth() > width) Helper.adjustTextSize(titleText, width, 0.13 * width);
+        titleText.relocate(0, 0);
+
+        unitText.setFont(Fonts.robotoLight(0.11 * width));
+        if (unitText.getLayoutBounds().getWidth() > 0.4 * width) Helper.adjustTextSize(unitText, width, 0.11 * width);
+        unitText.relocate((width - unitText.getLayoutBounds().getWidth()), 0.79 * height);
+    }
+    
     @Override protected void resize() {
         width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
         height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
@@ -294,18 +311,6 @@ public class SpaceXSkin extends GaugeSkinBase {
             centerX  = 0.5 * width;
             centerY  = 0.56989247 * height;
             barWidth = 0.125 * width;
-
-            titleText.setFont(Fonts.robotoMedium(0.13 * width));
-            if (titleText.getLayoutBounds().getWidth() > width) Helper.adjustTextSize(titleText, width, 0.13 * width);
-            titleText.relocate(0, 0);
-
-            valueText.setFont(Fonts.robotoRegular(0.21 * width));
-            if (valueText.getLayoutBounds().getWidth() > 0.64 * width) Helper.adjustTextSize(valueText, width, 0.21 * width);
-            valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
-
-            unitText.setFont(Fonts.robotoLight(0.11 * width));
-            if (unitText.getLayoutBounds().getWidth() > 0.4 * width) Helper.adjustTextSize(unitText, width, 0.11 * width);
-            unitText.relocate((width - unitText.getLayoutBounds().getWidth()), 0.79 * height);
 
             thresholdAngle    = (gauge.getThreshold() - minValue) * angleStep;
             currentValueAngle = (gauge.getCurrentValue() - minValue) * angleStep;
@@ -392,10 +397,12 @@ public class SpaceXSkin extends GaugeSkinBase {
 
         valueText.setFill(gauge.getValueColor());
         valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
-        valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
 
         unitText.setFill(gauge.getUnitColor());
         unitText.setText(gauge.getUnit());
-        unitText.relocate((width - unitText.getLayoutBounds().getWidth()), 0.79 * height);
+        
+        resizeStaticText();
+        resizeValueText();
+        
     }
 }
