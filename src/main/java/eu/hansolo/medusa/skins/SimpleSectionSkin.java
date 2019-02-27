@@ -286,8 +286,6 @@ public class SimpleSectionSkin extends GaugeSkinBase {
             bar.setRadiusY(size * 0.4);
             bar.setStrokeWidth(size * 0.125);
 
-            resizeValueText();
-
             redraw();
         }
     }
@@ -295,6 +293,8 @@ public class SimpleSectionSkin extends GaugeSkinBase {
     @Override protected void redraw() {
         drawBackground();
         setBar(gauge.getCurrentValue());
+
+        resizeValueText();
 
         titleText.setText(gauge.getTitle());
         unitText.setText(gauge.getUnit());
