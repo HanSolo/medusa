@@ -275,15 +275,13 @@ public class SpaceXSkin extends GaugeSkinBase {
         resizeValueText();
     }
     
-    private void resizeValueText()
-    {
+    private void resizeValueText() {
         valueText.setFont(Fonts.robotoRegular(0.21 * width));
         if (valueText.getLayoutBounds().getWidth() > 0.64 * width) Helper.adjustTextSize(valueText, width, 0.21 * width);
         valueText.relocate((width - valueText.getLayoutBounds().getWidth()), 0.58064516 * height);
     }
 
-    private void resizeStaticText()
-    {
+    private void resizeStaticText() {
         titleText.setFont(Fonts.robotoMedium(0.13 * width));
         if (titleText.getLayoutBounds().getWidth() > width) Helper.adjustTextSize(titleText, width, 0.13 * width);
         titleText.relocate(0, 0);
@@ -331,8 +329,8 @@ public class SpaceXSkin extends GaugeSkinBase {
             barBackgroundInnerArc.setX(centerX);
             barBackgroundInnerArc.setY(height - barWidth);
 
-            thresholdBarOuterArc.setLargeArcFlag(thresholdAngle < 180);
-            thresholdBarInnerArc.setLargeArcFlag(thresholdAngle < 180);
+            thresholdBarOuterArc.setLargeArcFlag(thresholdAngle < 90);
+            thresholdBarInnerArc.setLargeArcFlag(thresholdAngle < 90);
 
             thresholdBarStart.setX(centerX + centerX * Math.sin(-Math.toRadians(thresholdAngle)));
             thresholdBarStart.setY(centerY + centerX * Math.cos(-Math.toRadians(thresholdAngle)));
