@@ -93,7 +93,6 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
-import javax.xml.ws.soap.MTOM;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
