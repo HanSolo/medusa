@@ -48,7 +48,7 @@ public class Test extends Application {
                             .prefSize(600, 300)
                             .skinType(SkinType.PLAIN_AMP)
                             .title("Input")
-                            .unit("µV")
+                            .unit("U+03BCV")
                             .returnToZero(false)
                             .animated(true)
                             .animationDuration(800)
