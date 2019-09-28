@@ -75,6 +75,11 @@ repositories {
     mavenCentral()
 }
 
+task Demo(type: JavaExec) {
+    main = "eu.hansolo.medusa.TestLauncher"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
 // create one jar for the javadoc
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
