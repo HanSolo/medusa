@@ -1,4 +1,4 @@
-module eu.hansolo.tilesfx {
+module eu.hansolo.medusa {
 
     // Java
     requires java.base;
