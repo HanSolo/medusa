@@ -144,13 +144,13 @@ public class Gauge extends Control {
         BAR, WHITE, CHARGE, SIMPLE_SECTION, TILE_KPI, TILE_TEXT_KPI, TILE_SPARK_LINE
     }
 
-    public static final  Color   DARK_COLOR          = Color.rgb(36, 36, 36);    // #242424
-    public static final  Color   BRIGHT_COLOR        = Color.rgb(223, 223, 223); // #dfdfdf
+    public  static final Color   DARK_COLOR          = Color.rgb(36, 36, 36);    // #242424
+    public  static final Color   BRIGHT_COLOR        = Color.rgb(223, 223, 223); // #dfdfdf
     private static final long    LED_BLINK_INTERVAL  = 500l;
     private static final int     MAX_NO_OF_DECIMALS  = 3;
 
-    public final  ButtonEvent    BTN_PRESSED_EVENT   = new ButtonEvent(ButtonEvent.BTN_PRESSED);
-    public final  ButtonEvent    BTN_RELEASED_EVENT  = new ButtonEvent(ButtonEvent.BTN_RELEASED);
+    public  final ButtonEvent    BTN_PRESSED_EVENT   = new ButtonEvent(ButtonEvent.BTN_PRESSED);
+    public  final ButtonEvent    BTN_RELEASED_EVENT  = new ButtonEvent(ButtonEvent.BTN_RELEASED);
     private final ThresholdEvent EXCEEDED_EVENT      = new ThresholdEvent(ThresholdEvent.THRESHOLD_EXCEEDED);
     private final ThresholdEvent UNDERRUN_EVENT      = new ThresholdEvent(ThresholdEvent.THRESHOLD_UNDERRUN);
     private final UpdateEvent    RECALC_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
@@ -169,7 +169,9 @@ public class Gauge extends Control {
     private static ScheduledExecutorService      blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", true));
     private static volatile Callable<Void>       blinkTask;
 
-    private        BooleanBinding                showing;
+    private static          String               userAgentStyleSheet;
+
+    private                 BooleanBinding       showing;
 
     // Update events
     private              Queue<UpdateEvent>      updateEventQueue = new LinkedBlockingQueue<>();
@@ -5424,7 +5426,10 @@ public class Gauge extends Control {
         }
     }
 
-    @Override public String getUserAgentStylesheet() { return getClass().getResource("gauge.css").toExternalForm(); }
+    @Override public String getUserAgentStylesheet() {
+        if (null == userAgentStyleSheet) { userAgentStyleSheet = getClass().getResource("gauge.css").toExternalForm(); }
+        return userAgentStyleSheet;
+    }
 
     public SkinType getSkinType() { return skinType; }
     public void setSkinType(final SkinType SKIN_TYPE) {
