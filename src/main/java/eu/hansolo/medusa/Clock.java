@@ -370,6 +370,50 @@ public class Clock extends Control {
         _customFont             = Fonts.robotoRegular(12);
     }
 
+    public void reInit() {
+        setSecondsVisible         (false);
+        setHighlightSections      (false);
+        setAreasVisible           (false);
+        setHighlightAreas         (false);
+        setDiscreteSeconds        (true);
+        setDiscreteMinutes        (true);
+        setDiscreteHours          (false);
+        setSecondsVisible         (false);
+        setTitleVisible           (false);
+        setTextVisible            (false);
+        setDateVisible            (false);
+        setDayVisible             (false);
+        setNightMode              (false);
+        setRunning                (false);
+        setAutoNightMode          (false);
+        setBackgroundPaint        (Color.TRANSPARENT);
+        setBorderPaint            (Color.TRANSPARENT);
+        setBorderWidth            (1);
+        setForegroundPaint        (Color.TRANSPARENT);
+        setTitleColor             (DARK_COLOR);
+        setTextColor              (DARK_COLOR);
+        setDateColor              (DARK_COLOR);
+        setHourTickMarkColor      (DARK_COLOR);
+        setMinuteTickMarkColor    (DARK_COLOR);
+        setTickLabelColor         (DARK_COLOR);
+        setAlarmColor             (DARK_COLOR);
+        setHourTickMarksVisible   (true);
+        setMinuteTickMarksVisible (true);
+        setTickLabelsVisible      (true);
+        setHourColor              (DARK_COLOR);
+        setMinuteColor            (DARK_COLOR);
+        setSecondColor            (DARK_COLOR);
+        setKnobColor              (DARK_COLOR);
+        setLcdDesign              (LcdDesign.STANDARD);
+        setAlarmsEnabled          (false);
+        setAlarmsVisible          (false);
+        setLcdCrystalEnabled      (false);
+        setShadowsEnabled         (false);
+        setLcdFont                (LcdFont.DIGITAL_BOLD);
+        setTickLabelLocation      (TickLabelLocation.INSIDE);
+        setCustomFontEnabled      (false);
+    }
+    
     private void registerListeners() { disabledProperty().addListener(o -> setOpacity(isDisabled() ? 0.4 : 1)); }
 
 
@@ -2173,9 +2217,35 @@ public class Clock extends Control {
     }
 
     public ClockSkinType getSkinType() { return skinType; }
-    public void setSkinType(ClockSkinType SKIN) {
-        skinType = SKIN;
-        switch(SKIN) {
+    public void setSkinType(ClockSkinType SKIN_TYPE) {
+        skinType = SKIN_TYPE;
+        switch(SKIN_TYPE) {
+            case YOTA2     : super.setSkin(new ClockSkin(Clock.this)); break;
+            case LCD       : super.setSkin(new LcdClockSkin(Clock.this)); break;
+            case PEAR      : super.setSkin(new PearClockSkin(Clock.this)); break;
+            case PLAIN     : super.setSkin(new PlainClockSkin(Clock.this)); break;
+            case DB        : super.setSkin(new DBClockSkin(Clock.this)); break;
+            case FAT       : super.setSkin(new FatClockSkin(Clock.this)); break;
+            case ROUND_LCD : super.setSkin(new RoundLcdClockSkin(Clock.this)); break;
+            case SLIM      : super.setSkin(new SlimClockSkin(Clock.this)); break;
+            case MINIMAL   : super.setSkin(new MinimalClockSkin(Clock.this)); break;
+            case DIGITAL   : super.setSkin(new DigitalClockSkin(Clock.this)); break;
+            case TEXT      : super.setSkin(new TextClockSkin(Clock.this)); break;
+            case DESIGN    : super.setSkin(new DesignClockSkin(Clock.this)); break;
+            case INDUSTRIAL: super.setSkin(new IndustrialClockSkin(Clock.this)); break;
+            case TILE      : super.setSkin(new TileClockSkin(Clock.this)); break;
+            case DIGI      : super.setSkin(new DigitalClockSkin(Clock.this)); break;
+            case MORPHING  : super.setSkin(new MorphingClockSkin(Clock.this)); break;
+            case CLOCK     :
+            default        : super.setSkin(new ClockSkin(Clock.this)); break;
+        }
+        fireUpdateEvent(RESIZE_EVENT);
+        presetClockParameters(skinType);
+    }
+
+    private void presetClockParameters(final ClockSkinType SKIN_TYPE) {
+        reInit();
+        switch(SKIN_TYPE) {
             case YOTA2:
                 setBackgroundPaint(Color.rgb(40, 42, 48));
                 setHourTickMarkColor(Color.rgb(255, 255, 255));
@@ -2183,12 +2253,10 @@ public class Clock extends Control {
                 setHourColor(Color.WHITE);
                 setMinuteColor(Color.WHITE);
                 setKnobColor(Color.WHITE);
-                super.setSkin(new ClockSkin(Clock.this));
                 break;
             case LCD:
                 setBorderPaint(Color.WHITE);
                 setForegroundPaint(Color.WHITE);
-                super.setSkin(new LcdClockSkin(Clock.this));
                 break;
             case PEAR:
                 setBackgroundPaint(Color.BLACK);
@@ -2203,7 +2271,6 @@ public class Clock extends Control {
                 setSecondsVisible(true);
                 setTextVisible(false);
                 setTitleVisible(false);
-                super.setSkin(new PearClockSkin(Clock.this));
                 break;
             case PLAIN:
                 setBackgroundPaint(Color.rgb(29, 29, 29));
@@ -2214,24 +2281,19 @@ public class Clock extends Control {
                 setSecondsVisible(true);
                 setHourTickMarkColor(Color.rgb(240, 240, 240));
                 setMinuteTickMarkColor(Color.rgb(240, 240, 240));
-                super.setSkin(new PlainClockSkin(Clock.this));
                 break;
             case DB:
                 setDiscreteSeconds(false);
                 setDiscreteMinutes(true);
                 setSecondColor(Color.rgb(167, 0, 0));
                 setSecondsVisible(true);
-
-                super.setSkin(new DBClockSkin(Clock.this));
                 break;
             case FAT:
                 setDiscreteMinutes(true);
-                super.setSkin(new FatClockSkin(Clock.this));
                 break;
             case ROUND_LCD:
                 setTextVisible(true);
                 setDateVisible(true);
-                super.setSkin(new RoundLcdClockSkin(Clock.this));
                 break;
             case SLIM:
                 setSecondsVisible(true);
@@ -2241,7 +2303,6 @@ public class Clock extends Control {
                 setMinuteColor(Color.rgb(0,191,255));
                 setSecondColor(Color.WHITE);
                 setDateColor(Color.WHITE);
-                super.setSkin(new SlimClockSkin(Clock.this));
                 break;
             case MINIMAL:
                 setBackgroundPaint(Color.rgb(255, 255, 255, 0.3));
@@ -2250,19 +2311,16 @@ public class Clock extends Control {
                 setSecondColor(Color.rgb(255, 255, 255, 0.8));
                 setSecondsVisible(true);
                 setDateVisible(true);
-                super.setSkin(new MinimalClockSkin(Clock.this));
                 break;
             case DIGITAL:
                 setTextVisible(true);
                 setDateVisible(true);
                 setSecondsVisible(true);
-                super.setSkin(new DigitalClockSkin(Clock.this));
                 break;
             case TEXT:
                 setTextVisible(true);
                 setDateVisible(true);
                 setSecondsVisible(true);
-                super.setSkin(new TextClockSkin(Clock.this));
                 break;
             case DESIGN:
                 setDiscreteHours(false);
@@ -2273,7 +2331,6 @@ public class Clock extends Control {
                 setSecondsVisible(false);
                 setHourColor(Color.RED);
                 setBackgroundPaint(Color.WHITE);
-                super.setSkin(new DesignClockSkin(Clock.this));
                 break;
             case INDUSTRIAL:
                 setBackgroundPaint(Color.web("#efefef"));
@@ -2293,7 +2350,6 @@ public class Clock extends Control {
                 setTitleColor(Color.BLACK);
                 setBorderPaint(Color.BLACK);
                 setBorderWidth(5);
-                super.setSkin(new IndustrialClockSkin(Clock.this));
                 break;
             case TILE:
                 setBackgroundPaint(Color.rgb(42,42,42));
@@ -2310,15 +2366,12 @@ public class Clock extends Control {
                 setTextColor(Color.rgb(238, 238, 238));
                 setTitleVisible(true);
                 setTitleColor(Color.rgb(238, 238, 238));
-                super.setSkin(new TileClockSkin(Clock.this));
                 break;
             case DIGI:
                 setTextVisible(true);
                 setDateVisible(true);
-                super.setSkin(new DigitalClockSkin(Clock.this));
                 break;
             case MORPHING:
-                super.setSkin(new MorphingClockSkin(Clock.this));
                 break;
             case CLOCK:
                 setHourTickMarkColor(Color.rgb(255, 255, 255));
@@ -2328,10 +2381,8 @@ public class Clock extends Control {
                 setKnobColor(Color.WHITE);
                 setKnobColor(Color.WHITE);
             default:
-                super.setSkin(new ClockSkin(Clock.this));
                 break;
         }
-        fireUpdateEvent(RESIZE_EVENT);
     }
 
 

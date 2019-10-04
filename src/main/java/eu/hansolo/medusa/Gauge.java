@@ -5562,7 +5562,7 @@ public class Gauge extends Control {
             default             : super.setSkin(new GaugeSkin(Gauge.this)); break;
         }
         fireUpdateEvent(RESIZE_EVENT);
-        presetGaugeParameters(SKIN_TYPE);
+        presetGaugeParameters(skinType);
     }
 
     public void presetGaugeParameters(final SkinType SKIN_TYPE) {
