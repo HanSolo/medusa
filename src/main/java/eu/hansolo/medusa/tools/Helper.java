@@ -71,6 +71,7 @@ public class Helper {
     public static final double MAX_TICK_MARK_LENGTH = 0.125;
     public static final double MAX_TICK_MARK_WIDTH  = 0.02;
     public static final Color  INACTIVE_ALARM_COLOR = Color.rgb(90, 90, 90, 0.5);
+    public static final double MIN_FONT_SIZE        = 5;
 
 
     public static final <T extends Number> T clamp(final T MIN, final T MAX, final T VALUE) {
@@ -297,9 +298,8 @@ public class Helper {
     public static final void adjustTextSize(final Text TEXT, final double MAX_WIDTH, final double FONT_SIZE) {
         final String FONT_NAME          = TEXT.getFont().getName();
         double       adjustableFontSize = FONT_SIZE;
-
-        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && adjustableFontSize > 0) {
-            adjustableFontSize -= 0.05;
+        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && adjustableFontSize > MIN_FONT_SIZE) {
+            adjustableFontSize -= 0.1;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
     }
@@ -307,8 +307,8 @@ public class Helper {
         final String FONT_NAME          = TEXT.getFont().getName();
         double       adjustableFontSize = FONT_SIZE;
 
-        while (TEXT.getBoundsInLocal().getWidth() > MAX_WIDTH && adjustableFontSize > 0) {
-            adjustableFontSize -= 0.05;
+        while (TEXT.getLayoutBounds().getWidth() > MAX_WIDTH && adjustableFontSize > MIN_FONT_SIZE) {
+            adjustableFontSize -= 0.1;
             TEXT.setFont(new Font(FONT_NAME, adjustableFontSize));
         }
     }

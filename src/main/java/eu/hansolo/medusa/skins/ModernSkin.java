@@ -112,7 +112,6 @@ public class ModernSkin extends GaugeSkinBase {
     private InvalidationListener        currentValueListener;
     private int                         titleLength;
     private int                         subTitleLength;
-    private int                         valueLength;
     private int                         unitLength;
 
 
@@ -133,7 +132,6 @@ public class ModernSkin extends GaugeSkinBase {
         currentValueListener = o -> rotateNeedle(gauge.getCurrentValue());
         titleLength          = 0;
         subTitleLength       = 0;
-        valueLength          = 0;
         unitLength           = 0;
 
         initGraphics();
@@ -346,7 +344,6 @@ public class ModernSkin extends GaugeSkinBase {
         double targetAngle = 180 - START_ANGLE + (VALUE - gauge.getMinValue()) * angleStep;
         needleRotate.setAngle(Helper.clamp(180 - START_ANGLE, 180 - START_ANGLE + ANGLE_RANGE, targetAngle));
         valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), VALUE));
-        //valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
 
         resizeText();
         placeTextVerticaly();
@@ -661,9 +658,10 @@ public class ModernSkin extends GaugeSkinBase {
         }
         titleText.setTranslateX((size - titleText.getLayoutBounds().getWidth()) * 0.5);
 
-        if (valueText.getText().length() > valueLength) {
-            if (valueText.getLayoutBounds().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, size * 0.22); }
-        }
+        maxWidth = centerKnob.getRadius() * 1.8;
+        double fontSize = centerKnob.getRadius() * 0.65;
+        valueText.setFont(Fonts.latoRegular(fontSize));
+        if (valueText.getBoundsInLocal().getWidth() > maxWidth) { Helper.adjustTextSize(valueText, maxWidth, fontSize); }
         valueText.setTranslateX((size - valueText.getLayoutBounds().getWidth()) * 0.5);
 
         maxWidth = 0.28 * size;
@@ -681,7 +679,6 @@ public class ModernSkin extends GaugeSkinBase {
 
         titleLength    = titleText.getText().length();
         subTitleLength = subTitleText.getText().length();
-        valueLength    = valueText.getText().length();
         unitLength     = unitText.getText().length();
     }
 
