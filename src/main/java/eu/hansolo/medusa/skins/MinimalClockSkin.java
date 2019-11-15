@@ -46,20 +46,20 @@ import java.time.temporal.ChronoField;
  * Created by hansolo on 04.04.16.
  */
 public class MinimalClockSkin extends ClockSkinBase {
-    private static final DateTimeFormatter DATE_TEXT_FORMATTER = DateTimeFormatter.ofPattern("ccc., dd. MMM.");
-    private static final DateTimeFormatter HOUR_FORMATTER      = DateTimeFormatter.ofPattern("HH");
-    private static final DateTimeFormatter MINUTE_FORMATTER    = DateTimeFormatter.ofPattern("mm");
-    private double               size;
-    private Circle               secondBackgroundCircle;
-    private Text                 dateText;
-    private Text                 hour;
-    private Text                 minute;
-    private Circle               minuteCircle;
-    private Arc                  secondArc;
-    private Pane                 pane;
-    private DoubleProperty       minuteAngle;
-    private Timeline             timeline;
-    private InvalidationListener minuteAngleListener;
+    private static final DateTimeFormatter HOUR_FORMATTER    = DateTimeFormatter.ofPattern("HH");
+    private static final DateTimeFormatter MINUTE_FORMATTER  = DateTimeFormatter.ofPattern("mm");
+    private              DateTimeFormatter dateTextFormatter;
+    private double                         size;
+    private Circle                         secondBackgroundCircle;
+    private Text                           dateText;
+    private Text                           hour;
+    private Text                           minute;
+    private Circle                         minuteCircle;
+    private Arc                            secondArc;
+    private Pane                           pane;
+    private DoubleProperty                 minuteAngle;
+    private Timeline                       timeline;
+    private InvalidationListener           minuteAngleListener;
 
 
     // ******************** Constructors **************************************
@@ -72,6 +72,7 @@ public class MinimalClockSkin extends ClockSkinBase {
         };
         timeline            = new Timeline();
         minuteAngleListener = o -> moveMinute(minuteAngle.get());
+        dateTextFormatter   = DateTimeFormatter.ofPattern("ccc., dd. MMM.").withLocale(clock.getLocale());
 
         initGraphics();
         registerListeners();
@@ -101,7 +102,7 @@ public class MinimalClockSkin extends ClockSkinBase {
         secondBackgroundCircle.setVisible(clock.isSecondsVisible());
         secondBackgroundCircle.setManaged(clock.isSecondsVisible());
 
-        dateText = new Text(DATE_TEXT_FORMATTER.format(time));
+        dateText = new Text(dateTextFormatter.format(time));
         dateText.setVisible(clock.isDateVisible());
         dateText.setManaged(clock.isDateVisible());
 
@@ -131,6 +132,7 @@ public class MinimalClockSkin extends ClockSkinBase {
     @Override protected void registerListeners() {
         super.registerListeners();
         minuteAngle.addListener(minuteAngleListener);
+        clock.localeProperty().addListener(o -> dateTextFormatter = DateTimeFormatter.ofPattern("ccc., dd. MMM.").withLocale(clock.getLocale()));
     }
 
 
@@ -160,7 +162,7 @@ public class MinimalClockSkin extends ClockSkinBase {
     // ******************** Graphics ******************************************
     @Override public void updateTime(final ZonedDateTime TIME) {
         if (dateText.isVisible()) {
-            dateText.setText(DATE_TEXT_FORMATTER.format(TIME));
+            dateText.setText(dateTextFormatter.format(TIME));
             Helper.adjustTextSize(dateText, 0.6 * size, size * 0.08);
             dateText.relocate((size - dateText.getLayoutBounds().getWidth()) * 0.5, size * 0.22180451);
         }

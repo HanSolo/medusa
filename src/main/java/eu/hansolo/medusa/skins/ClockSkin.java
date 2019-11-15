@@ -57,10 +57,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by hansolo on 28.01.16.
  */
 public class ClockSkin extends ClockSkinBase {
-    private static final DateTimeFormatter  DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("EEEE\ndd.MM.YYYY\nHH:mm:ss");
-    private static final DateTimeFormatter  DATE_FORMATER       = DateTimeFormatter.ofPattern("EE d");
-    private static final DateTimeFormatter  TIME_FORMATTER      = DateTimeFormatter.ofPattern("HH:mm");
-    private              Map<Alarm, Circle> alarmMap            = new ConcurrentHashMap<>();
+    private static final DateTimeFormatter  TIME_FORMATTER    = DateTimeFormatter.ofPattern("HH:mm");
+    private              Map<Alarm, Circle> alarmMap          = new ConcurrentHashMap<>();
+    private              DateTimeFormatter  dateTimeFormatter;
+    private              DateTimeFormatter  dateFormatter;
     private              double             size;
     private              Canvas             sectionsAndAreasCanvas;
     private              GraphicsContext    sectionsAndAreasCtx;
@@ -104,6 +104,9 @@ public class ClockSkin extends ClockSkinBase {
         areas             = clock.getAreas();
         highlightAreas    = clock.isHighlightAreas();
         areasVisible      = clock.getAreasVisible();
+
+        dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE\ndd.MM.YYYY\nHH:mm:ss").withLocale(clock.getLocale());
+        dateFormatter     = DateTimeFormatter.ofPattern("EE d").withLocale(clock.getLocale());
 
         updateAlarms();
 
@@ -190,6 +193,10 @@ public class ClockSkin extends ClockSkinBase {
 
     @Override protected void registerListeners() {
         super.registerListeners();
+        clock.localeProperty().addListener(o -> {
+            dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE\ndd.MM.YYYY\nHH:mm:ss").withLocale(clock.getLocale());
+            dateFormatter = DateTimeFormatter.ofPattern("EE d").withLocale(clock.getLocale());
+        });
     }
 
 
@@ -294,13 +301,13 @@ public class ClockSkin extends ClockSkinBase {
         }
 
         if (dateText.isVisible()) {
-            dateText.setText(DATE_FORMATER.format(TIME).toUpperCase());
+            dateText.setText(dateFormatter.format(TIME).toUpperCase());
             Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
             dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.45), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
         }
 
         // Show all alarms within the next hour
-        if (TIME.getMinute() == 0 && TIME.getSecond() == 0) Helper.drawAlarms(getSkinnable(), size, 0.02, 0.45, alarmMap, DATE_TIME_FORMATTER, TIME);
+        if (TIME.getMinute() == 0 && TIME.getSecond() == 0) Helper.drawAlarms(getSkinnable(), size, 0.02, 0.45, alarmMap, dateTimeFormatter, TIME);
 
         // Highlight Areas and Sections
         if (highlightAreas | highlightSections) {
@@ -434,11 +441,11 @@ public class ClockSkin extends ClockSkinBase {
         Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
         text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
 
-        dateText.setText(DATE_FORMATER.format(time).toUpperCase());
+        dateText.setText(dateFormatter.format(time).toUpperCase());
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.45), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
 
         alarmPane.getChildren().setAll(alarmMap.values());
-        Helper.drawAlarms(getSkinnable(), size, 0.02, 0.45, alarmMap, DATE_TIME_FORMATTER, time);
+        Helper.drawAlarms(getSkinnable(), size, 0.02, 0.45, alarmMap, dateTimeFormatter, time);
     }
 }

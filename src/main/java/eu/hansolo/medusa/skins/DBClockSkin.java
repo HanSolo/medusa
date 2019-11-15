@@ -64,9 +64,9 @@ import static eu.hansolo.medusa.tools.Helper.enableNode;
  * Created by hansolo on 29.01.16.
  */
 public class DBClockSkin extends ClockSkinBase {
-    private static final DateTimeFormatter  DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("EEEE\ndd.MM.YYYY\nHH:mm:ss");
-    private static final DateTimeFormatter  TIME_FORMATTER      = DateTimeFormatter.ofPattern("HH:mm");
-    private              Map<Alarm, Circle> alarmMap            = new ConcurrentHashMap<>();
+    private static final DateTimeFormatter  TIME_FORMATTER    = DateTimeFormatter.ofPattern("HH:mm");
+    private              Map<Alarm, Circle> alarmMap          = new ConcurrentHashMap<>();
+    private              DateTimeFormatter  dateTimeFormatter;
     private              double             size;
     private              Canvas             sectionsAndAreasCanvas;
     private              GraphicsContext    sectionsAndAreasCtx;
@@ -112,6 +112,8 @@ public class DBClockSkin extends ClockSkinBase {
         areas             = clock.getAreas();
         highlightAreas    = clock.isHighlightAreas();
         areasVisible      = clock.getAreasVisible();
+
+        dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE\ndd.MM.YYYY\nHH:mm:ss").withLocale(clock.getLocale());
 
         updateAlarms();
 
@@ -352,7 +354,7 @@ public class DBClockSkin extends ClockSkinBase {
         }
 
         // Show all alarms within the next hour
-        if (TIME.getMinute() == 0 && TIME.getSecond() == 0) Helper.drawAlarms(clock, size, 0.02, 0.445, alarmMap, DATE_TIME_FORMATTER, TIME);
+        if (TIME.getMinute() == 0 && TIME.getSecond() == 0) Helper.drawAlarms(clock, size, 0.02, 0.445, alarmMap, dateTimeFormatter, TIME);
 
         // Highlight Areas and Sections
         if (highlightAreas | highlightSections) {
@@ -472,6 +474,6 @@ public class DBClockSkin extends ClockSkinBase {
         text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
 
         alarmPane.getChildren().setAll(alarmMap.values());
-        Helper.drawAlarms(clock, size, 0.02, 0.445, alarmMap, DATE_TIME_FORMATTER, time);
+        Helper.drawAlarms(clock, size, 0.02, 0.445, alarmMap, dateTimeFormatter, time);
     }
 }

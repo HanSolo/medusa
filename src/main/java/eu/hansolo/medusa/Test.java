@@ -16,6 +16,7 @@
 
 package eu.hansolo.medusa;
 
+import eu.hansolo.medusa.Clock.ClockSkinType;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEventListener;
@@ -32,6 +33,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.util.Locale;
 import java.util.Random;
 
 
@@ -45,46 +47,17 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .prefSize(600, 300)
-                            .skinType(SkinType.PLAIN_AMP)
-                            .title("Input")
-                            .unit("U+03BCV")
-                            .returnToZero(false)
-                            .animated(true)
-                            .animationDuration(800)
-                            .smoothing(true)
-                            .decimals(1)
-                            .tickLabelDecimals(1)
-                            .needleBehavior(Gauge.NeedleBehavior.STANDARD)
-                            .prefHeight(200)
-                            .barColor(Color.CORNFLOWERBLUE)
-                            .lcdFont(LcdFont.LCD)
-                            .sections(new Section(0, 30, Color.GREEN),
-                                      new Section(30, 60, Color.YELLOW),
-                                      new Section(60, 100, Color.RED))
-                            .sectionsVisible(true)
-                            .value(60)
+                            .skinType(SkinType.MODERN)
+                            .prefSize(400, 400)
+                            .decimals(2)
+                            .maxValue(200)
                             .build();
-
-        /*
-        gauge.currentValueProperty().addListener(o -> {
-            double currentValue = gauge.getCurrentValue();
-            if (currentValue > 3) {
-                gauge.setBarColor(Color.rgb(200, 80, 0));
-            } else if (currentValue < -3) {
-                gauge.setBarColor(Color.rgb(0, 80, 200));
-            } else {
-                gauge.setBarColor(Color.rgb(0, 200, 0));
-            }
-        });
-        */
 
         lastTimerCall = System.nanoTime();
         timer         = new AnimationTimer() {
             @Override public void handle(final long now) {
                 if (now > lastTimerCall + 2_000_000_000l) {
-                    double value = RND.nextDouble() * 100;
-                    //System.out.println(value);
+                    double value = RND.nextDouble() * gauge.getRange() + gauge.getMinValue();
                     gauge.setValue(value);
                     lastTimerCall = now;
                 }
@@ -106,7 +79,7 @@ public class Test extends Application {
         calcNoOfNodes(pane);
         System.out.println(noOfNodes + " Nodes in SceneGraph");
 
-        //timer.start();
+        timer.start();
     }
 
     @Override public void stop() {
