@@ -1237,6 +1237,15 @@ public class Gauge extends Control {
     }
 
     /**
+     * Returns the moving average object
+     * @return the moving average object
+     */
+    public MovingAverage getMovingAverage() {
+        if (null == movingAverage) { movingAverage = new MovingAverage(getAveragingPeriod()); }
+        return movingAverage;
+    }
+
+    /**
      * Returns true if the averaging functionality is enabled.
      * @return true if the averaging functionality is enabled
      */
@@ -1279,7 +1288,7 @@ public class Gauge extends Control {
     public void setAveragingPeriod(final int PERIOD) {
         if (null == averagingPeriod) {
             _averagingPeriod = PERIOD;
-            movingAverage    = new MovingAverage(PERIOD); // MAX 1000 values
+            getMovingAverage().setPeriod(_averagingPeriod); // MAX 1000 values
             fireUpdateEvent(REDRAW_EVENT);
         } else {
             averagingPeriod.set(PERIOD);
@@ -1289,7 +1298,7 @@ public class Gauge extends Control {
         if (null == averagingPeriod) {
             averagingPeriod = new IntegerPropertyBase(_averagingPeriod) {
                 @Override protected void invalidated() {
-                    movingAverage = new MovingAverage(get());
+                    getMovingAverage().setPeriod(_averagingPeriod); // MAX 1000 values
                     fireUpdateEvent(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
