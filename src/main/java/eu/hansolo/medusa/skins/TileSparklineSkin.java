@@ -101,7 +101,7 @@ public class TileSparklineSkin extends GaugeSkinBase {
         locale               = gauge.getLocale();
         noOfDatapoints       = gauge.getAveragingPeriod();
         dataList             = new LinkedList<>();
-        currentValueListener = o -> handleEvents("VALUE");
+        currentValueListener = o -> handleEvents("CURRENT_VALUE");
         averagingListener    = o -> handleEvents("AVERAGING_PERIOD");
         for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
 
@@ -214,6 +214,8 @@ public class TileSparklineSkin extends GaugeSkinBase {
         } else if ("ALERT".equals(EVENT_TYPE)) {
 
         } else if ("VALUE".equals(EVENT_TYPE)) {
+
+        } else if ("CURRENT_VALUE".equals(EVENT_TYPE)) {
             if(gauge.isAnimated()) { gauge.setAnimated(false); }
             if (!gauge.isAveragingEnabled()) { gauge.setAveragingEnabled(true); }
             double value = clamp(minValue, maxValue, gauge.getValue());
@@ -221,6 +223,7 @@ public class TileSparklineSkin extends GaugeSkinBase {
             drawChart(value);
         } else if ("AVERAGING_PERIOD".equals(EVENT_TYPE)) {
             noOfDatapoints = gauge.getAveragingPeriod();
+            dataList.clear();
             // To get smooth lines in the chart we need at least 4 values
             if (noOfDatapoints < 4) throw new IllegalArgumentException("Please increase the averaging period to a value larger than 3.");
             for (int i = 0; i < noOfDatapoints; i++) { dataList.add(minValue); }
