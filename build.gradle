@@ -69,7 +69,13 @@ repositories {
     mavenCentral()
 }
 
+// start demo from gradle
 task Demo(type: JavaExec) {
+    main = "eu.hansolo.medusa.DemoLauncher"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task Test(type: JavaExec) {
     main = "eu.hansolo.medusa.TestLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
