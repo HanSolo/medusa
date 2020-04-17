@@ -22,6 +22,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.DoublePropertyBase;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.property.StringPropertyBase;
@@ -44,6 +45,7 @@ public class Section implements Comparable<Section> {
     private DoubleProperty        start;
     private double                _stop;
     private DoubleProperty        stop;
+    private DoubleProperty        range;
     private String                _text;
     private StringProperty        text;
     private Image                 _icon;
@@ -95,6 +97,10 @@ public class Section implements Comparable<Section> {
     public Section(final double START, final double STOP, final String TEXT, final Image ICON, final Color COLOR, final Color HIGHLIGHT_COLOR, final Color TEXT_COLOR, final String STYLE_CLASS) {
         _start          = START;
         _stop           = STOP;
+        range           = new DoublePropertyBase(Math.abs(_stop - _start)) {
+            @Override public Object getBean() { return Section.this; }
+            @Override public String getName() { return "range"; }
+        };
         _text           = TEXT;
         _icon           = ICON;
         _color          = COLOR;
@@ -118,6 +124,7 @@ public class Section implements Comparable<Section> {
     public void setStart(final double START) {
         if (null == start) {
             _start = START;
+            range.set(Math.abs(getStop() - _start));
             fireSectionEvent(UPDATE_EVENT);
         } else {
             start.set(START);
@@ -126,7 +133,10 @@ public class Section implements Comparable<Section> {
     public DoubleProperty startProperty() {
         if (null == start) {
             start = new DoublePropertyBase(_start) {
-                @Override protected void invalidated() { fireSectionEvent(UPDATE_EVENT); }
+                @Override protected void invalidated() {
+                    range.set(Math.abs(getStop() - get()));
+                    fireSectionEvent(UPDATE_EVENT);
+                }
                 @Override public Object getBean() { return Section.this; }
                 @Override public String getName() { return "start"; }
             };
@@ -146,6 +156,7 @@ public class Section implements Comparable<Section> {
     public void setStop(final double STOP) {
         if (null == stop) {
             _stop = STOP;
+            range.set(Math.abs(_stop - getStart()));
             fireSectionEvent(UPDATE_EVENT);
         } else {
             stop.set(STOP);
@@ -154,13 +165,23 @@ public class Section implements Comparable<Section> {
     public DoubleProperty stopProperty() {
         if (null == stop) {
             stop = new DoublePropertyBase(_stop) {
-                @Override protected void invalidated() { fireSectionEvent(UPDATE_EVENT); }
+                @Override protected void invalidated() {
+                    range.set(Math.abs(get() - getStart()));
+                    fireSectionEvent(UPDATE_EVENT);
+                }
                 @Override public Object getBean() { return Section.this; }
                 @Override public String getName() { return "stop"; }
             };
         }
         return stop;
     }
+
+    /**
+     * Returns the absolute range between stop and start
+     * @return the absolute range between stop and start
+     */
+    public double getRange() { return range.get(); }
+    public ReadOnlyDoubleProperty rangeProperty() { return range; }
 
     /**
      * Returns the text that was set for the section.
