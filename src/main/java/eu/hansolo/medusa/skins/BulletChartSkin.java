@@ -48,6 +48,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 
+import static eu.hansolo.medusa.tools.Helper.enableNode;
 import static eu.hansolo.medusa.tools.Helper.formatNumber;
 
 
@@ -60,6 +61,7 @@ public class BulletChartSkin extends GaugeSkinBase {
     private              Pane                        pane;
     private              double                      width;
     private              double                      height;
+    private              double                      size;
     private              double                      aspectRatio;
     private              Orientation                 orientation;
     private              Canvas                      tickMarkCanvas;
@@ -221,7 +223,7 @@ public class BulletChartSkin extends GaugeSkinBase {
         double        minValue                 = gauge.getMinValue();
         double        maxValue                 = gauge.getMaxValue();
         double        tmpStepSize              = smallRange ? stepSize / 10 : stepSize;
-        Font          tickLabelFont            = Fonts.robotoRegular(0.15 * (Orientation.VERTICAL == orientation ? width : height));
+        Font          tickLabelFont            = Fonts.robotoRegular(0.1 * size);
         boolean       tickMarkSectionsVisible  = gauge.getTickMarkSectionsVisible();
         boolean       tickLabelSectionsVisible = gauge.getTickLabelSectionsVisible();
         double        offsetX                  = 0.18345865 * width;
@@ -230,7 +232,7 @@ public class BulletChartSkin extends GaugeSkinBase {
         double        innerPointY              = 0;
         double        outerPointX              = 0.07 * width;
         double        outerPointY              = 0.08 * height;
-        double        textPointX               = 0.55 * tickMarkCanvas.getWidth();
+        double        textPointX               = Orientation.HORIZONTAL == orientation ? 0.55 * tickMarkCanvas.getWidth() : outerPointX + size * 0.05;
         double        textPointY               = 0.7 * tickMarkCanvas.getHeight();
         BigDecimal    minorTickSpaceBD         = BigDecimal.valueOf(gauge.getMinorTickSpace());
         BigDecimal    majorTickSpaceBD         = BigDecimal.valueOf(gauge.getMajorTickSpace());
@@ -264,7 +266,7 @@ public class BulletChartSkin extends GaugeSkinBase {
                     CTX.save();
                     CTX.translate(textPointX, textPointY);
                     CTX.setFont(tickLabelFont);
-                    CTX.setTextAlign(TextAlignment.CENTER);
+                    CTX.setTextAlign(Orientation.HORIZONTAL == orientation ? TextAlignment.CENTER : TextAlignment.LEFT);
                     CTX.setTextBaseline(VPos.CENTER);
                     CTX.setFill(tickLabelSectionsVisible ? Helper.getColorOfSection(tickLabelSections, counter, tickLabelColor) : tickLabelColor);
                     if (Orientation.VERTICAL == orientation) {
@@ -289,11 +291,12 @@ public class BulletChartSkin extends GaugeSkinBase {
         CTX.clearRect(0, 0, sectionsCanvas.getWidth(), sectionsCanvas.getHeight());
         CTX.setFill(gauge.getBackgroundPaint());
         if (Orientation.VERTICAL == orientation) {
-            CTX.fillRect(0, 0, 0.5 * width, 0.89 * height);
+            CTX.fillRect(0, 0, 0.5 * width, 0.9 * height);
         } else {
             CTX.fillRect(0, 0, 0.79699248 * width, 0.5 * height);
         }
 
+        double tmpStepSize = stepSize * 1.11111111;
         double minValue = gauge.getMinValue();
         double maxValue = gauge.getMaxValue();
 
@@ -301,22 +304,18 @@ public class BulletChartSkin extends GaugeSkinBase {
         for (int i = 0 ; i < listSize ; i++) {
             final Section SECTION = gauge.getSections().get(i);
             final double SECTION_START;
+
+            final double SECTION_SIZE = SECTION.getRange() * tmpStepSize;
             if (Double.compare(SECTION.getStart(), maxValue) <= 0 && Double.compare(SECTION.getStop(), minValue) >= 0) {
                 if (Double.compare(SECTION.getStart(), minValue) < 0 && Double.compare(SECTION.getStop(), maxValue) < 0) {
-                    SECTION_START = minValue * stepSize;
+                    SECTION_START = minValue * tmpStepSize;
                 } else {
-                    SECTION_START = (SECTION.getStart() - minValue) * stepSize;
-                }
-                final double SECTION_SIZE;
-                if (Double.compare(SECTION.getStop(), maxValue) > 0) {
-                    SECTION_SIZE = (maxValue - SECTION.getStart()) * stepSize;
-                } else {
-                    SECTION_SIZE = (SECTION.getStop() - SECTION.getStart()) * stepSize;
+                    SECTION_START = height - (SECTION.getStart() * tmpStepSize) - SECTION_SIZE;
                 }
                 CTX.save();
                 CTX.setFill(SECTION.getColor());
                 if (Orientation.VERTICAL == orientation) {
-                    CTX.fillRect(0.0, 0.89 * height - SECTION_START - SECTION_SIZE, 0.5 * width, SECTION_SIZE);
+                    CTX.fillRect(0.0, SECTION_START, 0.5 * width, SECTION_SIZE);
                 } else {
                     CTX.fillRect(SECTION_START, 0.0, SECTION_SIZE, 0.5 * height);
                 }
@@ -330,9 +329,9 @@ public class BulletChartSkin extends GaugeSkinBase {
     private void updateBar() {
         double currentValue = gauge.getCurrentValue();
         if (Orientation.VERTICAL == orientation) {
-            barRect.setY(height - 0.06 * width - currentValue * stepSize);
             barRect.setHeight(currentValue * stepSize);
-            thresholdRect.setY(height - gauge.getThreshold() * stepSize - 0.08625 * width);
+            barRect.setY(height - barRect.getHeight());
+            thresholdRect.setY(height - gauge.getThreshold() * stepSize - 0.03125 * size);
         } else {
             barRect.setWidth(currentValue * stepSize);
             thresholdRect.setX(gauge.getThreshold() * stepSize - 0.03125 * height + 0.1835 * width);
@@ -344,24 +343,26 @@ public class BulletChartSkin extends GaugeSkinBase {
         height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
 
         double currentValue = gauge.getCurrentValue();
+        double fontSize;
 
         orientation = gauge.getOrientation();
         if (Orientation.VERTICAL == orientation) {
-            width = height / aspectRatio;
-            stepSize = (0.89 * height) / gauge.getRange();
-
+            width    = height / aspectRatio;
             pane.setMaxSize(width, height);
             pane.relocate((gauge.getWidth() - width) * 0.5, (gauge.getHeight() - height) * 0.5);
 
             width  = pane.getLayoutBounds().getWidth();
             height = pane.getLayoutBounds().getHeight();
+            size   = width < height ? width : height;
+
+            stepSize = (0.90 * height) / gauge.getRange();
 
             tickMarkCanvas.setWidth(0.39 * width);
             tickMarkCanvas.setHeight(height);
             tickMarkCanvas.relocate(0.578125 * width, 0);
 
             sectionsCanvas.setWidth(0.5 * width);
-            sectionsCanvas.setHeight(0.89 * height);
+            sectionsCanvas.setHeight(0.9 * height);
             sectionsCanvas.relocate(0.078125 * width, 0.1 * height);
 
             barRect.setWidth(0.16666667 * width);
@@ -370,17 +371,19 @@ public class BulletChartSkin extends GaugeSkinBase {
             barRect.setY(height - currentValue * stepSize);
 
             thresholdRect.setX(0.16145833 * width);
-            thresholdRect.setY(height - gauge.getThreshold() * stepSize - 0.03125 * width);
+            thresholdRect.setY(height - gauge.getThreshold() * stepSize - 0.03125 * size);
             thresholdRect.setWidth(0.33333333 * width);
-            thresholdRect.setHeight(0.0625 * width);
+            thresholdRect.setHeight(0.0625 * size);
 
             double maxTextWidth = width;
-            titleText.setFont(Fonts.robotoRegular(0.24 * width));
-            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(titleText, maxTextWidth, 0.24 * width); }
-            titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.03 * width);
+            fontSize = 0.24 * size;
+            titleText.setFont(Fonts.robotoRegular(fontSize));
+            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(titleText, maxTextWidth, fontSize); }
+            titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.03 * height);
 
-            unitText.setFont(Fonts.robotoRegular(0.15 * width));
-            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(unitText, maxTextWidth, 0.15 * width); }
+            fontSize = 0.15 * size;
+            unitText.setFont(Fonts.robotoRegular(fontSize));
+            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(unitText, maxTextWidth, fontSize); }
             unitText.relocate((width - unitText.getLayoutBounds().getWidth()) * 0.5, 0.35 * width);
         } else {
             height   = width * aspectRatio;
@@ -391,6 +394,7 @@ public class BulletChartSkin extends GaugeSkinBase {
 
             width  = pane.getLayoutBounds().getWidth();
             height = pane.getLayoutBounds().getHeight();
+            size   = width < height ? width : height;
 
             tickMarkCanvas.setWidth(width);
             tickMarkCanvas.setHeight(0.29166667 * height);
@@ -411,12 +415,14 @@ public class BulletChartSkin extends GaugeSkinBase {
             thresholdRect.setHeight(0.33333333 * height);
 
             double maxTextWidth = 0.20300752 * width;
-            titleText.setFont(Fonts.robotoMedium(0.24 * height));
-            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(titleText, maxTextWidth, 0.24 * width); }
-            titleText.relocate(0.17593985 * width - (titleText.getLayoutBounds().getWidth()), 0.075 * height);
+            fontSize = 0.24 * size;
+            titleText.setFont(Fonts.robotoMedium(fontSize));
+            if (titleText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(titleText, maxTextWidth, fontSize); }
+            titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.075 * height);
 
-            unitText.setFont(Fonts.robotoRegular(0.15 * height));
-            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(unitText, maxTextWidth, 0.15 * width); }
+            fontSize = 0.15 * size;
+            unitText.setFont(Fonts.robotoRegular(fontSize));
+            if (unitText.getLayoutBounds().getWidth() > maxTextWidth) { Helper.adjustTextSize(unitText, maxTextWidth, fontSize); }
             unitText.relocate(0.17593985 * width - (unitText.getLayoutBounds().getWidth()), 0.4 * height);
         }
         redraw();
@@ -430,6 +436,7 @@ public class BulletChartSkin extends GaugeSkinBase {
         thresholdRect.setFill(gauge.getThresholdColor());
         thresholdTooltip.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getThreshold()));
         barRect.setFill(gauge.getBarColor());
+        enableNode(titleText, true);
         titleText.setFill(gauge.getTitleColor());
         unitText.setFill(gauge.getUnitColor());
         updateBar();
