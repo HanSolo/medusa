@@ -5537,6 +5537,7 @@ public class Gauge extends Control {
     public SkinType getSkinType() { return skinType; }
     public void setSkinType(final SkinType SKIN_TYPE) {
         skinType = SKIN_TYPE;
+        presetGaugeParameters(skinType);
         switch (SKIN_TYPE) {
             case AMP            : super.setSkin(new AmpSkin(Gauge.this)); break;
             case PLAIN_AMP      : super.setSkin(new PlainAmpSkin(Gauge.this)); break;
@@ -5571,7 +5572,6 @@ public class Gauge extends Control {
             default             : super.setSkin(new GaugeSkin(Gauge.this)); break;
         }
         fireUpdateEvent(RESIZE_EVENT);
-        presetGaugeParameters(skinType);
     }
 
     public void presetGaugeParameters(final SkinType SKIN_TYPE) {

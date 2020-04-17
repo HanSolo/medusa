@@ -85,7 +85,7 @@ public class SimpleSectionSkin extends GaugeSkinBase {
         sectionCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
         sectionCtx    = sectionCanvas.getGraphicsContext2D();
 
-        barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.4, PREFERRED_HEIGHT * 0.4, gauge.getStartAngle() + 150, ANGLE_RANGE);
+        barBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.5, PREFERRED_WIDTH * 0.4, PREFERRED_HEIGHT * 0.4, gauge.getStartAngle() + 90, -ANGLE_RANGE);
         barBackground.setType(ArcType.OPEN);
         barBackground.setStroke(gauge.getBarBackgroundColor());
         barBackground.setStrokeWidth(PREFERRED_WIDTH * 0.125);
@@ -150,15 +150,14 @@ public class SimpleSectionSkin extends GaugeSkinBase {
 
     // ******************** Canvas ********************************************
     private void setBar( final double VALUE ) {
-
-        double barLength = 0;
-        double barStart = 0;
-        double min = gauge.getMinValue();
-        double max = gauge.getMaxValue();
-        double step = gauge.getAngleStep();
+        double barLength    = 0;
+        double barStart     = 0;
+        double min          = gauge.getMinValue();
+        double max          = gauge.getMaxValue();
+        double step         = gauge.getAngleStep();
         double clampedValue = Helper.clamp(min, max, VALUE);
 
-        if ( gauge.isStartFromZero() ) {
+        if (gauge.isStartFromZero()) {
             if ( ( VALUE > min || min < 0 ) && ( VALUE < max || max > 0 ) ) {
                 if ( max < 0 ) {
                     barStart = gauge.getStartAngle() + 90 - gauge.getAngleRange();
@@ -175,12 +174,12 @@ public class SimpleSectionSkin extends GaugeSkinBase {
             barStart = gauge.getStartAngle() + 90;
             barLength = ( min - clampedValue ) * step;
         }
-        
+
         bar.setStartAngle(barStart);
         bar.setLength(barLength);
 
-        if ( gauge.getSectionsVisible() && !sections.isEmpty() ) {
-            bar.setStroke(gauge.getBarColor());
+        bar.setStroke(gauge.getBarColor());
+        if (gauge.getSectionsVisible() && !sections.isEmpty()) {
             for ( Section section : sections ) {
                 if ( section.contains(VALUE) ) {
                     bar.setStroke(section.getColor());
@@ -274,6 +273,7 @@ public class SimpleSectionSkin extends GaugeSkinBase {
             sectionCanvas.setWidth(size);
             sectionCanvas.setHeight(size);
 
+            //barBackground.setStartAngle(gauge.getStartAngle() + 90);
             barBackground.setCenterX(size * 0.5);
             barBackground.setCenterY(size * 0.5);
             barBackground.setRadiusX(size * 0.4);
