@@ -165,9 +165,9 @@ public class Gauge extends Control {
     private final UpdateEvent    ALERT_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.ALERT);
     private final UpdateEvent    VALUE_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VALUE);
 
-    private static volatile Future               blinkFuture;
-    private static ScheduledExecutorService      blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", true));
-    private static volatile Callable<Void>       blinkTask;
+    private        volatile Future               blinkFuture;
+    private static ScheduledExecutorService      blinkService = new ScheduledThreadPoolExecutor(2, Helper.getThreadFactory("BlinkTask", true));
+    private        volatile Callable<Void>       blinkTask;
 
     private static          String               userAgentStyleSheet;
 
@@ -5437,7 +5437,7 @@ public class Gauge extends Control {
     }
     private synchronized void startBlinkExecutorService() {
         if (null == blinkTask) { createBlinkTask(); }
-        if (null == blinkService) { blinkService = new ScheduledThreadPoolExecutor(1, Helper.getThreadFactory("BlinkTask", true)); }
+        if (null == blinkService) { blinkService = new ScheduledThreadPoolExecutor(2, Helper.getThreadFactory("BlinkTask", true)); }
         blinkFuture = blinkService.schedule(blinkTask, LED_BLINK_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
