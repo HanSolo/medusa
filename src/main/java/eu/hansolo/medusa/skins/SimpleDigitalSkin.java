@@ -66,6 +66,7 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
     private double               maxValue;
     private double               range;
     private double               angleStep;
+    private double               arcExtend;
     private boolean              isStartFromZero;
     private double               barWidth;
     private boolean              sectionsVisible;
@@ -114,6 +115,8 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
             }
         }
 
+        arcExtend = gauge.getArcExtend();
+
         backgroundCanvas = new Canvas(PREFERRED_WIDTH, PREFERRED_HEIGHT);
         backgroundCtx    = backgroundCanvas.getGraphicsContext2D();
 
@@ -151,7 +154,10 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
     // ******************** Methods *******************************************
     @Override protected void handleEvents(final String EVENT_TYPE) {
         super.handleEvents(EVENT_TYPE);
-        if ("RECALC".equals(EVENT_TYPE)) {
+        if ("REDRAW".equals(EVENT_TYPE)) {
+            arcExtend = gauge.getArcExtend();
+            redraw();
+        } else if ("RECALC".equals(EVENT_TYPE)) {
             minValue  = gauge.getMinValue();
             maxValue  = gauge.getMaxValue();
             range     = gauge.getRange();
@@ -205,7 +211,7 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         if (!isStartFromZero) {
             for (int i = 0; i < 280; i++) {
                 if (i % 10 == 0 && i < v) {
-                    barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, (-i - 139), 9.2, ArcType.OPEN);
+                    barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, (-i - 139), arcExtend, ArcType.OPEN);
                 }
             }
         } else {
@@ -213,13 +219,13 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
                 if (VALUE < 0) {
                     for (int i = Math.min(minValueAngle, 280) - 1; i >= 0; i--) {
                         if (i % 10 == 0 && i > v - 10) {
-                            barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, (-i - 139), 9.2, ArcType.OPEN);
+                            barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, (-i - 139), arcExtend, ArcType.OPEN);
                         }
                     }
                 } else {
                     for (int i = Math.max(minValueAngle, 0) - 5; i < 280; i++) {
                         if (i % 10 == 0 && i < v) {
-                            barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, (-i - 139), 9.2, ArcType.OPEN);
+                            barCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, (-i - 139), arcExtend, ArcType.OPEN);
                         }
                     }
                 }
@@ -243,7 +249,7 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
                 // draw value bar
                 backgroundCtx.setStroke(bColor);
                 backgroundCtx.setLineWidth(barWidth);
-                backgroundCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, i + 1, 9.2, ArcType.OPEN);
+                backgroundCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, i + 1, arcExtend, ArcType.OPEN);
             }
             backgroundCtx.restore();
         }

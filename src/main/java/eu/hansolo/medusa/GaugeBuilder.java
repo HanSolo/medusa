@@ -230,6 +230,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B arcExtend(final double ARC_EXTEND) {
+        properties.put("arcExtend", new SimpleDoubleProperty(ARC_EXTEND));
+        return (B)this;
+    }
+
     public final B autoScale(final boolean AUTO_SCALE) {
         properties.put("autoScale", new SimpleBooleanProperty(AUTO_SCALE));
         return (B)this;
@@ -1229,6 +1234,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setStartAngle(((DoubleProperty) properties.get(key)).get());
             } else if("angleRange".equals(key)) {
                 CONTROL.setAngleRange(((DoubleProperty) properties.get(key)).get());
+            } else if ("arcExtend".equals(key)) {
+                CONTROL.setArcExtend(((DoubleProperty) properties.get(key)).get());
             } else if("needleType".equals(key)) {
                 CONTROL.setNeedleType(((ObjectProperty<NeedleType>) properties.get(key)).get());
             } else if("needleShape".equals(key)) {

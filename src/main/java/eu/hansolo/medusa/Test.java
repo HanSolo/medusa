@@ -47,10 +47,12 @@ public class Test extends Application {
 
     @Override public void init() {
         gauge = GaugeBuilder.create()
-                            .skinType(SkinType.MODERN)
+                            .skinType(SkinType.SIMPLE_DIGITAL)
                             .prefSize(400, 400)
                             .decimals(2)
                             .maxValue(200)
+                            .arcExtend(5)
+                            .animated(true)
                             .build();
 
         lastTimerCall = System.nanoTime();

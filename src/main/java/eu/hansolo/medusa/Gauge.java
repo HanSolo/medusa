@@ -251,6 +251,8 @@ public class Gauge extends Control {
     private DoubleProperty                       angleRange;
     private double                               _angleStep;
     private DoubleProperty                       angleStep;
+    private double                               _arcExtend;
+    private DoubleProperty                       arcExtend;
     private boolean                              _autoScale;
     private BooleanProperty                      autoScale;
     private boolean                              _shadowsEnabled;
@@ -685,6 +687,7 @@ public class Gauge extends Control {
         _startAngle                         = 320;
         _angleRange                         = 280;
         _angleStep                          = _angleRange / _range;
+        _arcExtend                          = 9.2;
         _autoScale                          = true;
         _shadowsEnabled                     = false;
         _barEffectEnabled                   = false;
@@ -2388,6 +2391,37 @@ public class Gauge extends Control {
     public ReadOnlyDoubleProperty angleStepProperty() {
         if (null == angleStep) { angleStep = new SimpleDoubleProperty(Gauge.this, "angleStep", _angleStep); }
         return angleStep;
+    }
+
+    /**
+     * Returns the distance between the segments in the SIMPLE_DIGITAL skin.
+     * @return the distance between the segments in the SIMPLE_DIGITAL skin.
+     */
+    public double getArcExtend() { return null == arcExtend ? _arcExtend : arcExtend.get(); }
+    /**
+     * Defines the distance between the segments in the SIMPLE_DIGITAL_SKIN
+     * @param ARC_EXTEND
+     */
+    public void setArcExtend(final double ARC_EXTEND) {
+        if (null == arcExtend) {
+            _arcExtend = Helper.clamp(0.1, 10, ARC_EXTEND);
+            fireUpdateEvent(REDRAW_EVENT);
+        } else {
+            arcExtend.set(ARC_EXTEND);
+        }
+    }
+    public DoubleProperty arcExtendProperty() {
+        if (null == arcExtend) {
+            arcExtend = new DoublePropertyBase(_arcExtend) {
+                @Override protected void invalidated() {
+                    set(Helper.clamp(0.1, 10, get()));
+                    fireUpdateEvent(REDRAW_EVENT);
+                }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "arcExtend"; }
+            };
+        }
+        return arcExtend;
     }
 
     /**
