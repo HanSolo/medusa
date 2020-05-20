@@ -15,7 +15,7 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'net.nemerosa.versioning' version '2.10.0'
-    id 'com.jfrog.bintray' version '1.8.4'
+    id 'com.jfrog.bintray' version '1.8.5'
     id 'org.openjfx.javafxplugin' version '0.0.8'
 }
 
@@ -164,5 +164,15 @@ bintray {
         issueTrackerUrl       = 'https://github.com/HanSolo/Medusa/issues'
         vcsUrl                = 'git@github.com:HanSolo/Medusa.git'
         publicDownloadNumbers = true
+        version {
+            name   = project.version
+            vcsTag = project.version
+            mavenCentralSync {
+                sync = true
+                user = project.sonatypeUsername
+                password = project.sonatypePassword
+                close = '1'
+            }
+        }
     }
 }
