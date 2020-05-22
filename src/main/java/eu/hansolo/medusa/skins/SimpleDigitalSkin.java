@@ -19,9 +19,8 @@ package eu.hansolo.medusa.skins;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
+import eu.hansolo.medusa.tools.AngleConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
-import java.util.List;
-import java.util.Locale;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.scene.CacheHint;
@@ -36,10 +35,16 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static eu.hansolo.medusa.tools.Helper.formatNumber;
 
@@ -50,6 +55,7 @@ import static eu.hansolo.medusa.tools.Helper.formatNumber;
 public class SimpleDigitalSkin extends GaugeSkinBase {
     private static final double  ANGLE_RANGE = 280;
     private double               size;
+    private double               oldSize;
     private double               center;
     private Pane                 pane;
     private Canvas               backgroundCanvas;
@@ -59,6 +65,10 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
     private Text                 titleText;
     private Text                 valueBkgText;
     private Text                 valueText;
+    private AngleConicalGradient gradient;
+    private Rectangle            gradientRect;
+    private boolean              gradientNeedsRefresh;
+    private Color                barBackgroundColor;
     private Color                barColor;
     private Color                valueColor;
     private Color                unitColor;
@@ -85,6 +95,7 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         maxValue             = gauge.getMaxValue();
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;
+        barBackgroundColor   = gauge.getBarBackgroundColor();
         barColor             = gauge.getBarColor();
         valueColor           = gauge.getValueColor();
         unitColor            = gauge.getUnitColor();
@@ -95,6 +106,7 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         thresholdColor       = gauge.getThresholdColor();
         decimalListener      = o -> handleEvents("DECIMALS");
         currentValueListener = o -> setBar(gauge.getCurrentValue());
+        gradientNeedsRefresh = true;
 
         initGraphics();
         registerListeners();
@@ -136,6 +148,8 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         valueText.setStroke(null);
         valueText.setFill(valueColor);
         Helper.enableNode(valueText, gauge.isValueVisible());
+
+        if (gauge.isGradientBarEnabled()) { setupGradient(); }
 
         pane = new Pane(backgroundCanvas, barCanvas, titleText, valueBkgText, valueText);
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth()))));
@@ -188,7 +202,11 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
     private void setBar(final double VALUE) {
         barCtx.clearRect(0, 0, size, size);
         barCtx.setLineCap(StrokeLineCap.BUTT);
-        barCtx.setStroke(barColor);
+        if (gauge.isGradientBarEnabled()) {
+            barCtx.setStroke(gradient.getImagePattern(gradientRect));
+        } else {
+            barCtx.setStroke(barColor);
+        }
         barCtx.setLineWidth(barWidth);
 
         if (sectionsVisible) {
@@ -242,12 +260,11 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
 
         // draw translucent background
         backgroundCtx.setStroke(Color.rgb(0, 12, 6, 0.1));
-        Color bColor = Helper.getTranslucentColorFrom(barColor, 0.1);
         for (int i = -50 ; i < 230 ; i++) {
             backgroundCtx.save();
             if (i % 10 == 0) {
                 // draw value bar
-                backgroundCtx.setStroke(bColor);
+                backgroundCtx.setStroke(barBackgroundColor);
                 backgroundCtx.setLineWidth(barWidth);
                 backgroundCtx.strokeArc(barWidth * 0.5 + barWidth * 0.1, barWidth * 0.5 + barWidth * 0.1, size - barWidth - barWidth * 0.2, size - barWidth - barWidth * 0.2, i + 1, arcExtend, ArcType.OPEN);
             }
@@ -291,6 +308,16 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         titleText.relocate((size - titleText.getLayoutBounds().getWidth()) * 0.5, size * 0.22180451);
     }
 
+    private void setupGradient() {
+        List<Stop>         stops        = gauge.getGradientBarStops();
+        Map<Double, Color> stopAngleMap = new HashMap<>(stops.size());
+        for (Stop stop : stops) { stopAngleMap.put(stop.getOffset() * 300, stop.getColor()); }
+        gradient     = new AngleConicalGradient(size * 0.5, size * 0.5, 210, stopAngleMap, gauge.getScaleDirection());
+        gradientRect = new Rectangle(0, 0, size, size);
+
+        gradientNeedsRefresh = false;
+    }
+
     @Override protected void resize() {
         double width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
         double height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
@@ -299,6 +326,9 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         if (width > 0 && height > 0) {
             pane.setMaxSize(size, size);
             pane.relocate((width - size) * 0.5, (height - size) * 0.5);
+
+            if (oldSize != size) { gradientNeedsRefresh = true; }
+            if (gauge.isGradientBarEnabled() && gradientNeedsRefresh) { setupGradient(); }
 
             center   = size * 0.5;
             barWidth = size * 0.125;
@@ -322,15 +352,21 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
             resizeStaticText();
             setBar(gauge.getCurrentValue());
         }
+
+        oldSize = size;
     }
 
     @Override protected void redraw() {
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
-        barColor        = gauge.getBarColor();
-        valueColor      = gauge.getValueColor();
-        unitColor       = gauge.getUnitColor();
-        sectionsVisible = gauge.getSectionsVisible();
+        barBackgroundColor = gauge.getBarBackgroundColor();
+        barColor           = gauge.getBarColor();
+        valueColor         = gauge.getValueColor();
+        unitColor          = gauge.getUnitColor();
+        sectionsVisible    = gauge.getSectionsVisible();
+
+        if (gauge.isGradientBarEnabled() && gradientNeedsRefresh) { setupGradient(); }
+
         drawBackground();
         resizeStaticText();
 

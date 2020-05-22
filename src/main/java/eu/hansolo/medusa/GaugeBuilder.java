@@ -29,6 +29,8 @@ import eu.hansolo.medusa.tools.GradientLookup;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
+import eu.hansolo.medusa.tools.Helper;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -994,6 +996,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                     CONTROL.setShadowsEnabled(true);
                     break;
                 case SIMPLE_DIGITAL:
+                    CONTROL.setBarBackgroundColor(Helper.getTranslucentColorFrom(Gauge.DARK_COLOR, 0.1));
                     CONTROL.setBarColor(Gauge.DARK_COLOR);
                     break;
                 case SECTION:

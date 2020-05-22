@@ -5768,6 +5768,7 @@ public class Gauge extends Control {
                 setBarColor(DARK_COLOR);
                 break;
             case SIMPLE_DIGITAL:
+                setBarBackgroundColor(Helper.getTranslucentColorFrom(DARK_COLOR, 0.1));
                 setBarColor(DARK_COLOR);
                 break;
             case SECTION:
