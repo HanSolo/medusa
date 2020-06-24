@@ -1,66 +1,120 @@
-import java.text.SimpleDateFormat
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:4.3.1'
-    }
-}
+
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2016-2020 Gerrit Grunwald.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 // Medusa main build file
 plugins {
     id 'idea'
-    id 'java'
-    id 'maven-publish'
-    id 'net.nemerosa.versioning' version '2.10.0'
-    id 'com.jfrog.bintray' version '1.8.5'
-    id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'java-library'
+    id 'org.kordamp.gradle.java-project'
+    id 'org.openjfx.javafxplugin'
+    id 'biz.aQute.bnd.builder'
 }
 
-apply plugin: 'biz.aQute.bnd.builder'
 
-sourceCompatibility = '11'
+if (!project.hasProperty('bintrayUsername'))  ext.bintrayUsername  = '**undefined**'
+if (!project.hasProperty('bintrayApiKey'))    ext.bintrayApiKey    = '**undefined**'
+if (!project.hasProperty('sonatypeUsername')) ext.sonatypeUsername = '**undefined**'
+if (!project.hasProperty('sonatypePassword')) ext.sonatypePassword = '**undefined**'
 
-wrapper {
-    gradleVersion = '6.0.1'
+config {
+    release = (rootProject.findProperty('release') ?: false).toBoolean()
+
+    info {
+        name          = 'Medusa'
+        description   = 'Medusa is a JavaFX library containing gauges and clocks'
+        vendor        = 'Hansolo'
+        inceptionYear = '2016'
+        tags          = ['javafx', 'gauges', 'clocks']
+
+        links {
+            website      = 'https://github.com/HanSolo/Medusax/wiki'
+            issueTracker = 'https://github.com/HanSolo/Medusa/issues'
+            scm          = 'https://github.com/HanSolo/Medusa.git'
+        }
+
+        people {
+            person {
+                id    = 'HanSolo'
+                name  = 'Gerrit Grunwald'
+                url   = 'https://harmoniccode.blogspot.com/'
+                roles = ['developer']
+            }
+        }
+
+        credentials {
+            sonatype {
+                username = project.sonatypeUsername
+                password = project.sonatypePassword
+            }
+        }
+
+        repositories {
+            repository {
+                name = 'localRelease'
+                url  = "${project.rootProject.buildDir}/repos/local/release"
+            }
+            repository {
+                name = 'localSnapshot'
+                url  = "${project.rootProject.buildDir}/repos/local/snapshot"
+            }
+        }
+    }
+
+    licensing {
+        licenses {
+            license {
+                id = 'Apache-2.0'
+            }
+        }
+    }
+
+    bintray {
+        enabled      = true
+        userOrg      = 'hansolo'
+        repo         = 'Medusa'
+        name         = rootProject.name
+        publish      = config.release
+        credentials {
+            username = project.bintrayUsername
+            password = project.bintrayApiKey
+        }
+    }
+
+    publishing {
+        signing             = false
+        releasesRepository  = 'localRelease'
+        snapshotsRepository = 'localSnapshot'
+    }
+
+    docs {
+        javadoc {
+            autoLinks {
+                enabled = false
+            }
+        }
+    }
 }
 
-description = 'Medusa is a JavaFX library containing gauges and clocks'
-
-Date buildTimeAndDate = new Date()
-ext {
-    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
-    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
-}
-
-dependencies {
-    
-}
-
-javafx {
-    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
-}
-
-jar {
-    manifest {
-        attributes(
-                'Built-By': System.properties['user.name'],
-                'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.properties['java.vm.version'] + ")",
-                'Build-Date': project.buildDate,
-                'Build-Time': project.buildTime,
-                'Build-Revision': versioning.info.commit,
-                'Specification-Title': project.name,
-                'Specification-Version': project.version,
-                'Implementation-Title': project.name,
-                'Implementation-Version': project.version,
-                'Bundle-Name': project.name,
-                'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://www.eclipse.org/legal/eplfaq.php',
-                'Bundle-Description': description,
-                'Bundle-SymbolicName': 'eu.hansolo.medusa',
-                'Export-Package': 'eu.hansolo.medusa,eu.hansolo.medusa.tools,eu.hansolo.medusa.skins,eu.hansolo.medusa.events'
-        )
+normalization {
+    runtimeClasspath {
+        ignore('/META-INF/MANIFEST.MF')
     }
 }
 
@@ -69,109 +123,44 @@ repositories {
     mavenCentral()
 }
 
-// start demo from gradle
+javafx {
+    version = javafxVersion
+    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls' ]
+}
+
+jar {
+    manifest {
+        attributes(
+                'Bundle-Name': project.name,
+                'Bundle-License': 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://spdx.org/licenses/Apache-2.0.html',
+                'Bundle-Description': config.info.description,
+                'Bundle-SymbolicName': 'eu.hansolo',
+                'Export-Package': 'eu.hansolo.medusa,eu.hansolo.medusa.tools,eu.hansolo.medusa.skins,eu.hansolo.medusa.events'
+        )
+    }
+}
+
+// start the demo from gradle
 task Demo(type: JavaExec) {
     main = "eu.hansolo.medusa.DemoLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 
+// Only used for internal test
 task Test(type: JavaExec) {
     main = "eu.hansolo.medusa.TestLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 
-// create one jar for the javadoc
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-// create one jar for the source files
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives jar
-    archives javadocJar
-    archives sourcesJar
-}
-
-def pomConfig = {
-    name 'Medusa'
-    // Description won't be used when creating the pom file automatically.
-    // So I've added it manually in the pom.withXml{} section in the publishing task
-    //description 'Medusa is a library containing gauges and clocks'
-    url 'https://github.com/HanSolo/Medusa/wiki'
-    inceptionYear '2016'
-    licenses {
-        license([:]) {
-            name 'The Apache Software License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-            distribution 'repo'
-        }
-    }
-    scm {
-        url 'scm:git@github.com:HanSolo/Medusa.git'
-        connection 'scm:git@github.com:HanSolo/Medusa.git'
-        developerConnection 'scm:git@github.com:HanSolo/Medusa.git'
-    }
-    developers {
-        developer {
-            id 'HanSolo'
-            name 'Gerrit Grunwald'
-        }
-    }
-}
-
 publishing {
     publications {
-        mavenCustom(MavenPublication) {
-            from components.java
-            artifact sourcesJar
-            artifact javadocJar
-
+        main(MavenPublication) {
             pom.withXml {
-                Node pomNode = asNode()
-                pomNode.children().last() + pomConfig
-                pomNode.appendNode('description', description)
-                pomNode.dependencies.'*'.findAll() {
+                asNode().dependencies.'*'.findAll {
                     it.groupId.text() == 'org.openjfx'
                 }.each {
                     it.remove(it.classifier)
                 }
-            }
-        }
-    }
-}
-
-if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
-if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = ''
-
-bintray {
-    user = project.bintrayUsername
-    key = project.bintrayApiKey
-    publications = ['mavenCustom']
-    pkg {
-        repo                  = 'Medusa'
-        userOrg               = 'hansolo'
-        name                  = project.name
-        desc                  = description
-        licenses              = ['Apache-2.0']
-        labels                = ['javafx']
-        websiteUrl            = 'https://github.com/HanSolo/Medusa/wiki'
-        issueTrackerUrl       = 'https://github.com/HanSolo/Medusa/issues'
-        vcsUrl                = 'git@github.com:HanSolo/Medusa.git'
-        publicDownloadNumbers = true
-        version {
-            name   = project.version
-            vcsTag = project.version
-            mavenCentralSync {
-                sync = true
-                user = project.sonatypeUsername
-                password = project.sonatypePassword
-                close = '1'
             }
         }
     }
