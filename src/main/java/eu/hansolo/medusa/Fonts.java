@@ -40,6 +40,10 @@ public class Fonts {
     private static final String LATO_LIGHT_NAME;
     private static final String LATO_REGULAR_NAME;
     private static final String LATO_BOLD_NAME;
+    private static final String ESTRICTA_REGULAR_NAME;
+    private static final String ESTRICTA_REGULAR_ITALIC_NAME;
+    private static final String ESTRICTA_MEDIUM_NAME;
+    private static final String ESTRICTA_MEDIUM_ITALIC_NAME;
 
     private static String digitalName;
     private static String digitalReadoutName;
@@ -60,6 +64,11 @@ public class Fonts {
     private static String latoRegularName;
     private static String latoBoldName;
 
+    private static String estrictaRegularName;
+    private static String estrictaRegularItalicName;
+    private static String estrictaMediumName;
+    private static String estrictaMediumItalicName;
+
 
     static {
         try {
@@ -78,6 +87,10 @@ public class Fonts {
             latoLightName              = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Lato-Lig.otf"), 10).getName();
             latoRegularName            = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Lato-Reg.otf"), 10).getName();
             latoBoldName               = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Lato-Bol.otf"), 10).getName();
+            estrictaRegularName        = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Estricta-Regular.otf"), 10).getName();
+            estrictaRegularItalicName  = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Estricta-RegularItalic.otf"), 10).getName();
+            estrictaMediumName         = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Estricta-Medium.otf"), 10).getName();
+            estrictaMediumItalicName   = Font.loadFont(Fonts.class.getResourceAsStream("/eu/hansolo/medusa/Estricta-MediumItalic.otf"), 10).getName();
         } catch (Exception exception) { }
         DIGITAL_NAME                  = digitalName;
         DIGITAL_READOUT_NAME          = digitalReadoutName;
@@ -94,6 +107,10 @@ public class Fonts {
         LATO_LIGHT_NAME               = latoLightName;
         LATO_REGULAR_NAME             = latoRegularName;
         LATO_BOLD_NAME                = latoBoldName;
+        ESTRICTA_REGULAR_NAME         = estrictaRegularName;
+        ESTRICTA_REGULAR_ITALIC_NAME  = estrictaRegularItalicName;
+        ESTRICTA_MEDIUM_NAME          = estrictaMediumName;
+        ESTRICTA_MEDIUM_ITALIC_NAME   = estrictaMediumItalicName;
     }
 
 
@@ -118,4 +135,9 @@ public class Fonts {
     public static Font latoLight(final double SIZE) { return new Font(LATO_LIGHT_NAME, SIZE); }
     public static Font latoRegular(final double SIZE) { return new Font(LATO_REGULAR_NAME, SIZE); }
     public static Font latoBold(final double SIZE) { return new Font(LATO_BOLD_NAME, SIZE); }
+
+    public static Font estrictaRegular(final double SIZE) { return new Font(ESTRICTA_REGULAR_NAME, SIZE); }
+    public static Font estrictaRegularItalic(final double SIZE) { return new Font(ESTRICTA_REGULAR_ITALIC_NAME, SIZE); }
+    public static Font estrictaMedium(final double SIZE) { return new Font(ESTRICTA_MEDIUM_NAME, SIZE); }
+    public static Font estrictaMediumItalic(final double SIZE) { return new Font(ESTRICTA_MEDIUM_ITALIC_NAME, SIZE); }
 }

@@ -20,36 +20,7 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.events.UpdateEvent;
 import eu.hansolo.medusa.events.UpdateEventListener;
-import eu.hansolo.medusa.skins.AmpSkin;
-import eu.hansolo.medusa.skins.BarSkin;
-import eu.hansolo.medusa.skins.BatterySkin;
-import eu.hansolo.medusa.skins.BulletChartSkin;
-import eu.hansolo.medusa.skins.ChargeSkin;
-import eu.hansolo.medusa.skins.DashboardSkin;
-import eu.hansolo.medusa.skins.DigitalSkin;
-import eu.hansolo.medusa.skins.FlatSkin;
-import eu.hansolo.medusa.skins.GaugeSkin;
-import eu.hansolo.medusa.skins.HSkin;
-import eu.hansolo.medusa.skins.IndicatorSkin;
-import eu.hansolo.medusa.skins.KpiSkin;
-import eu.hansolo.medusa.skins.LcdSkin;
-import eu.hansolo.medusa.skins.LevelSkin;
-import eu.hansolo.medusa.skins.LinearSkin;
-import eu.hansolo.medusa.skins.ModernSkin;
-import eu.hansolo.medusa.skins.PlainAmpSkin;
-import eu.hansolo.medusa.skins.QuarterSkin;
-import eu.hansolo.medusa.skins.SectionSkin;
-import eu.hansolo.medusa.skins.SimpleDigitalSkin;
-import eu.hansolo.medusa.skins.SimpleSectionSkin;
-import eu.hansolo.medusa.skins.SimpleSkin;
-import eu.hansolo.medusa.skins.SlimSkin;
-import eu.hansolo.medusa.skins.SpaceXSkin;
-import eu.hansolo.medusa.skins.TileKpiSkin;
-import eu.hansolo.medusa.skins.TileSparklineSkin;
-import eu.hansolo.medusa.skins.TileTextKpiSkin;
-import eu.hansolo.medusa.skins.TinySkin;
-import eu.hansolo.medusa.skins.VSkin;
-import eu.hansolo.medusa.skins.WhiteSkin;
+import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.Data;
 import eu.hansolo.medusa.tools.GradientLookup;
 import eu.hansolo.medusa.tools.Helper;
@@ -143,7 +114,8 @@ public class Gauge extends Control {
         AMP, PLAIN_AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
         MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL,
         LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL, SIMPLE_DIGITAL, SECTION,
-        BAR, WHITE, CHARGE, SIMPLE_SECTION, TILE_KPI, TILE_TEXT_KPI, TILE_SPARK_LINE
+        BAR, WHITE, CHARGE, SIMPLE_SECTION, TILE_KPI, TILE_TEXT_KPI, TILE_SPARK_LINE,
+        NASA
     }
 
     public  static final Color   DARK_COLOR          = Color.rgb(36, 36, 36);    // #242424
@@ -5560,6 +5532,7 @@ public class Gauge extends Control {
             case TILE_KPI       : return new TileKpiSkin(Gauge.this);
             case TILE_TEXT_KPI  : return new TileTextKpiSkin(Gauge.this);
             case TILE_SPARK_LINE: return new TileSparklineSkin(Gauge.this);
+            case NASA           : return new NasaSkin(Gauge.this);
             case GAUGE          :
             default             : return new GaugeSkin(Gauge.this);
         }
@@ -5604,6 +5577,7 @@ public class Gauge extends Control {
             case TILE_KPI       : super.setSkin(new TileKpiSkin(Gauge.this)); break;
             case TILE_TEXT_KPI  : super.setSkin(new TileTextKpiSkin(Gauge.this)); break;
             case TILE_SPARK_LINE: super.setSkin(new TileSparklineSkin(Gauge.this)); break;
+            case NASA           : super.setSkin(new NasaSkin(Gauge.this)); break;
             case GAUGE          :
             default             : super.setSkin(new GaugeSkin(Gauge.this)); break;
         }
@@ -5852,6 +5826,15 @@ public class Gauge extends Control {
                 setAveragingPeriod(10);
                 setAverageColor(Color.rgb(238, 238, 238, 0.5));
                 setAnimated(false);
+                break;
+            case NASA:
+                setBarBackgroundColor(Color.TRANSPARENT);
+                setForegroundBaseColor(Color.WHITE);
+                setStartAngle(108);
+                setAngleRange(216);
+                setTickLabelsVisible(false);
+                setMediumTickMarksVisible(false);
+                setMajorTickMarksVisible(false);
                 break;
             case GAUGE:
                 setStartAngle(320);
