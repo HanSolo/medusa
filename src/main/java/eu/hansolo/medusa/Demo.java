@@ -23,6 +23,7 @@ import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.Marker.MarkerType;
+import eu.hansolo.medusa.tools.GradientLookup;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
@@ -82,6 +83,7 @@ public class Demo extends Application {
     private              Gauge          gauge29;
     private              Gauge          gauge30;
     private              Gauge          gauge31;
+    private              Gauge          gauge32;
     private              Clock          clock1;
     private              Clock          clock2;
     private              Clock          clock3;
@@ -535,6 +537,22 @@ public class Demo extends Application {
                               .averageVisible(true)
                               .build();
 
+        gauge32 = GaugeBuilder.create()
+                              .skinType(SkinType.NASA)
+                              .prefSize(364, 364)
+                              .title("VELOCITY")
+                              .unit("MP/H")
+                              .decimals(0)
+                              .maxValue(20000)
+                              .gradientLookup(new GradientLookup(new Stop(0, Color.web("#B0BABE")),
+                                                                 new Stop(0.2, Color.web("#B0BABE")),
+                                                                 new Stop(0.5, Color.web("#FFBD5B")),
+                                                                 new Stop(0.725, Color.web("#AC626B")),
+                                                                 new Stop(1.0, Color.web("#CF0513"))))
+                              .gradientBarEnabled(true)
+                              .animated(true)
+                              .build();
+
         clock1 = ClockBuilder.create()
                              .skinType(ClockSkinType.YOTA2)
                              .sectionsVisible(true)
@@ -656,6 +674,7 @@ public class Demo extends Application {
                     gauge29.setValue(RND.nextDouble() * gauge29.getRange() + gauge29.getMinValue());
                     gauge30.setValue(RND.nextDouble() * gauge30.getRange() + gauge30.getMinValue());
                     gauge31.setValue(RND.nextDouble() * gauge31.getRange() + gauge31.getMinValue());
+                    gauge32.setValue(RND.nextDouble() * gauge32.getRange() + gauge32.getMinValue());
                     lastTimerCall = now;
                 }
             }
@@ -711,6 +730,7 @@ public class Demo extends Application {
         pane.add(clock9, 5, 4);
         pane.add(clock10, 6, 4);
         pane.add(clock11, 7, 4);
+        pane.add(gauge32, 8, 4);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(10));
