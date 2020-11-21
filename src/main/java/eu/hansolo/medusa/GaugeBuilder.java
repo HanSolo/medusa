@@ -1150,9 +1150,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         if (properties.keySet().contains("customTickLabelsList")) {
             CONTROL.setCustomTickLabels(((ObjectProperty<List<String>>) properties.get("customTickLabelsList")).get());
         }
-
         if(properties.keySet().contains("foregroundBaseColor")) {
             CONTROL.setForegroundBaseColor(((ObjectProperty<Color>) properties.get("foregroundBaseColor")).get());
+        }
+        if (properties.keySet().contains("autoScale")) {
+            CONTROL.setAutoScale(((BooleanProperty) properties.get("autoScale")).get());
         }
 
         setMinMaxValues(CONTROL);
@@ -1428,9 +1430,6 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setAlertMessage(((StringProperty) properties.get(key)).get());
             } else if ("smoothing".equals(key)) {
                 CONTROL.setSmoothing(((BooleanProperty) properties.get(key)).get());
-            } else if ("autoScale".equals(key)) {
-                CONTROL.setAutoScale(((BooleanProperty) properties.get(key)).get());
-                setMinMaxValues(CONTROL);
             } else if("value".equals(key)) {
                 CONTROL.setValue(((DoubleProperty) properties.get(key)).get());
             }
