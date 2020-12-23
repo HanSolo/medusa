@@ -734,6 +734,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B fixedRange(final boolean FIXED_RANGE) {
+        properties.put("fixedRange", new SimpleBooleanProperty(FIXED_RANGE));
+        return (B)this;
+    }
+
     public final B onValueChanged(final InvalidationListener LISTENER) {
         properties.put("onValueChanged", new SimpleObjectProperty<>(LISTENER));
         return (B)this;
@@ -1430,6 +1435,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setAlertMessage(((StringProperty) properties.get(key)).get());
             } else if ("smoothing".equals(key)) {
                 CONTROL.setSmoothing(((BooleanProperty) properties.get(key)).get());
+            } else if ("fixedRange".equals(key)) {
+                CONTROL.setFixedRange(((BooleanProperty) properties.get(key)).get());
             } else if("value".equals(key)) {
                 CONTROL.setValue(((DoubleProperty) properties.get(key)).get());
             }

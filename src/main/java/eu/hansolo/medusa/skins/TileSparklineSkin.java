@@ -248,11 +248,16 @@ public class TileSparklineSkin extends GaugeSkinBase {
     }
 
     private void drawChart(final double VALUE) {
-        low  = Statistics.getMin(dataList);
-        high = Statistics.getMax(dataList);
-        if (Double.compare(low, high) == 0) {
+        if(gauge.isFixedRange()) {
             low  = minValue;
             high = maxValue;
+        } else {
+            low  = Statistics.getMin(dataList);
+            high = Statistics.getMax(dataList);
+            if (Double.compare(low, high) == 0) {
+                low  = minValue;
+                high = maxValue;
+            }
         }
         range = high - low;
 
@@ -314,11 +319,16 @@ public class TileSparklineSkin extends GaugeSkinBase {
         double[] x    = new double[size];
         double[] y    = new double[size];
 
-        low  = Statistics.getMin(DATA_LIST);
-        high = Statistics.getMax(DATA_LIST);
-        if (Double.compare(low, high) == 0) {
+        if(gauge.isFixedRange()) {
             low  = minValue;
             high = maxValue;
+        } else {
+            low  = Statistics.getMin(dataList);
+            high = Statistics.getMax(dataList);
+            if (Double.compare(low, high) == 0) {
+                low  = minValue;
+                high = maxValue;
+            }
         }
         range = high - low;
 

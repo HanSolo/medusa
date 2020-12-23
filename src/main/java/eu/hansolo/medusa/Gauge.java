@@ -399,6 +399,8 @@ public class Gauge extends Control {
     private StringProperty                       alertMessage;
     private boolean                              _smoothing;
     private BooleanProperty                      smoothing;
+    private boolean                              _fixedRange;
+    private BooleanProperty                      fixedRange;
     private String                               formatString;
 
     // others
@@ -527,7 +529,8 @@ public class Gauge extends Control {
                  @NamedArg(value="customFont", defaultValue="Fonts.robotoRegular(12)") Font customFont,
                  @NamedArg(value="alert", defaultValue="false") boolean alert,
                  @NamedArg(value="alertMessage", defaultValue="") String alertMessage,
-                 @NamedArg(value="smoothing", defaultValue="false") boolean smoothing
+                 @NamedArg(value="smoothing", defaultValue="false") boolean smoothing,
+                 @NamedArg(value="fixedRange", defaultValue="false") boolean fixedRange
                  ) {
         setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         this.skinType = skinType;
@@ -748,6 +751,7 @@ public class Gauge extends Control {
         _alert                              = false;
         _alertMessage                       = "";
         _smoothing                          = false;
+        _fixedRange                         = false;
         formatString                        = "%.2f";
 
         originalMinValue                    = -Double.MAX_VALUE;
@@ -858,6 +862,7 @@ public class Gauge extends Control {
         setAlert(false);
         setAlertMessage("");
         setSmoothing(false);
+        setFixedRange(false);
     }
 
     private void registerListeners() {
@@ -5392,6 +5397,37 @@ public class Gauge extends Control {
             };
         }
         return smoothing;
+    }
+
+    /**
+     * Returns true when fixedRange is enabled. This property is only used
+     * in the TileSparklineSkin to fixed the range. In a custom skin it
+     * could be also used for other things.
+     * @return true when fixedRange is enabled
+     */
+    public boolean isFixedRange() { return null == fixedRange ? _fixedRange : fixedRange.get(); }
+    /**
+     * Defines if the fixedRange property should be enabled/disabled.
+     * At the moment this is only used in the TileSparklineSkin.
+     * @param FIXED_RANGE
+     */
+    public void setFixedRange(final boolean FIXED_RANGE) {
+        if (null == fixedRange) {
+            _fixedRange = FIXED_RANGE;
+            fireUpdateEvent(REDRAW_EVENT);
+        } else {
+            fixedRange.set(FIXED_RANGE);
+        }
+    }
+    public BooleanProperty FixedRangeProperty() {
+        if (null == fixedRange) {
+            fixedRange = new BooleanPropertyBase(_fixedRange) {
+                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "fixedRange"; }
+            };
+        }
+        return fixedRange;
     }
 
     public String getFormatString() { return formatString; }
