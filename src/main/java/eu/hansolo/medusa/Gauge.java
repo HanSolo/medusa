@@ -379,6 +379,8 @@ public class Gauge extends Control {
     private GradientLookup                       gradientLookup;
     private boolean                              _customTickLabelsEnabled;
     private BooleanProperty                      customTickLabelsEnabled;
+    private boolean                              _customTickLabelFontSizeEnabled;
+    private BooleanProperty                      customTickLabelFontSizeEnabled;
     private ObservableList<String>               customTickLabels;
     private double                               _customTickLabelFontSize;
     private DoubleProperty                       customTickLabelFontSize;
@@ -520,6 +522,7 @@ public class Gauge extends Control {
                  @NamedArg(value="gradientBarEnabled", defaultValue="false") boolean gradientBarEnabled,
                  @NamedArg(value="customTickLabelsEnabled", defaultValue="false") boolean customTickLabelsEnabled,
                  @NamedArg(value="customTickLabelFontSize", defaultValue="18") double customTickLabelFontSize,
+                 @NamedArg(value="customTickLabelFontSizeEnabled", defaultValue="false") boolean customTickLabelFontSizeEnabled,
                  @NamedArg(value="interactive", defaultValue="false") boolean interactive,
                  @NamedArg(value="buttonTooltipText", defaultValue="") String buttonTooltipText,
                  @NamedArg(value="customFontEnabled", defaultValue="false") boolean customFontEnabled,
@@ -739,6 +742,7 @@ public class Gauge extends Control {
         _customTickLabelsEnabled            = false;
         customTickLabels                    = FXCollections.observableArrayList();
         _customTickLabelFontSize            = 18;
+        _customTickLabelFontSizeEnabled     = false;
         _interactive                        = false;
         _buttonTooltipText                  = "";
         _keepAspect                         = true;
@@ -5017,16 +5021,16 @@ public class Gauge extends Control {
     }
 
     /**
-     * Returns true if custom ticklabels should be used instead of the
+     * Returns true if custom tick labels should be used instead of the
      * automatically calculated ones. This could be useful for gauges
      * like a compass where you need "N", "E", "S" and "W" instead of
      * numbers.
      *
-     * @return true if custom ticklabels should be used
+     * @return true if custom tick labels should be used
      */
     public boolean getCustomTickLabelsEnabled() { return null == customTickLabelsEnabled ? _customTickLabelsEnabled : customTickLabelsEnabled.get(); }
     /**
-     * Defines if custom ticklabels should be used instead of the
+     * Defines if custom tick labels should be used instead of the
      * automatically calculated ones. This could be useful for gauges
      * like a compass where you need "N", "E", "S" and "W" instead of
      * numbers.
@@ -5041,7 +5045,7 @@ public class Gauge extends Control {
             customTickLabelsEnabled.set(ENABLED);
         }
     }
-    public BooleanProperty getCustomTickLabelsEnabledProperty() {
+    public BooleanProperty customTickLabelsEnabledProperty() {
         if (null == customTickLabelsEnabled) {
             customTickLabelsEnabled = new BooleanPropertyBase(_customTickLabelsEnabled) {
                 @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
@@ -5050,6 +5054,34 @@ public class Gauge extends Control {
             };
         }
         return customTickLabelsEnabled;
+    }
+
+    /**
+     * Returns true if custom font size for tick labels and/or custom tick labels will be used.
+     * @return true if custom font size for tick labels and/or custom tick labels will be used
+     */
+    public boolean getCustomTickLabelFontSizeEnabled() { return null == customTickLabelFontSizeEnabled ? _customTickLabelFontSizeEnabled : customTickLabelFontSizeEnabled.get(); }
+    /**
+     * Defines if custom font size for tick labels and/or custom tick labels should be used.
+     * @param ENABLED
+     */
+    public void setCustomTickLabelFontSizeEnabled(final boolean ENABLED) {
+        if (null == customTickLabelFontSizeEnabled) {
+            _customTickLabelFontSizeEnabled = ENABLED;
+            fireUpdateEvent(REDRAW_EVENT);
+        } else {
+            customTickLabelFontSizeEnabled.set(ENABLED);
+        }
+    }
+    public BooleanProperty customTickLabelFontSizeEnabledProperty() {
+        if (null == customTickLabelFontSizeEnabled) {
+            customTickLabelFontSizeEnabled = new BooleanPropertyBase(_customTickLabelFontSizeEnabled) {
+                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override public Object getBean() { return Gauge.this; }
+                @Override public String getName() { return "customTickLabelFontSizeEnabled"; }
+            };
+        }
+        return customTickLabelFontSizeEnabled;
     }
 
     /**

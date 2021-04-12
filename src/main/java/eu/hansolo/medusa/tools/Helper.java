@@ -538,7 +538,9 @@ public class Helper {
         double  customFontSizeFactor       = GAUGE.getCustomTickLabelFontSize() / 400;
         boolean fullRange                  = (MIN_VALUE < 0 && MAX_VALUE > 0);
         double  tickLabelFontSize          = tickLabelDecimals == 0 ? 0.054 * SIZE : 0.051 * SIZE;
-        tickLabelFontSize                  = GAUGE.getCustomTickLabelsEnabled() ? customFontSizeFactor * SIZE : tickLabelFontSize;
+        if (GAUGE.getCustomTickLabelsEnabled() || GAUGE.getCustomTickLabelFontSizeEnabled()) {
+            tickLabelFontSize = customFontSizeFactor * SIZE;
+        }
         double  tickMarkFontSize           = tickLabelDecimals == 0 ? 0.047 * SIZE: 0.044 * SIZE;
         double  tickLabelOrientationFactor = TickLabelOrientation.HORIZONTAL == tickLabelOrientation ? 0.9 : 1.0;
 

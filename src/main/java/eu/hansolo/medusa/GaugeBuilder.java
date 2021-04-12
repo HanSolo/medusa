@@ -683,6 +683,11 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
         return (B)this;
     }
 
+    public final B customTickLabelFontSizeEnabled(final boolean ENABLED) {
+        properties.put("customTickLabelFontSizeEnabled", new SimpleBooleanProperty(ENABLED));
+        return (B)this;
+    }
+
     public final B customTickLabels(final String... TICK_LABELS) {
         properties.put("customTickLabelsArray", new SimpleObjectProperty<>(TICK_LABELS));
         return (B)this;
@@ -1397,6 +1402,8 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 CONTROL.setCustomTickLabelsEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("customTickLabelFontSize".equals(key)) {
                 CONTROL.setCustomTickLabelFontSize(((DoubleProperty) properties.get(key)).get());
+            } else if ("customTickLabelFontSizeEnabled".equals(key)) {
+                CONTROL.setCustomTickLabelFontSizeEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("interactive".equals(key)) {
                 CONTROL.setInteractive(((BooleanProperty) properties.get(key)).get());
             } else if ("checkSectionsForValue".equals(key)) {
