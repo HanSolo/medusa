@@ -5765,6 +5765,7 @@ public class Gauge extends Control {
             case LEVEL:
                 setValueColor(Color.WHITE);
                 setBarColor(Color.CYAN);
+                setUnit("%");
                 break;
             case LINEAR:
                 setOrientation(Orientation.VERTICAL);

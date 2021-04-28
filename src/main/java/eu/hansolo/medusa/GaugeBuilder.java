@@ -991,6 +991,7 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
                 case LEVEL:
                     CONTROL.setValueColor(Color.WHITE);
                     CONTROL.setBarColor(Color.CYAN);
+                    CONTROL.setUnit("%");
                     break;
                 case LINEAR:
                     CONTROL.setOrientation(Orientation.VERTICAL);

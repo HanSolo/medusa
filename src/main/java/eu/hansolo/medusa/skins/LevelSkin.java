@@ -90,7 +90,7 @@ public class LevelSkin extends GaugeSkinBase {
         locale               = gauge.getLocale();
         sections             = gauge.getSections();
         barTooltip           = new Tooltip();
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f%%").toString();
+        formatString         = new StringBuilder("%.").append(gauge.getDecimals()).append(gauge.getUnit().equals("%") ? "f%%" : "").toString();
         currentValueListener = o -> setBar(gauge.getCurrentValue());
         barTooltip.setTextAlignment(TextAlignment.CENTER);
 
@@ -360,8 +360,7 @@ public class LevelSkin extends GaugeSkinBase {
 
     @Override protected void redraw() {
         locale       = gauge.getLocale();
-        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f%%").toString();
-
+        formatString = new StringBuilder("%.").append(gauge.getDecimals()).append(gauge.getUnit().equals("%") ? "f%%" : "f" + gauge.getUnit()).toString();
         // Background stroke and fill
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * width))));
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
