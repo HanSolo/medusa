@@ -46,12 +46,7 @@ ext {
     platform        = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
     ciOssrhUsername = System.getenv('OSSRH_USERNAME')
     ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
-
 }
-
-project.logger.lifecycle('Platform       : ' + ext.platform)
-project.logger.lifecycle('ciOssrhUsername: ' + ext.ciOssrhUsername)
-project.logger.lifecycle('ossrhUsername  : ' + ossrhUsername)
 
 repositories {
     mavenCentral()
