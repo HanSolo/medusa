@@ -28,7 +28,7 @@ jobs:
       - name: Export Key
         run: gpg --armor --export-secret-keys han.solo@mac.com \
                  | awk 'NR == 1 { print "GPG_KEY=" } 1' ORS='\\n' \
-                 >> gradle.properties
+                 > gradle.properties
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
       - name: Build with Gradle
