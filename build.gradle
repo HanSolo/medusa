@@ -41,14 +41,15 @@ mainClassName = "$moduleName/eu.hansolo.Medusa.Demo"
 
 Date buildTimeAndDate = new Date()
 ext {
-    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
-    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+    buildDate       = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
+    buildTime       = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+    platform        = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
+    ciOssrhUsername = System.getenv('OSSRH_USERNAME')
+    ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
+
 }
 
-ext.platform        = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
-ext.ciOssrhUsername = System.getenv('OSSRH_USERNAME')
-ext.ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
-
+project.logger.lifecycle('Platform       : ' + ext.platform)
 project.logger.lifecycle('ciOssrhUsername: ' + ext.ciOssrhUsername)
 project.logger.lifecycle('ossrhUsername  : ' + ossrhUsername)
 
