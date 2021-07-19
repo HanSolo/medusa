@@ -22,6 +22,7 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Configure GPG Key
         run: |
+          export GPG_TTY=$(tty)
           mkdir -p ~/.gnupg/
           printf "${{ secrets.GPG_KEY }}" | base64 --decode > ~/.gnupg/private.key
           gpg --import ~/.gnupg/private.key
