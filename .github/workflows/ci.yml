@@ -20,14 +20,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
-      - name: Configure GPG Key
-        run: |
-          export GPG_TTY=$(tty)
-          mkdir -p ~/.gnupg/
-          printf "${{ secrets.GPG_KEY }}" | base64 --decode > ~/.gnupg/private.key
-          gpg --import ~/.gnupg/private.key
-        env:
-          GPG_SECRET_KEY: ${{ secrets.GPG_KEY }}
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_KEY }}
+          gpg-passphrase: GPG_PASSPHRASE
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
       - name: Build with Gradle
@@ -35,4 +31,5 @@ jobs:
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 ...
