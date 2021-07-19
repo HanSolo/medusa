@@ -16,15 +16,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Environment
-        env:
-          OSSRH_USERNAME: {{ secret.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: {{ secret.OSSRH_PASSWORD }}
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
       - name: Build with Gradle
+        env:
+          OSSRH_USERNAME: { { secret.OSSRH_USERNAME } }
+          OSSRH_PASSWORD: { { secret.OSSRH_PASSWORD } }
         run: ./gradlew build
 
 ...
