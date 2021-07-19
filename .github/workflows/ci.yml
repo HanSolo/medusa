@@ -25,7 +25,7 @@ jobs:
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_KEY }}
           PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-      - name Export Key
+      - name: Export Key
         run: gpg --armor --export-secret-keys han.solo@mac.com \
                  | awk 'NR == 1 { print "GPG_KEY=" } 1' ORS='\\n' \
                  >> gradle.properties
