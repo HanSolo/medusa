@@ -111,6 +111,13 @@ artifacts {
 }
 
 signing {
+    gpgkey = System.getenv("GPG_KEY")
+    gpgpassphrase = System.getenv("GPG_PASSPHRASE")
+
+    if (gpgkey && gpgpassphrase) {
+        useInMemoryPgpKeys(project.getProperty('GPG_KEY'), project.getProperty('GPG_PASSPHRASE'))
+    }
+    
     sign configurations.archives
     sign publishing.publications
 }
