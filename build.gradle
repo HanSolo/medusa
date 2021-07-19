@@ -170,5 +170,13 @@ publishing {
                 password = null == ciOssrhPassword ? ossrhPassword : ciOssrhPassword
             }
         }
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/HanSolo/Medusa"
+            credentials {
+                username = System.getenv("GH_USER")
+                password = System.getenv("GH_TOKEN")
+            }
+        }
     }
 }

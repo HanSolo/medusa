@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04, macOS-latest, windows-latest]
-        java: [11, 11.0.3]
+        java: [16.0.1]
       fail-fast: false
       max-parallel: 4
     name: Test JDK ${{ matrix.java }}, ${{ matrix.os }}
@@ -20,10 +20,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
       - name: Build with Gradle
-        env:
-          OSSRH_USERNAME: ${env.OSSRH_USERNAME}
-          OSSRH_PASSWORD: ${env.OSSRH_PASSWORD}
-        run: ./gradlew build
-
+        run: ./gradlew clean build
 ...
