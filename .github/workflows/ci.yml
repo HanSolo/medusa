@@ -22,8 +22,8 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Build with Gradle
         env:
-          OSSRH_USERNAME: { { secret.OSSRH_USERNAME } }
-          OSSRH_PASSWORD: { { secret.OSSRH_PASSWORD } }
+          OSSRH_USERNAME: ${env.OSSRH_USERNAME}
+          OSSRH_PASSWORD: ${env.OSSRH_PASSWORD}
         run: ./gradlew build
 
 ...
