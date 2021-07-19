@@ -116,7 +116,6 @@ signing {
 }
 
 publishing {
-    useLegacyMode = false
     publications {
         mavenCustom(MavenPublication) {
             group = 'eu.hansolo'
