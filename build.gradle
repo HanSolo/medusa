@@ -46,6 +46,8 @@ ext {
     platform        = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
     ciOssrhUsername = System.getenv('OSSRH_USERNAME')
     ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
+    gpgkey          = System.getenv("GPG_KEY")
+    gpgpassphrase   = System.getenv("GPG_PASSPHRASE")
 }
 
 repositories {
@@ -111,13 +113,10 @@ artifacts {
 }
 
 signing {
-    gpgkey = System.getenv("GPG_KEY")
-    gpgpassphrase = System.getenv("GPG_PASSPHRASE")
-
     if (gpgkey && gpgpassphrase) {
         useInMemoryPgpKeys(project.getProperty('GPG_KEY'), project.getProperty('GPG_PASSPHRASE'))
     }
-    
+
     sign configurations.archives
     sign publishing.publications
 }
