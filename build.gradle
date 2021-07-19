@@ -114,7 +114,7 @@ artifacts {
 
 signing {
     if (gpgkey && gpgpassphrase) {
-        useInMemoryPgpKeys(project.getProperty('GPG_KEY'), project.getProperty('GPG_PASSPHRASE'))
+        useInMemoryPgpKeys(gpgkey, gpgpassphrase)
     }
 
     sign configurations.archives
