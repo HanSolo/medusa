@@ -20,10 +20,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
-          server-username: OSSRH_USERNAME
-          server-password: OSSRH_PASSWORD
-          gpg-private-key: ${{ secrets.GPG_KEY }}
-          gpg-passphrase: GPG_PASSPHRASE
+      - name: Import GPG Key
+        uses: crazy-max/ghaction-import-gpg@v1
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_KEY }}
+          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
       - name: Build with Gradle
