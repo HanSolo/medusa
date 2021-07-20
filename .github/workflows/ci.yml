@@ -28,7 +28,7 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
       - name: Build with Gradle
-      - run: ./gradlew clean build
+        run: ./gradlew clean build
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
