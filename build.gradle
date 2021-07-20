@@ -46,8 +46,8 @@ ext {
     platform        = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
     ciOssrhUsername = System.getenv('OSSRH_USERNAME')
     ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
-    gpgkey          = System.getenv("GPG_KEY")
-    gpgpassphrase   = System.getenv("GPG_PASSPHRASE")
+    gpgkey          = System.getenv("GPG_PRIVATE_KEY")
+    gpgpassphrase   = System.getenv("PASSPHRASE")
 }
 
 repositories {
