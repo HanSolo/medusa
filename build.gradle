@@ -36,7 +36,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 description = 'Medusa is a JavaFX library containing gauges and clocks'
-mainClassName = "$moduleName/eu.hansolo.Medusa.Demo"
+mainClassName = "$moduleName/eu.hansolo.medusa.Demo"
 
 Date buildTimeAndDate = new Date()
 ext {
@@ -126,7 +126,7 @@ publishing {
     publications {
         mavenCustom(MavenPublication) {
             group = 'eu.hansolo'
-            artifactId = 'Medusa'
+            artifactId = 'medusa'
             version = "${version}"
 
             from components.java
@@ -144,7 +144,7 @@ publishing {
             pom {
                 name = 'Medusa'
                 description = 'Medusa is a JavaFX library containing gauges and clocks'
-                url = "https://github.com/HanSolo/Medusa/wiki"
+                url = "https://github.com/HanSolo/medusa/wiki"
                 licenses {
                     license {
                         name = "The Apache License, Version 2.0"
@@ -159,9 +159,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = "scm:git:https://HanSolo/Medusa"
-                    developerConnection = "scm:git:https://HanSolo/Medusa"
-                    url = "https://github.com/HanSolo/Medusa"
+                    connection = "scm:git:https://HanSolo/medusa"
+                    developerConnection = "scm:git:https://HanSolo/medusa"
+                    url = "https://github.com/HanSolo/medusa"
                 }
             }
         }
@@ -178,7 +178,7 @@ publishing {
         }
         maven {
             name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/HanSolo/Medusa"
+            url = "https://maven.pkg.github.com/HanSolo/medusa"
             credentials {
                 username = null == ciGHUser  ? ghUser  : ciGHUser
                 password = null == ciGHToken ? ghToken : ciGHToken
