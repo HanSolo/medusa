@@ -49,7 +49,7 @@ public abstract class GaugeSkinBase extends SkinBase<Gauge> implements Skin<Gaug
     protected void registerListeners() {
         getSkinnable().widthProperty().addListener(sizeListener);
         getSkinnable().heightProperty().addListener(sizeListener);
-        getSkinnable().setOnUpdate(e -> handleEvents(e.eventType.name()));
+        getSkinnable().setOnUpdate(updateEventListener);
     }
 
     protected void handleEvents(final String EVENT_TYPE) {
