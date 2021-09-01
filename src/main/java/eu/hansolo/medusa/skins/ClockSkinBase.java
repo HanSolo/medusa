@@ -71,7 +71,7 @@ public abstract class ClockSkinBase extends SkinBase<Clock> implements Skin<Cloc
     protected void registerListeners() {
         clock.widthProperty().addListener(sizeListener);
         clock.heightProperty().addListener(sizeListener);
-        clock.setOnUpdate(updateEventListener);
+        clock.addUpdateEventListener(updateEventListener);
         if (clock.isAnimated()) {
             clock.currentTimeProperty().addListener(currentTimeListener);
         } else {

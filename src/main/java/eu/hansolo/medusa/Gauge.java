@@ -5878,7 +5878,6 @@ public class Gauge extends Control {
 
 
     // ******************** Event handling ************************************
-    public void setOnUpdate(final UpdateEventListener LISTENER) { addUpdateEventListener(LISTENER); }
     public void addUpdateEventListener(final UpdateEventListener LISTENER) { if (!listenerList.contains(LISTENER)) listenerList.add(LISTENER); }
     public void removeUpdateEventListener(final UpdateEventListener LISTENER) { if (listenerList.contains(LISTENER)) listenerList.remove(LISTENER); }
 

@@ -700,9 +700,9 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
             } else if ("lcdDesign".equals(key)) {
                 CONTROL.setLcdDesign(((ObjectProperty<LcdDesign>) properties.get(key)).get());
             } else if ("onAlarm".equals(key)) {
-                CONTROL.setOnAlarm(((ObjectProperty<AlarmEventListener>) properties.get(key)).get());
+                CONTROL.addAlarmEventListener(((ObjectProperty<AlarmEventListener>) properties.get(key)).get());
             } else if ("onTimeEvent".equals(key)) {
-                CONTROL.setOnTimeEvent(((ObjectProperty<TimeEventListener>) properties.get(key)).get());
+                CONTROL.addTimeEventListener(((ObjectProperty<TimeEventListener>) properties.get(key)).get());
             } else if ("alarmsEnabled".equals(key)) {
                 CONTROL.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("alarmsVisible".equals(key)) {
