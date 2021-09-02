@@ -1,4 +1,4 @@
-## Medusa
+## Medusa <img align="right" src="https://github.com/foojay2020/badges/raw/main/works_with_openjdk/Works-with-OpenJDK.png" width="100">
 A JavaFX library for Gauges. The main focus of this project is to provide Gauges that can be configured in multiple ways.
 
 Donations are welcome at [Paypal](https://paypal.me/hans0l0)
