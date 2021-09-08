@@ -21,10 +21,6 @@ import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
-
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -39,16 +35,15 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcTo;
-import javafx.scene.shape.ClosePath;
-import javafx.scene.shape.FillRule;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+
+import java.util.List;
+import java.util.Locale;
 
 import static eu.hansolo.medusa.tools.Helper.formatNumber;
 
@@ -57,51 +52,44 @@ import static eu.hansolo.medusa.tools.Helper.formatNumber;
  * Created by hansolo on 28.12.15.
  */
 public class DashboardSkin extends GaugeSkinBase {
-    protected static final double PREFERRED_WIDTH  = 200;
-    protected static final double PREFERRED_HEIGHT = 148;
-    protected static final double MINIMUM_WIDTH    = 50;
-    protected static final double MINIMUM_HEIGHT   = 50;
-    protected static final double MAXIMUM_WIDTH    = 1024;
-    protected static final double MAXIMUM_HEIGHT   = 1024;
-    private static final double   ASPECT_RATIO     = 0.74;
-    private static final double   ANGLE_RANGE      = 180;
-    private double                size;
-    private double                width;
-    private double                height;
-    private double                centerX;
-    private double                currentValueAngle;
-    private Pane                  pane;
-    private Text                  unitText;
-    private Text                  titleText;
-    private Text                  valueText;
-    private Text                  minText;
-    private Text                  maxText;
-    private Path                  barBackground;
-    private MoveTo                barBackgroundStart;
-    private ArcTo                 barBackgroundOuterArc;
-    private LineTo                barBackgroundLineToInnerArc;
-    private ArcTo                 barBackgroundInnerArc;
-    private Path                  dataBar;
-    private MoveTo                dataBarStart;
-    private ArcTo                 dataBarOuterArc;
-    private LineTo                dataBarLineToInnerArc;
-    private ArcTo                 dataBarInnerArc;
-    private Line                  threshold;
-    private Text                  thresholdText;
-    private InnerShadow           innerShadow;
-    private Font                  smallFont;
-    private Font                  bigFont;
-    private double                range;
-    private double                angleStep;
-    private boolean               colorGradientEnabled;
-    private int                   noOfGradientStops;
-    private boolean               sectionsVisible;
-    private List<Section>         sections;
-    private String                formatString;
-    private String                otherFormatString;
-    private Locale                locale;
-    private double                minValue;
-    private InvalidationListener  currentValueListener;
+    protected static final double               PREFERRED_WIDTH  = 200;
+    protected static final double               PREFERRED_HEIGHT = 148;
+    protected static final double               MINIMUM_WIDTH    = 50;
+    protected static final double               MINIMUM_HEIGHT   = 50;
+    protected static final double               MAXIMUM_WIDTH    = 1024;
+    protected static final double               MAXIMUM_HEIGHT   = 1024;
+    private static final   double               ASPECT_RATIO     = 0.74;
+    private static final   double               START_ANGLE      = 90;
+    private static final   double               ANGLE_RANGE      = 180;
+    private                double               size;
+    private                double               width;
+    private                double               height;
+    private                double               centerX;
+    private                Pane                 pane;
+    private                Text                 unitText;
+    private                Text                 titleText;
+    private                Text                 valueText;
+    private                Text                 minText;
+    private                Text                 maxText;
+    private                Arc                  bBackground;
+    private                Arc                  dataBar;
+    private                Line                 threshold;
+    private                Text                 thresholdText;
+    private                InnerShadow          innerShadow;
+    private                Font                 smallFont;
+    private                Font                 bigFont;
+    private                double               range;
+    private                double               angleStep;
+    private                boolean              colorGradientEnabled;
+    private                int                  noOfGradientStops;
+    private                boolean              sectionsVisible;
+    private                List<Section>        sections;
+    private                String               formatString;
+    private                String               otherFormatString;
+    private                Locale               locale;
+    private                double               minValue;
+    private                double               maxValue;
+    private                InvalidationListener currentValueListener;
 
 
     // ******************** Constructors **************************************
@@ -114,9 +102,8 @@ public class DashboardSkin extends GaugeSkinBase {
         noOfGradientStops    = gauge.getGradientBarStops().size();
         sectionsVisible      = gauge.getSectionsVisible();
         sections             = gauge.getSections();
-        currentValueAngle    = 0;
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        otherFormatString    = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
+        formatString         = new StringBuilder("%.").append(gauge.getDecimals()).append("f").toString();
+        otherFormatString    = new StringBuilder("%.").append(gauge.getTickLabelDecimals()).append("f").toString();
         locale               = gauge.getLocale();
         currentValueListener = o -> setBar(gauge.getCurrentValue());
 
@@ -159,7 +146,8 @@ public class DashboardSkin extends GaugeSkinBase {
         minText.setTextOrigin(VPos.CENTER);
         minText.setFill(gauge.getValueColor());
 
-        maxText = new Text(String.format(locale, otherFormatString, gauge.getMaxValue()));
+        maxValue = gauge.getMaxValue();
+        maxText  = new Text(String.format(locale, otherFormatString, maxValue));
         maxText.setTextOrigin(VPos.CENTER);
         maxText.setFill(gauge.getValueColor());
 
@@ -169,37 +157,20 @@ public class DashboardSkin extends GaugeSkinBase {
 
         innerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.3), 30.0, 0.0, 0.0, 10.0);
 
-        barBackgroundStart          = new MoveTo(0, 0.675 * PREFERRED_HEIGHT);
-        barBackgroundOuterArc       = new ArcTo(0.675 * PREFERRED_HEIGHT, 0.675 * PREFERRED_HEIGHT, 0, PREFERRED_WIDTH, 0.675 * PREFERRED_HEIGHT, true, true);
-        barBackgroundLineToInnerArc = new LineTo(0.72222 * PREFERRED_WIDTH, 0.675 * PREFERRED_HEIGHT);
-        barBackgroundInnerArc       = new ArcTo(0.3 * PREFERRED_HEIGHT, 0.3 * PREFERRED_HEIGHT, 0, 0.27778 * PREFERRED_WIDTH, 0.675 * PREFERRED_HEIGHT, false, false);
+        bBackground = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.675, PREFERRED_WIDTH * 0.4, PREFERRED_HEIGHT * 0.4, 0, ANGLE_RANGE);
+        bBackground.setType(ArcType.OPEN);
+        bBackground.setStroke(gauge.getBarBackgroundColor());
+        bBackground.setStrokeWidth(PREFERRED_WIDTH * 0.125);
+        bBackground.setStrokeLineCap(StrokeLineCap.BUTT);
+        bBackground.setFill(null);
+        bBackground.setEffect(gauge.isShadowsEnabled() ? innerShadow : null);
 
-        barBackground = new Path();
-        barBackground.setFillRule(FillRule.EVEN_ODD);
-        barBackground.getElements().add(barBackgroundStart);
-        barBackground.getElements().add(barBackgroundOuterArc);
-        barBackground.getElements().add(barBackgroundLineToInnerArc);
-        barBackground.getElements().add(barBackgroundInnerArc);
-        barBackground.getElements().add(new ClosePath());
-        barBackground.setFill(gauge.getBarBackgroundColor());
-        barBackground.setStroke(gauge.getBorderPaint());
-        barBackground.setEffect(gauge.isShadowsEnabled() ? innerShadow : null);
-
-        dataBarStart          = new MoveTo(0, 0.675 * PREFERRED_HEIGHT);
-        dataBarOuterArc       = new ArcTo(0.675 * PREFERRED_HEIGHT, 0.675 * PREFERRED_HEIGHT, 0, 0, 0, false, true);
-        dataBarLineToInnerArc = new LineTo(0.27778 * PREFERRED_WIDTH, 0.675 * PREFERRED_HEIGHT);
-        dataBarInnerArc       = new ArcTo(0.3 * PREFERRED_HEIGHT, 0.3 * PREFERRED_HEIGHT, 0, 0, 0, false, false);
-
-        dataBar = new Path();
-        dataBar.setFillRule(FillRule.EVEN_ODD);
-        dataBar.getElements().add(dataBarStart);
-        dataBar.getElements().add(dataBarOuterArc);
-        dataBar.getElements().add(dataBarLineToInnerArc);
-        dataBar.getElements().add(dataBarInnerArc);
-        dataBar.getElements().add(new ClosePath());
-        dataBar.setFill(gauge.getBarColor());
-        dataBar.setStroke(gauge.getBorderPaint());
-        dataBar.setEffect(gauge.isShadowsEnabled() ? innerShadow : null);
+        dataBar = new Arc(PREFERRED_WIDTH * 0.5, PREFERRED_HEIGHT * 0.675, PREFERRED_WIDTH * 0.4, PREFERRED_HEIGHT * 0.4, 270, 0);
+        dataBar.setType(ArcType.OPEN);
+        dataBar.setStroke(gauge.getBarColor());
+        dataBar.setStrokeWidth(PREFERRED_WIDTH * 0.125);
+        dataBar.setStrokeLineCap(StrokeLineCap.BUTT);
+        dataBar.setFill(null);
 
         threshold = new Line();
         threshold.setStrokeLineCap(StrokeLineCap.BUTT);
@@ -208,7 +179,7 @@ public class DashboardSkin extends GaugeSkinBase {
         thresholdText = new Text(String.format(locale, formatString, gauge.getThreshold()));
         Helper.enableNode(thresholdText, gauge.isThresholdVisible());
 
-        pane = new Pane(unitText, titleText, valueText, minText, maxText, barBackground, dataBar, threshold, thresholdText);
+        pane = new Pane(unitText, titleText, valueText, minText, maxText, bBackground, dataBar, threshold, thresholdText);
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(gauge.getBorderWidth()))));
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -228,6 +199,7 @@ public class DashboardSkin extends GaugeSkinBase {
             range     = gauge.getRange();
             angleStep = ANGLE_RANGE / range;
             minValue  = gauge.getMinValue();
+            maxValue  = gauge.getMaxValue();
             sections  = gauge.getSections();
             resize();
             redraw();
@@ -255,69 +227,30 @@ public class DashboardSkin extends GaugeSkinBase {
 
     // ******************** Private Methods ***********************************
     private void setBar( final double VALUE ) {
+        double barLength    = 0;
+        double barStart     = 0;
+        double clampedValue = Helper.clamp(minValue, maxValue, VALUE);
 
-        currentValueAngle = Helper.clamp(90.0, 270.0, ( VALUE - minValue ) * angleStep + 90.0);
-
-        double smallHeight     = 0.675 * height;
-        double tinyHeight      = 0.3 * height;
-        double currentValueSin = Math.sin(-Math.toRadians(currentValueAngle));
-        double currentValueCos = Math.cos(-Math.toRadians(currentValueAngle));
-
-        dataBarOuterArc.setX(centerX + smallHeight * currentValueSin);
-        dataBarOuterArc.setY(centerX + smallHeight * currentValueCos);
-        dataBarLineToInnerArc.setX(centerX + tinyHeight * currentValueSin);
-        dataBarLineToInnerArc.setY(centerX + tinyHeight * currentValueCos);
-
-        if (gauge.isStartFromZero()) {
-
-            double min = gauge.getMinValue();
-            double max = gauge.getMaxValue();
-
-            if ( ( VALUE > min || min < 0 ) && ( VALUE < max || max > 0 ) ) {
-                if ( max < 0 ) {
-                    dataBarStart.setX(centerX + smallHeight);
-                    dataBarStart.setY(smallHeight);
-                    dataBarOuterArc.setSweepFlag(false);
-                    dataBarInnerArc.setX(centerX + tinyHeight);
-                    dataBarInnerArc.setY(smallHeight);
-                    dataBarInnerArc.setSweepFlag(true);
-                } else if ( min > 0 ) {
-                    dataBarStart.setX(0);
-                    dataBarStart.setY(smallHeight);
-                    dataBarOuterArc.setSweepFlag(true);
-                    dataBarInnerArc.setX(0.27778 * width);
-                    dataBarInnerArc.setY(smallHeight);
-                    dataBarInnerArc.setSweepFlag(false);
+        if ( gauge.isStartFromZero() ) {
+            if ( ( VALUE > minValue || minValue < 0 ) && ( VALUE < maxValue || maxValue > 0 ) ) {
+                if ( maxValue < 0 ) {
+                    barStart = START_ANGLE - 270 - ANGLE_RANGE;
+                    barLength = ( maxValue - clampedValue ) * angleStep;
+                } else if ( minValue > 0 ) {
+                    barStart = START_ANGLE - 270;
+                    barLength = ( minValue - clampedValue ) * angleStep;
                 } else {
-
-                    double zeroAngle = Helper.clamp(90.0, 270.0, 90.0 - minValue * angleStep);
-                    double zeroSin   = Math.sin(-Math.toRadians(zeroAngle));
-                    double zeroCos   = Math.cos(-Math.toRadians(zeroAngle));
-
-                    dataBarStart.setX(centerX + smallHeight * zeroSin);
-                    dataBarStart.setY(centerX + smallHeight * zeroCos);
-                    dataBarInnerArc.setX(centerX + tinyHeight * zeroSin);
-                    dataBarInnerArc.setY(centerX + tinyHeight * zeroCos);
-
-                    if ( VALUE < 0 ) {
-                        dataBarOuterArc.setSweepFlag(false);
-                        dataBarInnerArc.setSweepFlag(true);
-                    } else {
-                        dataBarOuterArc.setSweepFlag(true);
-                        dataBarInnerArc.setSweepFlag(false);
-                    }
-
+                    barStart = START_ANGLE - 270 + minValue * angleStep;
+                    barLength = -clampedValue * angleStep;
                 }
             }
-
         } else {
-            dataBarStart.setX(0);
-            dataBarStart.setY(smallHeight);
-            dataBarOuterArc.setSweepFlag(true);
-            dataBarInnerArc.setX(0.27778 * width);
-            dataBarInnerArc.setY(smallHeight);
-            dataBarInnerArc.setSweepFlag(false);
+            barStart = START_ANGLE - 270;
+            barLength = ( minValue - clampedValue ) * angleStep;
         }
+
+        dataBar.setStartAngle(barStart);
+        dataBar.setLength(barLength);
 
         setBarColor(VALUE);
 
@@ -330,14 +263,14 @@ public class DashboardSkin extends GaugeSkinBase {
 
     private void setBarColor(final double VALUE) {
         if (!sectionsVisible && !colorGradientEnabled) {
-            dataBar.setFill(gauge.getBarColor());
+            dataBar.setStroke(gauge.getBarColor());
         } else if (colorGradientEnabled && noOfGradientStops > 1) {
-            dataBar.setFill(gauge.getGradientLookup().getColorAt((VALUE - minValue) / range));
+            dataBar.setStroke(gauge.getGradientLookup().getColorAt((VALUE - minValue) / range));
         } else {
-            dataBar.setFill(gauge.getBarColor());
+            dataBar.setStroke(gauge.getBarColor());
             for (Section section : sections) {
                 if (section.contains(VALUE)) {
-                    dataBar.setFill(section.getColor());
+                    dataBar.setStroke(section.getColor());
                     break;
                 }
             }
@@ -392,32 +325,17 @@ public class DashboardSkin extends GaugeSkinBase {
                 innerShadow.setOffsetY(0.025 * height);
             }
 
-            barBackgroundStart.setX(0);
-            barBackgroundStart.setY(0.675 * height);
-            barBackgroundOuterArc.setRadiusX(0.675 * height);
-            barBackgroundOuterArc.setRadiusY(0.675 * height);
-            barBackgroundOuterArc.setX(width);
-            barBackgroundOuterArc.setY(0.675 * height);
-            barBackgroundLineToInnerArc.setX(0.72222 * width);
-            barBackgroundLineToInnerArc.setY(0.675 * height);
-            barBackgroundInnerArc.setRadiusX(0.3 * height);
-            barBackgroundInnerArc.setRadiusY(0.3 * height);
-            barBackgroundInnerArc.setX(0.27778 * width);
-            barBackgroundInnerArc.setY(0.675 * height);
+            bBackground.setCenterX(centerX);
+            bBackground.setCenterY(height * 0.675);
+            bBackground.setRadiusX(width * 0.361111111);
+            bBackground.setRadiusY(width * 0.361111111);
+            bBackground.setStrokeWidth(width * 0.27777777777);
 
-            currentValueAngle = Helper.clamp(90.0, 270.0, (gauge.getCurrentValue() - minValue) * angleStep + 90.0);
-            dataBarStart.setX(0);
-            dataBarStart.setY(0.675 * height);
-            dataBarOuterArc.setRadiusX(0.675 * height);
-            dataBarOuterArc.setRadiusY(0.675 * height);
-            dataBarOuterArc.setX(centerX + (0.675 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
-            dataBarOuterArc.setY(centerX + (0.675 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
-            dataBarLineToInnerArc.setX(centerX + (0.3 * height) * Math.sin(-Math.toRadians(currentValueAngle)));
-            dataBarLineToInnerArc.setY(centerX + (0.3 * height) * Math.cos(-Math.toRadians(currentValueAngle)));
-            dataBarInnerArc.setRadiusX(0.3 * height);
-            dataBarInnerArc.setRadiusY(0.3 * height);
-            dataBarInnerArc.setX(0.27778 * width);
-            dataBarInnerArc.setY(0.675 * height);
+            dataBar.setCenterX(centerX);
+            dataBar.setCenterY(height * 0.675);
+            dataBar.setRadiusX(width * 0.361111111);
+            dataBar.setRadiusY(width * 0.361111111);
+            dataBar.setStrokeWidth(width * 0.27777777777);
 
             threshold.setStroke(gauge.getThresholdColor());
             threshold.setStrokeWidth(Helper.clamp(1.0, 2.0, 0.00675676 * height));
@@ -447,8 +365,8 @@ public class DashboardSkin extends GaugeSkinBase {
         noOfGradientStops    = gauge.getGradientBarStops().size();
         sectionsVisible      = gauge.getSectionsVisible();
 
-        barBackground.setFill(gauge.getBarBackgroundColor());
-        barBackground.setEffect(gauge.isShadowsEnabled() ? innerShadow : null);
+        bBackground.setStroke(gauge.getBarBackgroundColor());
+        bBackground.setEffect(gauge.isShadowsEnabled() ? innerShadow : null);
 
         setBarColor(gauge.getCurrentValue());
 
@@ -468,12 +386,12 @@ public class DashboardSkin extends GaugeSkinBase {
 
     private void redrawText() {
         locale            = gauge.getLocale();
-        formatString      = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        otherFormatString = new StringBuilder("%.").append(Integer.toString(gauge.getTickLabelDecimals())).append("f").toString();
+        formatString      = new StringBuilder("%.").append(gauge.getDecimals()).append("f").toString();
+        otherFormatString = new StringBuilder("%.").append(gauge.getTickLabelDecimals()).append("f").toString();
 
         titleText.setFill(gauge.getTitleColor());
         titleText.setText(gauge.getTitle());
-        titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.88 * height);
+        titleText.relocate((width - titleText.getLayoutBounds().getWidth()) * 0.5, 0.87 * height);
 
         valueText.setFill(gauge.getValueColor());
         valueText.setText(formatNumber(gauge.getLocale(), gauge.getFormatString(), gauge.getDecimals(), gauge.getCurrentValue()));
