@@ -25,8 +25,8 @@ plugins {
     id 'maven-publish'
     id 'signing'
     id 'com.google.osdetector'           version '1.7.0'
-    id 'org.javamodularity.moduleplugin' version '1.8.7'
-    id 'org.beryx.jlink'                 version '2.23.2'
+    id 'org.javamodularity.moduleplugin' version '1.8.8'
+    id 'org.beryx.jlink'                 version '2.24.2'
     id 'net.nemerosa.versioning'         version '2.14.0'
     id 'biz.aQute.bnd.builder'           version '5.3.0'
 }
@@ -42,7 +42,7 @@ Date buildTimeAndDate = new Date()
 ext {
     buildDate       = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
     buildTime       = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
-    platform        = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
+    platform        = osdetector.os == 'osx' ? osdetector.arch == 'aarch_64' ? 'mac-aarch64' : 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os == 'linux' ? osdetector.arch == 'aarch_64' ? 'linux-aarch64' : 'linux' : osdetector.os
     ciOssrhUsername = System.getenv('OSSRH_USERNAME')
     ciOssrhPassword = System.getenv('OSSRH_PASSWORD')
     ciGHUser        = System.getenv('GH_USER')
@@ -56,10 +56,10 @@ repositories {
 }
 
 dependencies {
-    implementation "org.openjfx:javafx-base:16:$platform"
-    implementation "org.openjfx:javafx-graphics:16:$platform"
-    implementation "org.openjfx:javafx-controls:16:$platform"
-    implementation "org.openjfx:javafx-swing:16:$platform"
+    implementation "org.openjfx:javafx-base:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
+    implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
 }
 
 jar {
