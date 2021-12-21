@@ -113,8 +113,7 @@ public class Gauge extends Control {
         AMP, PLAIN_AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,
         MODERN, SIMPLE, SLIM, SPACE_X, QUARTER, HORIZONTAL, VERTICAL,
         LCD, TINY, BATTERY, LEVEL, LINEAR, DIGITAL, SIMPLE_DIGITAL, SECTION,
-        BAR, WHITE, CHARGE, SIMPLE_SECTION, TILE_KPI, TILE_TEXT_KPI, TILE_SPARK_LINE,
-        NASA
+        BAR, WHITE, CHARGE, SIMPLE_SECTION, NASA
     }
 
     public  static final Color   DARK_COLOR          = Color.rgb(36, 36, 36);    // #242424
@@ -5560,9 +5559,6 @@ public class Gauge extends Control {
             case WHITE          : return new WhiteSkin(Gauge.this);
             case CHARGE         : return new ChargeSkin(Gauge.this);
             case SIMPLE_SECTION : return new SimpleSectionSkin(Gauge.this);
-            case TILE_KPI       : return new TileKpiSkin(Gauge.this);
-            case TILE_TEXT_KPI  : return new TileTextKpiSkin(Gauge.this);
-            case TILE_SPARK_LINE: return new TileSparklineSkin(Gauge.this);
             case NASA           : return new NasaSkin(Gauge.this);
             case GAUGE          :
             default             : return new GaugeSkin(Gauge.this);
@@ -5605,9 +5601,6 @@ public class Gauge extends Control {
             case WHITE          : super.setSkin(new WhiteSkin(Gauge.this)); break;
             case CHARGE         : super.setSkin(new ChargeSkin(Gauge.this)); break;
             case SIMPLE_SECTION : super.setSkin(new SimpleSectionSkin(Gauge.this)); break;
-            case TILE_KPI       : super.setSkin(new TileKpiSkin(Gauge.this)); break;
-            case TILE_TEXT_KPI  : super.setSkin(new TileTextKpiSkin(Gauge.this)); break;
-            case TILE_SPARK_LINE: super.setSkin(new TileSparklineSkin(Gauge.this)); break;
             case NASA           : super.setSkin(new NasaSkin(Gauge.this)); break;
             case GAUGE          :
             default             : super.setSkin(new GaugeSkin(Gauge.this)); break;
@@ -5824,40 +5817,6 @@ public class Gauge extends Control {
                 setTitleColor(Color.rgb(90, 90, 90));
                 setUnitColor(Color.rgb(90, 90, 90));
                 setValueColor(Color.rgb(90, 90, 90));
-                break;
-            case TILE_KPI:
-                setKnobPosition(Pos.BOTTOM_CENTER);
-                setDecimals(0);
-                setValueColor(Color.rgb(238, 238, 238));
-                setBackgroundPaint(Color.rgb(42,42,42));
-                setForegroundBaseColor(Color.rgb(238,238,238));
-                setBarColor(Color.rgb(238,238,238));
-                setThresholdVisible(false);
-                setThresholdColor(Color.rgb(41,177,255));
-                setNeedleColor(Color.rgb(238,238,238));
-                setAngleRange(180);
-                break;
-            case TILE_TEXT_KPI:
-                setDecimals(0);
-                setBackgroundPaint(Color.rgb(42,42,42));
-                setForegroundBaseColor(Color.rgb(238,238,238));
-                setBarColor(Color.rgb(41,177,255));
-                setValueColor(Color.rgb(238, 238, 238));
-                setUnitColor(Color.rgb(238, 238, 238));
-                setThresholdVisible(false);
-                setThresholdColor(Color.rgb(139,144,146));
-                break;
-            case TILE_SPARK_LINE:
-                setDecimals(0);
-                setBackgroundPaint(Color.rgb(42,42,42));
-                setForegroundBaseColor(Color.rgb(238,238,238));
-                setBarColor(Color.rgb(41,177,255));
-                setValueColor(Color.rgb(238, 238, 238));
-                setUnitColor(Color.rgb(238, 238, 238));
-                setAveragingEnabled(true);
-                setAveragingPeriod(10);
-                setAverageColor(Color.rgb(238, 238, 238, 0.5));
-                setAnimated(false);
                 break;
             case NASA:
                 setBarBackgroundColor(Color.TRANSPARENT);
