@@ -15,23 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-module eu.hansolo.medusa {
 
-    // Java
-    requires java.base;
+package eu.hansolo.medusa.events;
 
-    // Java-FX
-    requires transitive javafx.base;
-    requires transitive javafx.graphics;
-    requires transitive javafx.controls;
+public class MedusaEvt extends ChangeEvt {
+    public static final EvtType<MedusaEvt> ANY = new EvtType<>(ChangeEvt.ANY, "ANY");
+    public static final EvtType<MedusaEvt> RECALC = new EvtType<>(MedusaEvt.RECALC, "RECALC");
 
-    // 3rd party
-    requires transitive eu.hansolo.toolbox;
-    requires transitive eu.hansolo.toolbox.evt;
-    requires transitive eu.hansolo.toolbox.evt.type;
-
-    exports eu.hansolo.medusa;
-    exports eu.hansolo.medusa.skins;
-    exports eu.hansolo.medusa.events;
-    exports eu.hansolo.medusa.tools;
+    , REDRAW, RESIZE, LED, LCD, VISIBILITY, INTERACTIVITY, FINISHED, SECTION, ALERT, VALUE
 }
