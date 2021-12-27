@@ -18,8 +18,10 @@
 package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Clock.ClockSkinType;
-import eu.hansolo.medusa.events.AlarmEventListener;
-import eu.hansolo.medusa.events.TimeEventListener;
+import eu.hansolo.medusa.events.AlarmEvt;
+import eu.hansolo.medusa.events.MedusaEvt;
+import eu.hansolo.medusa.events.TimeEvt;
+import eu.hansolo.toolbox.evt.EvtObserver;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.LongProperty;
@@ -299,12 +301,12 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
         return (B)this;
     }
 
-    public final B onAlarm(final AlarmEventListener LISTENER) {
+    public final B onAlarm(final EvtObserver<MedusaEvt> LISTENER) {
         properties.put("onAlarm", new SimpleObjectProperty<>(LISTENER));
         return (B)this;
     }
 
-    public final B onTimeEvent(final TimeEventListener LISTENER) {
+    public final B onTimeEvent(final EvtObserver<MedusaEvt> LISTENER) {
         properties.put("onTimeEvent", new SimpleObjectProperty<>(LISTENER));
         return (B)this;
     }
@@ -700,9 +702,9 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
             } else if ("lcdDesign".equals(key)) {
                 CONTROL.setLcdDesign(((ObjectProperty<LcdDesign>) properties.get(key)).get());
             } else if ("onAlarm".equals(key)) {
-                CONTROL.addAlarmEventListener(((ObjectProperty<AlarmEventListener>) properties.get(key)).get());
+                CONTROL.addClockObserver(AlarmEvt.ANY, ((ObjectProperty<EvtObserver<MedusaEvt>>) properties.get(key)).get());
             } else if ("onTimeEvent".equals(key)) {
-                CONTROL.addTimeEventListener(((ObjectProperty<TimeEventListener>) properties.get(key)).get());
+                CONTROL.addClockObserver(TimeEvt.ANY, ((ObjectProperty<EvtObserver<MedusaEvt>>) properties.get(key)).get());
             } else if ("alarmsEnabled".equals(key)) {
                 CONTROL.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
             } else if ("alarmsVisible".equals(key)) {

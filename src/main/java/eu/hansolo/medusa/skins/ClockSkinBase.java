@@ -19,7 +19,8 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Alarm;
 import eu.hansolo.medusa.Clock;
-import eu.hansolo.medusa.events.UpdateEventListener;
+import eu.hansolo.medusa.events.MedusaEvt;
+import eu.hansolo.toolbox.evt.EvtObserver;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.Skin;
@@ -43,7 +44,7 @@ public abstract class ClockSkinBase extends SkinBase<Clock> implements Skin<Cloc
 
     protected Clock                     clock;
     protected InvalidationListener      sizeListener;
-    protected UpdateEventListener       updateEventListener;
+    protected EvtObserver<MedusaEvt>    observer;
     protected InvalidationListener      currentTimeListener;
     protected InvalidationListener      timeListener;
     protected ListChangeListener<Alarm> alarmListener;
@@ -55,7 +56,7 @@ public abstract class ClockSkinBase extends SkinBase<Clock> implements Skin<Cloc
 
         clock               = CLOCK;
         sizeListener        = o -> handleEvents("RESIZE");
-        updateEventListener = e -> handleEvents(e.eventType.name());
+        observer            = e -> handleEvents(e.getEvtType().getName());
         currentTimeListener = o -> updateTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(clock.getCurrentTime()), ZoneId.of(ZoneId.systemDefault().getId())));
         timeListener        = o -> updateTime(clock.getTime());
         alarmListener       = c -> {
@@ -71,7 +72,7 @@ public abstract class ClockSkinBase extends SkinBase<Clock> implements Skin<Cloc
     protected void registerListeners() {
         clock.widthProperty().addListener(sizeListener);
         clock.heightProperty().addListener(sizeListener);
-        clock.addUpdateEventListener(updateEventListener);
+        clock.addClockObserver(MedusaEvt.ANY, observer);
         if (clock.isAnimated()) {
             clock.currentTimeProperty().addListener(currentTimeListener);
         } else {
@@ -101,7 +102,7 @@ public abstract class ClockSkinBase extends SkinBase<Clock> implements Skin<Cloc
     @Override public void dispose() {
         clock.widthProperty().removeListener(sizeListener);
         clock.heightProperty().removeListener(sizeListener);
-        clock.removeUpdateEventListener(updateEventListener);
+        clock.removeClockObserver(MedusaEvt.ANY, observer);
         if (clock.isAnimated()) {
             clock.currentTimeProperty().removeListener(currentTimeListener);
         } else {

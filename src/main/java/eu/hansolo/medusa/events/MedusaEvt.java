@@ -18,9 +18,34 @@
 
 package eu.hansolo.medusa.events;
 
-public class MedusaEvt extends ChangeEvt {
-    public static final EvtType<MedusaEvt> ANY = new EvtType<>(ChangeEvt.ANY, "ANY");
-    public static final EvtType<MedusaEvt> RECALC = new EvtType<>(MedusaEvt.RECALC, "RECALC");
+import eu.hansolo.toolbox.evt.EvtPriority;
+import eu.hansolo.toolbox.evt.EvtType;
+import eu.hansolo.toolbox.evt.type.ChangeEvt;
 
-    , REDRAW, RESIZE, LED, LCD, VISIBILITY, INTERACTIVITY, FINISHED, SECTION, ALERT, VALUE
+
+public class MedusaEvt extends ChangeEvt {
+    public static final EvtType<MedusaEvt> ANY           = new EvtType<>(ChangeEvt.ANY, "ANY");
+    public static final EvtType<MedusaEvt> RECALC        = new EvtType<>(MedusaEvt.ANY, "RECALC");
+    public static final EvtType<MedusaEvt> REDRAW        = new EvtType<>(MedusaEvt.ANY, "REDRAW");
+    public static final EvtType<MedusaEvt> RESIZE        = new EvtType<>(MedusaEvt.ANY, "RESIZE");
+    public static final EvtType<MedusaEvt> LED           = new EvtType<>(MedusaEvt.ANY, "LED");
+    public static final EvtType<MedusaEvt> LCD           = new EvtType<>(MedusaEvt.ANY, "LCD");
+    public static final EvtType<MedusaEvt> VISIBILITY    = new EvtType<>(MedusaEvt.ANY, "VISIBILITY");
+    public static final EvtType<MedusaEvt> INTERACTIVITY = new EvtType<>(MedusaEvt.ANY, "INTERACTIVITY");
+    public static final EvtType<MedusaEvt> FINISHED      = new EvtType<>(MedusaEvt.ANY, "FINISHED");
+    public static final EvtType<MedusaEvt> SECTION       = new EvtType<>(MedusaEvt.ANY, "SECTION");
+    public static final EvtType<MedusaEvt> ALERT         = new EvtType<>(MedusaEvt.ANY, "ALERT");
+    public static final EvtType<MedusaEvt> VALUE         = new EvtType<>(MedusaEvt.ANY, "VALUE");
+
+
+    // ******************** Constructors **************************************
+    public MedusaEvt(final EvtType<? extends MedusaEvt> evtType) {
+        super(evtType);
+    }
+    public MedusaEvt(final Object src, final EvtType<? extends MedusaEvt> evtType) {
+        super(src, evtType);
+    }
+    public MedusaEvt(final Object src, final EvtType<? extends MedusaEvt> evtType, final EvtPriority priority) {
+        super(src, evtType, priority);
+    }
 }

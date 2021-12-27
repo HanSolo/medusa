@@ -21,6 +21,7 @@ import eu.hansolo.medusa.Clock.ClockSkinType;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
+import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import eu.hansolo.medusa.Marker.MarkerType;
 import eu.hansolo.medusa.tools.GradientLookup;
 import javafx.animation.AnimationTimer;
@@ -51,6 +52,8 @@ public class Demo extends Application {
     private static final double         PREF_CELL_SIZE = 120;
     private static final double         MAX_CELL_SIZE  = 150;
     private static       int            noOfNodes      = 0;
+    private              FGauge         framedGauge1;
+    private              FGauge         framedGauge2;
     private              Gauge          gauge1;
     private              Gauge          gauge2;
     private              Gauge          gauge3;
@@ -616,15 +619,15 @@ public class Demo extends Application {
                               .running(true)
                               .build();
 
-        //framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO, GaugeBackground.DARK_GRAY);
-        //framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
+        framedGauge1 = new FGauge(gauge1, GaugeDesign.ENZO, GaugeBackground.DARK_GRAY);
+        framedGauge2 = new FGauge(gauge2, GaugeDesign.METAL);
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
             @Override public void handle(long now) {
                 if (now > lastTimerCall + 3_000_000_000l) {
-                    //framedGauge1.getGauge().setValue(RND.nextDouble() * gauge1.getRange() + gauge1.getMinValue());
-                    //framedGauge2.getGauge().setValue(RND.nextDouble() * gauge2.getRange() + gauge2.getMinValue());
+                    framedGauge1.getGauge().setValue(RND.nextDouble() * gauge1.getRange() + gauge1.getMinValue());
+                    framedGauge2.getGauge().setValue(RND.nextDouble() * gauge2.getRange() + gauge2.getMinValue());
                     gauge3.setValue(RND.nextDouble() * gauge3.getRange() + gauge3.getMinValue());
                     gauge4.setValue(RND.nextDouble() * gauge4.getRange() + gauge4.getMinValue());
                     gauge5.setValue(RND.nextDouble() * gauge5.getRange() + gauge5.getMinValue());
@@ -660,8 +663,8 @@ public class Demo extends Application {
 
     @Override public void start(Stage stage) {
         GridPane pane = new GridPane();
-        pane.add(gauge1, 0, 0);
-        pane.add(gauge2, 1, 0);
+        pane.add(framedGauge1, 0, 0);
+        pane.add(framedGauge2, 1, 0);
         pane.add(gauge3, 2, 0);
         pane.add(gauge4, 3, 0);
         pane.add(gauge5, 4, 0);

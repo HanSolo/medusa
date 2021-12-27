@@ -18,7 +18,8 @@
 package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.events.UpdateEventListener;
+import eu.hansolo.medusa.events.MedusaEvt;
+import eu.hansolo.toolbox.evt.EvtObserver;
 import javafx.beans.InvalidationListener;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
@@ -28,28 +29,28 @@ import javafx.scene.control.SkinBase;
  * Created by hansolo on 20.01.17.
  */
 public abstract class GaugeSkinBase extends SkinBase<Gauge> implements Skin<Gauge> {
-    protected static final double             PREFERRED_WIDTH  = 250;
-    protected static final double             PREFERRED_HEIGHT = 250;
-    protected static final double             MINIMUM_WIDTH    = 50;
-    protected static final double             MINIMUM_HEIGHT   = 50;
-    protected static final double             MAXIMUM_WIDTH    = 1024;
-    protected static final double             MAXIMUM_HEIGHT   = 1024;
-    protected Gauge                gauge;
-    protected InvalidationListener sizeListener;
-    protected UpdateEventListener  updateEventListener;
+    protected static final double                 PREFERRED_WIDTH  = 250;
+    protected static final double                 PREFERRED_HEIGHT = 250;
+    protected static final double                 MINIMUM_WIDTH    = 50;
+    protected static final double                 MINIMUM_HEIGHT   = 50;
+    protected static final double                 MAXIMUM_WIDTH    = 1024;
+    protected static final double                 MAXIMUM_HEIGHT   = 1024;
+    protected              Gauge                  gauge;
+    protected              InvalidationListener   sizeListener;
+    protected              EvtObserver<MedusaEvt> observer;
 
 
     protected GaugeSkinBase(final Gauge GAUGE) {
         super(GAUGE);
-        gauge               = GAUGE;
-        sizeListener        = o -> handleEvents("RESIZE");
-        updateEventListener = e -> handleEvents(e.eventType.name());
+        gauge        = GAUGE;
+        sizeListener = o -> handleEvents("RESIZE");
+        observer     = e -> handleEvents(e.getEvtType().getName());
     }
 
     protected void registerListeners() {
         getSkinnable().widthProperty().addListener(sizeListener);
         getSkinnable().heightProperty().addListener(sizeListener);
-        getSkinnable().addUpdateEventListener(updateEventListener);
+        getSkinnable().addGaugeObserver(MedusaEvt.ANY, observer);
     }
 
     protected void handleEvents(final String EVENT_TYPE) {
@@ -73,7 +74,7 @@ public abstract class GaugeSkinBase extends SkinBase<Gauge> implements Skin<Gaug
     @Override public void dispose() {
         gauge.widthProperty().removeListener(sizeListener);
         gauge.heightProperty().removeListener(sizeListener);
-        gauge.removeUpdateEventListener(updateEventListener);
+        gauge.removeGaugeObserver(MedusaEvt.ANY, observer);
     }
 
     protected void resize() {}

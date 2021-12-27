@@ -27,8 +27,6 @@ module eu.hansolo.medusa {
 
     // 3rd party
     requires transitive eu.hansolo.toolbox;
-    requires transitive eu.hansolo.toolbox.evt;
-    requires transitive eu.hansolo.toolbox.evt.type;
 
     exports eu.hansolo.medusa;
     exports eu.hansolo.medusa.skins;

@@ -17,17 +17,14 @@
  */
 package eu.hansolo.medusa;
 
-import eu.hansolo.medusa.events.AlarmEvent;
-import eu.hansolo.medusa.events.AlarmEventListener;
-import eu.hansolo.medusa.events.TimeEvent;
-import eu.hansolo.medusa.events.TimeEvent.TimeEventType;
-import eu.hansolo.medusa.events.TimeEventListener;
-import eu.hansolo.medusa.events.UpdateEvent;
-import eu.hansolo.medusa.events.UpdateEvent.EventType;
-import eu.hansolo.medusa.events.UpdateEventListener;
+import eu.hansolo.medusa.events.AlarmEvt;
+import eu.hansolo.medusa.events.MedusaEvt;
+import eu.hansolo.medusa.events.TimeEvt;
 import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.TimeSectionComparator;
+import eu.hansolo.toolbox.evt.EvtObserver;
+import eu.hansolo.toolbox.evt.EvtType;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -64,6 +61,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -83,21 +82,19 @@ public class Clock extends Control {
     public  static final int                  LONG_INTERVAL    = 1000;
     public  static final Color                DARK_COLOR       = Color.rgb(36, 36, 36);
     public  static final Color                BRIGHT_COLOR     = Color.rgb(223, 223, 223);
-    private        final UpdateEvent          RESIZE_EVENT     = new UpdateEvent(Clock.this, EventType.RESIZE);
-    private        final UpdateEvent          REDRAW_EVENT     = new UpdateEvent(Clock.this, EventType.REDRAW);
-    private        final UpdateEvent          VISIBILITY_EVENT = new UpdateEvent(Clock.this, EventType.VISIBILITY);
-    private        final UpdateEvent          LCD_EVENT        = new UpdateEvent(Clock.this, EventType.LCD);
-    private        final UpdateEvent          RECALC_EVENT     = new UpdateEvent(Clock.this, EventType.RECALC);
-    private        final UpdateEvent          SECTION_EVENT    = new UpdateEvent(Clock.this, UpdateEvent.EventType.SECTION);
-    private        final UpdateEvent          FINISHED_EVENT   = new UpdateEvent(Clock.this, UpdateEvent.EventType.FINISHED);
+    private        final MedusaEvt            RESIZE_EVENT     = new MedusaEvt(Clock.this, MedusaEvt.RESIZE);
+    private        final MedusaEvt            REDRAW_EVENT     = new MedusaEvt(Clock.this, MedusaEvt.REDRAW);
+    private        final MedusaEvt            VISIBILITY_EVENT = new MedusaEvt(Clock.this, MedusaEvt.VISIBILITY);
+    private        final MedusaEvt            LCD_EVENT        = new MedusaEvt(Clock.this, MedusaEvt.LCD);
+    private        final MedusaEvt            RECALC_EVENT     = new MedusaEvt(Clock.this, MedusaEvt.RECALC);
+    private        final MedusaEvt            SECTION_EVENT    = new MedusaEvt(Clock.this, MedusaEvt.SECTION);
+    private        final MedusaEvt            FINISHED_EVENT   = new MedusaEvt(Clock.this, MedusaEvt.FINISHED);
 
     private volatile ScheduledFuture<?>       periodicTickTask;
     private static   ScheduledExecutorService periodicTickExecutorService;
 
-    // Alarm events
-    private List<UpdateEventListener>         listenerList          = new CopyOnWriteArrayList<>();
-    private List<AlarmEventListener>          alarmListenerList     = new CopyOnWriteArrayList<>();
-    private List<TimeEventListener>           timeEventListenerList = new CopyOnWriteArrayList<>();
+    // Events
+    private Map<EvtType, List<EvtObserver<MedusaEvt>>> observers = new ConcurrentHashMap<>();
 
     private ObjectProperty<ZonedDateTime>     time;
     private LongProperty                      currentTime;
@@ -298,11 +295,11 @@ public class Clock extends Control {
                     final KeyValue KEY_VALUE = new KeyValue(currentTime, TIME.toEpochSecond());
                     final KeyFrame KEY_FRAME = new KeyFrame(javafx.util.Duration.millis(animationDuration), KEY_VALUE);
                     timeline.getKeyFrames().setAll(KEY_FRAME);
-                    timeline.setOnFinished(e -> fireUpdateEvent(FINISHED_EVENT));
+                    timeline.setOnFinished(e -> fireClockEvt(FINISHED_EVENT));
                     timeline.play();
                 } else {
                     currentTime.set(TIME.toEpochSecond());
-                    fireUpdateEvent(FINISHED_EVENT);
+                    fireClockEvt(FINISHED_EVENT);
                 }
             }
             @Override public Object getBean() { return Clock.this; }
@@ -315,7 +312,7 @@ public class Clock extends Control {
         };
         zoneId                  = time.get().getZone();
         timeline                = new Timeline();
-        timeline.setOnFinished(e -> fireUpdateEvent(FINISHED_EVENT));
+        timeline.setOnFinished(e -> fireClockEvt(FINISHED_EVENT));
         updateInterval          = LONG_INTERVAL;
         _checkSectionsForValue  = false;
         _checkAreasForValue     = false;
@@ -463,7 +460,7 @@ public class Clock extends Control {
     public void setTitle(final String TITLE) {
         if (null == title) {
             _title = TITLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             title.set(TITLE);
         }
@@ -471,7 +468,7 @@ public class Clock extends Control {
     public StringProperty titleProperty() {
         if (null == title) {
             title  = new StringPropertyBase(_title) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "title"; }
             };
@@ -494,7 +491,7 @@ public class Clock extends Control {
     public void setText(final String TEXT) {
         if (null == text) {
             _text = TEXT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             text.set(TEXT);
         }
@@ -502,7 +499,7 @@ public class Clock extends Control {
     public StringProperty textProperty() {
         if (null == text) {
             text  = new StringPropertyBase(_text) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "text"; }
             };
@@ -587,7 +584,7 @@ public class Clock extends Control {
     public void setSections(final List<TimeSection> SECTIONS) {
         sections.setAll(SECTIONS);
         Collections.sort(sections, new TimeSectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireClockEvt(SECTION_EVENT);
     }
     /**
      * Sets the sections to the given array of TimeSection objects. The
@@ -607,7 +604,7 @@ public class Clock extends Control {
         if (null == SECTION) return;
         sections.add(SECTION);
         Collections.sort(sections, new TimeSectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireClockEvt(SECTION_EVENT);
     }
     /**
      * Removes the given TimeSection from the list of sections.
@@ -619,14 +616,14 @@ public class Clock extends Control {
         if (null == SECTION) return;
         sections.remove(SECTION);
         Collections.sort(sections, new TimeSectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireClockEvt(SECTION_EVENT);
     }
     /**
      * Clears the list of sections.
      */
     public void clearSections() {
         sections.clear();
-        fireUpdateEvent(SECTION_EVENT);
+        fireClockEvt(SECTION_EVENT);
     }
 
     /**
@@ -641,7 +638,7 @@ public class Clock extends Control {
     public void setSectionsVisible(final boolean VISIBLE) {
         if (null == sectionsVisible) {
             _sectionsVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             sectionsVisible.set(VISIBLE);
         }
@@ -649,7 +646,7 @@ public class Clock extends Control {
     public BooleanProperty sectionsVisibleProperty() {
         if (null == sectionsVisible) {
             sectionsVisible = new BooleanPropertyBase(_sectionsVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "sectionsVisible"; }
             };
@@ -671,7 +668,7 @@ public class Clock extends Control {
     public void setHighlightSections(final boolean HIGHLIGHT) {
         if (null == highlightSections) {
             _highlightSections = HIGHLIGHT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             highlightSections.set(HIGHLIGHT);
         }
@@ -679,7 +676,7 @@ public class Clock extends Control {
     public BooleanProperty highlightSectionsProperty() {
         if (null == highlightSections) {
             highlightSections = new BooleanPropertyBase(_highlightSections) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "highlightSections"; }
             };
@@ -705,7 +702,7 @@ public class Clock extends Control {
     public void setAreas(final List<TimeSection> AREAS) {
         areas.setAll(AREAS);
         Collections.sort(areas, new TimeSectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireClockEvt(SECTION_EVENT);
     }
     /**
      * Sets the areas to the given array of TimeSection objects. The
@@ -725,7 +722,7 @@ public class Clock extends Control {
         if (null == AREA) return;
         areas.add(AREA);
         Collections.sort(areas, new TimeSectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireClockEvt(SECTION_EVENT);
     }
     /**
      * Removes the given TimeSection from the list of areas.
@@ -737,14 +734,14 @@ public class Clock extends Control {
         if (null == AREA) return;
         areas.remove(AREA);
         Collections.sort(areas, new TimeSectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireClockEvt(SECTION_EVENT);
     }
     /**
      * Clears the list of areas
      */
     public void clearAreas() {
         areas.clear();
-        fireUpdateEvent(SECTION_EVENT);
+        fireClockEvt(SECTION_EVENT);
     }
 
     /**
@@ -759,7 +756,7 @@ public class Clock extends Control {
     public void setAreasVisible(final boolean VISIBLE) {
         if (null == areasVisible) {
             _areasVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             areasVisible.set(VISIBLE);
         }
@@ -767,7 +764,7 @@ public class Clock extends Control {
     public BooleanProperty areasVisibleProperty() {
         if (null == areasVisible) {
             areasVisible = new BooleanPropertyBase(_areasVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "areasVisible"; }
             };
@@ -789,7 +786,7 @@ public class Clock extends Control {
     public void setHighlightAreas(final boolean HIGHLIGHT) {
         if (null == highlightAreas) {
             _highlightAreas = HIGHLIGHT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             highlightAreas.set(HIGHLIGHT);
         }
@@ -797,7 +794,7 @@ public class Clock extends Control {
     public BooleanProperty highlightAreasProperty() {
         if (null == highlightAreas) {
             highlightAreas = new BooleanPropertyBase(_highlightAreas) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "highlightAreas"; }
             };
@@ -920,7 +917,7 @@ public class Clock extends Control {
     public void setSecondsVisible(boolean VISIBLE) { 
         if (null == secondsVisible) {
             _secondsVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireClockEvt(VISIBILITY_EVENT);
         } else {
             secondsVisible.set(VISIBLE);
         }
@@ -928,7 +925,7 @@ public class Clock extends Control {
     public BooleanProperty secondsVisibleProperty() { 
         if (null == secondsVisible) {
             secondsVisible = new BooleanPropertyBase(_secondsVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "secondsVisible"; }
             };
@@ -948,7 +945,7 @@ public class Clock extends Control {
     public void setTitleVisible(final boolean VISIBLE) {
         if (null == titleVisible) {
             _titleVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireClockEvt(VISIBILITY_EVENT);
         } else {
             titleVisible.set(VISIBLE);
         }
@@ -956,7 +953,7 @@ public class Clock extends Control {
     public BooleanProperty titleVisibleProperty() {
         if (null == titleVisible) {
             titleVisible = new BooleanPropertyBase(_titleVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "titleVisible"; }
             };
@@ -976,7 +973,7 @@ public class Clock extends Control {
     public void setTextVisible(final boolean VISIBLE) {
         if (null == textVisible) {
             _textVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireClockEvt(VISIBILITY_EVENT);
         } else {
             textVisible.set(VISIBLE);
         }
@@ -984,7 +981,7 @@ public class Clock extends Control {
     public BooleanProperty textVisibleProperty() {
         if (null == textVisible) {
             textVisible = new BooleanPropertyBase(_textVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "textVisible"; }
             };
@@ -1004,7 +1001,7 @@ public class Clock extends Control {
     public void setDateVisible(final boolean VISIBLE) {
         if (null == dateVisible) {
             _dateVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireClockEvt(VISIBILITY_EVENT);
         } else {
             dateVisible.set(VISIBLE);
         }
@@ -1013,7 +1010,7 @@ public class Clock extends Control {
     public BooleanProperty dateVisibleProperty() {
         if (null == dateVisible) {
             dateVisible = new BooleanPropertyBase(_dateVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "dateVisible"; }
             };
@@ -1025,7 +1022,7 @@ public class Clock extends Control {
     public void setDayVisible(final boolean VISIBLE) {
         if (null == dayVisible) {
             _dayVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireClockEvt(VISIBILITY_EVENT);
         } else {
             dayVisible.set(VISIBLE);
         }
@@ -1033,7 +1030,7 @@ public class Clock extends Control {
     public BooleanProperty dayVisibleProperty() {
         if (null == dayVisible) {
             dayVisible = new BooleanPropertyBase(_dayVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "dayVisible"; }
             };
@@ -1053,7 +1050,7 @@ public class Clock extends Control {
     public void setNightMode(boolean MODE) { 
         if (null == nightMode) {
             _nightMode = MODE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             nightMode.set(MODE);
         }
@@ -1061,7 +1058,7 @@ public class Clock extends Control {
     public BooleanProperty nightModeProperty() { 
         if (null == nightMode) {
             nightMode = new BooleanPropertyBase(_nightMode) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "nightMode"; }
             };
@@ -1137,7 +1134,7 @@ public class Clock extends Control {
     public void setBackgroundPaint(final Paint PAINT) {
         if (null == backgroundPaint) {
             _backgroundPaint = PAINT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             backgroundPaint.set(PAINT);
         }
@@ -1145,7 +1142,7 @@ public class Clock extends Control {
     public ObjectProperty<Paint> backgroundPaintProperty() {
         if (null == backgroundPaint) {
             backgroundPaint  = new ObjectPropertyBase<Paint>(_backgroundPaint) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "backgroundPaint"; }
             };
@@ -1168,7 +1165,7 @@ public class Clock extends Control {
     public void setBorderPaint(final Paint PAINT) {
         if (null == borderPaint) {
             _borderPaint = PAINT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             borderPaint.set(PAINT);
         }
@@ -1176,7 +1173,7 @@ public class Clock extends Control {
     public ObjectProperty<Paint> borderPaintProperty() {
         if (null == borderPaint) {
             borderPaint  = new ObjectPropertyBase<Paint>(_borderPaint) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "borderPaint"; }
             };
@@ -1199,7 +1196,7 @@ public class Clock extends Control {
     public void setBorderWidth(final double WIDTH) {
         if (null == borderWidth) {
             _borderWidth = Helper.clamp(0.0, 50.0, WIDTH);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             borderWidth.set(WIDTH);
         }
@@ -1210,7 +1207,7 @@ public class Clock extends Control {
                 @Override protected void invalidated() {
                     final double WIDTH = get();
                     if (WIDTH < 0 || WIDTH > 50) set(Helper.clamp(0.0, 50.0, WIDTH));
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireClockEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "borderWidth"; }
@@ -1233,7 +1230,7 @@ public class Clock extends Control {
     public void setForegroundPaint(final Paint PAINT) {
         if (null == foregroundPaint) {
             _foregroundPaint = PAINT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             foregroundPaint.set(PAINT);
         }
@@ -1241,7 +1238,7 @@ public class Clock extends Control {
     public ObjectProperty<Paint> foregroundPaintProperty() {
         if (null == foregroundPaint) {
             foregroundPaint  = new ObjectPropertyBase<Paint>(_foregroundPaint) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "foregroundPaint"; }
             };
@@ -1262,7 +1259,7 @@ public class Clock extends Control {
     public void setTitleColor(final Color COLOR) {
         if (null == titleColor) {
             _titleColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             titleColor.set(COLOR);
         }
@@ -1270,7 +1267,7 @@ public class Clock extends Control {
     public ObjectProperty<Color> titleColorProperty() {
         if (null == titleColor) {
             titleColor  = new ObjectPropertyBase<Color>(_titleColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "titleColor"; }
             };
@@ -1291,7 +1288,7 @@ public class Clock extends Control {
     public void setTextColor(final Color COLOR) {
         if (null == textColor) {
             _textColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             textColor.set(COLOR);
         }
@@ -1299,7 +1296,7 @@ public class Clock extends Control {
     public ObjectProperty<Color> textColorProperty() {
         if (null == textColor) {
             textColor  = new ObjectPropertyBase<Color>(_textColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "textColor"; }
             };
@@ -1320,7 +1317,7 @@ public class Clock extends Control {
     public void setDateColor(final Color COLOR) {
         if (null == dateColor) {
             _dateColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             dateColor.set(COLOR);
         }
@@ -1328,7 +1325,7 @@ public class Clock extends Control {
     public ObjectProperty<Color> dateColorProperty() {
         if (null == dateColor) {
             dateColor  = new ObjectPropertyBase<Color>(_dateColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "dateColor"; }
             };
@@ -1349,7 +1346,7 @@ public class Clock extends Control {
     public void setHourTickMarkColor(final Color COLOR) {
         if (null == hourTickMarkColor) {
             _hourTickMarkColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             hourTickMarkColor.set(COLOR);
         }
@@ -1357,7 +1354,7 @@ public class Clock extends Control {
     public ObjectProperty<Color> hourTickMarkColorProperty() {
         if (null == hourTickMarkColor) {
             hourTickMarkColor  = new ObjectPropertyBase<Color>(_hourTickMarkColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "hourTickMarkColor"; }
             };
@@ -1378,7 +1375,7 @@ public class Clock extends Control {
     public void setMinuteTickMarkColor(final Color COLOR) {
         if (null == minuteTickMarkColor) {
             _minuteTickMarkColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             minuteTickMarkColor.set(COLOR);
         }
@@ -1386,7 +1383,7 @@ public class Clock extends Control {
     public ObjectProperty<Color> minuteTickMarkColorProperty() {
         if (null == minuteTickMarkColor) {
             minuteTickMarkColor  = new ObjectPropertyBase<Color>(_minuteTickMarkColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "minuteTickMarkColor"; }
             };
@@ -1407,7 +1404,7 @@ public class Clock extends Control {
     public void setTickLabelColor(final Color COLOR) {
         if (null == tickLabelColor) {
             _tickLabelColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             tickLabelColor.set(COLOR);
         }
@@ -1415,7 +1412,7 @@ public class Clock extends Control {
     public ObjectProperty<Color> tickLabelColorProperty() {
         if (null == tickLabelColor) {
             tickLabelColor  = new ObjectPropertyBase<Color>(_tickLabelColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "tickLabelColor"; }
             };
@@ -1436,7 +1433,7 @@ public class Clock extends Control {
     public void setAlarmColor(final Color COLOR) {
         if (null == alarmColor) {
             _alarmColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             alarmColor.set(COLOR);
         }
@@ -1444,7 +1441,7 @@ public class Clock extends Control {
     public ObjectProperty<Color> alarmColorProperty() {
         if (null == alarmColor) {
             alarmColor  = new ObjectPropertyBase<Color>(_alarmColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "alarmColor"; }
             };
@@ -1465,7 +1462,7 @@ public class Clock extends Control {
     public void setHourTickMarksVisible(final boolean VISIBLE) {
         if (null == hourTickMarksVisible) {
             _hourTickMarksVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             hourTickMarksVisible.set(VISIBLE);
         }
@@ -1473,7 +1470,7 @@ public class Clock extends Control {
     public BooleanProperty hourTickMarksVisibleProperty() {
         if (null == hourTickMarksVisible) {
             hourTickMarksVisible = new BooleanPropertyBase(_hourTickMarksVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "hourTickMarksVisible"; }
             };
@@ -1493,7 +1490,7 @@ public class Clock extends Control {
     public void setMinuteTickMarksVisible(final boolean VISIBLE) {
         if (null == minuteTickMarksVisible) {
             _minuteTickMarksVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             minuteTickMarksVisible.set(VISIBLE);
         }
@@ -1501,7 +1498,7 @@ public class Clock extends Control {
     public BooleanProperty minuteTickMarksVisibleProperty() {
         if (null == minuteTickMarksVisible) {
             minuteTickMarksVisible = new BooleanPropertyBase(_minuteTickMarksVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "minuteTickMarksVisible"; }
             };
@@ -1521,7 +1518,7 @@ public class Clock extends Control {
     public void setTickLabelsVisible(final boolean VISIBLE) {
         if (null == tickLabelsVisible) {
             _tickLabelsVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             tickLabelsVisible.set(VISIBLE);
         }
@@ -1529,7 +1526,7 @@ public class Clock extends Control {
     public BooleanProperty tickLabelsVisibleProperty() {
         if (null == tickLabelsVisible) {
             tickLabelsVisible = new BooleanPropertyBase(_tickLabelsVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "tickLabelsVisible"; }
             };
@@ -1549,7 +1546,7 @@ public class Clock extends Control {
     public void setHourColor(final Color COLOR) {
         if (null == hourColor) {
             _hourColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             hourColor.set(COLOR);
         }
@@ -1557,7 +1554,7 @@ public class Clock extends Control {
     public ObjectProperty<Color> hourColorProperty() {
         if (null == hourColor) {
             hourColor  = new ObjectPropertyBase<Color>(_hourColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "hourColor"; }
             };
@@ -1578,7 +1575,7 @@ public class Clock extends Control {
     public void setMinuteColor(final Color COLOR) {
         if (null == minuteColor) {
             _minuteColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             minuteColor.set(COLOR);
         }
@@ -1586,7 +1583,7 @@ public class Clock extends Control {
     public ObjectProperty<Color> minuteColorProperty() {
         if (null == minuteColor) {
             minuteColor  = new ObjectPropertyBase<Color>(_minuteColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "minuteColor"; }
             };
@@ -1607,7 +1604,7 @@ public class Clock extends Control {
     public void setSecondColor(final Color COLOR) {
         if (null == secondColor) {
             _secondColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             secondColor.set(COLOR);
         }
@@ -1615,7 +1612,7 @@ public class Clock extends Control {
     public ObjectProperty<Color> secondColorProperty() {
         if (null == secondColor) {
             secondColor  = new ObjectPropertyBase<Color>(_secondColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "secondColor"; }
             };
@@ -1636,7 +1633,7 @@ public class Clock extends Control {
     public void setKnobColor(final Color COLOR) {
         if (null == knobColor) {
             _knobColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             knobColor.set(COLOR);
         }
@@ -1644,7 +1641,7 @@ public class Clock extends Control {
     public ObjectProperty<Color> knobColorProperty() {
         if (null == knobColor) {
             knobColor  = new ObjectPropertyBase<Color>(_knobColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "knobColor"; }
             };
@@ -1667,7 +1664,7 @@ public class Clock extends Control {
     public void setLcdDesign(final LcdDesign DESIGN) {
         if (null == lcdDesign) {
             _lcdDesign = DESIGN;
-            fireUpdateEvent(LCD_EVENT);
+            fireClockEvt(LCD_EVENT);
         } else {
             lcdDesign.set(DESIGN);
         }
@@ -1675,7 +1672,7 @@ public class Clock extends Control {
     public ObjectProperty<LcdDesign> lcdDesignProperty() {
         if (null == lcdDesign) {
             lcdDesign  = new ObjectPropertyBase<LcdDesign>(_lcdDesign) {
-                @Override protected void invalidated() { fireUpdateEvent(LCD_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(LCD_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "lcdDesign"; }
             };
@@ -1698,7 +1695,7 @@ public class Clock extends Control {
     public void setAlarmsEnabled(final boolean CHECK) {
         if (null == alarmsEnabled) {
             _alarmsEnabled = CHECK;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireClockEvt(VISIBILITY_EVENT);
         } else {
             alarmsEnabled.set(CHECK);
         }
@@ -1706,7 +1703,7 @@ public class Clock extends Control {
     public BooleanProperty alarmsEnabledProperty() {
         if (null == alarmsEnabled) {
             alarmsEnabled = new BooleanPropertyBase(_alarmsEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "alarmsEnabled"; }
             };
@@ -1726,7 +1723,7 @@ public class Clock extends Control {
     public void setAlarmsVisible(final boolean VISIBLE) {
         if (null == alarmsVisible) {
             _alarmsVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             alarmsVisible.set(VISIBLE);
         }
@@ -1734,7 +1731,7 @@ public class Clock extends Control {
     public BooleanProperty alarmsVisibleProperty() {
         if (null == alarmsVisible) {
             alarmsVisible = new BooleanPropertyBase(_alarmsVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "alarmsVisible"; }
             };
@@ -1790,7 +1787,7 @@ public class Clock extends Control {
     public void setLcdCrystalEnabled(final boolean ENABLED) {
         if (null == lcdCrystalEnabled) {
             _lcdCrystalEnabled = ENABLED;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireClockEvt(VISIBILITY_EVENT);
         } else {
             lcdCrystalEnabled.set(ENABLED);
         }
@@ -1798,7 +1795,7 @@ public class Clock extends Control {
     public BooleanProperty lcdCrystalEnabledProperty() {
         if (null == lcdCrystalEnabled) {
             lcdCrystalEnabled = new BooleanPropertyBase(_lcdCrystalEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "lcdCrystalEnabled"; }
             };
@@ -1818,7 +1815,7 @@ public class Clock extends Control {
     public void setShadowsEnabled(final boolean ENABLED) {
         if (null == shadowsEnabled) {
             _shadowsEnabled = ENABLED;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             shadowsEnabled.set(ENABLED);
         }
@@ -1826,7 +1823,7 @@ public class Clock extends Control {
     public BooleanProperty shadowsEnabledProperty() {
         if (null == shadowsEnabled) {
             shadowsEnabled = new BooleanPropertyBase(_shadowsEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "shadowsEnabled"; }
             };
@@ -1850,7 +1847,7 @@ public class Clock extends Control {
     public void setLcdFont(final LcdFont FONT) {
         if (null == lcdFont) {
             _lcdFont = FONT;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireClockEvt(RESIZE_EVENT);
         } else {
             lcdFont.set(FONT);
         }
@@ -1858,7 +1855,7 @@ public class Clock extends Control {
     public ObjectProperty<LcdFont> lcdFontProperty() {
         if (null == lcdFont) {
             lcdFont  = new ObjectPropertyBase<LcdFont>(_lcdFont) {
-                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "lcdFont"; }
             };
@@ -1881,7 +1878,7 @@ public class Clock extends Control {
     public void setLocale(final Locale LOCALE) {
         if (null == locale) {
             _locale = LOCALE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             locale.set(LOCALE);
         }
@@ -1889,7 +1886,7 @@ public class Clock extends Control {
     public ObjectProperty<Locale> localeProperty() {
         if (null == locale) {
             locale  = new ObjectPropertyBase<Locale>(_locale) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "locale"; }
             };
@@ -1916,7 +1913,7 @@ public class Clock extends Control {
     public void setTickLabelLocation(final TickLabelLocation LOCATION) {
         if (null == tickLabelLocation) {
             _tickLabelLocation = LOCATION;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireClockEvt(REDRAW_EVENT);
         } else {
             tickLabelLocation.set(LOCATION);
         }
@@ -1924,7 +1921,7 @@ public class Clock extends Control {
     public ObjectProperty<TickLabelLocation> tickLabelLocationProperty() {
         if (null == tickLabelLocation) {
             tickLabelLocation  = new ObjectPropertyBase<TickLabelLocation>(_tickLabelLocation) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "tickLabelLocation"; }
             };
@@ -1991,7 +1988,7 @@ public class Clock extends Control {
     public void setCustomFontEnabled(final boolean ENABLED) {
         if (null == customFontEnabled) {
             _customFontEnabled = ENABLED;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireClockEvt(RESIZE_EVENT);
         } else {
             customFontEnabled.set(ENABLED);
         }
@@ -1999,7 +1996,7 @@ public class Clock extends Control {
     public BooleanProperty customFontEnabledProperty() {
         if (null == customFontEnabled) {
             customFontEnabled = new BooleanPropertyBase(_customFontEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "customFontEnabled"; }
             };
@@ -2023,7 +2020,7 @@ public class Clock extends Control {
     public void setCustomFont(final Font FONT) {
         if (null == customFont) {
             _customFont = FONT;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireClockEvt(RESIZE_EVENT);
         } else {
             customFont.set(FONT);
         }
@@ -2031,7 +2028,7 @@ public class Clock extends Control {
     public ObjectProperty<Font> customFontProperty() {
         if (null == customFont) {
             customFont = new ObjectPropertyBase<Font>() {
-                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireClockEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Clock.this; }
                 @Override public String getName() { return "customFont"; }
             };
@@ -2054,7 +2051,7 @@ public class Clock extends Control {
                 case ONCE:
                     if (TIME.isAfter(ALARM_TIME)) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(Clock.this, alarm));
+                            fireClockEvt(new AlarmEvt(Clock.this, AlarmEvt.ALARM, alarm));
                             alarm.executeCommand();
                         }
                         alarmsToRemove.add(alarm);
@@ -2065,7 +2062,7 @@ public class Clock extends Control {
                         ALARM_TIME.plusMinutes(30).getMinute() == TIME.getMinute()) &&
                         ALARM_TIME.getSecond() == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(Clock.this, alarm));
+                            fireClockEvt(new AlarmEvt(Clock.this, AlarmEvt.ALARM, alarm));
                             alarm.executeCommand();
                         }
                     }
@@ -2074,7 +2071,7 @@ public class Clock extends Control {
                     if (ALARM_TIME.getMinute() == TIME.getMinute() &&
                         ALARM_TIME.getSecond() == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(Clock.this, alarm));
+                            fireClockEvt(new AlarmEvt(Clock.this, AlarmEvt.ALARM, alarm));
                             alarm.executeCommand();
                         }
                     }
@@ -2084,7 +2081,7 @@ public class Clock extends Control {
                         ALARM_TIME.getMinute() == TIME.getMinute() &&
                         ALARM_TIME.getSecond() == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(Clock.this, alarm));
+                            fireClockEvt(new AlarmEvt(Clock.this, AlarmEvt.ALARM, alarm));
                             alarm.executeCommand();
                         }
                     }
@@ -2095,7 +2092,7 @@ public class Clock extends Control {
                         ALARM_TIME.getMinute()    == TIME.getMinute() &&
                         ALARM_TIME.getSecond()    == TIME.getSecond()) {
                         if (alarm.isArmed()) {
-                            fireAlarmEvent(new AlarmEvent(Clock.this, alarm));
+                            fireClockEvt(new AlarmEvt(Clock.this, AlarmEvt.ALARM, alarm));
                             alarm.executeCommand();
                         }
                     }
@@ -2125,28 +2122,31 @@ public class Clock extends Control {
         }
     }
 
-    private void tick() { Platform.runLater(() -> {
-        if (isAnimated()) return;
-        ZonedDateTime oldTime = getTime();
-        setTime(getTime().plus(Duration.ofMillis(updateInterval)));
-        ZonedDateTime now = time.get();
-        if (isAlarmsEnabled()) checkAlarms(now);
-        if (isAutoNightMode()) checkForNight(now);
-        if (getCheckSectionsForValue()) {
-            int listSize = sections.size();
-            for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(LocalTime.from(now)); }
-        }
-        if (getCheckAreasForValue()) {
-            int listSize = areas.size();
-            for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(LocalTime.from(now)); }
-        }
+    private void tick() {
+        Platform.runLater(() -> {
+            if (isAnimated()) return;
+            ZonedDateTime oldTime = getTime();
+            setTime(getTime().plus(Duration.ofMillis(updateInterval)));
+            ZonedDateTime now = time.get();
+            if (isAlarmsEnabled()) checkAlarms(now);
+            if (isAutoNightMode()) checkForNight(now);
+            if (getCheckSectionsForValue()) {
+                int listSize = sections.size();
+                for (int i = 0 ; i < listSize ; i++) { sections.get(i).checkForValue(LocalTime.from(now)); }
+            }
+            if (getCheckAreasForValue()) {
+                int listSize = areas.size();
+                for (int i = 0 ; i < listSize ; i++) { areas.get(i).checkForValue(LocalTime.from(now)); }
+            }
 
-        if (timeEventListenerList.isEmpty()) return;
-        // Fire TimeEvents
-        if (oldTime.getSecond() != now.getSecond()) fireTimeEvent(new TimeEvent(Clock.this, now, TimeEventType.SECOND));
-        if (oldTime.getMinute() != now.getMinute()) fireTimeEvent(new TimeEvent(Clock.this, now, TimeEventType.MINUTE));
-        if (oldTime.getHour() != now.getHour()) fireTimeEvent(new TimeEvent(Clock.this, now, TimeEventType.HOUR));
-    }); }
+            if (observers.containsKey(TimeEvt.SECOND) || observers.containsKey(TimeEvt.MINUTE) || observers.containsKey(TimeEvt.HOUR)) {
+                // Fire TimeEvents
+                if (oldTime.getSecond() != now.getSecond()) fireClockEvt(new TimeEvt(TimeEvt.SECOND, now));
+                if (oldTime.getMinute() != now.getMinute()) fireClockEvt(new TimeEvt(TimeEvt.MINUTE, now));
+                if (oldTime.getHour() != now.getHour()) fireClockEvt(new TimeEvt(TimeEvt.HOUR, now));
+            }
+        });
+    }
 
 
     // ******************** Scheduled tasks ***********************************
@@ -2240,7 +2240,7 @@ public class Clock extends Control {
             case CLOCK     :
             default        : super.setSkin(new ClockSkin(Clock.this)); break;
         }
-        fireUpdateEvent(RESIZE_EVENT);
+        fireClockEvt(RESIZE_EVENT);
         presetClockParameters(skinType);
     }
 
@@ -2388,29 +2388,25 @@ public class Clock extends Control {
 
 
     // ******************** Event handling ************************************
-    public void addUpdateEventListener(final UpdateEventListener LISTENER) { if(!listenerList.contains(LISTENER)) listenerList.add(LISTENER); }
-    public void removeUpdateEventListener(final UpdateEventListener LISTENER) { if (listenerList.contains(LISTENER)) listenerList.remove(LISTENER); }
-
-    public void fireUpdateEvent(final UpdateEvent EVENT) {
-        int listSize = listenerList.size();
-        for (int i = 0 ; i < listSize ; i++) { listenerList.get(i).onUpdateEvent(EVENT); }
+    public void addClockObserver(final EvtType type, final EvtObserver<MedusaEvt> observer) {
+        if (!observers.containsKey(type)) { observers.put(type, new CopyOnWriteArrayList<>()); }
+        if (observers.get(type).contains(observer)) { return; }
+        observers.get(type).add(observer);
     }
-
-
-    public void addAlarmEventListener(final AlarmEventListener LISTENER) { if (!alarmListenerList.contains(LISTENER)) alarmListenerList.add(LISTENER); }
-    public void removeAlarmEventListener(final AlarmEventListener LISTENER) { if (alarmListenerList.contains(LISTENER)) alarmListenerList.remove(LISTENER); }
-
-    public void fireAlarmEvent(final AlarmEvent EVENT) {
-        int listSize = alarmListenerList.size();
-        for (int i = 0 ; i < listSize ; i++) { alarmListenerList.get(i).onAlarmEvent(EVENT); }
+    public void removeClockObserver(final EvtType type, final EvtObserver<MedusaEvt> observer) {
+        if (observers.containsKey(type)) {
+            if (observers.get(type).contains(observer)) {
+                observers.get(type).remove(observer);
+            }
+        }
     }
+    public void removeAllObservers() { observers.clear(); }
 
-    
-    public void addTimeEventListener(final TimeEventListener LISTENER) { if (!timeEventListenerList.contains(LISTENER)) timeEventListenerList.add(LISTENER); }
-    public void removeTimeEventListener(final TimeEventListener LISTENER) { if (timeEventListenerList.contains(LISTENER)) timeEventListenerList.remove(LISTENER); }
-
-    public void fireTimeEvent(final TimeEvent EVENT) {
-        int listSize = timeEventListenerList.size();
-        for (int i = 0 ; i < listSize ; i++) { timeEventListenerList.get(i).onTimeEvent(EVENT); }
+    public void fireClockEvt(final MedusaEvt evt) {
+        final EvtType type = evt.getEvtType();
+        observers.entrySet().stream().filter(entry -> entry.getKey().equals(MedusaEvt.ANY)).forEach(entry -> entry.getValue().forEach(observer -> observer.handle(evt)));
+        if (observers.containsKey(type)) {
+            observers.get(type).forEach(observer -> observer.handle(evt));
+        }
     }
 }

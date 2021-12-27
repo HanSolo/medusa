@@ -17,8 +17,7 @@
  */
 package eu.hansolo.medusa;
 
-import eu.hansolo.medusa.events.UpdateEvent;
-import eu.hansolo.medusa.events.UpdateEventListener;
+import eu.hansolo.medusa.events.MedusaEvt;
 import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.Data;
 import eu.hansolo.medusa.tools.GradientLookup;
@@ -26,6 +25,8 @@ import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.MarkerComparator;
 import eu.hansolo.medusa.tools.MovingAverage;
 import eu.hansolo.medusa.tools.SectionComparator;
+import eu.hansolo.toolbox.evt.EvtObserver;
+import eu.hansolo.toolbox.evt.EvtType;
 import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -70,9 +71,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -125,17 +128,17 @@ public class Gauge extends Control {
     public  final ButtonEvent    BTN_RELEASED_EVENT  = new ButtonEvent(ButtonEvent.BTN_RELEASED);
     private final ThresholdEvent EXCEEDED_EVENT      = new ThresholdEvent(ThresholdEvent.THRESHOLD_EXCEEDED);
     private final ThresholdEvent UNDERRUN_EVENT      = new ThresholdEvent(ThresholdEvent.THRESHOLD_UNDERRUN);
-    private final UpdateEvent    RECALC_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RECALC);
-    private final UpdateEvent    REDRAW_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.REDRAW);
-    private final UpdateEvent    RESIZE_EVENT        = new UpdateEvent(Gauge.this, UpdateEvent.EventType.RESIZE);
-    private final UpdateEvent    LED_EVENT           = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LED);
-    private final UpdateEvent    LCD_EVENT           = new UpdateEvent(Gauge.this, UpdateEvent.EventType.LCD);
-    private final UpdateEvent    VISIBILITY_EVENT    = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VISIBILITY);
-    private final UpdateEvent    INTERACTIVITY_EVENT = new UpdateEvent(Gauge.this, UpdateEvent.EventType.INTERACTIVITY);
-    private final UpdateEvent    FINISHED_EVENT      = new UpdateEvent(Gauge.this, UpdateEvent.EventType.FINISHED);
-    private final UpdateEvent    SECTION_EVENT       = new UpdateEvent(Gauge.this, UpdateEvent.EventType.SECTION);
-    private final UpdateEvent    ALERT_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.ALERT);
-    private final UpdateEvent    VALUE_EVENT         = new UpdateEvent(Gauge.this, UpdateEvent.EventType.VALUE);
+    private final MedusaEvt      RECALC_EVENT        = new MedusaEvt(Gauge.this, MedusaEvt.RECALC);
+    private final MedusaEvt      REDRAW_EVENT        = new MedusaEvt(Gauge.this, MedusaEvt.REDRAW);
+    private final MedusaEvt      RESIZE_EVENT        = new MedusaEvt(Gauge.this, MedusaEvt.RESIZE);
+    private final MedusaEvt      LED_EVENT           = new MedusaEvt(Gauge.this, MedusaEvt.LED);
+    private final MedusaEvt      LCD_EVENT           = new MedusaEvt(Gauge.this, MedusaEvt.LCD);
+    private final MedusaEvt      VISIBILITY_EVENT    = new MedusaEvt(Gauge.this, MedusaEvt.VISIBILITY);
+    private final MedusaEvt      INTERACTIVITY_EVENT = new MedusaEvt(Gauge.this, MedusaEvt.INTERACTIVITY);
+    private final MedusaEvt      FINISHED_EVENT      = new MedusaEvt(Gauge.this, MedusaEvt.FINISHED);
+    private final MedusaEvt      SECTION_EVENT       = new MedusaEvt(Gauge.this, MedusaEvt.SECTION);
+    private final MedusaEvt      ALERT_EVENT         = new MedusaEvt(Gauge.this, MedusaEvt.ALERT);
+    private final MedusaEvt      VALUE_EVENT         = new MedusaEvt(Gauge.this, MedusaEvt.VALUE);
 
     private        volatile Future               blinkFuture;
     private static ScheduledExecutorService      blinkService = new ScheduledThreadPoolExecutor(2, Helper.getThreadFactory("BlinkTask", true));
@@ -146,8 +149,8 @@ public class Gauge extends Control {
     private                 BooleanBinding       showing;
 
     // Update events
-    private              Queue<UpdateEvent>      updateEventQueue = new LinkedBlockingQueue<>();
-    private List<UpdateEventListener>            listenerList     = new CopyOnWriteArrayList<>();
+    private Queue<MedusaEvt>                           updateEventQueue = new LinkedBlockingQueue<>();
+    private Map<EvtType, List<EvtObserver<MedusaEvt>>> observers        = new ConcurrentHashMap<>();
 
     // Data related
     private DoubleProperty                       value;
@@ -591,13 +594,13 @@ public class Gauge extends Control {
                     timeline.play();
                 } else {
                     currentValue.set(VALUE);
-                    fireUpdateEvent(FINISHED_EVENT);
+                    fireGaugeEvt(FINISHED_EVENT);
                 }
                 if (isAveragingEnabled()) { movingAverage.addData(new Data(VALUE)); }
             }
             @Override public void set(final double VALUE) {
                 super.set(VALUE);
-                fireUpdateEvent(VALUE_EVENT);
+                fireGaugeEvt(VALUE_EVENT);
             }
             @Override public Object getBean() { return Gauge.this; }
             @Override public String getName() { return "value"; }
@@ -764,7 +767,7 @@ public class Gauge extends Control {
                 timeline.getKeyFrames().setAll(KEY_FRAME2);
                 timeline.play();
             }
-            fireUpdateEvent(FINISHED_EVENT);
+            fireGaugeEvt(FINISHED_EVENT);
         });
     }
 
@@ -957,7 +960,7 @@ public class Gauge extends Control {
             if (isStartFromZero() && _minValue < 0) setValue(0);
             if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(_minValue, getMaxValue(), originalThreshold)); }
             updateFormatString();
-            fireUpdateEvent(RECALC_EVENT);
+            fireGaugeEvt(RECALC_EVENT);
             if (!valueProperty().isBound()) Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
         } else {
             minValue.set(VALUE);
@@ -974,7 +977,7 @@ public class Gauge extends Control {
                     if (isStartFromZero() && _minValue < 0) Gauge.this.setValue(0);
                     if (Double.compare(originalThreshold, getThreshold()) < 0) { setThreshold(Helper.clamp(VALUE, getMaxValue(), originalThreshold)); }
                     updateFormatString();
-                    fireUpdateEvent(RECALC_EVENT);
+                    fireGaugeEvt(RECALC_EVENT);
                     if (!valueProperty().isBound()) Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -1007,7 +1010,7 @@ public class Gauge extends Control {
 
             if (!valueProperty().isBound()) Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
             updateFormatString();
-            fireUpdateEvent(RECALC_EVENT);
+            fireGaugeEvt(RECALC_EVENT);
         } else {
             maxValue.set(VALUE);
         }
@@ -1022,7 +1025,7 @@ public class Gauge extends Control {
                     if (Double.compare(originalMaxValue, Double.MAX_VALUE) == 0) originalMaxValue = VALUE;
                     if (Double.compare(originalThreshold, getThreshold()) > 0) { setThreshold(Helper.clamp(getMinValue(), VALUE, originalThreshold)); }
                     updateFormatString();
-                    fireUpdateEvent(RECALC_EVENT);
+                    fireGaugeEvt(RECALC_EVENT);
                     if (!valueProperty().isBound()) Gauge.this.setValue(Helper.clamp(getMinValue(), getMaxValue(), Gauge.this.getValue()));
                 }
                 @Override public Object getBean() { return Gauge.this; }
@@ -1084,7 +1087,7 @@ public class Gauge extends Control {
         originalThreshold = THRESHOLD;
         if (null == threshold) {
             _threshold = Helper.clamp(getMinValue(), getMaxValue(), THRESHOLD);
-            fireUpdateEvent(RESIZE_EVENT);
+            fireGaugeEvt(RESIZE_EVENT);
         } else {
             threshold.set(THRESHOLD);
         }
@@ -1095,7 +1098,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final double THRESHOLD = get();
                     if (THRESHOLD < getMinValue() || THRESHOLD > getMaxValue()) set(Helper.clamp(getMinValue(), getMaxValue(), THRESHOLD));
-                    fireUpdateEvent(RESIZE_EVENT);
+                    fireGaugeEvt(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "threshold"; }
@@ -1120,8 +1123,8 @@ public class Gauge extends Control {
     public void setTitle(final String TITLE) {
         if (null == title) {
             _title = TITLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             title.set(TITLE);
         }
@@ -1130,8 +1133,8 @@ public class Gauge extends Control {
         if (null == title) {
             title  = new StringPropertyBase(_title) {
                 @Override protected void invalidated() {
-                    fireUpdateEvent(VISIBILITY_EVENT);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(VISIBILITY_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "title"; }
@@ -1157,8 +1160,8 @@ public class Gauge extends Control {
     public void setSubTitle(final String SUBTITLE) {
         if (null == subTitle) {
             _subTitle = SUBTITLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             subTitle.set(SUBTITLE);
         }
@@ -1167,8 +1170,8 @@ public class Gauge extends Control {
         if (null == subTitle) {
             subTitle  = new StringPropertyBase(_subTitle) {
                 @Override protected void invalidated() {
-                    fireUpdateEvent(VISIBILITY_EVENT);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(VISIBILITY_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "subTitle"; }
@@ -1194,8 +1197,8 @@ public class Gauge extends Control {
     public void setUnit(final String UNIT) {
         if (null == unit) {
             _unit = UNIT;
-            fireUpdateEvent(VISIBILITY_EVENT);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             unit.set(UNIT);
         }
@@ -1204,8 +1207,8 @@ public class Gauge extends Control {
         if (null == unit) {
             unit  = new StringPropertyBase(_unit) {
                 @Override protected void invalidated() { 
-                    fireUpdateEvent(VISIBILITY_EVENT);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(VISIBILITY_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "unit"; }
@@ -1235,7 +1238,7 @@ public class Gauge extends Control {
     public void setAveragingEnabled(final boolean ENABLED) {
         if (null == averagingEnabled) {
             _averagingEnabled = ENABLED;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             averagingEnabled.set(ENABLED);
         }
@@ -1243,7 +1246,7 @@ public class Gauge extends Control {
     public BooleanProperty averagingEnabledProperty() {
         if (null == averagingEnabled) {
             averagingEnabled = new BooleanPropertyBase(_averagingEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "averagingEnabled"; }
             };
@@ -1268,7 +1271,7 @@ public class Gauge extends Control {
         if (null == averagingPeriod) {
             _averagingPeriod = PERIOD;
             getMovingAverage().setPeriod(_averagingPeriod); // MAX 1000 values
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             averagingPeriod.set(PERIOD);
         }
@@ -1278,7 +1281,7 @@ public class Gauge extends Control {
             averagingPeriod = new IntegerPropertyBase(_averagingPeriod) {
                 @Override protected void invalidated() {
                     getMovingAverage().setPeriod(_averagingPeriod); // MAX 1000 values
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "averagingPeriod"; }
@@ -1328,7 +1331,7 @@ public class Gauge extends Control {
     public void setSections(final List<Section> SECTIONS) {
         sections.setAll(SECTIONS);
         Collections.sort(sections, new SectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireGaugeEvt(SECTION_EVENT);
     }
     /**
      * Sets the sections to the given array of Section objects. The
@@ -1349,7 +1352,7 @@ public class Gauge extends Control {
         if (null == SECTION) return;
         sections.add(SECTION);
         Collections.sort(sections, new SectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireGaugeEvt(SECTION_EVENT);
     }
     /**
      * Removes the given Section from the list of sections.
@@ -1362,14 +1365,14 @@ public class Gauge extends Control {
         if (null == SECTION) return;
         sections.remove(SECTION);
         Collections.sort(sections, new SectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireGaugeEvt(SECTION_EVENT);
     }
     /**
      * Clears the list of sections.
      */
     public void clearSections() {
         sections.clear();
-        fireUpdateEvent(SECTION_EVENT);
+        fireGaugeEvt(SECTION_EVENT);
     }
 
     /**
@@ -1393,7 +1396,7 @@ public class Gauge extends Control {
     public void setAreas(final List<Section> AREAS) {
         areas.setAll(AREAS);
         Collections.sort(areas, new SectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireGaugeEvt(SECTION_EVENT);
     }
     /**
      * Sets the sections to the given array of Section objects. The
@@ -1416,7 +1419,7 @@ public class Gauge extends Control {
         if (null == AREA) return;
         areas.add(AREA);
         Collections.sort(areas, new SectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireGaugeEvt(SECTION_EVENT);
     }
     /**
      * Removes the given Section from the list of areas.
@@ -1429,14 +1432,14 @@ public class Gauge extends Control {
         if (null == AREA) return;
         areas.remove(AREA);
         Collections.sort(areas, new SectionComparator());
-        fireUpdateEvent(SECTION_EVENT);
+        fireGaugeEvt(SECTION_EVENT);
     }
     /**
      * Clears the list of areas.
      */
     public void clearAreas() {
         areas.clear();
-        fireUpdateEvent(SECTION_EVENT);
+        fireGaugeEvt(SECTION_EVENT);
     }
 
     /**
@@ -1455,7 +1458,7 @@ public class Gauge extends Control {
     public void setTickMarkSections(final List<Section> SECTIONS) {
         tickMarkSections.setAll(SECTIONS);
         Collections.sort(tickMarkSections, new SectionComparator());
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Sets the tickmark sections to the given array of Section objects.
@@ -1472,7 +1475,7 @@ public class Gauge extends Control {
         if (null == SECTION) return;
         tickMarkSections.add(SECTION);
         Collections.sort(tickMarkSections, new SectionComparator());
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Removes the given Section from the list of tickmark sections.
@@ -1483,14 +1486,14 @@ public class Gauge extends Control {
         if (null == SECTION) return;
         tickMarkSections.remove(SECTION);
         Collections.sort(tickMarkSections, new SectionComparator());
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Clears the list of tickmark sections.
      */
     public void clearTickMarkSections() {
         tickMarkSections.clear();
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
 
     /**
@@ -1509,7 +1512,7 @@ public class Gauge extends Control {
     public void setTickLabelSections(final List<Section> SECTIONS) {
         tickLabelSections.setAll(SECTIONS);
         Collections.sort(tickLabelSections, new SectionComparator());
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Sets the ticklabel sections to the given array of Section objects.
@@ -1526,7 +1529,7 @@ public class Gauge extends Control {
         if (null == SECTION) return;
         tickLabelSections.add(SECTION);
         Collections.sort(tickLabelSections, new SectionComparator());
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Removes the given Section from the list of ticklabel sections.
@@ -1537,14 +1540,14 @@ public class Gauge extends Control {
         if (null == SECTION) return;
         tickLabelSections.remove(SECTION);
         Collections.sort(tickLabelSections, new SectionComparator());
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Clears the list of ticklabel sections.
      */
     public void clearTickLabelSections() {
         tickLabelSections.clear();
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
 
     /**
@@ -1567,7 +1570,7 @@ public class Gauge extends Control {
     public void setMarkers(final List<Marker> MARKERS) {
         markers.setAll(MARKERS);
         Collections.sort(markers, new MarkerComparator());
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Sets the list of markers to the given array of Marker objects.
@@ -1586,7 +1589,7 @@ public class Gauge extends Control {
         if (null == MARKER) return;
         markers.add(MARKER);
         Collections.sort(markers, new MarkerComparator());
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Removes the given Marker from the list of markers.
@@ -1597,14 +1600,14 @@ public class Gauge extends Control {
         if (null == MARKER) return;
         markers.remove(MARKER);
         Collections.sort(markers, new MarkerComparator());
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Clears the list of markers.
      */
     public void clearMarkers() {
         markers.clear();
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
 
 
@@ -1627,7 +1630,7 @@ public class Gauge extends Control {
         if (null == majorTickMarkColor) { _majorTickMarkColor = COLOR; } else { majorTickMarkColor.set(COLOR); }
         if (null == mediumTickMarkColor) { _mediumTickMarkColor = COLOR; } else { mediumTickMarkColor.set(COLOR); }
         if (null == minorTickMarkColor) { _minorTickMarkColor = COLOR; } else { minorTickMarkColor.set(COLOR); }
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
 
     /**
@@ -1649,7 +1652,7 @@ public class Gauge extends Control {
         if (null == startFromZero) {
             _startFromZero = IS_TRUE;
             //setValue(IS_TRUE && getMinValue() < 0 ? 0 : getMinValue());
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             startFromZero.set(IS_TRUE);
         }
@@ -1659,7 +1662,7 @@ public class Gauge extends Control {
             startFromZero = new BooleanPropertyBase(_startFromZero) {
                 @Override protected void invalidated() {
                     //Gauge.this.setValue((get() && getMinValue() < 0) ? 0 : getMinValue());
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "startFromZero"; }
@@ -1687,7 +1690,7 @@ public class Gauge extends Control {
     public void setReturnToZero(final boolean IS_TRUE) {
         if (null == returnToZero) {
             _returnToZero = Double.compare(getMinValue(), 0.0) <= 0 ? IS_TRUE : false;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             returnToZero.set(IS_TRUE);
         }
@@ -1697,7 +1700,7 @@ public class Gauge extends Control {
             returnToZero = new BooleanPropertyBase(_returnToZero) {
                 @Override protected void invalidated() {
                     if (Double.compare(getMaxValue(), 0.0) > 0) set(false);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "returnToZero"; }
@@ -1722,7 +1725,7 @@ public class Gauge extends Control {
     public void setZeroColor(final Color COLOR) {
         if (null == zeroColor) {
             _zeroColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             zeroColor.set(COLOR);
         }
@@ -1730,7 +1733,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> zeroColorProperty() {
         if (null == zeroColor) {
             zeroColor  = new ObjectPropertyBase<Color>(_zeroColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "zeroColor"; }
             };
@@ -1811,7 +1814,7 @@ public class Gauge extends Control {
     public void setMinMeasuredValueVisible(final boolean VISIBLE) {
         if (null == minMeasuredValueVisible) {
             _minMeasuredValueVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             minMeasuredValueVisible.set(VISIBLE);
         }
@@ -1819,7 +1822,7 @@ public class Gauge extends Control {
     public BooleanProperty minMeasuredValueVisibleProperty() {
         if (null == minMeasuredValueVisible) {
             minMeasuredValueVisible = new BooleanPropertyBase(_minMeasuredValueVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minMeasuredValueVisible"; }
             };
@@ -1841,7 +1844,7 @@ public class Gauge extends Control {
     public void setMaxMeasuredValueVisible(final boolean VISIBLE) {
         if (null == maxMeasuredValueVisible) {
             _maxMeasuredValueVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             maxMeasuredValueVisible.set(VISIBLE);
         }
@@ -1849,7 +1852,7 @@ public class Gauge extends Control {
     public BooleanProperty maxMeasuredValueVisibleProperty() {
         if (null == maxMeasuredValueVisible) {
             maxMeasuredValueVisible = new BooleanPropertyBase(_maxMeasuredValueVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "maxMeasuredValueVisible"; }
             };
@@ -1871,7 +1874,7 @@ public class Gauge extends Control {
     public void setOldValueVisible(final boolean VISIBLE) {
         if (null == oldValueVisible) {
             _oldValueVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             oldValueVisible.set(VISIBLE);
         }
@@ -1879,7 +1882,7 @@ public class Gauge extends Control {
     public BooleanProperty oldValueVisibleProperty() {
         if (null == oldValueVisible) {
             oldValueVisible = new BooleanPropertyBase(_oldValueVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "oldValueVisible"; }
             };
@@ -1902,7 +1905,7 @@ public class Gauge extends Control {
     public void setValueVisible(final boolean VISIBLE) {
         if (null == valueVisible) {
             _valueVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             valueVisible.set(VISIBLE);
         }
@@ -1910,7 +1913,7 @@ public class Gauge extends Control {
     public BooleanProperty valueVisibleProperty() {
         if (null == valueVisible) {
             valueVisible = new BooleanPropertyBase(_valueVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "valueVisible"; }
             };
@@ -1933,7 +1936,7 @@ public class Gauge extends Control {
     public void setBackgroundPaint(final Paint PAINT) {
         if (null == backgroundPaint) {
             _backgroundPaint = PAINT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             backgroundPaint.set(PAINT);
         }
@@ -1941,7 +1944,7 @@ public class Gauge extends Control {
     public ObjectProperty<Paint> backgroundPaintProperty() {
         if (null == backgroundPaint) {
             backgroundPaint  = new ObjectPropertyBase<Paint>(_backgroundPaint) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "backgroundPaint"; }
             };
@@ -1965,7 +1968,7 @@ public class Gauge extends Control {
     public void setBorderPaint(final Paint PAINT) {
         if (null == borderPaint) {
             _borderPaint = PAINT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             borderPaint.set(PAINT);
         }
@@ -1973,7 +1976,7 @@ public class Gauge extends Control {
     public ObjectProperty<Paint> borderPaintProperty() {
         if (null == borderPaint) {
             borderPaint  = new ObjectPropertyBase<Paint>(_borderPaint) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "borderPaint"; }
             };
@@ -1998,7 +2001,7 @@ public class Gauge extends Control {
     public void setBorderWidth(final double WIDTH) {
         if (null == borderWidth) {
             _borderWidth = Helper.clamp(0.0, 50.0, WIDTH);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             borderWidth.set(WIDTH);
         }
@@ -2009,7 +2012,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final double WIDTH = get();
                     if (WIDTH < 0 || WIDTH > 50) set(Helper.clamp(0.0, 50.0, WIDTH));
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "borderWidth"; }
@@ -2034,7 +2037,7 @@ public class Gauge extends Control {
     public void setForegroundPaint(final Paint PAINT) {
         if (null == foregroundPaint) {
             _foregroundPaint = PAINT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             foregroundPaint.set(PAINT);
         }
@@ -2042,7 +2045,7 @@ public class Gauge extends Control {
     public ObjectProperty<Paint> foregroundPaintProperty() {
         if (null == foregroundPaint) {
             foregroundPaint  = new ObjectPropertyBase<Paint>(_foregroundPaint) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "foregroundPaint"; }
             };
@@ -2067,7 +2070,7 @@ public class Gauge extends Control {
     public void setKnobColor(final Color COLOR) {
         if (null == knobColor) {
             _knobColor = COLOR;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireGaugeEvt(RESIZE_EVENT);
         } else {
             knobColor.set(COLOR);
         }
@@ -2075,7 +2078,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> knobColorProperty() {
         if (null == knobColor) {
             knobColor  = new ObjectPropertyBase<Color>(_knobColor) {
-                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "knobColor"; }
             };
@@ -2100,7 +2103,7 @@ public class Gauge extends Control {
     public void setKnobType(final KnobType TYPE) {
         if (null == knobType) {
             _knobType = null == TYPE ? KnobType.STANDARD : TYPE;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireGaugeEvt(RESIZE_EVENT);
         } else {
             knobType.set(TYPE);
         }
@@ -2110,7 +2113,7 @@ public class Gauge extends Control {
             knobType  = new ObjectPropertyBase<KnobType>(_knobType) {
                 @Override protected void invalidated() {
                     if (null == get()) set(KnobType.STANDARD);
-                    fireUpdateEvent(RESIZE_EVENT);
+                    fireGaugeEvt(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "knobType"; }
@@ -2146,7 +2149,7 @@ public class Gauge extends Control {
     public void setKnobPosition(final Pos POSITION) {
         if (null == knobPosition) {
             _knobPosition = POSITION;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireGaugeEvt(RESIZE_EVENT);
         } else {
             knobPosition.set(POSITION);
         }
@@ -2164,7 +2167,7 @@ public class Gauge extends Control {
                             default        : super.set(Pos.CENTER);
                         }
                     }
-                    fireUpdateEvent(RESIZE_EVENT);
+                    fireGaugeEvt(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "knobPosition"; }
@@ -2188,7 +2191,7 @@ public class Gauge extends Control {
     public void setKnobVisible(final boolean VISIBLE) {
         if (null == knobVisible) {
             _knobVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             knobVisible.set(VISIBLE);
         }
@@ -2196,7 +2199,7 @@ public class Gauge extends Control {
     public BooleanProperty knobVisibleProperty() {
         if (null == knobVisible) {
             knobVisible = new BooleanPropertyBase(_knobVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "knobVisible"; }
             };
@@ -2278,7 +2281,7 @@ public class Gauge extends Control {
     public void setStartAngle(final double ANGLE) {
         if (null == startAngle) {
             _startAngle = Helper.clamp(0.0, 360.0, ANGLE);
-            fireUpdateEvent(RECALC_EVENT);
+            fireGaugeEvt(RECALC_EVENT);
         } else {
             startAngle.set(ANGLE);
         }
@@ -2289,7 +2292,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final double ANGLE = get();
                     if (ANGLE < 0 || ANGLE > 360 ) set(Helper.clamp(0.0, 360.0, ANGLE));
-                    fireUpdateEvent(RECALC_EVENT);
+                    fireGaugeEvt(RECALC_EVENT);
                 }
                 @Override public Object getBean() { return this; }
                 @Override public String getName() { return "startAngle"; }
@@ -2321,7 +2324,7 @@ public class Gauge extends Control {
             _angleRange = tmpAngleRange;
             setAngleStep(tmpAngleRange / getRange());
             if (isAutoScale()) { calcAutoScale(); }
-            fireUpdateEvent(RECALC_EVENT);
+            fireGaugeEvt(RECALC_EVENT);
         } else {
             angleRange.set(tmpAngleRange);
         }
@@ -2334,7 +2337,7 @@ public class Gauge extends Control {
                     set(Helper.clamp(0.0, 360.0, ANGLE_RANGE));
                     setAngleStep(get() / getRange());
                     if (isAutoScale()) { calcAutoScale(); }
-                    fireUpdateEvent(RECALC_EVENT);
+                    fireGaugeEvt(RECALC_EVENT);
                 }
                 @Override public Object getBean() { return this; }
                 @Override public String getName() { return "angleRange"; }
@@ -2381,7 +2384,7 @@ public class Gauge extends Control {
     public void setArcExtend(final double ARC_EXTEND) {
         if (null == arcExtend) {
             _arcExtend = Helper.clamp(0.1, 10, ARC_EXTEND);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             arcExtend.set(ARC_EXTEND);
         }
@@ -2391,7 +2394,7 @@ public class Gauge extends Control {
             arcExtend = new DoublePropertyBase(_arcExtend) {
                 @Override protected void invalidated() {
                     set(Helper.clamp(0.1, 10, get()));
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "arcExtend"; }
@@ -2430,7 +2433,7 @@ public class Gauge extends Control {
                 setMinValue(Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ? getMinValue() : originalMinValue);
                 setMaxValue(Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ? getMaxValue() : originalMaxValue);
             }
-            fireUpdateEvent(RECALC_EVENT);
+            fireGaugeEvt(RECALC_EVENT);
         } else {
             autoScale.set(AUTO_SCALE);
         }
@@ -2445,7 +2448,7 @@ public class Gauge extends Control {
                         setMinValue(Double.compare(-Double.MAX_VALUE, originalMinValue) == 0 ? getMinValue() : originalMinValue);
                         setMaxValue(Double.compare(Double.MAX_VALUE, originalMaxValue) == 0 ? getMaxValue() : originalMaxValue);
                     }
-                    fireUpdateEvent(RECALC_EVENT);
+                    fireGaugeEvt(RECALC_EVENT);
                 }
                 @Override public Object getBean() { return this; }
                 @Override public String getName() { return "autoScale"; }
@@ -2472,7 +2475,7 @@ public class Gauge extends Control {
     public void setShadowsEnabled(final boolean ENABLED) {
         if (null == shadowsEnabled) {
             _shadowsEnabled = ENABLED;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             shadowsEnabled.set(ENABLED);
         }
@@ -2480,7 +2483,7 @@ public class Gauge extends Control {
     public BooleanProperty shadowsEnabledProperty() {
         if (null == shadowsEnabled) {
             shadowsEnabled = new BooleanPropertyBase(_shadowsEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "shadowsEnabled"; }
             };
@@ -2506,7 +2509,7 @@ public class Gauge extends Control {
     public void setBarEffectEnabled(final boolean ENABLED) {
         if (null == barEffectEnabled) {
             _barEffectEnabled = ENABLED;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             barEffectEnabled.set(ENABLED);
         }
@@ -2514,7 +2517,7 @@ public class Gauge extends Control {
     public BooleanProperty barEffectEnabledProperty() {
         if (null == barEffectEnabled) {
             barEffectEnabled = new BooleanPropertyBase(_barEffectEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "barEffectEnabled"; }
             };
@@ -2546,7 +2549,7 @@ public class Gauge extends Control {
     public void setScaleDirection(final ScaleDirection DIRECTION) {
         if (null == scaleDirection) {
             _scaleDirection = null == DIRECTION ? ScaleDirection.CLOCKWISE : DIRECTION;
-            fireUpdateEvent(RECALC_EVENT);
+            fireGaugeEvt(RECALC_EVENT);
         } else {
             scaleDirection.set(DIRECTION);
         }
@@ -2556,7 +2559,7 @@ public class Gauge extends Control {
             scaleDirection  = new ObjectPropertyBase<ScaleDirection>(_scaleDirection) {
                 @Override protected void invalidated() {
                     if (null == get()) set(ScaleDirection.CLOCKWISE);
-                    fireUpdateEvent(RECALC_EVENT);
+                    fireGaugeEvt(RECALC_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "scaleDirection"; }
@@ -2584,7 +2587,7 @@ public class Gauge extends Control {
     public void setTickLabelLocation(final TickLabelLocation LOCATION) {
         if (null == tickLabelLocation) {
             _tickLabelLocation = null == LOCATION ? TickLabelLocation.INSIDE : LOCATION;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             tickLabelLocation.set(LOCATION);
         }
@@ -2594,7 +2597,7 @@ public class Gauge extends Control {
             tickLabelLocation  = new ObjectPropertyBase<TickLabelLocation>(_tickLabelLocation) {
                 @Override protected void invalidated() {
                     if(null == get()) set(TickLabelLocation.INSIDE);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickLabelLocation"; }
@@ -2622,7 +2625,7 @@ public class Gauge extends Control {
     public void setTickLabelOrientation(final TickLabelOrientation ORIENTATION) {
         if (null == tickLabelOrientation) {
             _tickLabelOrientation = null == ORIENTATION ? TickLabelOrientation.HORIZONTAL : ORIENTATION;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             tickLabelOrientation.set(ORIENTATION);
         }
@@ -2632,7 +2635,7 @@ public class Gauge extends Control {
             tickLabelOrientation  = new ObjectPropertyBase<TickLabelOrientation>(_tickLabelOrientation) {
                 @Override protected void invalidated() {
                     if(null == get()) set(TickLabelOrientation.HORIZONTAL);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickLabelOrientation"; }
@@ -2658,7 +2661,7 @@ public class Gauge extends Control {
     public void setTickLabelColor(final Color COLOR) {
         if (null == tickLabelColor) {
             _tickLabelColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             tickLabelColor.set(COLOR);
         }
@@ -2666,7 +2669,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> tickLabelColorProperty() {
         if (null == tickLabelColor) {
             tickLabelColor  = new ObjectPropertyBase<Color>(_tickLabelColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickLabelColor"; }
             };
@@ -2693,7 +2696,7 @@ public class Gauge extends Control {
     public void setTickMarkColor(final Color COLOR) {
         if (null == tickMarkColor) {
             _tickMarkColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             tickMarkColor.set(COLOR);
         }
@@ -2701,7 +2704,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> tickMarkColorProperty() {
         if (null == tickMarkColor) {
             tickMarkColor  = new ObjectPropertyBase<Color>(_tickMarkColor) {
-                @Override protected void invalidated() { fireUpdateEvent( REDRAW_EVENT ); }
+                @Override protected void invalidated() { fireGaugeEvt( REDRAW_EVENT ); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickMarkColor"; }
             };
@@ -2728,7 +2731,7 @@ public class Gauge extends Control {
     public void setMajorTickMarkColor(final Color COLOR) {
         if (null == majorTickMarkColor) {
             _majorTickMarkColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             majorTickMarkColor.set(COLOR);
         }
@@ -2736,7 +2739,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> majorTickMarkColorProperty() {
         if (null == majorTickMarkColor) {
             majorTickMarkColor  = new ObjectPropertyBase<Color>(_majorTickMarkColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "majorTickMarkColor"; }
             };
@@ -2761,7 +2764,7 @@ public class Gauge extends Control {
     public void setMajorTickMarkLengthFactor(final double FACTOR) {
         if (null == majorTickMarkLengthFactor) {
             _majorTickMarkLengthFactor = Helper.clamp(0.0, 1.0, FACTOR);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             majorTickMarkLengthFactor.set(FACTOR);
         }
@@ -2772,7 +2775,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final double VALUE = get();
                     if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "majorTickMarkLengthFactor"; }
@@ -2797,7 +2800,7 @@ public class Gauge extends Control {
     public void setMajorTickMarkWidthFactor(final double FACTOR) {
         if (null == majorTickMarkWidthFactor) {
             _majorTickMarkWidthFactor = Helper.clamp(0.0, 1.0, FACTOR);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             majorTickMarkWidthFactor.set(FACTOR);
         }
@@ -2808,7 +2811,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final double VALUE = get();
                     if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "majorTickMarkWidthFactor"; }
@@ -2835,7 +2838,7 @@ public class Gauge extends Control {
     public void setMediumTickMarkColor(final Color COLOR) {
         if (null == mediumTickMarkColor) {
             _mediumTickMarkColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             mediumTickMarkColor.set(COLOR);
         }
@@ -2843,7 +2846,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> mediumTickMarkColorProperty() {
         if (null == mediumTickMarkColor) {
             mediumTickMarkColor  = new ObjectPropertyBase<Color>(_mediumTickMarkColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "mediumTickMarkColor"; }
             };
@@ -2868,7 +2871,7 @@ public class Gauge extends Control {
     public void setMediumTickMarkLengthFactor(final double FACTOR) {
         if (null == mediumTickMarkLengthFactor) {
             _mediumTickMarkLengthFactor = Helper.clamp(0.0, 1.0, FACTOR);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             mediumTickMarkLengthFactor.set(FACTOR);
         }
@@ -2879,7 +2882,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final double VALUE = get();
                     if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "mediumTickMarkLengthFactor"; }
@@ -2904,7 +2907,7 @@ public class Gauge extends Control {
     public void setMediumTickMarkWidthFactor(final double FACTOR) {
         if (null == mediumTickMarkWidthFactor) {
             _mediumTickMarkWidthFactor = Helper.clamp(0.0, 1.0, FACTOR);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             mediumTickMarkWidthFactor.set(FACTOR);
         }
@@ -2915,7 +2918,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final double VALUE = get();
                     if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "mediumTickMarkWidthFactor"; }
@@ -2942,7 +2945,7 @@ public class Gauge extends Control {
     public void setMinorTickMarkColor(final Color COLOR) {
         if (null == minorTickMarkColor) {
             _minorTickMarkColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             minorTickMarkColor.set(COLOR);
         }
@@ -2950,7 +2953,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> minorTickMarkColorProperty() {
         if (null == minorTickMarkColor) {
             minorTickMarkColor  = new ObjectPropertyBase<Color>(_minorTickMarkColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minorTickMarkColor"; }
             };
@@ -2975,7 +2978,7 @@ public class Gauge extends Control {
     public void setMinorTickMarkLengthFactor(final double FACTOR) {
         if (null == minorTickMarkLengthFactor) {
             _minorTickMarkLengthFactor = Helper.clamp(0.0, 1.0, FACTOR);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             minorTickMarkLengthFactor.set(FACTOR);
         }
@@ -2986,7 +2989,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final double VALUE = get();
                     if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minorTickMarkLengthFactor"; }
@@ -3011,7 +3014,7 @@ public class Gauge extends Control {
     public void setMinorTickMarkWidthFactor(final double FACTOR) {
         if (null == minorTickMarkWidthFactor) {
             _minorTickMarkWidthFactor = Helper.clamp(0.0, 1.0, FACTOR);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             minorTickMarkWidthFactor.set(FACTOR);
         }
@@ -3022,7 +3025,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final double VALUE = get();
                     if (VALUE < 0 || VALUE > 1) set(Helper.clamp(0.0, 1.0, VALUE));
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minorTickMarkWidthFactor"; }
@@ -3047,7 +3050,7 @@ public class Gauge extends Control {
     public void setMajorTickMarkType(final TickMarkType TYPE) {
         if (null == majorTickMarkType) {
             _majorTickMarkType = null == TYPE ? TickMarkType.LINE : TYPE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             majorTickMarkType.set(TYPE);
         }
@@ -3057,7 +3060,7 @@ public class Gauge extends Control {
             majorTickMarkType  = new ObjectPropertyBase<TickMarkType>(_majorTickMarkType) {
                 @Override protected void invalidated() {
                     if (null == get()) set(TickMarkType.LINE);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "majorTickMarkType"; }
@@ -3083,7 +3086,7 @@ public class Gauge extends Control {
     public void setMediumTickMarkType(final TickMarkType TYPE) {
         if (null == mediumTickMarkType) {
             _mediumTickMarkType = null == TYPE ? TickMarkType.LINE : TYPE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             mediumTickMarkType.set(TYPE);
         }
@@ -3093,7 +3096,7 @@ public class Gauge extends Control {
             mediumTickMarkType  = new ObjectPropertyBase<TickMarkType>(_mediumTickMarkType) {
                 @Override protected void invalidated() {
                     if (null == get()) set(TickMarkType.LINE);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "mediumTickMarkType"; }
@@ -3119,7 +3122,7 @@ public class Gauge extends Control {
     public void setMinorTickMarkType(final TickMarkType TYPE) {
         if (null == minorTickMarkType) {
             _minorTickMarkType = null == TYPE ? TickMarkType.LINE : TYPE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             minorTickMarkType.set(TYPE);
         }
@@ -3129,7 +3132,7 @@ public class Gauge extends Control {
             minorTickMarkType  = new ObjectPropertyBase<TickMarkType>(_minorTickMarkType) {
                 @Override protected void invalidated() {
                     if (null == get()) set(TickMarkType.LINE);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minorTickMarkType"; }
@@ -3143,7 +3146,7 @@ public class Gauge extends Control {
     public void setLocale(final Locale LOCALE) {
         if (null == locale) {
             _locale = null == LOCALE ? Locale.US : LOCALE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             locale.set(LOCALE);
         }
@@ -3153,7 +3156,7 @@ public class Gauge extends Control {
             locale  = new ObjectPropertyBase<Locale>(_locale) {
                 @Override protected void invalidated() {
                     if (null == get()) set(Locale.US);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "locale"; }
@@ -3182,7 +3185,7 @@ public class Gauge extends Control {
         if (null == decimals) {
             _decimals = Helper.clamp(0, MAX_NO_OF_DECIMALS, DECIMALS);
             updateFormatString();
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             decimals.set(DECIMALS);
         }
@@ -3194,7 +3197,7 @@ public class Gauge extends Control {
                     final int VALUE = get();
                     if (VALUE < 0 || VALUE > MAX_NO_OF_DECIMALS) set(Helper.clamp(0, MAX_NO_OF_DECIMALS, VALUE));
                     updateFormatString();
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "decimals"; }
@@ -3221,7 +3224,7 @@ public class Gauge extends Control {
     public void setTickLabelDecimals(final int DECIMALS) {
         if (null == tickLabelDecimals) {
             _tickLabelDecimals = Helper.clamp(0, MAX_NO_OF_DECIMALS, DECIMALS);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             tickLabelDecimals.set(DECIMALS);
         }
@@ -3232,7 +3235,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final int VALUE = get();
                     if (VALUE < 0 || VALUE > MAX_NO_OF_DECIMALS) set(Helper.clamp(0, MAX_NO_OF_DECIMALS, VALUE));
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickLabelDecimals"; }
@@ -3265,7 +3268,7 @@ public class Gauge extends Control {
     public void setNeedleType(final NeedleType TYPE) {
         if (null == needleType) {
             _needleType = TYPE == null ? NeedleType.STANDARD : TYPE;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireGaugeEvt(RESIZE_EVENT);
         } else {
             needleType.set(TYPE);
         }
@@ -3275,7 +3278,7 @@ public class Gauge extends Control {
             needleType  = new ObjectPropertyBase<NeedleType>(_needleType) {
                 @Override protected void invalidated() {
                     if (null == get()) set(NeedleType.STANDARD);
-                    fireUpdateEvent(RESIZE_EVENT);
+                    fireGaugeEvt(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "needleType"; }
@@ -3303,7 +3306,7 @@ public class Gauge extends Control {
     public void setNeedleShape(final NeedleShape SHAPE) {
         if (null == needleShape) {
             _needleShape = null == SHAPE ? NeedleShape.ANGLED : SHAPE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             needleShape.set(SHAPE);
         }
@@ -3313,7 +3316,7 @@ public class Gauge extends Control {
             needleShape  = new ObjectPropertyBase<NeedleShape>(_needleShape) {
                 @Override protected void invalidated() {
                     if (null == get()) set(NeedleShape.ANGLED);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "needleShape"; }
@@ -3339,7 +3342,7 @@ public class Gauge extends Control {
     public void setNeedleSize(final NeedleSize SIZE) {
         if (null == needleSize) {
             _needleSize = null == SIZE ? NeedleSize.STANDARD : SIZE;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireGaugeEvt(RESIZE_EVENT);
         } else {
             needleSize.set(SIZE);
         }
@@ -3349,7 +3352,7 @@ public class Gauge extends Control {
             needleSize  = new ObjectPropertyBase<NeedleSize>(_needleSize) {
                 @Override protected void invalidated() {
                     if(null == get()) set(NeedleSize.STANDARD);
-                    fireUpdateEvent(RESIZE_EVENT);
+                    fireGaugeEvt(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "needleSize"; }
@@ -3421,7 +3424,7 @@ public class Gauge extends Control {
     public void setNeedleColor(final Color COLOR) {
         if (null == needleColor) {
             _needleColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             needleColor.set(COLOR);
         }
@@ -3429,7 +3432,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> needleColorProperty() {
         if (null == needleColor) {
             needleColor  = new ObjectPropertyBase<Color>(_needleColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "needleColor"; }
             };
@@ -3452,7 +3455,7 @@ public class Gauge extends Control {
     public void setNeedleBorderColor(final Color COLOR) {
         if (null == needleBorderColor) {
             _needleBorderColor = null == COLOR ? Color.TRANSPARENT : COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             needleBorderColor.set(COLOR);
         }
@@ -3462,7 +3465,7 @@ public class Gauge extends Control {
             needleBorderColor  = new ObjectPropertyBase<Color>(_needleBorderColor) {
                 @Override protected void invalidated() {
                     if (null == get()) set(Color.TRANSPARENT);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "needleBorderColor"; }
@@ -3488,7 +3491,7 @@ public class Gauge extends Control {
     public void setBarColor(final Color COLOR) {
         if (null == barColor) {
             _barColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             barColor.set(COLOR);
         }
@@ -3496,7 +3499,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> barColorProperty() {
         if (null == barColor) {
             barColor  = new ObjectPropertyBase<Color>(_barColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "barColor"; }
             };
@@ -3519,7 +3522,7 @@ public class Gauge extends Control {
     public void setBarBorderColor(final Color COLOR) {
         if (null == barBorderColor) {
             _barBorderColor = null == COLOR ? Color.TRANSPARENT : COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             barBorderColor.set(COLOR);
         }
@@ -3529,7 +3532,7 @@ public class Gauge extends Control {
             barBorderColor  = new ObjectPropertyBase<Color>(_barBorderColor) {
                 @Override protected void invalidated() {
                     if(null == get()) set(Color.TRANSPARENT);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "barBorderColor"; }
@@ -3555,7 +3558,7 @@ public class Gauge extends Control {
     public void setBarBackgroundColor(final Color COLOR) {
         if (null == barBackgroundColor) {
             _barBackgroundColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             barBackgroundColor.set(COLOR);
         }
@@ -3563,7 +3566,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> barBackgroundColorProperty() {
         if (null == barBackgroundColor) {
             barBackgroundColor  = new ObjectPropertyBase<Color>(_barBackgroundColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "barBackgroundColor"; }
             };
@@ -3604,7 +3607,7 @@ public class Gauge extends Control {
     public void setLcdDesign(final LcdDesign DESIGN) {
         if (null == lcdDesign) {
             _lcdDesign = null == DESIGN ? LcdDesign.STANDARD : DESIGN;
-            fireUpdateEvent(LCD_EVENT);
+            fireGaugeEvt(LCD_EVENT);
         } else {
             lcdDesign.set(DESIGN);
         }
@@ -3614,7 +3617,7 @@ public class Gauge extends Control {
             lcdDesign  = new ObjectPropertyBase<LcdDesign>(_lcdDesign) {
                 @Override protected void invalidated() {
                     if(null == get()) set(LcdDesign.STANDARD);
-                    fireUpdateEvent(LCD_EVENT);
+                    fireGaugeEvt(LCD_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "lcdDesign"; }
@@ -3642,7 +3645,7 @@ public class Gauge extends Control {
     public void setLcdFont(final LcdFont FONT) {
         if (null == lcdFont) {
             _lcdFont = null == FONT ? LcdFont.DIGITAL_BOLD : FONT;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireGaugeEvt(RESIZE_EVENT);
         } else {
             lcdFont.set(FONT);
         }
@@ -3652,7 +3655,7 @@ public class Gauge extends Control {
             lcdFont  = new ObjectPropertyBase<LcdFont>(_lcdFont) {
                 @Override protected void invalidated() {
                     if(null == get()) set(LcdFont.DIGITAL_BOLD);
-                    fireUpdateEvent(RESIZE_EVENT);
+                    fireGaugeEvt(RESIZE_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "lcdFont"; }
@@ -3678,7 +3681,7 @@ public class Gauge extends Control {
     public void setLedColor(final Color COLOR) {
         if (null == ledColor) {
             _ledColor = null == COLOR ? Color.RED : COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             ledColor.set(COLOR);
         }
@@ -3688,7 +3691,7 @@ public class Gauge extends Control {
             ledColor  = new ObjectPropertyBase<Color>(_ledColor) {
                 @Override protected void invalidated() {
                     if (null == get()) set(Color.RED);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "ledColor"; }
@@ -3716,7 +3719,7 @@ public class Gauge extends Control {
     public void setLedType(final LedType TYPE) {
         if (null == ledType) {
             _ledType = null == TYPE ? LedType.STANDARD : TYPE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             ledType.set(TYPE);
         }
@@ -3726,7 +3729,7 @@ public class Gauge extends Control {
             ledType  = new ObjectPropertyBase<LedType>(_ledType) {
                 @Override protected void invalidated() {
                     if(null == get()) set(LedType.STANDARD);
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "ledType"; }
@@ -3752,7 +3755,7 @@ public class Gauge extends Control {
     public void setTitleColor(final Color COLOR) {
         if (null == titleColor) {
             _titleColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             titleColor.set(COLOR);
         }
@@ -3760,7 +3763,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> titleColorProperty() {
         if (null == titleColor) {
             titleColor  = new ObjectPropertyBase<Color>(_titleColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "titleColor"; }
             };
@@ -3785,7 +3788,7 @@ public class Gauge extends Control {
     public void setSubTitleColor(final Color COLOR) {
         if (null == subTitleColor) {
             _subTitleColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             subTitleColor.set(COLOR);
         }
@@ -3793,7 +3796,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> subTitleColorProperty() {
         if (null == subTitleColor) {
             subTitleColor  = new ObjectPropertyBase<Color>(_subTitleColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "subTitleColor"; }
             };
@@ -3818,7 +3821,7 @@ public class Gauge extends Control {
     public void setUnitColor(final Color COLOR) {
         if (null == unitColor) {
             _unitColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             unitColor.set(COLOR);
         }
@@ -3826,7 +3829,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> unitColorProperty() {
         if (null == unitColor) {
             unitColor  = new ObjectPropertyBase<Color>(_unitColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "unitColor"; }
             };
@@ -3851,7 +3854,7 @@ public class Gauge extends Control {
     public void setValueColor(final Color COLOR) {
         if (null == valueColor) {
             _valueColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             valueColor.set(COLOR);
         }
@@ -3859,7 +3862,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> valueColorProperty() {
         if (null == valueColor) {
             valueColor  = new ObjectPropertyBase<Color>(_valueColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "valueColor"; }
             };
@@ -3884,7 +3887,7 @@ public class Gauge extends Control {
     public void setThresholdColor(final Color COLOR) {
         if (null == thresholdColor) {
             _thresholdColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             thresholdColor.set(COLOR);
         }
@@ -3892,7 +3895,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> thresholdColorProperty() {
         if (null == thresholdColor) {
             thresholdColor  = new ObjectPropertyBase<Color>(_thresholdColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "thresholdColor"; }
             };
@@ -3917,7 +3920,7 @@ public class Gauge extends Control {
     public void setAverageColor(final Color COLOR) {
         if (null == averageColor) {
             _averageColor = COLOR;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             averageColor.set(COLOR);
         }
@@ -3925,7 +3928,7 @@ public class Gauge extends Control {
     public ObjectProperty<Color> averageColorProperty() {
         if (null == averageColor) {
             averageColor  = new ObjectPropertyBase<Color>(_averageColor) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "averageColor"; }
             };
@@ -4029,7 +4032,7 @@ public class Gauge extends Control {
     public void setInnerShadowEnabled(final boolean ENABLED) {
         if (null == innerShadowEnabled) {
             _innerShadowEnabled = ENABLED;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             innerShadowEnabled.set(ENABLED);
         }
@@ -4037,7 +4040,7 @@ public class Gauge extends Control {
     public BooleanProperty innerShadowEnabledProperty() {
         if (null == innerShadowEnabled) {
             innerShadowEnabled = new BooleanPropertyBase(_innerShadowEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "innerShadowEnabled"; }
             };
@@ -4059,7 +4062,7 @@ public class Gauge extends Control {
     public void setThresholdVisible(final boolean VISIBLE) {
         if (null == thresholdVisible) {
             _thresholdVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             thresholdVisible.set(VISIBLE);
         }
@@ -4067,7 +4070,7 @@ public class Gauge extends Control {
     public BooleanProperty thresholdVisibleProperty() {
         if (null == thresholdVisible) {
             thresholdVisible = new BooleanPropertyBase(_thresholdVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "thresholdVisible"; }
             };
@@ -4089,7 +4092,7 @@ public class Gauge extends Control {
     public void setAverageVisible(final boolean VISIBLE) {
         if (null == averageVisible) {
             _averageVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             averageVisible.set(VISIBLE);
         }
@@ -4097,7 +4100,7 @@ public class Gauge extends Control {
     public BooleanProperty averageVisibleProperty() {
         if (null == averageVisible) {
             averageVisible = new BooleanPropertyBase() {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "averageVisible"; }
             };
@@ -4119,7 +4122,7 @@ public class Gauge extends Control {
     public void setSectionsVisible(final boolean VISIBLE) {
         if (null == sectionsVisible) {
             _sectionsVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             sectionsVisible.set(VISIBLE);
         }
@@ -4127,7 +4130,7 @@ public class Gauge extends Control {
     public BooleanProperty sectionsVisibleProperty() {
         if (null == sectionsVisible) {
             sectionsVisible = new BooleanPropertyBase(_sectionsVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "sectionsVisible"; }
             };
@@ -4149,7 +4152,7 @@ public class Gauge extends Control {
     public void setSectionsAlwaysVisible(final boolean VISIBLE) {
         if (null == sectionsAlwaysVisible) {
             _sectionsAlwaysVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             sectionsAlwaysVisible.set(VISIBLE);
         }
@@ -4157,7 +4160,7 @@ public class Gauge extends Control {
     public BooleanProperty sectionsAlwaysVisibleProperty() {
         if (null == sectionsAlwaysVisible) {
             sectionsAlwaysVisible = new BooleanPropertyBase(_sectionsAlwaysVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "sectionsAlwaysVisible"; }
             };
@@ -4181,7 +4184,7 @@ public class Gauge extends Control {
     public void setSectionTextVisible(final boolean VISIBLE) {
         if (null == sectionTextVisible) {
             _sectionTextVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             sectionTextVisible.set(VISIBLE);
         }
@@ -4189,7 +4192,7 @@ public class Gauge extends Control {
     public BooleanProperty sectionTextVisibleProperty() {
         if (null == sectionTextVisible) {
             sectionTextVisible = new BooleanPropertyBase(_sectionTextVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "sectionTextVisible"; }
             };
@@ -4213,7 +4216,7 @@ public class Gauge extends Control {
     public void setSectionIconsVisible(final boolean VISIBLE) {
         if (null == sectionIconsVisible) {
             _sectionIconsVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             sectionIconsVisible.set(VISIBLE);
         }
@@ -4221,7 +4224,7 @@ public class Gauge extends Control {
     public BooleanProperty sectionIconsVisibleProperty() {
         if (null == sectionIconsVisible) {
             sectionIconsVisible = new BooleanPropertyBase(_sectionIconsVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "sectionIconsVisible"; }
             };
@@ -4245,7 +4248,7 @@ public class Gauge extends Control {
     public void setHighlightSections(final boolean HIGHLIGHT) {
         if (null == highlightSections) {
             _highlightSections = HIGHLIGHT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             highlightSections.set(HIGHLIGHT);
         }
@@ -4253,7 +4256,7 @@ public class Gauge extends Control {
     public BooleanProperty highlightSectionsProperty() {
         if (null == highlightSections) {
             highlightSections = new BooleanPropertyBase(_highlightSections) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "highlightSections"; }
             };
@@ -4275,7 +4278,7 @@ public class Gauge extends Control {
     public void setAreasVisible(final boolean VISIBLE) {
         if (null == areasVisible) {
             _areasVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             areasVisible.set(VISIBLE);
         }
@@ -4283,7 +4286,7 @@ public class Gauge extends Control {
     public BooleanProperty areasVisibleProperty() {
         if (null == areasVisible) {
             areasVisible = new BooleanPropertyBase(_areasVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "areasVisible"; }
             };
@@ -4307,7 +4310,7 @@ public class Gauge extends Control {
     public void setAreaTextVisible(final boolean VISIBLE) {
         if (null == areaTextVisible) {
             _areaTextVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             areaTextVisible.set(VISIBLE);
         }
@@ -4315,7 +4318,7 @@ public class Gauge extends Control {
     public BooleanProperty areaTextVisibleProperty() {
         if (null == areaTextVisible) {
             areaTextVisible = new BooleanPropertyBase(_areaTextVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "areaTextVisible"; }
             };
@@ -4339,7 +4342,7 @@ public class Gauge extends Control {
     public void setAreaIconsVisible(final boolean VISIBLE) {
         if (null == areaIconsVisible) {
             _areaIconsVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             areaIconsVisible.set(VISIBLE);
         }
@@ -4347,7 +4350,7 @@ public class Gauge extends Control {
     public BooleanProperty areaIconsVisibleProperty() {
         if (null == areaIconsVisible) {
             areaIconsVisible = new BooleanPropertyBase(_areaIconsVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "areaIconsVisible"; }
             };
@@ -4371,7 +4374,7 @@ public class Gauge extends Control {
     public void setHighlightAreas(final boolean HIGHLIGHT) {
         if (null == highlightAreas) {
             _highlightAreas = HIGHLIGHT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             highlightAreas.set(HIGHLIGHT);
         }
@@ -4379,7 +4382,7 @@ public class Gauge extends Control {
     public BooleanProperty highlightAreasProperty() {
         if (null == highlightAreas) {
             highlightAreas = new BooleanPropertyBase(_highlightAreas) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "highlightAreas"; }
             };
@@ -4403,7 +4406,7 @@ public class Gauge extends Control {
     public void setTickMarkSectionsVisible(final boolean VISIBLE) {
         if (null == tickMarkSectionsVisible) {
             _tickMarkSectionsVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             tickMarkSectionsVisible.set(VISIBLE);
         }
@@ -4411,7 +4414,7 @@ public class Gauge extends Control {
     public BooleanProperty tickMarkSectionsVisibleProperty() {
         if (null == tickMarkSectionsVisible) {
             tickMarkSectionsVisible = new BooleanPropertyBase(_tickMarkSectionsVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickMarkSectionsVisible"; }
             };
@@ -4435,7 +4438,7 @@ public class Gauge extends Control {
     public void setTickLabelSectionsVisible(final boolean VISIBLE) {
         if (null == tickLabelSectionsVisible) {
             _tickLabelSectionsVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             tickLabelSectionsVisible.set(VISIBLE);
         }
@@ -4443,7 +4446,7 @@ public class Gauge extends Control {
     public BooleanProperty tickLabelSectionsVisibleProperty() {
         if (null == tickLabelSectionsVisible) {
             tickLabelSectionsVisible = new BooleanPropertyBase(_tickLabelSectionsVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickLabelSectionsVisible"; }
             };
@@ -4465,7 +4468,7 @@ public class Gauge extends Control {
     public void setMarkersVisible(final boolean VISIBLE) {
         if (null == markersVisible) {
             _markersVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             markersVisible.set(VISIBLE);
         }
@@ -4473,7 +4476,7 @@ public class Gauge extends Control {
     public BooleanProperty markersVisibleProperty() {
         if (null == markersVisible) {
             markersVisible = new BooleanPropertyBase(_markersVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "markersVisible"; }
             };
@@ -4495,7 +4498,7 @@ public class Gauge extends Control {
     public void setTickLabelsVisible(final boolean VISIBLE) {
         if (null == tickLabelsVisible) {
             _tickLabelsVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             tickLabelsVisible.set(VISIBLE);
         }
@@ -4503,7 +4506,7 @@ public class Gauge extends Control {
     public BooleanProperty tickLabelsVisibleProperty() {
         if (null == tickLabelsVisible) {
             tickLabelsVisible = new BooleanPropertyBase(_tickLabelsVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickLabelsVisible"; }
             };
@@ -4531,7 +4534,7 @@ public class Gauge extends Control {
     public void setOnlyFirstAndLastTickLabelVisible(final boolean VISIBLE) {
         if (null == onlyFirstAndLastTickLabelVisible) {
             _onlyFirstAndLastTickLabelVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             onlyFirstAndLastTickLabelVisible.set(VISIBLE);
         }
@@ -4539,7 +4542,7 @@ public class Gauge extends Control {
     public BooleanProperty onlyFirstAndLastTickLabelVisibleProperty() {
         if (null == onlyFirstAndLastTickLabelVisible) {
             onlyFirstAndLastTickLabelVisible = new BooleanPropertyBase(_onlyFirstAndLastTickLabelVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "onlyFirstAndLastTickLabelVisible"; }
             };
@@ -4565,7 +4568,7 @@ public class Gauge extends Control {
     public void setMajorTickMarksVisible(final boolean VISIBLE) {
         if (null == majorTickMarksVisible) {
             _majorTickMarksVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             majorTickMarksVisible.set(VISIBLE);
         }
@@ -4573,7 +4576,7 @@ public class Gauge extends Control {
     public BooleanProperty majorTickMarksVisibleProperty() {
         if (null == majorTickMarksVisible) {
             majorTickMarksVisible = new BooleanPropertyBase(_majorTickMarksVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "majorTickMarksVisible"; }
             };
@@ -4592,7 +4595,7 @@ public class Gauge extends Control {
     public void setMediumTickMarksVisible(final boolean VISIBLE) {
         if (null == mediumTickMarksVisible) {
             _mediumTickMarksVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             mediumTickMarksVisible.set(VISIBLE);
         }
@@ -4600,7 +4603,7 @@ public class Gauge extends Control {
     public BooleanProperty mediumTickMarksVisibleProperty() {
         if (null == mediumTickMarksVisible) {
             mediumTickMarksVisible = new BooleanPropertyBase(_mediumTickMarksVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "mediumTickMarksVisible"; }
             };
@@ -4622,7 +4625,7 @@ public class Gauge extends Control {
     public void setMinorTickMarksVisible(final boolean VISIBLE) {
         if (null == minorTickMarksVisible) {
             _minorTickMarksVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             minorTickMarksVisible.set(VISIBLE);
         }
@@ -4630,7 +4633,7 @@ public class Gauge extends Control {
     public BooleanProperty minorTickMarksVisibleProperty() {
         if (null == minorTickMarksVisible) {
             minorTickMarksVisible = new BooleanPropertyBase(_minorTickMarksVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minorTickMarksVisible"; }
             };
@@ -4653,7 +4656,7 @@ public class Gauge extends Control {
     public void setTickMarkRingVisible(final boolean VISIBLE) {
         if (null == tickMarkRingVisible) {
             _tickMarkRingVisible = VISIBLE;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             tickMarkRingVisible.set(VISIBLE);
         }
@@ -4661,7 +4664,7 @@ public class Gauge extends Control {
     public BooleanProperty tickMarkRingVisibleProperty() {
         if (null == tickMarkRingVisible) {
             tickMarkRingVisible = new BooleanPropertyBase(_tickMarkRingVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "tickMarkRingVisible"; }
             };
@@ -4687,7 +4690,7 @@ public class Gauge extends Control {
     public void setMajorTickSpace(final double SPACE) {
         if (null == majorTickSpace) {
             _majorTickSpace = SPACE;
-            fireUpdateEvent(RECALC_EVENT);
+            fireGaugeEvt(RECALC_EVENT);
         } else {
             majorTickSpace.set(SPACE);
         }
@@ -4695,7 +4698,7 @@ public class Gauge extends Control {
     public DoubleProperty majorTickSpaceProperty() {
         if (null == majorTickSpace) {
             majorTickSpace = new DoublePropertyBase(_majorTickSpace) {
-                @Override protected void invalidated() { fireUpdateEvent(RECALC_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(RECALC_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "majorTickSpace"; }
             };
@@ -4721,7 +4724,7 @@ public class Gauge extends Control {
     public void setMinorTickSpace(final double SPACE) {
         if (null == minorTickSpace) {
             _minorTickSpace = SPACE;
-            fireUpdateEvent(RECALC_EVENT);
+            fireGaugeEvt(RECALC_EVENT);
         } else {
             minorTickSpace.set(SPACE);
         }
@@ -4729,7 +4732,7 @@ public class Gauge extends Control {
     public DoubleProperty minorTickSpaceProperty() {
         if (null == minorTickSpace) {
             minorTickSpace = new DoublePropertyBase(_minorTickSpace) {
-                @Override protected void invalidated() { fireUpdateEvent(RECALC_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(RECALC_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "minorTickSpace"; }
             };
@@ -4753,7 +4756,7 @@ public class Gauge extends Control {
     public void setLcdVisible(final boolean VISIBLE) {
         if (null == lcdVisible) {
             _lcdVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             lcdVisible.set(VISIBLE);
         }
@@ -4761,7 +4764,7 @@ public class Gauge extends Control {
     public BooleanProperty lcdVisibleProperty() {
         if (null == lcdVisible) {
             lcdVisible = new BooleanPropertyBase(_lcdVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "lcdVisible"; }
             };
@@ -4789,7 +4792,7 @@ public class Gauge extends Control {
     public void setLcdCrystalEnabled(final boolean ENABLED) {
         if (null == lcdCrystalEnabled) {
             _lcdCrystalEnabled = ENABLED;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             lcdCrystalEnabled.set(ENABLED);
         }
@@ -4797,7 +4800,7 @@ public class Gauge extends Control {
     public BooleanProperty lcdCrystalEnabledProperty() {
         if (null == lcdCrystalEnabled) {
             lcdCrystalEnabled = new BooleanPropertyBase(_lcdCrystalEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "lcdCrystalEnabled"; }
             };
@@ -4819,7 +4822,7 @@ public class Gauge extends Control {
     public void setLedVisible(final boolean VISIBLE) {
         if (null == ledVisible) {
             _ledVisible = VISIBLE;
-            fireUpdateEvent(VISIBILITY_EVENT);
+            fireGaugeEvt(VISIBILITY_EVENT);
         } else {
             ledVisible.set(VISIBLE);
         }
@@ -4827,7 +4830,7 @@ public class Gauge extends Control {
     public BooleanProperty ledVisibleProperty() {
         if (null == ledVisible) {
             ledVisible = new BooleanPropertyBase(_ledVisible) {
-                @Override protected void invalidated() { fireUpdateEvent(VISIBILITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(VISIBILITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "ledVisible"; }
             };
@@ -4849,7 +4852,7 @@ public class Gauge extends Control {
     public void setLedOn(final boolean ON) {
         if (null == ledOn) {
             _ledOn = ON;
-            fireUpdateEvent(LED_EVENT);
+            fireGaugeEvt(LED_EVENT);
         } else {
             ledOn.set(ON);
         }
@@ -4857,7 +4860,7 @@ public class Gauge extends Control {
     public BooleanProperty ledOnProperty() {
         if (null == ledOn) {
             ledOn = new BooleanPropertyBase(_ledOn) {
-                @Override protected void invalidated() { fireUpdateEvent(LED_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(LED_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "ledOn"; }
             };
@@ -4925,7 +4928,7 @@ public class Gauge extends Control {
     public void setOrientation(final Orientation ORIENTATION) {
         if (null == orientation) {
             _orientation = ORIENTATION;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireGaugeEvt(RESIZE_EVENT);
         } else {
             orientation.set(ORIENTATION);
         }
@@ -4933,7 +4936,7 @@ public class Gauge extends Control {
     public ObjectProperty<Orientation> orientationProperty() {
         if (null == orientation) {
             orientation  = new ObjectPropertyBase<Orientation>(_orientation) {
-                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "orientation"; }
             };
@@ -4958,7 +4961,7 @@ public class Gauge extends Control {
     public void setGradientBarEnabled(final boolean ENABLED) {
         if (null == gradientBarEnabled) {
             _gradientBarEnabled = ENABLED;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             gradientBarEnabled.set(ENABLED);
         }
@@ -4966,7 +4969,7 @@ public class Gauge extends Control {
     public BooleanProperty gradientBarEnabledProperty() {
         if (null == gradientBarEnabled) {
             gradientBarEnabled = new BooleanPropertyBase(_gradientBarEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "gradientBarEnabled"; }
             };
@@ -4992,7 +4995,7 @@ public class Gauge extends Control {
      */
     public void setGradientLookup(final GradientLookup GRADIENT_LOOKUP) {
         gradientLookup = GRADIENT_LOOKUP;
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Returns a list of Stops that will be used to calculate the gradient
@@ -5016,7 +5019,7 @@ public class Gauge extends Control {
      */
     public void setGradientBarStops(final List<Stop> STOPS) {
         getGradientLookup().setStops(STOPS);
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
 
     /**
@@ -5039,7 +5042,7 @@ public class Gauge extends Control {
     public void setCustomTickLabelsEnabled(final boolean ENABLED) {
         if (null == customTickLabelsEnabled) {
             _customTickLabelsEnabled = ENABLED;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             customTickLabelsEnabled.set(ENABLED);
         }
@@ -5047,7 +5050,7 @@ public class Gauge extends Control {
     public BooleanProperty customTickLabelsEnabledProperty() {
         if (null == customTickLabelsEnabled) {
             customTickLabelsEnabled = new BooleanPropertyBase(_customTickLabelsEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "customTickLabelsEnabled"; }
             };
@@ -5067,7 +5070,7 @@ public class Gauge extends Control {
     public void setCustomTickLabelFontSizeEnabled(final boolean ENABLED) {
         if (null == customTickLabelFontSizeEnabled) {
             _customTickLabelFontSizeEnabled = ENABLED;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             customTickLabelFontSizeEnabled.set(ENABLED);
         }
@@ -5075,7 +5078,7 @@ public class Gauge extends Control {
     public BooleanProperty customTickLabelFontSizeEnabledProperty() {
         if (null == customTickLabelFontSizeEnabled) {
             customTickLabelFontSizeEnabled = new BooleanPropertyBase(_customTickLabelFontSizeEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "customTickLabelFontSizeEnabled"; }
             };
@@ -5098,7 +5101,7 @@ public class Gauge extends Control {
      */
     public void setCustomTickLabels(final List<String> TICK_LABELS) {
         customTickLabels.setAll(TICK_LABELS);
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Defines a list of Strings that represent the ticklabels that
@@ -5115,7 +5118,7 @@ public class Gauge extends Control {
     public void addCustomTickLabel(final String TICK_LABEL) {
         if (null == TICK_LABEL) return;
         if (!customTickLabels.contains(TICK_LABEL)) customTickLabels.add(TICK_LABEL);
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Removes the given String from the list of custom ticklabels
@@ -5125,14 +5128,14 @@ public class Gauge extends Control {
     public void removeCustomTickLabel(final String TICK_LABEL) {
         if (null == TICK_LABEL) return;
         if (customTickLabels.contains(TICK_LABEL)) customTickLabels.remove(TICK_LABEL);
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
     /**
      * Clears the list of custom ticklabels
      */
     public void clearCustomTickLabels() {
         customTickLabels.clear();
-        fireUpdateEvent(REDRAW_EVENT);
+        fireGaugeEvt(REDRAW_EVENT);
     }
 
     /**
@@ -5153,7 +5156,7 @@ public class Gauge extends Control {
     public void setCustomTickLabelFontSize(final double SIZE) {
         if (null == customTickLabelFontSize) {
             _customTickLabelFontSize = Helper.clamp(0.0, 72.0, SIZE);
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             customTickLabelFontSize.set(SIZE);
         }
@@ -5164,7 +5167,7 @@ public class Gauge extends Control {
                 @Override protected void invalidated() {
                     final double SIZE = get();
                     if (SIZE < 0 || SIZE > 72) set(Helper.clamp(0.0, 72.0, SIZE));
-                    fireUpdateEvent(REDRAW_EVENT);
+                    fireGaugeEvt(REDRAW_EVENT);
                 }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "customTickLabelFontSize";}
@@ -5191,7 +5194,7 @@ public class Gauge extends Control {
     public void setInteractive(final boolean INTERACTIVE) {
         if (null == interactive) {
             _interactive = INTERACTIVE;
-            fireUpdateEvent(INTERACTIVITY_EVENT);
+            fireGaugeEvt(INTERACTIVITY_EVENT);
         } else {
             interactive.set(INTERACTIVE);
         }
@@ -5199,7 +5202,7 @@ public class Gauge extends Control {
     public BooleanProperty interactiveProperty() {
         if (null == interactive) {
             interactive = new BooleanPropertyBase(_interactive) {
-                @Override protected void invalidated() { fireUpdateEvent(INTERACTIVITY_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(INTERACTIVITY_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "interactive"; }
             };
@@ -5223,7 +5226,7 @@ public class Gauge extends Control {
     public void setButtonTooltipText(final String TEXT) {
         if (null == buttonTooltipText) {
             _buttonTooltipText = TEXT;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             buttonTooltipText.set(TEXT);
         }
@@ -5231,7 +5234,7 @@ public class Gauge extends Control {
     public StringProperty buttonTooltipTextProperty() {
         if (null == buttonTooltipText) {
             buttonTooltipText  = new StringPropertyBase(_buttonTooltipText) {
-                @Override protected  void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected  void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "buttonTooltipText"; }
             };
@@ -5281,7 +5284,7 @@ public class Gauge extends Control {
     public void setCustomFontEnabled(final boolean ENABLED) {
         if (null == customFontEnabled) {
             _customFontEnabled = ENABLED;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireGaugeEvt(RESIZE_EVENT);
         } else {
             customFontEnabled.set(ENABLED);
         }
@@ -5289,7 +5292,7 @@ public class Gauge extends Control {
     public BooleanProperty customFontEnabledProperty() {
         if (null == customFontEnabled) {
             customFontEnabled = new BooleanPropertyBase(_customFontEnabled) {
-                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "customFontEnabled"; }
             };
@@ -5313,7 +5316,7 @@ public class Gauge extends Control {
     public void setCustomFont(final Font FONT) {
         if (null == customFont) {
             _customFont = FONT;
-            fireUpdateEvent(RESIZE_EVENT);
+            fireGaugeEvt(RESIZE_EVENT);
         } else {
             customFont.set(FONT);
         }
@@ -5321,7 +5324,7 @@ public class Gauge extends Control {
     public ObjectProperty<Font> customFontProperty() {
         if (null == customFont) {
             customFont = new ObjectPropertyBase<Font>() {
-                @Override protected void invalidated() { fireUpdateEvent(RESIZE_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(RESIZE_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "customFont"; }
             };
@@ -5346,7 +5349,7 @@ public class Gauge extends Control {
     public void setAlert(final boolean ALERT) {
         if (null == alert) {
             _alert = ALERT;
-            fireUpdateEvent(ALERT_EVENT);
+            fireGaugeEvt(ALERT_EVENT);
         } else {
             alert.set(ALERT);
         }
@@ -5354,7 +5357,7 @@ public class Gauge extends Control {
     public BooleanProperty alertProperty() {
         if (null == alert) {
             alert = new BooleanPropertyBase(_alert) {
-                @Override protected void invalidated() { fireUpdateEvent(ALERT_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(ALERT_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "alert"; }
             };
@@ -5376,7 +5379,7 @@ public class Gauge extends Control {
     public void setAlertMessage(final String MESSAGE) {
         if (null == alertMessage) {
             _alertMessage = MESSAGE;
-            fireUpdateEvent(ALERT_EVENT);
+            fireGaugeEvt(ALERT_EVENT);
         } else {
             alertMessage.set(MESSAGE);
         }
@@ -5384,7 +5387,7 @@ public class Gauge extends Control {
     public StringProperty alertMessageProperty() {
         if (null == alertMessage) {
             alertMessage = new StringPropertyBase(_alertMessage) {
-                @Override protected void invalidated() { fireUpdateEvent(ALERT_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(ALERT_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "alertMessage"; }
             };
@@ -5408,7 +5411,7 @@ public class Gauge extends Control {
     public void setSmoothing(final boolean SMOOTHING) {
         if (null == smoothing) {
             _smoothing = SMOOTHING;
-            fireUpdateEvent(REDRAW_EVENT);
+            fireGaugeEvt(REDRAW_EVENT);
         } else {
             smoothing.set(SMOOTHING);
         }
@@ -5416,7 +5419,7 @@ public class Gauge extends Control {
     public BooleanProperty smoothingProperty() {
         if (null == smoothing) {
             smoothing = new BooleanPropertyBase(_smoothing) {
-                @Override protected void invalidated() { fireUpdateEvent(REDRAW_EVENT); }
+                @Override protected void invalidated() { fireGaugeEvt(REDRAW_EVENT); }
                 @Override public Object getBean() { return Gauge.this; }
                 @Override public String getName() { return "smoothing"; }
             };
@@ -5435,7 +5438,7 @@ public class Gauge extends Control {
         //formatBuilder.append("%").append(length).append(".").append(getDecimals()).append("f");
         formatBuilder.append("%").append(".").append(getDecimals()).append("f");
         formatString = formatBuilder.toString();
-        fireUpdateEvent(RESIZE_EVENT);
+        fireGaugeEvt(RESIZE_EVENT);
     }
 
     /**
@@ -5510,8 +5513,12 @@ public class Gauge extends Control {
             if (getScene() != null && getScene().getWindow() != null) {
                 if (getScene().getWindow().isShowing()) {
                     while(updateEventQueue.peek() != null) {
-                        UpdateEvent event = updateEventQueue.poll();
-                        for (UpdateEventListener listener : listenerList) { listener.onUpdateEvent(event); }
+                        final MedusaEvt evt  = updateEventQueue.poll();
+                        final EvtType   type = evt.getEvtType();
+                        observers.entrySet().stream().filter(entry -> entry.getKey().equals(MedusaEvt.ANY)).forEach(entry -> entry.getValue().forEach(observer -> observer.handle(evt)));
+                        if (observers.containsKey(type)) {
+                            observers.get(type).forEach(observer -> observer.handle(evt));
+                        }
                     }
                 }
                 return getScene().getWindow().isShowing();
@@ -5522,8 +5529,12 @@ public class Gauge extends Control {
         showing.addListener((o, ov, nv) -> {
             if (nv) {
                 while(updateEventQueue.peek() != null) {
-                    UpdateEvent event = updateEventQueue.poll();
-                    for (UpdateEventListener listener : listenerList) { listener.onUpdateEvent(event); }
+                    final MedusaEvt evt  = updateEventQueue.poll();
+                    final EvtType   type = evt.getEvtType();
+                    observers.entrySet().stream().filter(entry -> entry.getKey().equals(MedusaEvt.ANY)).forEach(entry -> entry.getValue().forEach(observer -> observer.handle(evt)));
+                    if (observers.containsKey(type)) {
+                        observers.get(type).forEach(observer -> observer.handle(evt));
+                    }
                 }
             }
         });
@@ -5605,7 +5616,7 @@ public class Gauge extends Control {
             case GAUGE          :
             default             : super.setSkin(new GaugeSkin(Gauge.this)); break;
         }
-        fireUpdateEvent(RESIZE_EVENT);
+        fireGaugeEvt(RESIZE_EVENT);
     }
 
     public void presetGaugeParameters(final SkinType SKIN_TYPE) {
@@ -5837,18 +5848,33 @@ public class Gauge extends Control {
 
 
     // ******************** Event handling ************************************
-    public void addUpdateEventListener(final UpdateEventListener LISTENER) { if (!listenerList.contains(LISTENER)) listenerList.add(LISTENER); }
-    public void removeUpdateEventListener(final UpdateEventListener LISTENER) { if (listenerList.contains(LISTENER)) listenerList.remove(LISTENER); }
-
-    public void fireUpdateEvent(final UpdateEvent EVENT) {
-        if (null != showing && showing.get()) {
-            for (UpdateEventListener listener : listenerList) { listener.onUpdateEvent(EVENT); }
-        } else {
-            updateEventQueue.add(EVENT);
+    public void addGaugeObserver(final EvtType type, final EvtObserver<MedusaEvt> observer) {
+        if (!observers.containsKey(type)) { observers.put(type, new CopyOnWriteArrayList<>()); }
+        if (observers.get(type).contains(observer)) { return; }
+        observers.get(type).add(observer);
+    }
+    public void removeGaugeObserver(final EvtType type, final EvtObserver<MedusaEvt> observer) {
+        if (observers.containsKey(type)) {
+            if (observers.get(type).contains(observer)) {
+                observers.get(type).remove(observer);
+            }
         }
     }
+    public void removeAllObservers() { observers.clear(); }
 
-
+    public void fireGaugeEvt(final MedusaEvt evt) {
+        final EvtType type = evt.getEvtType();
+        if (null != showing && showing.get()) {
+            observers.entrySet().stream().filter(entry -> entry.getKey().equals(MedusaEvt.ANY)).forEach(entry -> entry.getValue().forEach(observer -> observer.handle(evt)));
+            if (observers.containsKey(type)) {
+                observers.get(type).forEach(observer -> observer.handle(evt));
+            }
+        } else {
+            updateEventQueue.add(evt);
+        }
+    }
+    
+    
     public void setOnButtonPressed(final EventHandler<ButtonEvent> HANDLER) { addEventHandler(ButtonEvent.BTN_PRESSED, HANDLER); }
     public void removeOnButtonPressed(final EventHandler<ButtonEvent> HANDLER) { removeEventHandler(ButtonEvent.BTN_PRESSED, HANDLER); }
 
