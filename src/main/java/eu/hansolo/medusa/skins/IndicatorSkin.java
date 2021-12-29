@@ -19,9 +19,9 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
+import eu.hansolo.toolboxfx.ScaleDirection;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;

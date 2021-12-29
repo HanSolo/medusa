@@ -22,7 +22,6 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.LedType;
 import eu.hansolo.medusa.Gauge.NeedleBehavior;
 import eu.hansolo.medusa.Gauge.NeedleType;
-import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.LcdDesign;
 import eu.hansolo.medusa.Marker;
 import eu.hansolo.medusa.Needle;
@@ -35,6 +34,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import eu.hansolo.toolboxfx.ScaleDirection;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;

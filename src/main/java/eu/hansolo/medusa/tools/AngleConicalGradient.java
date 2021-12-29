@@ -17,7 +17,9 @@
  */
 package eu.hansolo.medusa.tools;
 
-import eu.hansolo.medusa.Gauge.ScaleDirection;
+
+import eu.hansolo.toolboxfx.ConicalGradient;
+import eu.hansolo.toolboxfx.ScaleDirection;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;

@@ -19,9 +19,9 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.Gauge.ScaleDirection;
-import eu.hansolo.medusa.tools.ConicalGradient;
 import eu.hansolo.medusa.tools.Helper;
+import eu.hansolo.toolboxfx.ConicalGradient;
+import eu.hansolo.toolboxfx.ScaleDirection;
 import javafx.beans.InvalidationListener;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
@@ -36,7 +36,6 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 
 import java.util.List;
-import java.util.Locale;
 
 import static eu.hansolo.medusa.tools.Helper.formatNumber;
 

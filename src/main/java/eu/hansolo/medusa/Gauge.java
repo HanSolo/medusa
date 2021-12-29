@@ -20,13 +20,14 @@ package eu.hansolo.medusa;
 import eu.hansolo.medusa.events.MedusaEvt;
 import eu.hansolo.medusa.skins.*;
 import eu.hansolo.medusa.tools.Data;
-import eu.hansolo.medusa.tools.GradientLookup;
 import eu.hansolo.medusa.tools.Helper;
 import eu.hansolo.medusa.tools.MarkerComparator;
 import eu.hansolo.medusa.tools.MovingAverage;
 import eu.hansolo.medusa.tools.SectionComparator;
 import eu.hansolo.toolbox.evt.EvtObserver;
 import eu.hansolo.toolbox.evt.EvtType;
+import eu.hansolo.toolboxfx.GradientLookup;
+import eu.hansolo.toolboxfx.ScaleDirection;
 import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -109,8 +110,6 @@ public class Gauge extends Control {
     public enum KnobType { STANDARD, PLAIN, METAL, FLAT }
 
     public enum LedType { STANDARD, FLAT }
-
-    public enum ScaleDirection { CLOCKWISE, COUNTER_CLOCKWISE, LEFT_TO_RIGHT, RIGHT_TO_LEFT, BOTTOM_TO_TOP, TOP_TO_BOTTOM }
 
     public enum SkinType {
         AMP, PLAIN_AMP, BULLET_CHART, DASHBOARD, FLAT, GAUGE, INDICATOR, KPI,

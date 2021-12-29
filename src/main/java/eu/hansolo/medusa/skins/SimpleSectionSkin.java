@@ -19,10 +19,11 @@ package eu.hansolo.medusa.skins;
 
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Section;
 import eu.hansolo.medusa.tools.Helper;
 import java.util.List;
+
+import eu.hansolo.toolboxfx.ScaleDirection;
 import javafx.beans.InvalidationListener;
 import javafx.scene.CacheHint;
 import javafx.scene.canvas.Canvas;

@@ -23,15 +23,15 @@ import eu.hansolo.medusa.Gauge.NeedleBehavior;
 import eu.hansolo.medusa.Gauge.NeedleShape;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.NeedleType;
-import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
-import eu.hansolo.medusa.tools.GradientLookup;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import eu.hansolo.medusa.tools.Helper;
+import eu.hansolo.toolboxfx.GradientLookup;
+import eu.hansolo.toolboxfx.ScaleDirection;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;

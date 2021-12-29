@@ -19,11 +19,11 @@ package eu.hansolo.medusa;
 
 import eu.hansolo.medusa.Clock.ClockSkinType;
 import eu.hansolo.medusa.Gauge.NeedleSize;
-import eu.hansolo.medusa.Gauge.ScaleDirection;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.GaugeDesign.GaugeBackground;
 import eu.hansolo.medusa.Marker.MarkerType;
-import eu.hansolo.medusa.tools.GradientLookup;
+import eu.hansolo.toolboxfx.GradientLookup;
+import eu.hansolo.toolboxfx.ScaleDirection;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
