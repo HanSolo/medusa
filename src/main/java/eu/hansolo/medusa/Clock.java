@@ -2141,9 +2141,9 @@ public class Clock extends Control {
 
             if (observers.containsKey(TimeEvt.SECOND) || observers.containsKey(TimeEvt.MINUTE) || observers.containsKey(TimeEvt.HOUR)) {
                 // Fire TimeEvents
-                if (oldTime.getSecond() != now.getSecond()) fireClockEvt(new TimeEvt(TimeEvt.SECOND, now));
-                if (oldTime.getMinute() != now.getMinute()) fireClockEvt(new TimeEvt(TimeEvt.MINUTE, now));
-                if (oldTime.getHour() != now.getHour()) fireClockEvt(new TimeEvt(TimeEvt.HOUR, now));
+                if (oldTime.getSecond() != now.getSecond()) fireClockEvt(new TimeEvt(Clock.this, TimeEvt.SECOND, now));
+                if (oldTime.getMinute() != now.getMinute()) fireClockEvt(new TimeEvt(Clock.this, TimeEvt.MINUTE, now));
+                if (oldTime.getHour() != now.getHour()) fireClockEvt(new TimeEvt(Clock.this, TimeEvt.HOUR, now));
             }
         });
     }

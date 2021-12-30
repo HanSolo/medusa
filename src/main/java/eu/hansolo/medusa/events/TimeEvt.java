@@ -35,10 +35,6 @@ public class TimeEvt extends MedusaEvt {
 
 
     // ******************** Constructors **************************************
-    public TimeEvt(final EvtType<? extends TimeEvt> evtType, final ZonedDateTime time) {
-        super(evtType);
-        this.time = time;
-    }
     public TimeEvt(final Object src, final EvtType<? extends TimeEvt> evtType, final ZonedDateTime time) {
         super(src, evtType);
         this.time = time;

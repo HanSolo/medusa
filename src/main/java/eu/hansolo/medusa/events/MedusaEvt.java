@@ -40,9 +40,6 @@ public class MedusaEvt extends ChangeEvt {
 
 
     // ******************** Constructors **************************************
-    public MedusaEvt(final EvtType<? extends MedusaEvt> evtType) {
-        super(evtType);
-    }
     public MedusaEvt(final Object src, final EvtType<? extends MedusaEvt> evtType) {
         super(src, evtType);
     }
