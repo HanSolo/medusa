@@ -21,6 +21,7 @@ package eu.hansolo.medusa.events;
 import eu.hansolo.toolbox.evt.EvtPriority;
 import eu.hansolo.toolbox.evt.EvtType;
 import eu.hansolo.toolbox.evt.type.ChangeEvt;
+import eu.hansolo.toolbox.evt.type.PropertyChangeEvt;
 
 
 public class MedusaEvt extends ChangeEvt {
@@ -48,4 +49,8 @@ public class MedusaEvt extends ChangeEvt {
     public MedusaEvt(final Object src, final EvtType<? extends MedusaEvt> evtType, final EvtPriority priority) {
         super(src, evtType, priority);
     }
+
+
+    // ******************** Methods *******************************************
+    public EvtType<? extends MedusaEvt> getEvtType() { return (EvtType<? extends MedusaEvt>) super.getEvtType(); }
 }
