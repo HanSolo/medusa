@@ -7,6 +7,8 @@
 <br>
 A JavaFX library for Gauges. The main focus of this project is to provide Gauges that can be configured in multiple ways.
 
+<b>ATTENTION: Version 17.1.0 will break backwards compatibility !!!</b>
+
 Donations are welcome at [Paypal](https://paypal.me/hans0l0)
 
 ## Overview
