@@ -2405,7 +2405,7 @@ public class Clock extends Control {
     public void fireClockEvt(final MedusaEvt evt) {
         final EvtType type = evt.getEvtType();
         observers.entrySet().stream().filter(entry -> entry.getKey().equals(MedusaEvt.ANY)).forEach(entry -> entry.getValue().forEach(observer -> observer.handle(evt)));
-        if (observers.containsKey(type)) {
+        if (observers.containsKey(type) && !type.equals(MedusaEvt.ANY)) {
             observers.get(type).forEach(observer -> observer.handle(evt));
         }
     }

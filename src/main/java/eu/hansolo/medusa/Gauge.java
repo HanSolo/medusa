@@ -5865,7 +5865,7 @@ public class Gauge extends Control {
         final EvtType type = evt.getEvtType();
         if (null != showing && showing.get()) {
             observers.entrySet().stream().filter(entry -> entry.getKey().equals(MedusaEvt.ANY)).forEach(entry -> entry.getValue().forEach(observer -> observer.handle(evt)));
-            if (observers.containsKey(type)) {
+            if (observers.containsKey(type) && !type.equals(MedusaEvt.ANY)) {
                 observers.get(type).forEach(observer -> observer.handle(evt));
             }
         } else {
