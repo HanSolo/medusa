@@ -29,6 +29,11 @@ module eu.hansolo.medusa {
     requires transitive eu.hansolo.toolbox;
     requires transitive eu.hansolo.toolboxfx;
 
+    opens eu.hansolo.medusa to eu.hansolo.toolbox, eu.hansolo.toolboxfx;
+    opens eu.hansolo.medusa.skins to eu.hansolo.toolbox, eu.hansolo.toolboxfx;
+    opens eu.hansolo.medusa.events to eu.hansolo.toolbox, eu.hansolo.toolboxfx;
+    opens eu.hansolo.medusa.tools to eu.hansolo.toolbox, eu.hansolo.toolboxfx;
+
     exports eu.hansolo.medusa;
     exports eu.hansolo.medusa.skins;
     exports eu.hansolo.medusa.events;
