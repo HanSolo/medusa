@@ -28,10 +28,8 @@ plugins {
     id 'org.javamodularity.moduleplugin' version '1.8.10'
     id 'org.beryx.jlink'                 version '2.24.2'
     id 'net.nemerosa.versioning'         version '2.15.1'
-    id 'biz.aQute.bnd.builder'           version '6.1.0'
 }
 
-apply plugin: 'biz.aQute.bnd.builder'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
@@ -60,8 +58,8 @@ dependencies {
     implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
-    implementation "eu.hansolo:toolbox:17.0.17"
-    implementation "eu.hansolo:toolboxfx:17.0.24"
+    implementation "eu.hansolo:toolbox:17.0.19"
+    implementation "eu.hansolo:toolboxfx:17.0.26"
 }
 
 jar {
@@ -82,6 +80,14 @@ jar {
                 'Bundle-SymbolicName'   : 'eu.hansolo',
                 'Export-Package'        : 'eu.hansolo.medusa,eu.hansolo.medusa.tools,eu.hansolo.medusa.skins,eu.hansolo.medusa.events'
         )
+    }
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
     }
 }
 
