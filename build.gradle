@@ -58,8 +58,8 @@ dependencies {
     implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
-    implementation "eu.hansolo:toolbox:17.0.19"
-    implementation "eu.hansolo:toolboxfx:17.0.26"
+    implementation "eu.hansolo:toolbox:17.0.21"
+    implementation "eu.hansolo:toolboxfx:17.0.27"
 }
 
 jar {
@@ -93,13 +93,13 @@ if (JavaVersion.current().isJava8Compatible()) {
 
 // start the demo from gradle
 task Demo(type: JavaExec) {
-    main = "eu.hansolo.medusa.DemoLauncher"
+    mainClass = "eu.hansolo.medusa.DemoLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 
 // Only used for internal test
 task Test(type: JavaExec) {
-    main = "eu.hansolo.medusa.TestLauncher"
+    mainClass = "eu.hansolo.medusa.TestLauncher"
     classpath = sourceSets.main.runtimeClasspath
 }
 
