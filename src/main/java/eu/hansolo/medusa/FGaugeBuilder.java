@@ -145,45 +145,36 @@ public class FGaugeBuilder<B extends FGaugeBuilder<B>> {
             throw new RuntimeException("Please change Skin to GaugeSkin.");
         }
 
-        final FGauge CONTROL = new FGauge(gauge, design, background);
+        final FGauge fGauge = new FGauge(gauge, design, background);
         for (String key : properties.keySet()) {
-            if ("prefSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
-            } else if("minSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
-            } else if("maxSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
-            } else if("prefWidth".equals(key)) {
-                CONTROL.setPrefWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("prefHeight".equals(key)) {
-                CONTROL.setPrefHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("minWidth".equals(key)) {
-                CONTROL.setMinWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("minHeight".equals(key)) {
-                CONTROL.setMinHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("maxWidth".equals(key)) {
-                CONTROL.setMaxWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("maxHeight".equals(key)) {
-                CONTROL.setMaxHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("scaleX".equals(key)) {
-                CONTROL.setScaleX(((DoubleProperty) properties.get(key)).get());
-            } else if("scaleY".equals(key)) {
-                CONTROL.setScaleY(((DoubleProperty) properties.get(key)).get());
-            } else if ("layoutX".equals(key)) {
-                CONTROL.setLayoutX(((DoubleProperty) properties.get(key)).get());
-            } else if ("layoutY".equals(key)) {
-                CONTROL.setLayoutY(((DoubleProperty) properties.get(key)).get());
-            } else if ("translateX".equals(key)) {
-                CONTROL.setTranslateX(((DoubleProperty) properties.get(key)).get());
-            } else if ("translateY".equals(key)) {
-                CONTROL.setTranslateY(((DoubleProperty) properties.get(key)).get());
-            } else if ("foregroundVisible".equals(key)) {
-                CONTROL.setForegroundVisible(((BooleanProperty) properties.get(key)).get());
+            switch (key) {
+                case "prefSize"          -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    fGauge.setPrefSize(dim.getWidth(), dim.getHeight());
+                }
+                case "minSize"           -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    fGauge.setPrefSize(dim.getWidth(), dim.getHeight());
+                }
+                case "maxSize"           -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    fGauge.setPrefSize(dim.getWidth(), dim.getHeight());
+                }
+                case "prefWidth"         -> fGauge.setPrefWidth(((DoubleProperty) properties.get(key)).get());
+                case "prefHeight"        -> fGauge.setPrefHeight(((DoubleProperty) properties.get(key)).get());
+                case "minWidth"          -> fGauge.setMinWidth(((DoubleProperty) properties.get(key)).get());
+                case "minHeight"         -> fGauge.setMinHeight(((DoubleProperty) properties.get(key)).get());
+                case "maxWidth"          -> fGauge.setMaxWidth(((DoubleProperty) properties.get(key)).get());
+                case "maxHeight"         -> fGauge.setMaxHeight(((DoubleProperty) properties.get(key)).get());
+                case "scaleX"            -> fGauge.setScaleX(((DoubleProperty) properties.get(key)).get());
+                case "scaleY"            -> fGauge.setScaleY(((DoubleProperty) properties.get(key)).get());
+                case "layoutX"           -> fGauge.setLayoutX(((DoubleProperty) properties.get(key)).get());
+                case "layoutY"           -> fGauge.setLayoutY(((DoubleProperty) properties.get(key)).get());
+                case "translateX"        -> fGauge.setTranslateX(((DoubleProperty) properties.get(key)).get());
+                case "translateY"        -> fGauge.setTranslateY(((DoubleProperty) properties.get(key)).get());
+                case "foregroundVisible" -> fGauge.setForegroundVisible(((BooleanProperty) properties.get(key)).get());
             }
         }
-        return CONTROL;
+        return fGauge;
     }
 }

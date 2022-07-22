@@ -836,588 +836,462 @@ public class GaugeBuilder<B extends GaugeBuilder<B>> {
     }
 
     public final Gauge build() {
-        final Gauge CONTROL;
+        final Gauge gauge;
         if (properties.containsKey("skinType")) {
             SkinType skinType = ((ObjectProperty<SkinType>) properties.get("skinType")).get();
-            CONTROL = new Gauge(skinType);
+            gauge = new Gauge(skinType);
             switch(skinType) {
                 case AMP:
-                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
-                    CONTROL.setTitleColor(Color.WHITE);
-                    CONTROL.setLedVisible(true);
-                    CONTROL.setBackgroundPaint(Color.WHITE);
-                    CONTROL.setForegroundPaint(Color.BLACK);
-                    CONTROL.setLcdVisible(true);
-                    CONTROL.setShadowsEnabled(true);
+                    gauge.setKnobPosition(Pos.BOTTOM_CENTER);
+                    gauge.setTitleColor(Color.WHITE);
+                    gauge.setLedVisible(true);
+                    gauge.setBackgroundPaint(Color.WHITE);
+                    gauge.setForegroundPaint(Color.BLACK);
+                    gauge.setLcdVisible(true);
+                    gauge.setShadowsEnabled(true);
                     break;
                 case PLAIN_AMP:
-                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
-                    CONTROL.setTitleColor(Color.WHITE);
-                    CONTROL.setLedVisible(true);
-                    CONTROL.setBackgroundPaint(Color.WHITE);
-                    CONTROL.setForegroundPaint(Color.BLACK);
-                    CONTROL.setLcdVisible(true);
-                    CONTROL.setShadowsEnabled(true);
+                    gauge.setKnobPosition(Pos.BOTTOM_CENTER);
+                    gauge.setTitleColor(Color.WHITE);
+                    gauge.setLedVisible(true);
+                    gauge.setBackgroundPaint(Color.WHITE);
+                    gauge.setForegroundPaint(Color.BLACK);
+                    gauge.setLcdVisible(true);
+                    gauge.setShadowsEnabled(true);
                     break;
                 case BULLET_CHART:
-                    CONTROL.setKnobPosition(Pos.CENTER);
-                    CONTROL.setBarColor(Color.BLACK);
-                    CONTROL.setThresholdColor(Color.BLACK);
+                    gauge.setKnobPosition(Pos.CENTER);
+                    gauge.setBarColor(Color.BLACK);
+                    gauge.setThresholdColor(Color.BLACK);
                     break;
                 case DASHBOARD:
-                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
-                    CONTROL.setDecimals(0);
-                    CONTROL.setBarBackgroundColor(Color.LIGHTGRAY);
-                    CONTROL.setBarColor(Color.rgb(93,190,205));
-                    CONTROL.setStartFromZero(false);
+                    gauge.setKnobPosition(Pos.BOTTOM_CENTER);
+                    gauge.setDecimals(0);
+                    gauge.setBarBackgroundColor(Color.LIGHTGRAY);
+                    gauge.setBarColor(Color.rgb(93, 190, 205));
+                    gauge.setStartFromZero(false);
                     break;
                 case FLAT:
-                    CONTROL.setKnobPosition(Pos.CENTER);
-                    CONTROL.setBarColor(Color.CYAN);
-                    CONTROL.setBackgroundPaint(Color.TRANSPARENT);
-                    CONTROL.setTitleColor(Gauge.DARK_COLOR);
-                    CONTROL.setValueColor(Gauge.DARK_COLOR);
-                    CONTROL.setUnitColor(Gauge.DARK_COLOR);
-                    CONTROL.setBorderPaint(Color.rgb(208, 208, 208));
-                    CONTROL.setDecimals(0);
-                    CONTROL.setStartFromZero(true);
+                    gauge.setKnobPosition(Pos.CENTER);
+                    gauge.setBarColor(Color.CYAN);
+                    gauge.setBackgroundPaint(Color.TRANSPARENT);
+                    gauge.setTitleColor(Gauge.DARK_COLOR);
+                    gauge.setValueColor(Gauge.DARK_COLOR);
+                    gauge.setUnitColor(Gauge.DARK_COLOR);
+                    gauge.setBorderPaint(Color.rgb(208, 208, 208));
+                    gauge.setDecimals(0);
+                    gauge.setStartFromZero(true);
                     break;
                 case INDICATOR:
-                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
-                    CONTROL.setValueVisible(false);
-                    CONTROL.setGradientBarEnabled(false);
-                    CONTROL.setGradientBarStops(new Stop(0.0, Color.rgb(34,180,11)),
-                                                new Stop(0.5, Color.rgb(255,146,0)),
-                                                new Stop(1.0, Color.rgb(255,0,39)));
-                    CONTROL.setTickLabelsVisible(false);
-                    CONTROL.setNeedleColor(Color.rgb(71,71,71));
-                    CONTROL.setBarBackgroundColor(Color.rgb(232,231,223));
-                    CONTROL.setBarColor(Color.rgb(255,0,39));
-                    CONTROL.setAngleRange(180);
+                    gauge.setKnobPosition(Pos.BOTTOM_CENTER);
+                    gauge.setValueVisible(false);
+                    gauge.setGradientBarEnabled(false);
+                    gauge.setGradientBarStops(new Stop(0.0, Color.rgb(34, 180, 11)),
+                                              new Stop(0.5, Color.rgb(255,146,0)),
+                                              new Stop(1.0, Color.rgb(255,0,39)));
+                    gauge.setTickLabelsVisible(false);
+                    gauge.setNeedleColor(Color.rgb(71, 71, 71));
+                    gauge.setBarBackgroundColor(Color.rgb(232, 231, 223));
+                    gauge.setBarColor(Color.rgb(255, 0, 39));
+                    gauge.setAngleRange(180);
                     break;
                 case KPI:
-                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
-                    CONTROL.setDecimals(0);
-                    CONTROL.setForegroundBaseColor(Color.rgb(126,126,127));
-                    CONTROL.setBarColor(Color.rgb(168,204,254));
-                    CONTROL.setThresholdVisible(true);
-                    CONTROL.setThresholdColor(Color.rgb(45,86,184));
-                    CONTROL.setNeedleColor(Color.rgb(74,74,74));
-                    CONTROL.setAngleRange(128);
+                    gauge.setKnobPosition(Pos.BOTTOM_CENTER);
+                    gauge.setDecimals(0);
+                    gauge.setForegroundBaseColor(Color.rgb(126, 126, 127));
+                    gauge.setBarColor(Color.rgb(168, 204, 254));
+                    gauge.setThresholdVisible(true);
+                    gauge.setThresholdColor(Color.rgb(45, 86, 184));
+                    gauge.setNeedleColor(Color.rgb(74, 74, 74));
+                    gauge.setAngleRange(128);
                     break;
                 case MODERN:
-                    CONTROL.setKnobPosition(Pos.CENTER);
-                    CONTROL.setDecimals(0);
-                    CONTROL.setValueColor(Color.WHITE);
-                    CONTROL.setTitleColor(Color.WHITE);
-                    CONTROL.setSubTitleColor(Color.WHITE);
-                    CONTROL.setUnitColor(Color.WHITE);
-                    CONTROL.setBarColor(Color.rgb(0, 214, 215));
-                    CONTROL.setNeedleColor(Color.WHITE);
-                    CONTROL.setThresholdColor(Color.rgb(204, 0, 0));
-                    CONTROL.setTickLabelColor(Color.rgb(151, 151, 151));
-                    CONTROL.setTickMarkColor(Color.BLACK);
-                    CONTROL.setTickLabelOrientation(TickLabelOrientation.ORTHOGONAL);
+                    gauge.setKnobPosition(Pos.CENTER);
+                    gauge.setDecimals(0);
+                    gauge.setValueColor(Color.WHITE);
+                    gauge.setTitleColor(Color.WHITE);
+                    gauge.setSubTitleColor(Color.WHITE);
+                    gauge.setUnitColor(Color.WHITE);
+                    gauge.setBarColor(Color.rgb(0, 214, 215));
+                    gauge.setNeedleColor(Color.WHITE);
+                    gauge.setThresholdColor(Color.rgb(204, 0, 0));
+                    gauge.setTickLabelColor(Color.rgb(151, 151, 151));
+                    gauge.setTickMarkColor(Color.BLACK);
+                    gauge.setTickLabelOrientation(TickLabelOrientation.ORTHOGONAL);
                     break;
                 case SIMPLE:
-                    CONTROL.setKnobPosition(Pos.CENTER);
-                    CONTROL.setBorderPaint(Color.WHITE);
-                    CONTROL.setNeedleBorderColor(Color.WHITE);
-                    CONTROL.setBackgroundPaint(Color.DARKGRAY);
-                    CONTROL.setDecimals(0);
-                    CONTROL.setTickLabelColor(Color.WHITE);
-                    CONTROL.setNeedleColor(Color.web("#5a615f"));
-                    CONTROL.setValueColor(Color.WHITE);
-                    CONTROL.setTitleColor(Color.WHITE);
-                    CONTROL.setSubTitleColor(Color.WHITE);
-                    CONTROL.setSectionsVisible(true);
+                    gauge.setKnobPosition(Pos.CENTER);
+                    gauge.setBorderPaint(Color.WHITE);
+                    gauge.setNeedleBorderColor(Color.WHITE);
+                    gauge.setBackgroundPaint(Color.DARKGRAY);
+                    gauge.setDecimals(0);
+                    gauge.setTickLabelColor(Color.WHITE);
+                    gauge.setNeedleColor(Color.web("#5a615f"));
+                    gauge.setValueColor(Color.WHITE);
+                    gauge.setTitleColor(Color.WHITE);
+                    gauge.setSubTitleColor(Color.WHITE);
+                    gauge.setSectionsVisible(true);
                     break;
                 case SLIM:
-                    CONTROL.setKnobPosition(Pos.CENTER);
-                    CONTROL.setDecimals(2);
-                    CONTROL.setStartFromZero(true);
-                    CONTROL.setBarBackgroundColor(Color.rgb(62, 67, 73));
-                    CONTROL.setBarColor(Color.rgb(93,190,205));
-                    CONTROL.setTitleColor(Color.rgb(142,147,151));
-                    CONTROL.setValueColor(Color.rgb(228,231,238));
-                    CONTROL.setUnitColor(Color.rgb(142,147,151));
+                    gauge.setKnobPosition(Pos.CENTER);
+                    gauge.setDecimals(2);
+                    gauge.setStartFromZero(true);
+                    gauge.setBarBackgroundColor(Color.rgb(62, 67, 73));
+                    gauge.setBarColor(Color.rgb(93, 190, 205));
+                    gauge.setTitleColor(Color.rgb(142, 147, 151));
+                    gauge.setValueColor(Color.rgb(228, 231, 238));
+                    gauge.setUnitColor(Color.rgb(142, 147, 151));
                     break;
                 case SPACE_X:
-                    CONTROL.setKnobPosition(Pos.CENTER);
-                    CONTROL.setDecimals(0);
-                    CONTROL.setThresholdColor(Color.rgb(180, 0, 0));
-                    CONTROL.setBarBackgroundColor(Color.rgb(169, 169, 169, 0.25));
-                    CONTROL.setBarColor(Color.rgb(169, 169, 169));
-                    CONTROL.setTitleColor(Color.WHITE);
-                    CONTROL.setValueColor(Color.WHITE);
-                    CONTROL.setUnitColor(Color.WHITE);
+                    gauge.setKnobPosition(Pos.CENTER);
+                    gauge.setDecimals(0);
+                    gauge.setThresholdColor(Color.rgb(180, 0, 0));
+                    gauge.setBarBackgroundColor(Color.rgb(169, 169, 169, 0.25));
+                    gauge.setBarColor(Color.rgb(169, 169, 169));
+                    gauge.setTitleColor(Color.WHITE);
+                    gauge.setValueColor(Color.WHITE);
+                    gauge.setUnitColor(Color.WHITE);
                     break;
                 case QUARTER:
-                    CONTROL.setKnobPosition(Pos.BOTTOM_RIGHT);
-                    CONTROL.setAngleRange(90);
+                    gauge.setKnobPosition(Pos.BOTTOM_RIGHT);
+                    gauge.setAngleRange(90);
                     break;
                 case HORIZONTAL:
-                    CONTROL.setKnobPosition(Pos.BOTTOM_CENTER);
-                    CONTROL.setAngleRange(180);
+                    gauge.setKnobPosition(Pos.BOTTOM_CENTER);
+                    gauge.setAngleRange(180);
                     break;
                 case VERTICAL:
-                    CONTROL.setKnobPosition(Pos.CENTER_RIGHT);
-                    CONTROL.setAngleRange(180);
+                    gauge.setKnobPosition(Pos.CENTER_RIGHT);
+                    gauge.setAngleRange(180);
                     break;
                 case LCD:
-                    CONTROL.setDecimals(1);
-                    CONTROL.setTickLabelDecimals(1);
-                    CONTROL.setMinMeasuredValueVisible(true);
-                    CONTROL.setMaxMeasuredValueVisible(true);
-                    CONTROL.setOldValueVisible(true);
-                    CONTROL.setBorderPaint(Color.WHITE);
-                    CONTROL.setForegroundPaint(Color.WHITE);
+                    gauge.setDecimals(1);
+                    gauge.setTickLabelDecimals(1);
+                    gauge.setMinMeasuredValueVisible(true);
+                    gauge.setMaxMeasuredValueVisible(true);
+                    gauge.setOldValueVisible(true);
+                    gauge.setBorderPaint(Color.WHITE);
+                    gauge.setForegroundPaint(Color.WHITE);
                     break;
                 case TINY:
-                    CONTROL.setBorderWidth(24);
-                    CONTROL.setBackgroundPaint(Color.rgb(216,216,216));
-                    CONTROL.setBorderPaint(Color.rgb(76,76,76));
-                    CONTROL.setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));
-                    CONTROL.setNeedleColor(Color.rgb(76, 76, 76));
-                    CONTROL.setSectionsVisible(true);
-                    CONTROL.setMajorTickMarksVisible(true);
-                    CONTROL.setMajorTickMarkColor(Color.WHITE);
+                    gauge.setBorderWidth(24);
+                    gauge.setBackgroundPaint(Color.rgb(216, 216, 216));
+                    gauge.setBorderPaint(Color.rgb(76, 76, 76));
+                    gauge.setBarBackgroundColor(Color.rgb(76, 76, 76, 0.2));
+                    gauge.setNeedleColor(Color.rgb(76, 76, 76));
+                    gauge.setSectionsVisible(true);
+                    gauge.setMajorTickMarksVisible(true);
+                    gauge.setMajorTickMarkColor(Color.WHITE);
                     break;
                 case BATTERY:
-                    CONTROL.setBarBackgroundColor(Color.BLACK);
-                    CONTROL.setBarColor(Color.BLACK);
-                    CONTROL.setValueColor(Color.WHITE);
+                    gauge.setBarBackgroundColor(Color.BLACK);
+                    gauge.setBarColor(Color.BLACK);
+                    gauge.setValueColor(Color.WHITE);
                     break;
                 case LEVEL:
-                    CONTROL.setValueColor(Color.WHITE);
-                    CONTROL.setBarColor(Color.CYAN);
-                    CONTROL.setUnit("%");
+                    gauge.setValueColor(Color.WHITE);
+                    gauge.setBarColor(Color.CYAN);
+                    gauge.setUnit("%");
                     break;
                 case LINEAR:
-                    CONTROL.setOrientation(Orientation.VERTICAL);
-                    CONTROL.setBarColor(Gauge.DARK_COLOR);
-                    CONTROL.setBarEffectEnabled(true);
+                    gauge.setOrientation(Orientation.VERTICAL);
+                    gauge.setBarColor(Gauge.DARK_COLOR);
+                    gauge.setBarEffectEnabled(true);
                     break;
                 case DIGITAL:
-                    CONTROL.setBarColor(Gauge.DARK_COLOR);
-                    CONTROL.setShadowsEnabled(true);
+                    gauge.setBarColor(Gauge.DARK_COLOR);
+                    gauge.setShadowsEnabled(true);
                     break;
                 case SIMPLE_DIGITAL:
-                    CONTROL.setBarBackgroundColor(Helper.getTranslucentColorFrom(Gauge.DARK_COLOR, 0.1));
-                    CONTROL.setBarColor(Gauge.DARK_COLOR);
+                    gauge.setBarBackgroundColor(Helper.getTranslucentColorFrom(Gauge.DARK_COLOR, 0.1));
+                    gauge.setBarColor(Gauge.DARK_COLOR);
                     break;
                 case SECTION:
-                    CONTROL.setBackgroundPaint(Gauge.DARK_COLOR);
-                    CONTROL.setAutoScale(false);
-                    CONTROL.setValueVisible(false);
-                    CONTROL.setKnobColor(Color.rgb(82,82,84));
-                    CONTROL.setSectionsVisible(true);
-                    CONTROL.setSectionTextVisible(true);
+                    gauge.setBackgroundPaint(Gauge.DARK_COLOR);
+                    gauge.setAutoScale(false);
+                    gauge.setValueVisible(false);
+                    gauge.setKnobColor(Color.rgb(82, 82, 84));
+                    gauge.setSectionsVisible(true);
+                    gauge.setSectionTextVisible(true);
                     break;
                 case BAR:
-                    Color barColor = CONTROL.getBarColor();
-                    CONTROL.setAnimated(true);
-                    CONTROL.setAnimationDuration(1000);
-                    CONTROL.setMinValue(0);
-                    CONTROL.setMaxValue(100);
-                    CONTROL.setGradientBarEnabled(true);
-                    CONTROL.setGradientBarStops(new Stop(0.0, barColor),
-                                                new Stop(0.01, barColor),
-                                                new Stop(0.75, barColor.deriveColor(-10, 1, 1, 1)),
-                                                new Stop(1.0, barColor.deriveColor(-20, 1, 1, 1)));
-                    CONTROL.setBarColor(barColor);
-                    CONTROL.setBarEffectEnabled(true);
+                    Color barColor = gauge.getBarColor();
+                    gauge.setAnimated(true);
+                    gauge.setAnimationDuration(1000);
+                    gauge.setMinValue(0);
+                    gauge.setMaxValue(100);
+                    gauge.setGradientBarEnabled(true);
+                    gauge.setGradientBarStops(new Stop(0.0, barColor),
+                                              new Stop(0.01, barColor),
+                                              new Stop(0.75, barColor.deriveColor(-10, 1, 1, 1)),
+                                              new Stop(1.0, barColor.deriveColor(-20, 1, 1, 1)));
+                    gauge.setBarColor(barColor);
+                    gauge.setBarEffectEnabled(true);
                     break;
                 case WHITE:
-                    CONTROL.setAnimated(true);
-                    CONTROL.setAnimationDuration(1000);
-                    CONTROL.setAngleRange(360);
-                    CONTROL.setMinValue(0);
-                    CONTROL.setMaxValue(100);
-                    CONTROL.setBarColor(Color.WHITE);
-                    CONTROL.setValueColor(Color.WHITE);
-                    CONTROL.setUnitColor(Color.WHITE);
+                    gauge.setAnimated(true);
+                    gauge.setAnimationDuration(1000);
+                    gauge.setAngleRange(360);
+                    gauge.setMinValue(0);
+                    gauge.setMaxValue(100);
+                    gauge.setBarColor(Color.WHITE);
+                    gauge.setValueColor(Color.WHITE);
+                    gauge.setUnitColor(Color.WHITE);
                     break;
                 case CHARGE:
-                    CONTROL.setMinValue(0);
-                    CONTROL.setMaxValue(1.0);
-                    CONTROL.setAnimated(true);
+                    gauge.setMinValue(0);
+                    gauge.setMaxValue(1.0);
+                    gauge.setAnimated(true);
                     break;
                 case SIMPLE_SECTION:
-                    CONTROL.setAnimated(true);
-                    CONTROL.setStartAngle(150);
-                    CONTROL.setAngleRange(300);
-                    CONTROL.setStartFromZero(true);
-                    CONTROL.setSectionsVisible(true);
-                    CONTROL.setBarBackgroundColor(Color.rgb(150, 150, 150, 0.25));
-                    CONTROL.setBarColor(Color.rgb(69, 106, 207));
-                    CONTROL.setTitleColor(Color.rgb(90, 90, 90));
-                    CONTROL.setUnitColor(Color.rgb(90, 90, 90));
-                    CONTROL.setValueColor(Color.rgb(90, 90, 90));
+                    gauge.setAnimated(true);
+                    gauge.setStartAngle(150);
+                    gauge.setAngleRange(300);
+                    gauge.setStartFromZero(true);
+                    gauge.setSectionsVisible(true);
+                    gauge.setBarBackgroundColor(Color.rgb(150, 150, 150, 0.25));
+                    gauge.setBarColor(Color.rgb(69, 106, 207));
+                    gauge.setTitleColor(Color.rgb(90, 90, 90));
+                    gauge.setUnitColor(Color.rgb(90, 90, 90));
+                    gauge.setValueColor(Color.rgb(90, 90, 90));
                     break;
                 case NASA:
-                    CONTROL.setBarBackgroundColor(Color.TRANSPARENT);
-                    CONTROL.setForegroundBaseColor(Color.WHITE);
-                    CONTROL.setStartAngle(108);
-                    CONTROL.setAngleRange(216);
-                    CONTROL.setTickLabelsVisible(false);
-                    CONTROL.setMediumTickMarksVisible(false);
-                    CONTROL.setMajorTickMarksVisible(false);
+                    gauge.setBarBackgroundColor(Color.TRANSPARENT);
+                    gauge.setForegroundBaseColor(Color.WHITE);
+                    gauge.setStartAngle(108);
+                    gauge.setAngleRange(216);
+                    gauge.setTickLabelsVisible(false);
+                    gauge.setMediumTickMarksVisible(false);
+                    gauge.setMajorTickMarksVisible(false);
                     break;
                 case GAUGE:
-                    CONTROL.setStartAngle(320);
-                    CONTROL.setAngleRange(280);
+                    gauge.setStartAngle(320);
+                    gauge.setAngleRange(280);
                     break;
             }
         } else {
-            CONTROL = new Gauge();
+            gauge = new Gauge();
         }
 
         // Make sure that sections, areas and markers will be added first
         if (properties.keySet().contains("sectionsArray")) {
-            CONTROL.setSections(((ObjectProperty<Section[]>) properties.get("sectionsArray")).get());
+            gauge.setSections(((ObjectProperty<Section[]>) properties.get("sectionsArray")).get());
         }
         if(properties.keySet().contains("sectionsList")) {
-            CONTROL.setSections(((ObjectProperty<List<Section>>) properties.get("sectionsList")).get());
+            gauge.setSections(((ObjectProperty<List<Section>>) properties.get("sectionsList")).get());
         }
 
         if (properties.keySet().contains("areasArray")) {
-            CONTROL.setAreas(((ObjectProperty<Section[]>) properties.get("areasArray")).get());
+            gauge.setAreas(((ObjectProperty<Section[]>) properties.get("areasArray")).get());
         }
         if(properties.keySet().contains("areasList")) {
-            CONTROL.setAreas(((ObjectProperty<List<Section>>) properties.get("areasList")).get());
+            gauge.setAreas(((ObjectProperty<List<Section>>) properties.get("areasList")).get());
         }
 
         if (properties.keySet().contains("tickMarkSectionsArray")) {
-            CONTROL.setTickMarkSections(((ObjectProperty<Section[]>) properties.get("tickMarkSectionsArray")).get());
+            gauge.setTickMarkSections(((ObjectProperty<Section[]>) properties.get("tickMarkSectionsArray")).get());
         }
         if(properties.keySet().contains("tickMarkSectionsList")) {
-            CONTROL.setTickMarkSections(((ObjectProperty<List<Section>>) properties.get("tickMarkSectionsList")).get());
+            gauge.setTickMarkSections(((ObjectProperty<List<Section>>) properties.get("tickMarkSectionsList")).get());
         }
 
         if (properties.keySet().contains("tickLabelSectionsArray")) {
-            CONTROL.setTickLabelSections(((ObjectProperty<Section[]>) properties.get("tickLabelSectionsArray")).get());
+            gauge.setTickLabelSections(((ObjectProperty<Section[]>) properties.get("tickLabelSectionsArray")).get());
         }
         if(properties.keySet().contains("tickLabelSectionsList")) {
-            CONTROL.setTickLabelSections(((ObjectProperty<List<Section>>) properties.get("tickLabelSectionsList")).get());
+            gauge.setTickLabelSections(((ObjectProperty<List<Section>>) properties.get("tickLabelSectionsList")).get());
         }
 
         if (properties.keySet().contains("markersArray")) {
-            CONTROL.setMarkers(((ObjectProperty<Marker[]>) properties.get("markersArray")).get());
+            gauge.setMarkers(((ObjectProperty<Marker[]>) properties.get("markersArray")).get());
         }
         if (properties.keySet().contains("markersList")) {
-            CONTROL.setMarkers(((ObjectProperty<List<Marker>>) properties.get("markersList")).get());
+            gauge.setMarkers(((ObjectProperty<List<Marker>>) properties.get("markersList")).get());
         }
 
         if (properties.keySet().contains("gradientBarStopsArray")) {
-            CONTROL.setGradientBarStops(((ObjectProperty<Stop[]>) properties.get("gradientBarStopsArray")).get());
+            gauge.setGradientBarStops(((ObjectProperty<Stop[]>) properties.get("gradientBarStopsArray")).get());
         }
         if (properties.keySet().contains("gradientBarStopsList")) {
-            CONTROL.setGradientBarStops(((ObjectProperty<List<Stop>>) properties.get("gradientBarStopsList")).get());
+            gauge.setGradientBarStops(((ObjectProperty<List<Stop>>) properties.get("gradientBarStopsList")).get());
         }
 
         if (properties.keySet().contains("customTickLabelsArray")) {
-            CONTROL.setCustomTickLabels(((ObjectProperty<String[]>) properties.get("customTickLabelsArray")).get());
+            gauge.setCustomTickLabels(((ObjectProperty<String[]>) properties.get("customTickLabelsArray")).get());
         }
         if (properties.keySet().contains("customTickLabelsList")) {
-            CONTROL.setCustomTickLabels(((ObjectProperty<List<String>>) properties.get("customTickLabelsList")).get());
+            gauge.setCustomTickLabels(((ObjectProperty<List<String>>) properties.get("customTickLabelsList")).get());
         }
         if(properties.keySet().contains("foregroundBaseColor")) {
-            CONTROL.setForegroundBaseColor(((ObjectProperty<Color>) properties.get("foregroundBaseColor")).get());
+            gauge.setForegroundBaseColor(((ObjectProperty<Color>) properties.get("foregroundBaseColor")).get());
         }
         if (properties.keySet().contains("autoScale")) {
-            CONTROL.setAutoScale(((BooleanProperty) properties.get("autoScale")).get());
+            gauge.setAutoScale(((BooleanProperty) properties.get("autoScale")).get());
         }
 
-        setMinMaxValues(CONTROL);
+        setMinMaxValues(gauge);
 
         for (String key : properties.keySet()) {
-            if ("prefSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
-            } else if("minSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setMinSize(dim.getWidth(), dim.getHeight());
-            } else if("maxSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setMaxSize(dim.getWidth(), dim.getHeight());
-            } else if("prefWidth".equals(key)) {
-                CONTROL.setPrefWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("prefHeight".equals(key)) {
-                CONTROL.setPrefHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("minWidth".equals(key)) {
-                CONTROL.setMinWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("minHeight".equals(key)) {
-                CONTROL.setMinHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("maxWidth".equals(key)) {
-                CONTROL.setMaxWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("maxHeight".equals(key)) {
-                CONTROL.setMaxHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("scaleX".equals(key)) {
-                CONTROL.setScaleX(((DoubleProperty) properties.get(key)).get());
-            } else if("scaleY".equals(key)) {
-                CONTROL.setScaleY(((DoubleProperty) properties.get(key)).get());
-            } else if ("layoutX".equals(key)) {
-                CONTROL.setLayoutX(((DoubleProperty) properties.get(key)).get());
-            } else if ("layoutY".equals(key)) {
-                CONTROL.setLayoutY(((DoubleProperty) properties.get(key)).get());
-            } else if ("translateX".equals(key)) {
-                CONTROL.setTranslateX(((DoubleProperty) properties.get(key)).get());
-            } else if ("translateY".equals(key)) {
-                CONTROL.setTranslateY(((DoubleProperty) properties.get(key)).get());
-            } else if ("padding".equals(key)) {
-                CONTROL.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
-            } else if("styleClass".equals(key)) {
-                CONTROL.getStyleClass().setAll("gauge");
-                CONTROL.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
-            } else if("decimals".equals(key)) {
-                CONTROL.setDecimals(((IntegerProperty) properties.get(key)).get());
-            } else if ("tickLabelDecimals".equals(key)) {
-                CONTROL.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
-            } else if("title".equals(key)) {
-                CONTROL.setTitle(((StringProperty) properties.get(key)).get());
-            } else if("subTitle".equals(key)) {
-                CONTROL.setSubTitle(((StringProperty) properties.get(key)).get());
-            } else if("unit".equals(key)) {
-                CONTROL.setUnit(((StringProperty) properties.get(key)).get());
-            } else if("averagingEnabled".equals(key)) {
-                CONTROL.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if("averagingPeriod".equals(key)) {
-                CONTROL.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
-            } else if("startFromZero".equals(key)) {
-                CONTROL.setStartFromZero(((BooleanProperty) properties.get(key)).get());
-            } else if("returnToZero".equals(key)) {
-                CONTROL.setReturnToZero(((BooleanProperty) properties.get(key)).get());
-            } else if("zeroColor".equals(key)) {
-                CONTROL.setZeroColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("minMeasuredValueVisible".equals(key)) {
-                CONTROL.setMinMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("maxMeasuredValueVisible".equals(key)) {
-                CONTROL.setMaxMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("oldValueVisible".equals(key)) {
-                CONTROL.setOldValueVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("valueVisible".equals(key)) {
-                CONTROL.setValueVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("backgroundPaint".equals(key)) {
-                CONTROL.setBackgroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
-            } else if ("borderPaint".equals(key)) {
-                CONTROL.setBorderPaint(((ObjectProperty<Paint>) properties.get(key)).get());
-            } else if ("borderWidth".equals(key)) {
-                CONTROL.setBorderWidth(((DoubleProperty) properties.get(key)).get());
-            } else if ("foregroundPaint".equals(key)) {
-                CONTROL.setForegroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
-            } else if ("knobColor".equals(key)) {
-                CONTROL.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("knobType".equals(key)) {
-                CONTROL.setKnobType(((ObjectProperty<KnobType>) properties.get(key)).get());
-            } else if ("knobPosition".equals(key)) {
-                CONTROL.setKnobPosition(((ObjectProperty<Pos>) properties.get(key)).get());
-            } else if ("knobVisible".equals(key)) {
-                CONTROL.setKnobVisible(((BooleanProperty) properties.get(key)).get());
-            } else if("animated".equals(key)) {
-                CONTROL.setAnimated(((BooleanProperty) properties.get(key)).get());
-            } else if("animationDuration".equals(key)) {
-                CONTROL.setAnimationDuration(((LongProperty) properties.get(key)).get());
-            } else if("startAngle".equals(key)) {
-                CONTROL.setStartAngle(((DoubleProperty) properties.get(key)).get());
-            } else if("angleRange".equals(key)) {
-                CONTROL.setAngleRange(((DoubleProperty) properties.get(key)).get());
-            } else if ("arcExtend".equals(key)) {
-                CONTROL.setArcExtend(((DoubleProperty) properties.get(key)).get());
-            } else if("needleType".equals(key)) {
-                CONTROL.setNeedleType(((ObjectProperty<NeedleType>) properties.get(key)).get());
-            } else if("needleShape".equals(key)) {
-                CONTROL.setNeedleShape(((ObjectProperty<NeedleShape>) properties.get(key)).get());
-            } else if("needleSize".equals(key)) {
-                CONTROL.setNeedleSize(((ObjectProperty<NeedleSize>) properties.get(key)).get());
-            } else if("needleBehavior".equals(key)) {
-                CONTROL.setNeedleBehavior(((ObjectProperty<NeedleBehavior>) properties.get(key)).get());
-            } else if("needleColor".equals(key)) {
-                CONTROL.setNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if("needleBorderColor".equals(key)) {
-                CONTROL.setNeedleBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if("barColor".equals(key)) {
-                CONTROL.setBarColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if("barBorderColor".equals(key)) {
-                CONTROL.setBarBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("barBackgroundColor".equals(key)) {
-                CONTROL.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if("tickLabelOrientation".equals(key)) {
-                CONTROL.setTickLabelOrientation(((ObjectProperty<TickLabelOrientation>) properties.get(key)).get());
-            } else if("tickLabelLocation".equals(key)) {
-                CONTROL.setTickLabelLocation(((ObjectProperty<TickLabelLocation>) properties.get(key)).get());
-            } else if("locale".equals(key)) {
-                CONTROL.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
-            } else if("majorTickSpace".equals(key)) {
-                CONTROL.setMajorTickSpace(((DoubleProperty) properties.get(key)).get());
-            } else if("minorTickSpace".equals(key)) {
-                CONTROL.setMinorTickSpace(((DoubleProperty) properties.get(key)).get());
-            } else if("shadowsEnabled".equals(key)) {
-                CONTROL.setShadowsEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("barEffectEnabled".equals(key)) {
-                CONTROL.setBarEffectEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("scaleDirection".equals(key)) {
-                CONTROL.setScaleDirection(((ObjectProperty<ScaleDirection>) properties.get(key)).get());
-            } else if("tickLabelColor".equals(key)) {
-                CONTROL.setTickLabelColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("tickMarkColor".equals(key)) {
-                CONTROL.setTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("majorTickMarkColor".equals(key)) {
-                CONTROL.setMajorTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("majorTickMarkLengthFactor".equals(key)) {
-                CONTROL.setMajorTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
-            } else if ("majorTickMarkWidthFactor".equals(key)) {
-                CONTROL.setMajorTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
-            } else if ("mediumTickMarkColor".equals(key)) {
-                CONTROL.setMediumTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("mediumTickMarkLengthFactor".equals(key)) {
-                CONTROL.setMediumTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
-            } else if ("mediumTickMarkWidthFactor".equals(key)) {
-                CONTROL.setMediumTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
-            } else if ("minorTickMarkColor".equals(key)) {
-                CONTROL.setMinorTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("minorTickMarkLengthFactor".equals(key)) {
-                CONTROL.setMinorTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
-            } else if ("minorTickMarkWidthFactor".equals(key)) {
-                CONTROL.setMinorTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
-            } else if ("style".equals(key)) {
-                CONTROL.setStyle(((StringProperty) properties.get(key)).get());
-            } else if("ledColor".equals(key)) {
-                CONTROL.setLedColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if("ledType".equals(key)) {
-                CONTROL.setLedType(((ObjectProperty<LedType>) properties.get(key)).get());
-            } else if ("ledVisible".equals(key)) {
-                CONTROL.setLedVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("lcdVisible".equals(key)) {
-                CONTROL.setLcdVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("lcdCrystalEnabled".equals(key)) {
-                CONTROL.setLcdCrystalEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("lcdDesign".equals(key)) {
-                CONTROL.setLcdDesign(((ObjectProperty<LcdDesign>) properties.get(key)).get());
-            } else if ("lcdFont".equals(key)) {
-                CONTROL.setLcdFont(((ObjectProperty<LcdFont>) properties.get(key)).get());
-            } else if ("innerShadowEnabled".equals(key)) {
-                CONTROL.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("thresholdVisible".equals(key)) {
-                CONTROL.setThresholdVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("averageVisible".equals(key)) {
-                CONTROL.setAverageVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("sectionsVisible".equals(key)) {
-                CONTROL.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("sectionsAlwaysVisible".equals(key)) {
-                CONTROL.setSectionsAlwaysVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("sectionTextVisible".equals(key)) {
-                CONTROL.setSectionTextVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("sectionIconsVisible".equals(key)) {
-                CONTROL.setSectionIconsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("highlightSections".equals(key)) {
-                CONTROL.setHighlightSections(((BooleanProperty) properties.get(key)).get());
-            } else if ("areasVisible".equals(key)) {
-                CONTROL.setAreasVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("areaTextVisible".equals(key)) {
-                CONTROL.setAreaTextVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("areaIconsVisible".equals(key)) {
-                CONTROL.setAreaIconsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("highlightAreas".equals(key)) {
-                CONTROL.setHighlightAreas(((BooleanProperty) properties.get(key)).get());
-            } else if ("tickMarkSectionsVisible".equals(key)) {
-                CONTROL.setTickMarkSectionsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("tickLabelSectionsVisible".equals(key)) {
-                CONTROL.setTickLabelSectionsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("markersVisible".equals(key)) {
-                CONTROL.setMarkersVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("majorTickMarkType".equals(key)) {
-                CONTROL.setMajorTickMarkType(((ObjectProperty<TickMarkType>) properties.get(key)).get());
-            } else if ("mediumTickMarkType".equals(key)) {
-                CONTROL.setMediumTickMarkType(((ObjectProperty<TickMarkType>) properties.get(key)).get());
-            } else if ("minorTickMarkType".equals(key)) {
-                CONTROL.setMinorTickMarkType(((ObjectProperty<TickMarkType>) properties.get(key)).get());
-            } else if ("titleColor".equals(key)) {
-                CONTROL.setTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("subTitleColor".equals(key)) {
-                CONTROL.setSubTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("unitColor".equals(key)) {
-                CONTROL.setUnitColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("valueColor".equals(key)) {
-                CONTROL.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("thresholdColor".equals(key)) {
-                CONTROL.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("averageColor".equals(key)) {
-                CONTROL.setAverageColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("tickLabelsVisible".equals(key)) {
-                CONTROL.setTickLabelsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("onlyFirstAndLastTickLabelVisible".equals(key)) {
-                CONTROL.setOnlyFirstAndLastTickLabelVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("majorTickMarksVisible".equals(key)) {
-                CONTROL.setMajorTickMarksVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("mediumTickMarksVisible".equals(key)) {
-                CONTROL.setMediumTickMarksVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("minorTickMarksVisible".equals(key)) {
-                CONTROL.setMinorTickMarksVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("tickMarkRingVisible".equals(key)) {
-                CONTROL.setTickMarkRingVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("ledBlinking".equals(key)) {
-                CONTROL.setLedBlinking(((BooleanProperty) properties.get(key)).get());
-            } else if ("ledOn".equals(key)) {
-                CONTROL.setLedOn(((BooleanProperty) properties.get(key)).get());
-            } else if ("orientation".equals(key)) {
-                CONTROL.setOrientation(((ObjectProperty<Orientation>) properties.get(key)).get());
-            } else if("gradientBarEnabled".equals(key)) {
-                CONTROL.setGradientBarEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("gradientLookup".equals(key)) {
-                CONTROL.setGradientLookup(((ObjectProperty<GradientLookup>) properties.get(key)).get());
-            } else if ("customTickLabelsEnabled".equals(key)) {
-                CONTROL.setCustomTickLabelsEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("customTickLabelFontSize".equals(key)) {
-                CONTROL.setCustomTickLabelFontSize(((DoubleProperty) properties.get(key)).get());
-            } else if ("customTickLabelFontSizeEnabled".equals(key)) {
-                CONTROL.setCustomTickLabelFontSizeEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("interactive".equals(key)) {
-                CONTROL.setInteractive(((BooleanProperty) properties.get(key)).get());
-            } else if ("checkSectionsForValue".equals(key)) {
-                CONTROL.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
-            } else if ("checkAreasForValue".equals(key)) {
-                CONTROL.setCheckAreasForValue(((BooleanProperty) properties.get(key)).get());
-            } else if ("checkThreshold".equals(key)) {
-                CONTROL.setCheckThreshold(((BooleanProperty) properties.get(key)).get());
-            } else if ("onValueChanged".equals(key)) {
-                CONTROL.currentValueProperty().addListener(((ObjectProperty<InvalidationListener>) properties.get(key)).get());
-            } else if ("onButtonPressed".equals(key)) {
-                CONTROL.setOnButtonPressed(((ObjectProperty<EventHandler>) properties.get(key)).get());
-            } else if ("onButtonReleased".equals(key)) {
-                CONTROL.setOnButtonReleased(((ObjectProperty<EventHandler>) properties.get(key)).get());
-            } else if ("onThresholdExceeded".equals(key)) {
-                CONTROL.setOnThresholdExceeded(((ObjectProperty<EventHandler>) properties.get(key)).get());
-            } else if ("onThresholdUnderrun".equals(key)) {
-                CONTROL.setOnThresholdUnderrun(((ObjectProperty<EventHandler>) properties.get(key)).get());
-            } else if ("buttonTooltipText".equals(key)) {
-                CONTROL.setButtonTooltipText(((StringProperty) properties.get(key)).get());
-            } else if ("keepAspect".equals(key)) {
-                CONTROL.setKeepAspect(((BooleanProperty) properties.get(key)).get());
-            } else if ("threshold".equals(key)) {
-                CONTROL.setThreshold(((DoubleProperty) properties.get(key)).get());
-            } else if ("customFontEnabled".equals(key)) {
-                CONTROL.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("customFont".equals(key)) {
-                CONTROL.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
-            } else if ("alertMessage".equals(key)) {
-                CONTROL.setAlertMessage(((StringProperty) properties.get(key)).get());
-            } else if ("smoothing".equals(key)) {
-                CONTROL.setSmoothing(((BooleanProperty) properties.get(key)).get());
-            } else if("value".equals(key)) {
-                CONTROL.setValue(((DoubleProperty) properties.get(key)).get());
+            switch (key) {
+                case "prefSize"                         -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    gauge.setPrefSize(dim.getWidth(), dim.getHeight());
+                }
+                case "minSize"                          -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    gauge.setMinSize(dim.getWidth(), dim.getHeight());
+                }
+                case "maxSize"                          -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    gauge.setMaxSize(dim.getWidth(), dim.getHeight());
+                }
+                case "prefWidth"                        -> gauge.setPrefWidth(((DoubleProperty) properties.get(key)).get());
+                case "prefHeight"                       -> gauge.setPrefHeight(((DoubleProperty) properties.get(key)).get());
+                case "minWidth"                         -> gauge.setMinWidth(((DoubleProperty) properties.get(key)).get());
+                case "minHeight"                        -> gauge.setMinHeight(((DoubleProperty) properties.get(key)).get());
+                case "maxWidth"                         -> gauge.setMaxWidth(((DoubleProperty) properties.get(key)).get());
+                case "maxHeight"                        -> gauge.setMaxHeight(((DoubleProperty) properties.get(key)).get());
+                case "scaleX"                           -> gauge.setScaleX(((DoubleProperty) properties.get(key)).get());
+                case "scaleY"                           -> gauge.setScaleY(((DoubleProperty) properties.get(key)).get());
+                case "layoutX"                          -> gauge.setLayoutX(((DoubleProperty) properties.get(key)).get());
+                case "layoutY"                          -> gauge.setLayoutY(((DoubleProperty) properties.get(key)).get());
+                case "translateX"                       -> gauge.setTranslateX(((DoubleProperty) properties.get(key)).get());
+                case "translateY"                       -> gauge.setTranslateY(((DoubleProperty) properties.get(key)).get());
+                case "padding"                          -> gauge.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
+                case "styleClass"                       -> {
+                    gauge.getStyleClass().setAll("gauge");
+                    gauge.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
+                }
+                case "decimals"                         -> gauge.setDecimals(((IntegerProperty) properties.get(key)).get());
+                case "tickLabelDecimals"                -> gauge.setTickLabelDecimals(((IntegerProperty) properties.get(key)).get());
+                case "title"                            -> gauge.setTitle(((StringProperty) properties.get(key)).get());
+                case "subTitle"                         -> gauge.setSubTitle(((StringProperty) properties.get(key)).get());
+                case "unit"                             -> gauge.setUnit(((StringProperty) properties.get(key)).get());
+                case "averagingEnabled"                 -> gauge.setAveragingEnabled(((BooleanProperty) properties.get(key)).get());
+                case "averagingPeriod"                  -> gauge.setAveragingPeriod(((IntegerProperty) properties.get(key)).get());
+                case "startFromZero"                    -> gauge.setStartFromZero(((BooleanProperty) properties.get(key)).get());
+                case "returnToZero"                     -> gauge.setReturnToZero(((BooleanProperty) properties.get(key)).get());
+                case "zeroColor"                        -> gauge.setZeroColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "minMeasuredValueVisible"          -> gauge.setMinMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
+                case "maxMeasuredValueVisible"          -> gauge.setMaxMeasuredValueVisible(((BooleanProperty) properties.get(key)).get());
+                case "oldValueVisible"                  -> gauge.setOldValueVisible(((BooleanProperty) properties.get(key)).get());
+                case "valueVisible"                     -> gauge.setValueVisible(((BooleanProperty) properties.get(key)).get());
+                case "backgroundPaint"                  -> gauge.setBackgroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
+                case "borderPaint"                      -> gauge.setBorderPaint(((ObjectProperty<Paint>) properties.get(key)).get());
+                case "borderWidth"                      -> gauge.setBorderWidth(((DoubleProperty) properties.get(key)).get());
+                case "foregroundPaint"                  -> gauge.setForegroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
+                case "knobColor"                        -> gauge.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "knobType"                         -> gauge.setKnobType(((ObjectProperty<KnobType>) properties.get(key)).get());
+                case "knobPosition"                     -> gauge.setKnobPosition(((ObjectProperty<Pos>) properties.get(key)).get());
+                case "knobVisible"                      -> gauge.setKnobVisible(((BooleanProperty) properties.get(key)).get());
+                case "animated"                         -> gauge.setAnimated(((BooleanProperty) properties.get(key)).get());
+                case "animationDuration"                -> gauge.setAnimationDuration(((LongProperty) properties.get(key)).get());
+                case "startAngle"                       -> gauge.setStartAngle(((DoubleProperty) properties.get(key)).get());
+                case "angleRange"                       -> gauge.setAngleRange(((DoubleProperty) properties.get(key)).get());
+                case "arcExtend"                        -> gauge.setArcExtend(((DoubleProperty) properties.get(key)).get());
+                case "needleType"                       -> gauge.setNeedleType(((ObjectProperty<NeedleType>) properties.get(key)).get());
+                case "needleShape"                      -> gauge.setNeedleShape(((ObjectProperty<NeedleShape>) properties.get(key)).get());
+                case "needleSize"                       -> gauge.setNeedleSize(((ObjectProperty<NeedleSize>) properties.get(key)).get());
+                case "needleBehavior"                   -> gauge.setNeedleBehavior(((ObjectProperty<NeedleBehavior>) properties.get(key)).get());
+                case "needleColor"                      -> gauge.setNeedleColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "needleBorderColor"                -> gauge.setNeedleBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "barColor"                         -> gauge.setBarColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "barBorderColor"                   -> gauge.setBarBorderColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "barBackgroundColor"               -> gauge.setBarBackgroundColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "tickLabelOrientation"             -> gauge.setTickLabelOrientation(((ObjectProperty<TickLabelOrientation>) properties.get(key)).get());
+                case "tickLabelLocation"                -> gauge.setTickLabelLocation(((ObjectProperty<TickLabelLocation>) properties.get(key)).get());
+                case "locale"                           -> gauge.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
+                case "majorTickSpace"                   -> gauge.setMajorTickSpace(((DoubleProperty) properties.get(key)).get());
+                case "minorTickSpace"                   -> gauge.setMinorTickSpace(((DoubleProperty) properties.get(key)).get());
+                case "shadowsEnabled"                   -> gauge.setShadowsEnabled(((BooleanProperty) properties.get(key)).get());
+                case "barEffectEnabled"                 -> gauge.setBarEffectEnabled(((BooleanProperty) properties.get(key)).get());
+                case "scaleDirection"                   -> gauge.setScaleDirection(((ObjectProperty<ScaleDirection>) properties.get(key)).get());
+                case "tickLabelColor"                   -> gauge.setTickLabelColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "tickMarkColor"                    -> gauge.setTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "majorTickMarkColor"               -> gauge.setMajorTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "majorTickMarkLengthFactor"        -> gauge.setMajorTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
+                case "majorTickMarkWidthFactor"         -> gauge.setMajorTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
+                case "mediumTickMarkColor"              -> gauge.setMediumTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "mediumTickMarkLengthFactor"       -> gauge.setMediumTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
+                case "mediumTickMarkWidthFactor"        -> gauge.setMediumTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
+                case "minorTickMarkColor"               -> gauge.setMinorTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "minorTickMarkLengthFactor"        -> gauge.setMinorTickMarkLengthFactor(((DoubleProperty) properties.get(key)).get());
+                case "minorTickMarkWidthFactor"         -> gauge.setMinorTickMarkWidthFactor(((DoubleProperty) properties.get(key)).get());
+                case "style"                            -> gauge.setStyle(((StringProperty) properties.get(key)).get());
+                case "ledColor"                         -> gauge.setLedColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "ledType"                          -> gauge.setLedType(((ObjectProperty<LedType>) properties.get(key)).get());
+                case "ledVisible"                       -> gauge.setLedVisible(((BooleanProperty) properties.get(key)).get());
+                case "lcdVisible"                       -> gauge.setLcdVisible(((BooleanProperty) properties.get(key)).get());
+                case "lcdCrystalEnabled"                -> gauge.setLcdCrystalEnabled(((BooleanProperty) properties.get(key)).get());
+                case "lcdDesign"                        -> gauge.setLcdDesign(((ObjectProperty<LcdDesign>) properties.get(key)).get());
+                case "lcdFont"                          -> gauge.setLcdFont(((ObjectProperty<LcdFont>) properties.get(key)).get());
+                case "innerShadowEnabled"               -> gauge.setInnerShadowEnabled(((BooleanProperty) properties.get(key)).get());
+                case "thresholdVisible"                 -> gauge.setThresholdVisible(((BooleanProperty) properties.get(key)).get());
+                case "averageVisible"                   -> gauge.setAverageVisible(((BooleanProperty) properties.get(key)).get());
+                case "sectionsVisible"                  -> gauge.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
+                case "sectionsAlwaysVisible"            -> gauge.setSectionsAlwaysVisible(((BooleanProperty) properties.get(key)).get());
+                case "sectionTextVisible"               -> gauge.setSectionTextVisible(((BooleanProperty) properties.get(key)).get());
+                case "sectionIconsVisible"              -> gauge.setSectionIconsVisible(((BooleanProperty) properties.get(key)).get());
+                case "highlightSections"                -> gauge.setHighlightSections(((BooleanProperty) properties.get(key)).get());
+                case "areasVisible"                     -> gauge.setAreasVisible(((BooleanProperty) properties.get(key)).get());
+                case "areaTextVisible"                  -> gauge.setAreaTextVisible(((BooleanProperty) properties.get(key)).get());
+                case "areaIconsVisible"                 -> gauge.setAreaIconsVisible(((BooleanProperty) properties.get(key)).get());
+                case "highlightAreas"                   -> gauge.setHighlightAreas(((BooleanProperty) properties.get(key)).get());
+                case "tickMarkSectionsVisible"          -> gauge.setTickMarkSectionsVisible(((BooleanProperty) properties.get(key)).get());
+                case "tickLabelSectionsVisible"         -> gauge.setTickLabelSectionsVisible(((BooleanProperty) properties.get(key)).get());
+                case "markersVisible"                   -> gauge.setMarkersVisible(((BooleanProperty) properties.get(key)).get());
+                case "majorTickMarkType"                -> gauge.setMajorTickMarkType(((ObjectProperty<TickMarkType>) properties.get(key)).get());
+                case "mediumTickMarkType"               -> gauge.setMediumTickMarkType(((ObjectProperty<TickMarkType>) properties.get(key)).get());
+                case "minorTickMarkType"                -> gauge.setMinorTickMarkType(((ObjectProperty<TickMarkType>) properties.get(key)).get());
+                case "titleColor"                       -> gauge.setTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "subTitleColor"                    -> gauge.setSubTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "unitColor"                        -> gauge.setUnitColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "valueColor"                       -> gauge.setValueColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "thresholdColor"                   -> gauge.setThresholdColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "averageColor"                     -> gauge.setAverageColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "tickLabelsVisible"                -> gauge.setTickLabelsVisible(((BooleanProperty) properties.get(key)).get());
+                case "onlyFirstAndLastTickLabelVisible" -> gauge.setOnlyFirstAndLastTickLabelVisible(((BooleanProperty) properties.get(key)).get());
+                case "majorTickMarksVisible"            -> gauge.setMajorTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+                case "mediumTickMarksVisible"           -> gauge.setMediumTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+                case "minorTickMarksVisible"            -> gauge.setMinorTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+                case "tickMarkRingVisible"              -> gauge.setTickMarkRingVisible(((BooleanProperty) properties.get(key)).get());
+                case "ledBlinking"                      -> gauge.setLedBlinking(((BooleanProperty) properties.get(key)).get());
+                case "ledOn"                            -> gauge.setLedOn(((BooleanProperty) properties.get(key)).get());
+                case "orientation"                      -> gauge.setOrientation(((ObjectProperty<Orientation>) properties.get(key)).get());
+                case "gradientBarEnabled"               -> gauge.setGradientBarEnabled(((BooleanProperty) properties.get(key)).get());
+                case "gradientLookup"                   -> gauge.setGradientLookup(((ObjectProperty<GradientLookup>) properties.get(key)).get());
+                case "customTickLabelsEnabled"          -> gauge.setCustomTickLabelsEnabled(((BooleanProperty) properties.get(key)).get());
+                case "customTickLabelFontSize"          -> gauge.setCustomTickLabelFontSize(((DoubleProperty) properties.get(key)).get());
+                case "customTickLabelFontSizeEnabled"   -> gauge.setCustomTickLabelFontSizeEnabled(((BooleanProperty) properties.get(key)).get());
+                case "interactive"                      -> gauge.setInteractive(((BooleanProperty) properties.get(key)).get());
+                case "checkSectionsForValue"            -> gauge.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
+                case "checkAreasForValue"               -> gauge.setCheckAreasForValue(((BooleanProperty) properties.get(key)).get());
+                case "checkThreshold"                   -> gauge.setCheckThreshold(((BooleanProperty) properties.get(key)).get());
+                case "onValueChanged"                   -> gauge.currentValueProperty().addListener(((ObjectProperty<InvalidationListener>) properties.get(key)).get());
+                case "onButtonPressed"                  -> gauge.setOnButtonPressed(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "onButtonReleased"                 -> gauge.setOnButtonReleased(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "onThresholdExceeded"              -> gauge.setOnThresholdExceeded(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "onThresholdUnderrun"              -> gauge.setOnThresholdUnderrun(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "buttonTooltipText"                -> gauge.setButtonTooltipText(((StringProperty) properties.get(key)).get());
+                case "keepAspect"                       -> gauge.setKeepAspect(((BooleanProperty) properties.get(key)).get());
+                case "threshold"                        -> gauge.setThreshold(((DoubleProperty) properties.get(key)).get());
+                case "customFontEnabled"                -> gauge.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
+                case "customFont"                       -> gauge.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
+                case "alertMessage"                     -> gauge.setAlertMessage(((StringProperty) properties.get(key)).get());
+                case "smoothing"                        -> gauge.setSmoothing(((BooleanProperty) properties.get(key)).get());
+                case "value"                            -> gauge.setValue(((DoubleProperty) properties.get(key)).get());
             }
         }
 
         // Adjust tick mark colors
         if (properties.containsKey("tickMarkColor")) {
             Color tickMarkColor = ((ObjectProperty<Color>) properties.get("tickMarkColor")).get();
-            if (!properties.containsKey("majorTickMarkColor")) CONTROL.setMajorTickMarkColor(tickMarkColor);
-            if (!properties.containsKey("mediumTickMarkColor")) CONTROL.setMediumTickMarkColor(tickMarkColor);
-            if (!properties.containsKey("minorTickMarkColor")) CONTROL.setMinorTickMarkColor(tickMarkColor);
+            if (!properties.containsKey("majorTickMarkColor")) gauge.setMajorTickMarkColor(tickMarkColor);
+            if (!properties.containsKey("mediumTickMarkColor")) gauge.setMediumTickMarkColor(tickMarkColor);
+            if (!properties.containsKey("minorTickMarkColor")) gauge.setMinorTickMarkColor(tickMarkColor);
         }
 
-        return CONTROL;
+        return gauge;
     }
 
     private void setMinMaxValues(final Gauge CONTROL) {

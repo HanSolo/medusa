@@ -93,29 +93,21 @@ public class MarkerBuilder<B extends MarkerBuilder<B>> {
     }
 
     public final Marker build() {
-        final Marker MARKER = new Marker();
+        final Marker marker = new Marker();
         for (String key : properties.keySet()) {
-            if ("value".equals(key)) {
-                MARKER.setValue(((DoubleProperty) properties.get(key)).get());
-            } else if("text".equals(key)) {
-                MARKER.setText(((StringProperty) properties.get(key)).get());
-            } else if ("color".equals(key)) {
-                MARKER.setColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("markerType".equals(key)) {
-                MARKER.setMarkerType(((ObjectProperty<MarkerType>) properties.get(key)).get());
-            } else if ("onMarkerPressed".equals(key)) {
-                MARKER.setOnMarkerPressed(((ObjectProperty<EventHandler>) properties.get(key)).get());
-            } else if ("onMarkerReleased".equals(key)) {
-                MARKER.setOnMarkerReleased(((ObjectProperty<EventHandler>) properties.get(key)).get());
-            } else if ("onMarkerExceeded".equals(key)) {
-                MARKER.setOnMarkerExceeded(((ObjectProperty<EventHandler>) properties.get(key)).get());
-            } else if ("onMarkerUnderrun".equals(key)) {
-                MARKER.setOnMarkerUnderrun(((ObjectProperty<EventHandler>) properties.get(key)).get());
-            } else if ("styleClass".equals(key)) {
-                MARKER.setStyleClass(((StringProperty) properties.get(key)).get());
+            switch (key) {
+                case "value"            -> marker.setValue(((DoubleProperty) properties.get(key)).get());
+                case "text"             -> marker.setText(((StringProperty) properties.get(key)).get());
+                case "color"            -> marker.setColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "markerType"       -> marker.setMarkerType(((ObjectProperty<MarkerType>) properties.get(key)).get());
+                case "onMarkerPressed"  -> marker.setOnMarkerPressed(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "onMarkerReleased" -> marker.setOnMarkerReleased(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "onMarkerExceeded" -> marker.setOnMarkerExceeded(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "onMarkerUnderrun" -> marker.setOnMarkerUnderrun(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "styleClass"       -> marker.setStyleClass(((StringProperty) properties.get(key)).get());
             }
         }
-        return MARKER;
+        return marker;
     }
 }
 
