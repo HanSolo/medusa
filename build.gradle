@@ -25,9 +25,9 @@ plugins {
     id 'maven-publish'
     id 'signing'
     id 'com.google.osdetector'           version '1.7.0'
-    id 'org.javamodularity.moduleplugin' version '1.8.10'
-    id 'org.beryx.jlink'                 version '2.24.2'
-    id 'net.nemerosa.versioning'         version '2.15.1'
+    id 'org.javamodularity.moduleplugin' version '1.8.12'
+    id 'org.beryx.jlink'                 version '2.25.0'
+    id 'net.nemerosa.versioning'         version '3.0.0'
 }
 
 apply plugin: 'maven-publish'
@@ -58,8 +58,8 @@ dependencies {
     implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
-    implementation "eu.hansolo:toolbox:17.0.21"
-    implementation "eu.hansolo:toolboxfx:17.0.27"
+    implementation "eu.hansolo:toolbox:17+"
+    implementation "eu.hansolo:toolboxfx:17+"
 }
 
 jar {
