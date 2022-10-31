@@ -93,29 +93,21 @@ public class TimeSectionBuilder<B extends TimeSectionBuilder<B>> {
     }
 
     public final TimeSection build() {
-        final TimeSection SECTION = new TimeSection();
+        final TimeSection section = new TimeSection();
         for (String key : properties.keySet()) {
-            if ("start".equals(key)) {
-                SECTION.setStart(((ObjectProperty<LocalTime>) properties.get(key)).get());
-            } else if("stop".equals(key)) {
-                SECTION.setStop(((ObjectProperty<LocalTime>) properties.get(key)).get());
-            } else if("text".equals(key)) {
-                SECTION.setText(((StringProperty) properties.get(key)).get());
-            } else if("icon".equals(key)) {
-                SECTION.setIcon(((ObjectProperty<Image>) properties.get(key)).get());
-            } else if ("color".equals(key)) {
-                SECTION.setColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("highlightColor".equals(key)) {
-                SECTION.setHighlightColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("textColor".equals(key)) {
-                SECTION.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("onTimeSectionEntered".equals(key)) {
-                SECTION.setOnTimeSectionEntered(((ObjectProperty<EventHandler>) properties.get(key)).get());
-            } else if ("onTimeSectionLeft".equals(key)) {
-                SECTION.setOnTimeSectionLeft(((ObjectProperty<EventHandler>) properties.get(key)).get());
+            switch (key) {
+                case "start"                -> section.setStart(((ObjectProperty<LocalTime>) properties.get(key)).get());
+                case "stop"                 -> section.setStop(((ObjectProperty<LocalTime>) properties.get(key)).get());
+                case "text"                 -> section.setText(((StringProperty) properties.get(key)).get());
+                case "icon"                 -> section.setIcon(((ObjectProperty<Image>) properties.get(key)).get());
+                case "color"                -> section.setColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "highlightColor"       -> section.setHighlightColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "textColor"            -> section.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "onTimeSectionEntered" -> section.setOnTimeSectionEntered(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "onTimeSectionLeft"    -> section.setOnTimeSectionLeft(((ObjectProperty<EventHandler>) properties.get(key)).get());
             }
         }
-        return SECTION;
+        return section;
     }
 }
 

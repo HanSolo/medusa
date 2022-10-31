@@ -424,311 +424,251 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
     }
 
     public final Clock build() {
-        final Clock CONTROL;
+        final Clock clock;
         if (properties.containsKey("skinType")) {
             ClockSkinType skinType = ((ObjectProperty<ClockSkinType>) properties.get("skinType")).get();
-            CONTROL = new Clock(skinType);
-
+            clock = new Clock(skinType);
             switch(skinType) {
                 case YOTA2:
-                    CONTROL.setBackgroundPaint(Color.rgb(40, 42, 48));
-                    CONTROL.setHourTickMarkColor(Color.rgb(255, 255, 255));
-                    CONTROL.setMinuteTickMarkColor(Color.rgb(255, 255, 255, 0.5));
-                    CONTROL.setHourColor(Color.WHITE);
-                    CONTROL.setMinuteColor(Color.WHITE);
-                    CONTROL.setKnobColor(Color.WHITE);
-                    CONTROL.setTextColor(Color.rgb(255, 255, 255, 0.5));
-                    CONTROL.setDateColor(Color.rgb(255, 255, 255));
+                    clock.setBackgroundPaint(Color.rgb(40, 42, 48));
+                    clock.setHourTickMarkColor(Color.rgb(255, 255, 255));
+                    clock.setMinuteTickMarkColor(Color.rgb(255, 255, 255, 0.5));
+                    clock.setHourColor(Color.WHITE);
+                    clock.setMinuteColor(Color.WHITE);
+                    clock.setKnobColor(Color.WHITE);
+                    clock.setTextColor(Color.rgb(255, 255, 255, 0.5));
+                    clock.setDateColor(Color.rgb(255, 255, 255));
                     break;
                 case LCD:
-                    CONTROL.setBorderPaint(Color.WHITE);
-                    CONTROL.setForegroundPaint(Color.WHITE);
+                    clock.setBorderPaint(Color.WHITE);
+                    clock.setForegroundPaint(Color.WHITE);
                     break;
                 case PEAR:
-                    CONTROL.setBackgroundPaint(Color.BLACK);
-                    CONTROL.setHourColor(Color.WHITE);
-                    CONTROL.setMinuteColor(Color.WHITE);
-                    CONTROL.setSecondColor(Color.rgb(255, 165, 24));
-                    CONTROL.setHourTickMarkColor(Color.WHITE);
-                    CONTROL.setMinuteTickMarkColor(Color.rgb(115, 115, 115));
-                    CONTROL.setTickLabelColor(Color.WHITE);
-                    CONTROL.setDateColor(Color.WHITE);
-                    CONTROL.setDateVisible(true);
-                    CONTROL.setSecondsVisible(true);
-                    CONTROL.setTextVisible(false);
-                    CONTROL.setTitleVisible(false);
+                    clock.setBackgroundPaint(Color.BLACK);
+                    clock.setHourColor(Color.WHITE);
+                    clock.setMinuteColor(Color.WHITE);
+                    clock.setSecondColor(Color.rgb(255, 165, 24));
+                    clock.setHourTickMarkColor(Color.WHITE);
+                    clock.setMinuteTickMarkColor(Color.rgb(115, 115, 115));
+                    clock.setTickLabelColor(Color.WHITE);
+                    clock.setDateColor(Color.WHITE);
+                    clock.setDateVisible(true);
+                    clock.setSecondsVisible(true);
+                    clock.setTextVisible(false);
+                    clock.setTitleVisible(false);
                     break;
                 case PLAIN:
-                    CONTROL.setBackgroundPaint(Color.rgb(29, 29, 29));
-                    CONTROL.setHourColor(Color.rgb(190, 190, 190));
-                    CONTROL.setMinuteColor(Color.rgb(190, 190, 190));
-                    CONTROL.setSecondColor(Color.rgb(0, 244, 0));
-                    CONTROL.setDateColor(Color.rgb(190, 190, 190));
-                    CONTROL.setSecondsVisible(true);
-                    CONTROL.setHourTickMarkColor(Color.rgb(240, 240, 240));
-                    CONTROL.setMinuteTickMarkColor(Color.rgb(240, 240, 240));
+                    clock.setBackgroundPaint(Color.rgb(29, 29, 29));
+                    clock.setHourColor(Color.rgb(190, 190, 190));
+                    clock.setMinuteColor(Color.rgb(190, 190, 190));
+                    clock.setSecondColor(Color.rgb(0, 244, 0));
+                    clock.setDateColor(Color.rgb(190, 190, 190));
+                    clock.setSecondsVisible(true);
+                    clock.setHourTickMarkColor(Color.rgb(240, 240, 240));
+                    clock.setMinuteTickMarkColor(Color.rgb(240, 240, 240));
                     break;
                 case DB:
-                    CONTROL.setDiscreteSeconds(false);
-                    CONTROL.setDiscreteMinutes(true);
-                    CONTROL.setSecondColor(Color.rgb(167, 0, 0));
-                    CONTROL.setSecondsVisible(true);
+                    clock.setDiscreteSeconds(false);
+                    clock.setDiscreteMinutes(true);
+                    clock.setSecondColor(Color.rgb(167, 0, 0));
+                    clock.setSecondsVisible(true);
                     break;
                 case ROUND_LCD:
-                    CONTROL.setTextVisible(true);
-                    CONTROL.setDateVisible(true);
+                    clock.setTextVisible(true);
+                    clock.setDateVisible(true);
                     break;
                 case FAT:
-                    CONTROL.setDiscreteMinutes(true);
+                    clock.setDiscreteMinutes(true);
                     break;
                 case SLIM:
-                    CONTROL.setSecondsVisible(true);
-                    CONTROL.setDateVisible(true);
-                    CONTROL.setDayVisible(true);
-                    CONTROL.setHourColor(Color.WHITE);
-                    CONTROL.setMinuteColor(Color.rgb(0,191,255));
-                    CONTROL.setSecondColor(Color.WHITE);
-                    CONTROL.setDateColor(Color.WHITE);
+                    clock.setSecondsVisible(true);
+                    clock.setDateVisible(true);
+                    clock.setDayVisible(true);
+                    clock.setHourColor(Color.WHITE);
+                    clock.setMinuteColor(Color.rgb(0,191,255));
+                    clock.setSecondColor(Color.WHITE);
+                    clock.setDateColor(Color.WHITE);
                     break;
                 case MINIMAL:
-                    CONTROL.setBackgroundPaint(Color.rgb(255, 255, 255, 0.3));
-                    CONTROL.setTextColor(Color.WHITE);
-                    CONTROL.setMinuteColor(Color.rgb(59, 209, 255));
-                    CONTROL.setSecondColor(Color.rgb(255, 255, 255, 0.8));
-                    CONTROL.setSecondsVisible(true);
-                    CONTROL.setDateVisible(true);
+                    clock.setBackgroundPaint(Color.rgb(255, 255, 255, 0.3));
+                    clock.setTextColor(Color.WHITE);
+                    clock.setMinuteColor(Color.rgb(59, 209, 255));
+                    clock.setSecondColor(Color.rgb(255, 255, 255, 0.8));
+                    clock.setSecondsVisible(true);
+                    clock.setDateVisible(true);
                     break;
                 case DIGITAL:
-                    CONTROL.setTextVisible(true);
-                    CONTROL.setDateVisible(true);
-                    CONTROL.setSecondsVisible(true);
+                    clock.setTextVisible(true);
+                    clock.setDateVisible(true);
+                    clock.setSecondsVisible(true);
                     break;
                 case TEXT:
-                    CONTROL.setTextVisible(true);
-                    CONTROL.setDateVisible(true);
-                    CONTROL.setSecondsVisible(true);
+                    clock.setTextVisible(true);
+                    clock.setDateVisible(true);
+                    clock.setSecondsVisible(true);
                     break;
                 case DESIGN:
-                    CONTROL.setDiscreteHours(false);
-                    CONTROL.setDiscreteMinutes(false);
-                    CONTROL.setDiscreteSeconds(false);
-                    CONTROL.setTextVisible(false);
-                    CONTROL.setDateVisible(false);
-                    CONTROL.setSecondsVisible(false);
-                    CONTROL.setHourColor(Color.RED);
-                    CONTROL.setBackgroundPaint(Color.WHITE);
+                    clock.setDiscreteHours(false);
+                    clock.setDiscreteMinutes(false);
+                    clock.setDiscreteSeconds(false);
+                    clock.setTextVisible(false);
+                    clock.setDateVisible(false);
+                    clock.setSecondsVisible(false);
+                    clock.setHourColor(Color.RED);
+                    clock.setBackgroundPaint(Color.WHITE);
                     break;
                 case INDUSTRIAL:
-                    CONTROL.setBackgroundPaint(Color.web("#efefef"));
-                    CONTROL.setHourColor(Color.web("#2a2a2a"));
-                    CONTROL.setMinuteColor(Color.web("#2a2a2a"));
-                    CONTROL.setSecondColor(Color.web("#d1222b"));
-                    CONTROL.setHourTickMarkColor(Color.BLACK);
-                    CONTROL.setMinuteTickMarkColor(Color.BLACK);
-                    CONTROL.setTickLabelsVisible(false);
-                    CONTROL.setTickLabelColor(Color.BLACK);
-                    CONTROL.setDateColor(Color.BLACK);
-                    CONTROL.setDateVisible(false);
-                    CONTROL.setSecondsVisible(true);
-                    CONTROL.setTextVisible(false);
-                    CONTROL.setTextColor(Color.BLACK);
-                    CONTROL.setTitleVisible(false);
-                    CONTROL.setTitleColor(Color.BLACK);
-                    CONTROL.setBorderPaint(Color.BLACK);
-                    CONTROL.setBorderWidth(5);
+                    clock.setBackgroundPaint(Color.web("#efefef"));
+                    clock.setHourColor(Color.web("#2a2a2a"));
+                    clock.setMinuteColor(Color.web("#2a2a2a"));
+                    clock.setSecondColor(Color.web("#d1222b"));
+                    clock.setHourTickMarkColor(Color.BLACK);
+                    clock.setMinuteTickMarkColor(Color.BLACK);
+                    clock.setTickLabelsVisible(false);
+                    clock.setTickLabelColor(Color.BLACK);
+                    clock.setDateColor(Color.BLACK);
+                    clock.setDateVisible(false);
+                    clock.setSecondsVisible(true);
+                    clock.setTextVisible(false);
+                    clock.setTextColor(Color.BLACK);
+                    clock.setTitleVisible(false);
+                    clock.setTitleColor(Color.BLACK);
+                    clock.setBorderPaint(Color.BLACK);
+                    clock.setBorderWidth(5);
                     break;
                 case TILE:
-                    CONTROL.setBackgroundPaint(Color.rgb(42,42,42));
-                    CONTROL.setHourColor(Color.rgb(238, 238, 238));
-                    CONTROL.setMinuteColor(Color.rgb(238, 238, 238));
-                    CONTROL.setSecondColor(Color.rgb(238, 238, 238));
-                    CONTROL.setKnobColor(Color.rgb(238, 238, 238));
-                    CONTROL.setHourTickMarkColor(Color.rgb(238, 238, 238));
-                    CONTROL.setMinuteTickMarkColor(Color.rgb(238, 238, 238));
-                    CONTROL.setDateColor(Color.rgb(238, 238, 238));
-                    CONTROL.setDateVisible(false);
-                    CONTROL.setSecondsVisible(false);
-                    CONTROL.setTextVisible(false);
-                    CONTROL.setTextColor(Color.rgb(238, 238, 238));
-                    CONTROL.setTitleVisible(true);
-                    CONTROL.setTitleColor(Color.rgb(238, 238, 238));
+                    clock.setBackgroundPaint(Color.rgb(42,42,42));
+                    clock.setHourColor(Color.rgb(238, 238, 238));
+                    clock.setMinuteColor(Color.rgb(238, 238, 238));
+                    clock.setSecondColor(Color.rgb(238, 238, 238));
+                    clock.setKnobColor(Color.rgb(238, 238, 238));
+                    clock.setHourTickMarkColor(Color.rgb(238, 238, 238));
+                    clock.setMinuteTickMarkColor(Color.rgb(238, 238, 238));
+                    clock.setDateColor(Color.rgb(238, 238, 238));
+                    clock.setDateVisible(false);
+                    clock.setSecondsVisible(false);
+                    clock.setTextVisible(false);
+                    clock.setTextColor(Color.rgb(238, 238, 238));
+                    clock.setTitleVisible(true);
+                    clock.setTitleColor(Color.rgb(238, 238, 238));
                     break;
                 case DIGI:
-                    CONTROL.setTextVisible(true);
-                    CONTROL.setDateVisible(true);
+                    clock.setTextVisible(true);
+                    clock.setDateVisible(true);
                     break;
                 case MORPHING:
                     break;
             }
         } else {
-            CONTROL = new Clock();
+            clock = new Clock();
         }
 
         // Make sure that alarms, sections, areas and markers will be added first
         if (properties.keySet().contains("alarmsArray")) {
-            CONTROL.setAlarms(((ObjectProperty<Alarm[]>) properties.get("alarmsArray")).get());
+            clock.setAlarms(((ObjectProperty<Alarm[]>) properties.get("alarmsArray")).get());
         }
         if(properties.keySet().contains("alarmsList")) {
-            CONTROL.setAlarms(((ObjectProperty<List<Alarm>>) properties.get("alarmsList")).get());
+            clock.setAlarms(((ObjectProperty<List<Alarm>>) properties.get("alarmsList")).get());
         }
 
         if (properties.keySet().contains("sectionsArray")) {
-            CONTROL.setSections(((ObjectProperty<TimeSection[]>) properties.get("sectionsArray")).get());
+            clock.setSections(((ObjectProperty<TimeSection[]>) properties.get("sectionsArray")).get());
         }
         if(properties.keySet().contains("sectionsList")) {
-            CONTROL.setSections(((ObjectProperty<List<TimeSection>>) properties.get("sectionsList")).get());
+            clock.setSections(((ObjectProperty<List<TimeSection>>) properties.get("sectionsList")).get());
         }
 
         if (properties.keySet().contains("areasArray")) {
-            CONTROL.setAreas(((ObjectProperty<TimeSection[]>) properties.get("areasArray")).get());
+            clock.setAreas(((ObjectProperty<TimeSection[]>) properties.get("areasArray")).get());
         }
         if(properties.keySet().contains("areasList")) {
-            CONTROL.setAreas(((ObjectProperty<List<TimeSection>>) properties.get("areasList")).get());
+            clock.setAreas(((ObjectProperty<List<TimeSection>>) properties.get("areasList")).get());
         }
 
         for (String key : properties.keySet()) {
-            if ("prefSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setPrefSize(dim.getWidth(), dim.getHeight());
-            } else if("minSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setMinSize(dim.getWidth(), dim.getHeight());
-            } else if("maxSize".equals(key)) {
-                Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
-                CONTROL.setMaxSize(dim.getWidth(), dim.getHeight());
-            } else if("prefWidth".equals(key)) {
-                CONTROL.setPrefWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("prefHeight".equals(key)) {
-                CONTROL.setPrefHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("minWidth".equals(key)) {
-                CONTROL.setMinWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("minHeight".equals(key)) {
-                CONTROL.setMinHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("maxWidth".equals(key)) {
-                CONTROL.setMaxWidth(((DoubleProperty) properties.get(key)).get());
-            } else if("maxHeight".equals(key)) {
-                CONTROL.setMaxHeight(((DoubleProperty) properties.get(key)).get());
-            } else if("scaleX".equals(key)) {
-                CONTROL.setScaleX(((DoubleProperty) properties.get(key)).get());
-            } else if("scaleY".equals(key)) {
-                CONTROL.setScaleY(((DoubleProperty) properties.get(key)).get());
-            } else if ("layoutX".equals(key)) {
-                CONTROL.setLayoutX(((DoubleProperty) properties.get(key)).get());
-            } else if ("layoutY".equals(key)) {
-                CONTROL.setLayoutY(((DoubleProperty) properties.get(key)).get());
-            } else if ("translateX".equals(key)) {
-                CONTROL.setTranslateX(((DoubleProperty) properties.get(key)).get());
-            } else if ("translateY".equals(key)) {
-                CONTROL.setTranslateY(((DoubleProperty) properties.get(key)).get());
-            } else if ("padding".equals(key)) {
-                CONTROL.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
-            } else if ("styleClass".equals(key)) {
-                CONTROL.getStyleClass().setAll("gauge");
-                CONTROL.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
-            } else if ("time".equals(key)) {
-                CONTROL.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
-            } else if ("title".equals(key)) {
-                CONTROL.setTitle(((StringProperty) properties.get(key)).get());
-            } else if ("text".equals(key)) {
-                CONTROL.setText(((StringProperty) properties.get(key)).get());
-            } else if ("checkSectionsForValue".equals(key)) {
-                CONTROL.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
-            } else if ("checkAreasForValue".equals(key)) {
-                CONTROL.setCheckAreasForValue(((BooleanProperty) properties.get(key)).get());
-            } else if ("sectionsVisible".equals(key)) {
-                CONTROL.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("highlightSections".equals(key)) {
-                CONTROL.setHighlightSections(((BooleanProperty) properties.get(key)).get());
-            } else if ("areasVisible".equals(key)) {
-                CONTROL.setAreasVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("highlightAreas".equals(key)) {
-                CONTROL.setHighlightAreas(((BooleanProperty) properties.get(key)).get());
-            } else if ("discreteSeconds".equals(key)) {
-                CONTROL.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
-            } else if ("discreteMinutes".equals(key)) {
-                CONTROL.setDiscreteMinutes(((BooleanProperty) properties.get(key)).get());
-            } else if ("discreteHours".equals(key)) {
-                CONTROL.setDiscreteHours(((BooleanProperty) properties.get(key)).get());
-            } else if ("secondsVisible".equals(key)) {
-                CONTROL.setSecondsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("titleVisible".equals(key)) {
-                CONTROL.setTitleVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("textVisible".equals(key)) {
-                CONTROL.setTextVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("dateVisible".equals(key)) {
-                CONTROL.setDateVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("dayVisible".equals(key)) {
-                CONTROL.setDayVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("nightMode".equals(key)) {
-                CONTROL.setNightMode(((BooleanProperty) properties.get(key)).get());
-            } else if ("autoNightMode".equals(key)) {
-                CONTROL.setAutoNightMode(((BooleanProperty) properties.get(key)).get());
-            } else if ("backgroundPaint".equals(key)) {
-                CONTROL.setBackgroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
-            } else if ("borderPaint".equals(key)) {
-                CONTROL.setBorderPaint(((ObjectProperty<Paint>) properties.get(key)).get());
-            } else if ("borderWidth".equals(key)) {
-                CONTROL.setBorderWidth(((DoubleProperty) properties.get(key)).get());
-            } else if ("foregroundPaint".equals(key)) {
-                CONTROL.setForegroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
-            } else if ("titleColor".equals(key)) {
-                CONTROL.setTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("textColor".equals(key)) {
-                CONTROL.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("dateColor".equals(key)) {
-                CONTROL.setDateColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("hourTickMarkColor".equals(key)) {
-                CONTROL.setHourTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("minuteTickMarkColor".equals(key)) {
-                CONTROL.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("tickLabelColor".equals(key)) {
-                CONTROL.setTickLabelColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("alarmColor".equals(key)) {
-                CONTROL.setAlarmColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("hourTickMarksVisible".equals(key)) {
-                CONTROL.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("minuteTickMarksVisible".equals(key)) {
-                CONTROL.setMinuteTickMarksVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("tickLabelsVisible".equals(key)) {
-                CONTROL.setTickLabelsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("hourColor".equals(key)) {
-                CONTROL.setHourColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("minuteColor".equals(key)) {
-                CONTROL.setMinuteColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("secondColor".equals(key)) {
-                CONTROL.setSecondColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("knobColor".equals(key)) {
-                CONTROL.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
-            } else if ("lcdDesign".equals(key)) {
-                CONTROL.setLcdDesign(((ObjectProperty<LcdDesign>) properties.get(key)).get());
-            } else if ("onAlarm".equals(key)) {
-                CONTROL.addClockObserver(AlarmEvt.ANY, ((ObjectProperty<EvtObserver<MedusaEvt>>) properties.get(key)).get());
-            } else if ("onTimeEvent".equals(key)) {
-                CONTROL.addClockObserver(TimeEvt.ANY, ((ObjectProperty<EvtObserver<MedusaEvt>>) properties.get(key)).get());
-            } else if ("alarmsEnabled".equals(key)) {
-                CONTROL.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("alarmsVisible".equals(key)) {
-                CONTROL.setAlarmsVisible(((BooleanProperty) properties.get(key)).get());
-            } else if ("lcdCrystalEnabled".equals(key)) {
-                CONTROL.setLcdCrystalEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("shadowsEnabled".equals(key)) {
-                CONTROL.setShadowsEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("lcdFont".equals(key)) {
-                CONTROL.setLcdFont(((ObjectProperty<LcdFont>) properties.get(key)).get());
-            } else if ("locale".equals(key)) {
-                CONTROL.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
-            } else if("animated".equals(key)) {
-                CONTROL.setAnimated(((BooleanProperty) properties.get(key)).get());
-            } else if("animationDuration".equals(key)) {
-                CONTROL.setAnimationDuration(((LongProperty) properties.get(key)).get());
-            } else if ("running".equals(key)) {
-                CONTROL.setRunning(((BooleanProperty) properties.get(key)).get());
-            } else if ("customFontEnabled".equals(key)) {
-                CONTROL.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
-            } else if ("customFont".equals(key)) {
-                CONTROL.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
+            switch (key) {
+                case "prefSize"               -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    clock.setPrefSize(dim.getWidth(), dim.getHeight());
+                }
+                case "minSize"                -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    clock.setMinSize(dim.getWidth(), dim.getHeight());
+                }
+                case "maxSize"                -> {
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    clock.setMaxSize(dim.getWidth(), dim.getHeight());
+                }
+                case "prefWidth"              -> clock.setPrefWidth(((DoubleProperty) properties.get(key)).get());
+                case "prefHeight"             -> clock.setPrefHeight(((DoubleProperty) properties.get(key)).get());
+                case "minWidth"               -> clock.setMinWidth(((DoubleProperty) properties.get(key)).get());
+                case "minHeight"              -> clock.setMinHeight(((DoubleProperty) properties.get(key)).get());
+                case "maxWidth"               -> clock.setMaxWidth(((DoubleProperty) properties.get(key)).get());
+                case "maxHeight"              -> clock.setMaxHeight(((DoubleProperty) properties.get(key)).get());
+                case "scaleX"                 -> clock.setScaleX(((DoubleProperty) properties.get(key)).get());
+                case "scaleY"                 -> clock.setScaleY(((DoubleProperty) properties.get(key)).get());
+                case "layoutX"                -> clock.setLayoutX(((DoubleProperty) properties.get(key)).get());
+                case "layoutY"                -> clock.setLayoutY(((DoubleProperty) properties.get(key)).get());
+                case "translateX"             -> clock.setTranslateX(((DoubleProperty) properties.get(key)).get());
+                case "translateY"             -> clock.setTranslateY(((DoubleProperty) properties.get(key)).get());
+                case "padding"                -> clock.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
+                case "styleClass"             -> {
+                    clock.getStyleClass().setAll("gauge");
+                    clock.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
+                }
+                case "time"                   -> clock.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
+                case "title"                  -> clock.setTitle(((StringProperty) properties.get(key)).get());
+                case "text"                   -> clock.setText(((StringProperty) properties.get(key)).get());
+                case "checkSectionsForValue"  -> clock.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
+                case "checkAreasForValue"     -> clock.setCheckAreasForValue(((BooleanProperty) properties.get(key)).get());
+                case "sectionsVisible"        -> clock.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
+                case "highlightSections"      -> clock.setHighlightSections(((BooleanProperty) properties.get(key)).get());
+                case "areasVisible"           -> clock.setAreasVisible(((BooleanProperty) properties.get(key)).get());
+                case "highlightAreas"         -> clock.setHighlightAreas(((BooleanProperty) properties.get(key)).get());
+                case "discreteSeconds"        -> clock.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
+                case "discreteMinutes"        -> clock.setDiscreteMinutes(((BooleanProperty) properties.get(key)).get());
+                case "discreteHours"          -> clock.setDiscreteHours(((BooleanProperty) properties.get(key)).get());
+                case "secondsVisible"         -> clock.setSecondsVisible(((BooleanProperty) properties.get(key)).get());
+                case "titleVisible"           -> clock.setTitleVisible(((BooleanProperty) properties.get(key)).get());
+                case "textVisible"            -> clock.setTextVisible(((BooleanProperty) properties.get(key)).get());
+                case "dateVisible"            -> clock.setDateVisible(((BooleanProperty) properties.get(key)).get());
+                case "dayVisible"             -> clock.setDayVisible(((BooleanProperty) properties.get(key)).get());
+                case "nightMode"              -> clock.setNightMode(((BooleanProperty) properties.get(key)).get());
+                case "autoNightMode"          -> clock.setAutoNightMode(((BooleanProperty) properties.get(key)).get());
+                case "backgroundPaint"        -> clock.setBackgroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
+                case "borderPaint"            -> clock.setBorderPaint(((ObjectProperty<Paint>) properties.get(key)).get());
+                case "borderWidth"            -> clock.setBorderWidth(((DoubleProperty) properties.get(key)).get());
+                case "foregroundPaint"        -> clock.setForegroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
+                case "titleColor"             -> clock.setTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "textColor"              -> clock.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "dateColor"              -> clock.setDateColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "hourTickMarkColor"      -> clock.setHourTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "minuteTickMarkColor"    -> clock.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "tickLabelColor"         -> clock.setTickLabelColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "alarmColor"             -> clock.setAlarmColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "hourTickMarksVisible"   -> clock.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+                case "minuteTickMarksVisible" -> clock.setMinuteTickMarksVisible(((BooleanProperty) properties.get(key)).get());
+                case "tickLabelsVisible"      -> clock.setTickLabelsVisible(((BooleanProperty) properties.get(key)).get());
+                case "hourColor"              -> clock.setHourColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "minuteColor"            -> clock.setMinuteColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "secondColor"            -> clock.setSecondColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "knobColor"              -> clock.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
+                case "lcdDesign"              -> clock.setLcdDesign(((ObjectProperty<LcdDesign>) properties.get(key)).get());
+                case "onAlarm"                -> clock.addClockObserver(AlarmEvt.ANY, ((ObjectProperty<EvtObserver<MedusaEvt>>) properties.get(key)).get());
+                case "onTimeEvent"            -> clock.addClockObserver(TimeEvt.ANY, ((ObjectProperty<EvtObserver<MedusaEvt>>) properties.get(key)).get());
+                case "alarmsEnabled"          -> clock.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
+                case "alarmsVisible"          -> clock.setAlarmsVisible(((BooleanProperty) properties.get(key)).get());
+                case "lcdCrystalEnabled"      -> clock.setLcdCrystalEnabled(((BooleanProperty) properties.get(key)).get());
+                case "shadowsEnabled"         -> clock.setShadowsEnabled(((BooleanProperty) properties.get(key)).get());
+                case "lcdFont"                -> clock.setLcdFont(((ObjectProperty<LcdFont>) properties.get(key)).get());
+                case "locale"                 -> clock.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
+                case "animated"               -> clock.setAnimated(((BooleanProperty) properties.get(key)).get());
+                case "animationDuration"      -> clock.setAnimationDuration(((LongProperty) properties.get(key)).get());
+                case "running"                -> clock.setRunning(((BooleanProperty) properties.get(key)).get());
+                case "customFontEnabled"      -> clock.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
+                case "customFont"             -> clock.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
             }
         }
-        return CONTROL;
+        return clock;
     }
 }
