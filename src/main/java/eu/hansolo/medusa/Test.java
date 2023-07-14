@@ -20,7 +20,9 @@ package eu.hansolo.medusa;
 import eu.hansolo.medusa.Gauge.NeedleSize;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.Marker.MarkerType;
+import eu.hansolo.toolbox.Helper;
 import eu.hansolo.toolboxfx.GradientLookup;
+import eu.hansolo.toolboxfx.ScaleDirection;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
@@ -48,6 +50,7 @@ public class Test extends Application {
 
 
     @Override public void init() {
+        /*
         gauge = GaugeBuilder.create()
                             .skinType(SkinType.SIMPLE_DIGITAL)
                             .prefSize(400, 400)
@@ -64,51 +67,56 @@ public class Test extends Application {
                             .gradientBarEnabled(true)
                             .animated(true)
                             .build();
+        */
 
         gauge = GaugeBuilder.create()
-                    .minValue(0)
-                    .maxValue(1)
+                    .skinType(SkinType.BAR)
+                    .minValue(-100)
+                    .maxValue(0)
                     .tickLabelDecimals(1)
+                    .startAngle(90)
+                    .angleRange(270)
+                    //.scaleDirection(ScaleDirection.CLOCKWISE)
                     .decimals(2)
-                    .autoScale(true)
+                    .autoScale(false)
                     .animated(true)
                     //.backgroundPaint(Color.TRANSPARENT)
                     //.borderPaint(Color.LIGHTGRAY)
                     //.knobColor(Color.rgb(0, 90, 120))
-                    .shadowsEnabled(true)
+                    //.shadowsEnabled(true)
                     //.tickLabelColor(Color.rgb(0, 175, 248))
                     //.ledColor(Color.rgb(0, 175, 248))
-                    .ledVisible(true)
-                    .ledBlinking(true)
-                    .sectionsVisible(true)
-                    .sections(new Section(0.5, 0.75, Color.rgb(139, 195, 102, 0.5)))
-                    .areasVisible(true)
-                    .areas(new Section(0.75, 1.0, Color.rgb(234, 83, 79, 0.5)))
-                    .majorTickMarkColor(Color.MAGENTA)
+                    //.ledVisible(true)
+                    //.ledBlinking(true)
+                    //.sectionsVisible(true)
+                    //.sections(new Section(0.5, 0.75, Color.rgb(139, 195, 102, 0.5)))
+                    //.areasVisible(true)
+                    //.areas(new Section(0.75, 1.0, Color.rgb(234, 83, 79, 0.5)))
+                    //.majorTickMarkColor(Color.MAGENTA)
                     //.minorTickMarkColor(Color.rgb(0, 175, 248))
-                    .majorTickMarkType(TickMarkType.TRAPEZOID)
-                    .mediumTickMarkType(TickMarkType.DOT)
-                    .minorTickMarkType(TickMarkType.LINE)
-                    .tickLabelOrientation(TickLabelOrientation.ORTHOGONAL)
-                    .tickMarkSections(new Section(0.25, 0.5, Color.rgb(241, 161, 71)))
-                    .tickMarkSectionsVisible(true)
-                    .markers(new Marker(0.5, "", Color.CYAN, MarkerType.TRIANGLE))
-                    .markersVisible(true)
+                    //.majorTickMarkType(TickMarkType.TRAPEZOID)
+                    //.mediumTickMarkType(TickMarkType.DOT)
+                    //.minorTickMarkType(TickMarkType.LINE)
+                    //.tickLabelOrientation(TickLabelOrientation.ORTHOGONAL)
+                    //.tickMarkSections(new Section(0.25, 0.5, Color.rgb(241, 161, 71)))
+                    //.tickMarkSectionsVisible(true)
+                    //.markers(new Marker(0.5, "", Color.CYAN, MarkerType.TRIANGLE))
+                    //.markersVisible(true)
                     //.majorTickMarksVisible(true)
                     //.minorTickMarksVisible(true)
-                    .tickLabelLocation(TickLabelLocation.INSIDE)
+                    //.tickLabelLocation(TickLabelLocation.INSIDE)
                     //.tickLabelsVisible(true)
-                    .tickLabelSections(new Section(0.1, 0.3, Color.rgb(0, 175, 248)))
+                    //.tickLabelSections(new Section(0.1, 0.3, Color.rgb(0, 175, 248)))
                     //.tickLabelSectionsVisible(true)
-                    .title("Title")
+                    //.title("Title")
                     //.titleColor(Color.rgb(223, 223, 223))
-                    .unit("Unit")
-                    .lcdDesign(LcdDesign.SECTIONS)
-                    .lcdVisible(true)
-                    .lcdFont(LcdFont.STANDARD)
+                    //.unit("Unit")
+                    //.lcdDesign(LcdDesign.SECTIONS)
+                    //.lcdVisible(true)
+                    //.lcdFont(LcdFont.STANDARD)
                     //.unitColor(Color.rgb(223, 223, 223))
                     //.valueColor(Color.rgb(223, 223, 223))
-                    .needleSize(NeedleSize.THICK)
+                    //.needleSize(NeedleSize.THICK)
                     .build();
 
         lastTimerCall = System.nanoTime();
@@ -126,7 +134,7 @@ public class Test extends Application {
     @Override public void start(Stage stage) {
         StackPane pane = new StackPane(gauge);
         pane.setPadding(new Insets(10));
-        pane.setBackground(new Background(new BackgroundFill(Color.web("#10163a"), CornerRadii.EMPTY, Insets.EMPTY)));
+        //pane.setBackground(new Background(new BackgroundFill(Color.web("#10163a"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(pane);
 

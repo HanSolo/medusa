@@ -51,6 +51,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -533,7 +534,7 @@ public class Helper {
             mediumHalfDotSize = mediumDotSize * 0.5;
             minorDotSize      = 0.0125 * SIZE;
             minorHalfDotSize  = minorDotSize * 0.5;
-        };
+        }
 
         double  customFontSizeFactor       = GAUGE.getCustomTickLabelFontSize() / 400;
         boolean fullRange                  = (MIN_VALUE < 0 && MAX_VALUE > 0);
@@ -677,7 +678,7 @@ public class Helper {
 
         // Main loop
         BigDecimal     tmpStepBD      = new BigDecimal(tmpAngleStep);
-        tmpStepBD                     = tmpStepBD.setScale(3, BigDecimal.ROUND_HALF_UP);
+        tmpStepBD                     = tmpStepBD.setScale(3, RoundingMode.HALF_UP);
         double tmpStep                = tmpStepBD.doubleValue();
         double angle                  = 0;
         int    customTickLabelCounter = 0;
