@@ -26,7 +26,7 @@ plugins {
     id 'signing'
     id 'com.google.osdetector'           version '1.7.3'
     id 'org.javamodularity.moduleplugin' version '1.8.12'
-    id 'org.beryx.jlink'                 version '2.25.0'
+    id 'org.beryx.jlink'                 version '3.0.1'
     id 'net.nemerosa.versioning'         version '3.0.0'
 }
 
@@ -58,8 +58,8 @@ dependencies {
     implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
-    implementation "eu.hansolo:toolbox:17.0.53"
-    implementation "eu.hansolo:toolboxfx:17.0.41"
+    implementation "eu.hansolo:toolbox:21.0.0"
+    implementation "eu.hansolo:toolboxfx:21.0.0"
 }
 
 jar {
