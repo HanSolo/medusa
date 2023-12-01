@@ -122,6 +122,7 @@ public class IndicatorSkin extends GaugeSkinBase {
         formatString                 = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         locale                       = gauge.getLocale();
         barColor                     = gauge.getBarColor();
+        barTooltip                   = new Tooltip("");
         currentValueListener         = o -> rotateNeedle(gauge.getCurrentValue());
         sectionAlwaysVisibleListener = o -> bar.setVisible(!gauge.getSectionsAlwaysVisible());
 
