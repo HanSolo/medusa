@@ -58,8 +58,7 @@ dependencies {
     implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
-    implementation "eu.hansolo:toolbox:21.0.0"
-    implementation "eu.hansolo:toolboxfx:21.0.0"
+    api "eu.hansolo:toolboxfx:21.0.1"
 }
 
 jar {
