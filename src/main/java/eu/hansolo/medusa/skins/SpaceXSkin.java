@@ -57,7 +57,6 @@ public class SpaceXSkin extends GaugeSkinBase {
     protected static final double             MAXIMUM_HEIGHT   = 1024;
     private static final double               ASPECT_RATIO     = 1.1625;
     private static final double               ANGLE_RANGE      = 270;
-    private              double               size;
     private              double               width;
     private              double               height;
     private              double               centerX;
@@ -295,7 +294,6 @@ public class SpaceXSkin extends GaugeSkinBase {
     @Override protected void resize() {
         width  = gauge.getWidth() - gauge.getInsets().getLeft() - gauge.getInsets().getRight();
         height = gauge.getHeight() - gauge.getInsets().getTop() - gauge.getInsets().getBottom();
-        size   = width < height ? width : height;
 
         if (ASPECT_RATIO * width > height) {
             width  = 1 / (ASPECT_RATIO / height);

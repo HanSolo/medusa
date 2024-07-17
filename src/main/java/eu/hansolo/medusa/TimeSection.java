@@ -29,6 +29,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.time.LocalTime;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -279,10 +280,15 @@ public class TimeSection implements Comparable<TimeSection> {
         checkedValue = VALUE;
     }
 
-    public boolean equals(final TimeSection SECTION) {
-        return (SECTION.getStart().equals(getStart()) &&
-                SECTION.getStop().equals(getStop()) &&
-                SECTION.getText().equals(getText()));
+    @Override public boolean equals(final Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        TimeSection that = (TimeSection) o;
+        return Objects.equals(_start, that._start) && Objects.equals(start, that.start) && Objects.equals(_stop, that._stop) && Objects.equals(stop, that.stop) && Objects.equals(_text, that._text) && Objects.equals(text, that.text);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(_start, start, _stop, stop, _text, text);
     }
 
     @Override public int compareTo(final TimeSection SECTION) {

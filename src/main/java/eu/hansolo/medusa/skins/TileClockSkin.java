@@ -49,6 +49,7 @@ import javafx.scene.transform.Rotate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.util.Locale;
 
 
 /**
@@ -184,9 +185,9 @@ public class TileClockSkin extends ClockSkinBase {
             Helper.enableNode(text, clock.isTextVisible());
             Helper.enableNode(dateText, clock.isDateVisible());
             Helper.enableNode(second, clock.isSecondsVisible());
-        } else if ("FINISHED".equals(EVENT_TYPE)) {
+        } /*else if ("FINISHED".equals(EVENT_TYPE)) {
 
-        }
+        }*/
     }
 
     private void drawTicks() {
@@ -259,7 +260,7 @@ public class TileClockSkin extends ClockSkinBase {
         amPmText.setX((size - amPmText.getLayoutBounds().getWidth()) * 0.5);
         amPmText.setY(size * 0.4);
 
-        dateText.setText(DATE_FORMATER.format(TIME).toUpperCase());
+        dateText.setText(DATE_FORMATER.format(TIME).toUpperCase(Locale.ENGLISH));
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.setX((size - dateText.getLayoutBounds().getWidth()) * 0.5);
         dateText.setY(size * 0.65);

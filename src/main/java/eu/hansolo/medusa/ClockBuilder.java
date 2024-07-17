@@ -585,90 +585,90 @@ public class ClockBuilder <B extends ClockBuilder<B>> {
             clock.setAreas(((ObjectProperty<List<TimeSection>>) properties.get("areasList")).get());
         }
 
-        for (String key : properties.keySet()) {
+        properties.forEach((key, property) -> {
             switch (key) {
                 case "prefSize"               -> {
-                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) property).get();
                     clock.setPrefSize(dim.getWidth(), dim.getHeight());
                 }
                 case "minSize"                -> {
-                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) property).get();
                     clock.setMinSize(dim.getWidth(), dim.getHeight());
                 }
                 case "maxSize"                -> {
-                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) property).get();
                     clock.setMaxSize(dim.getWidth(), dim.getHeight());
                 }
-                case "prefWidth"              -> clock.setPrefWidth(((DoubleProperty) properties.get(key)).get());
-                case "prefHeight"             -> clock.setPrefHeight(((DoubleProperty) properties.get(key)).get());
-                case "minWidth"               -> clock.setMinWidth(((DoubleProperty) properties.get(key)).get());
-                case "minHeight"              -> clock.setMinHeight(((DoubleProperty) properties.get(key)).get());
-                case "maxWidth"               -> clock.setMaxWidth(((DoubleProperty) properties.get(key)).get());
-                case "maxHeight"              -> clock.setMaxHeight(((DoubleProperty) properties.get(key)).get());
-                case "scaleX"                 -> clock.setScaleX(((DoubleProperty) properties.get(key)).get());
-                case "scaleY"                 -> clock.setScaleY(((DoubleProperty) properties.get(key)).get());
-                case "layoutX"                -> clock.setLayoutX(((DoubleProperty) properties.get(key)).get());
-                case "layoutY"                -> clock.setLayoutY(((DoubleProperty) properties.get(key)).get());
-                case "translateX"             -> clock.setTranslateX(((DoubleProperty) properties.get(key)).get());
-                case "translateY"             -> clock.setTranslateY(((DoubleProperty) properties.get(key)).get());
-                case "padding"                -> clock.setPadding(((ObjectProperty<Insets>) properties.get(key)).get());
+                case "prefWidth"              -> clock.setPrefWidth(((DoubleProperty) property).get());
+                case "prefHeight"             -> clock.setPrefHeight(((DoubleProperty) property).get());
+                case "minWidth"               -> clock.setMinWidth(((DoubleProperty) property).get());
+                case "minHeight"              -> clock.setMinHeight(((DoubleProperty) property).get());
+                case "maxWidth"               -> clock.setMaxWidth(((DoubleProperty) property).get());
+                case "maxHeight"              -> clock.setMaxHeight(((DoubleProperty) property).get());
+                case "scaleX"                 -> clock.setScaleX(((DoubleProperty) property).get());
+                case "scaleY"                 -> clock.setScaleY(((DoubleProperty) property).get());
+                case "layoutX"                -> clock.setLayoutX(((DoubleProperty) property).get());
+                case "layoutY"                -> clock.setLayoutY(((DoubleProperty) property).get());
+                case "translateX"             -> clock.setTranslateX(((DoubleProperty) property).get());
+                case "translateY"             -> clock.setTranslateY(((DoubleProperty) property).get());
+                case "padding"                -> clock.setPadding(((ObjectProperty<Insets>) property).get());
                 case "styleClass"             -> {
                     clock.getStyleClass().setAll("gauge");
-                    clock.getStyleClass().addAll(((ObjectProperty<String[]>) properties.get(key)).get());
+                    clock.getStyleClass().addAll(((ObjectProperty<String[]>) property).get());
                 }
-                case "time"                   -> clock.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
-                case "title"                  -> clock.setTitle(((StringProperty) properties.get(key)).get());
-                case "text"                   -> clock.setText(((StringProperty) properties.get(key)).get());
-                case "checkSectionsForValue"  -> clock.setCheckSectionsForValue(((BooleanProperty) properties.get(key)).get());
-                case "checkAreasForValue"     -> clock.setCheckAreasForValue(((BooleanProperty) properties.get(key)).get());
-                case "sectionsVisible"        -> clock.setSectionsVisible(((BooleanProperty) properties.get(key)).get());
-                case "highlightSections"      -> clock.setHighlightSections(((BooleanProperty) properties.get(key)).get());
-                case "areasVisible"           -> clock.setAreasVisible(((BooleanProperty) properties.get(key)).get());
-                case "highlightAreas"         -> clock.setHighlightAreas(((BooleanProperty) properties.get(key)).get());
-                case "discreteSeconds"        -> clock.setDiscreteSeconds(((BooleanProperty) properties.get(key)).get());
-                case "discreteMinutes"        -> clock.setDiscreteMinutes(((BooleanProperty) properties.get(key)).get());
-                case "discreteHours"          -> clock.setDiscreteHours(((BooleanProperty) properties.get(key)).get());
-                case "secondsVisible"         -> clock.setSecondsVisible(((BooleanProperty) properties.get(key)).get());
-                case "titleVisible"           -> clock.setTitleVisible(((BooleanProperty) properties.get(key)).get());
-                case "textVisible"            -> clock.setTextVisible(((BooleanProperty) properties.get(key)).get());
-                case "dateVisible"            -> clock.setDateVisible(((BooleanProperty) properties.get(key)).get());
-                case "dayVisible"             -> clock.setDayVisible(((BooleanProperty) properties.get(key)).get());
-                case "nightMode"              -> clock.setNightMode(((BooleanProperty) properties.get(key)).get());
-                case "autoNightMode"          -> clock.setAutoNightMode(((BooleanProperty) properties.get(key)).get());
-                case "backgroundPaint"        -> clock.setBackgroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
-                case "borderPaint"            -> clock.setBorderPaint(((ObjectProperty<Paint>) properties.get(key)).get());
-                case "borderWidth"            -> clock.setBorderWidth(((DoubleProperty) properties.get(key)).get());
-                case "foregroundPaint"        -> clock.setForegroundPaint(((ObjectProperty<Paint>) properties.get(key)).get());
-                case "titleColor"             -> clock.setTitleColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "textColor"              -> clock.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "dateColor"              -> clock.setDateColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "hourTickMarkColor"      -> clock.setHourTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "minuteTickMarkColor"    -> clock.setMinuteTickMarkColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "tickLabelColor"         -> clock.setTickLabelColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "alarmColor"             -> clock.setAlarmColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "hourTickMarksVisible"   -> clock.setHourTickMarksVisible(((BooleanProperty) properties.get(key)).get());
-                case "minuteTickMarksVisible" -> clock.setMinuteTickMarksVisible(((BooleanProperty) properties.get(key)).get());
-                case "tickLabelsVisible"      -> clock.setTickLabelsVisible(((BooleanProperty) properties.get(key)).get());
-                case "hourColor"              -> clock.setHourColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "minuteColor"            -> clock.setMinuteColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "secondColor"            -> clock.setSecondColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "knobColor"              -> clock.setKnobColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "lcdDesign"              -> clock.setLcdDesign(((ObjectProperty<LcdDesign>) properties.get(key)).get());
-                case "onAlarm"                -> clock.addClockObserver(AlarmEvt.ANY, ((ObjectProperty<EvtObserver<MedusaEvt>>) properties.get(key)).get());
-                case "onTimeEvent"            -> clock.addClockObserver(TimeEvt.ANY, ((ObjectProperty<EvtObserver<MedusaEvt>>) properties.get(key)).get());
-                case "alarmsEnabled"          -> clock.setAlarmsEnabled(((BooleanProperty) properties.get(key)).get());
-                case "alarmsVisible"          -> clock.setAlarmsVisible(((BooleanProperty) properties.get(key)).get());
-                case "lcdCrystalEnabled"      -> clock.setLcdCrystalEnabled(((BooleanProperty) properties.get(key)).get());
-                case "shadowsEnabled"         -> clock.setShadowsEnabled(((BooleanProperty) properties.get(key)).get());
-                case "lcdFont"                -> clock.setLcdFont(((ObjectProperty<LcdFont>) properties.get(key)).get());
-                case "locale"                 -> clock.setLocale(((ObjectProperty<Locale>) properties.get(key)).get());
-                case "animated"               -> clock.setAnimated(((BooleanProperty) properties.get(key)).get());
-                case "animationDuration"      -> clock.setAnimationDuration(((LongProperty) properties.get(key)).get());
-                case "running"                -> clock.setRunning(((BooleanProperty) properties.get(key)).get());
-                case "customFontEnabled"      -> clock.setCustomFontEnabled(((BooleanProperty) properties.get(key)).get());
-                case "customFont"             -> clock.setCustomFont(((ObjectProperty<Font>) properties.get(key)).get());
+                case "time"                   -> clock.setTime(((ObjectProperty<ZonedDateTime>) property).get());
+                case "title"                  -> clock.setTitle(((StringProperty) property).get());
+                case "text"                   -> clock.setText(((StringProperty) property).get());
+                case "checkSectionsForValue"  -> clock.setCheckSectionsForValue(((BooleanProperty) property).get());
+                case "checkAreasForValue"     -> clock.setCheckAreasForValue(((BooleanProperty) property).get());
+                case "sectionsVisible"        -> clock.setSectionsVisible(((BooleanProperty) property).get());
+                case "highlightSections"      -> clock.setHighlightSections(((BooleanProperty) property).get());
+                case "areasVisible"           -> clock.setAreasVisible(((BooleanProperty) property).get());
+                case "highlightAreas"         -> clock.setHighlightAreas(((BooleanProperty) property).get());
+                case "discreteSeconds"        -> clock.setDiscreteSeconds(((BooleanProperty) property).get());
+                case "discreteMinutes"        -> clock.setDiscreteMinutes(((BooleanProperty) property).get());
+                case "discreteHours"          -> clock.setDiscreteHours(((BooleanProperty) property).get());
+                case "secondsVisible"         -> clock.setSecondsVisible(((BooleanProperty) property).get());
+                case "titleVisible"           -> clock.setTitleVisible(((BooleanProperty) property).get());
+                case "textVisible"            -> clock.setTextVisible(((BooleanProperty) property).get());
+                case "dateVisible"            -> clock.setDateVisible(((BooleanProperty) property).get());
+                case "dayVisible"             -> clock.setDayVisible(((BooleanProperty) property).get());
+                case "nightMode"              -> clock.setNightMode(((BooleanProperty) property).get());
+                case "autoNightMode"          -> clock.setAutoNightMode(((BooleanProperty) property).get());
+                case "backgroundPaint"        -> clock.setBackgroundPaint(((ObjectProperty<Paint>) property).get());
+                case "borderPaint"            -> clock.setBorderPaint(((ObjectProperty<Paint>) property).get());
+                case "borderWidth"            -> clock.setBorderWidth(((DoubleProperty) property).get());
+                case "foregroundPaint"        -> clock.setForegroundPaint(((ObjectProperty<Paint>) property).get());
+                case "titleColor"             -> clock.setTitleColor(((ObjectProperty<Color>) property).get());
+                case "textColor"              -> clock.setTextColor(((ObjectProperty<Color>) property).get());
+                case "dateColor"              -> clock.setDateColor(((ObjectProperty<Color>) property).get());
+                case "hourTickMarkColor"      -> clock.setHourTickMarkColor(((ObjectProperty<Color>) property).get());
+                case "minuteTickMarkColor"    -> clock.setMinuteTickMarkColor(((ObjectProperty<Color>) property).get());
+                case "tickLabelColor"         -> clock.setTickLabelColor(((ObjectProperty<Color>) property).get());
+                case "alarmColor"             -> clock.setAlarmColor(((ObjectProperty<Color>) property).get());
+                case "hourTickMarksVisible"   -> clock.setHourTickMarksVisible(((BooleanProperty) property).get());
+                case "minuteTickMarksVisible" -> clock.setMinuteTickMarksVisible(((BooleanProperty) property).get());
+                case "tickLabelsVisible"      -> clock.setTickLabelsVisible(((BooleanProperty) property).get());
+                case "hourColor"              -> clock.setHourColor(((ObjectProperty<Color>) property).get());
+                case "minuteColor"            -> clock.setMinuteColor(((ObjectProperty<Color>) property).get());
+                case "secondColor"            -> clock.setSecondColor(((ObjectProperty<Color>) property).get());
+                case "knobColor"              -> clock.setKnobColor(((ObjectProperty<Color>) property).get());
+                case "lcdDesign"              -> clock.setLcdDesign(((ObjectProperty<LcdDesign>) property).get());
+                case "onAlarm"                -> clock.addClockObserver(AlarmEvt.ANY, ((ObjectProperty<EvtObserver<MedusaEvt>>) property).get());
+                case "onTimeEvent"            -> clock.addClockObserver(TimeEvt.ANY, ((ObjectProperty<EvtObserver<MedusaEvt>>) property).get());
+                case "alarmsEnabled"          -> clock.setAlarmsEnabled(((BooleanProperty) property).get());
+                case "alarmsVisible"          -> clock.setAlarmsVisible(((BooleanProperty) property).get());
+                case "lcdCrystalEnabled"      -> clock.setLcdCrystalEnabled(((BooleanProperty) property).get());
+                case "shadowsEnabled"         -> clock.setShadowsEnabled(((BooleanProperty) property).get());
+                case "lcdFont"                -> clock.setLcdFont(((ObjectProperty<LcdFont>) property).get());
+                case "locale"                 -> clock.setLocale(((ObjectProperty<Locale>) property).get());
+                case "animated"               -> clock.setAnimated(((BooleanProperty) property).get());
+                case "animationDuration"      -> clock.setAnimationDuration(((LongProperty) property).get());
+                case "running"                -> clock.setRunning(((BooleanProperty) property).get());
+                case "customFontEnabled"      -> clock.setCustomFontEnabled(((BooleanProperty) property).get());
+                case "customFont"             -> clock.setCustomFont(((ObjectProperty<Font>) property).get());
             }
-        }
+        });
         return clock;
     }
 }

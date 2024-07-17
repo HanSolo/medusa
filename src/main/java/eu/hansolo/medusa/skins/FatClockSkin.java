@@ -57,6 +57,7 @@ import javafx.scene.transform.Rotate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -207,9 +208,9 @@ public class FatClockSkin extends ClockSkinBase {
             highlightAreas    = clock.isHighlightAreas();
             areasVisible      = clock.getAreasVisible();
             redraw();
-        } else if ("FINISHED".equals(EVENT_TYPE)) {
+        } /*else if ("FINISHED".equals(EVENT_TYPE)) {
 
-        }
+        }*/
     }
 
 
@@ -329,7 +330,7 @@ public class FatClockSkin extends ClockSkinBase {
         }
 
         if (dateText.isVisible()) {
-            dateText.setText(dateFormatter.format(TIME).toUpperCase());
+            dateText.setText(dateFormatter.format(TIME).toUpperCase(Locale.ENGLISH));
             Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
             dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.45), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
         }
@@ -436,13 +437,11 @@ public class FatClockSkin extends ClockSkinBase {
         Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
         text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
 
-        dateText.setText(dateFormatter.format(time).toUpperCase());
+        dateText.setText(dateFormatter.format(time).toUpperCase(Locale.ENGLISH));
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.45), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
 
         alarmPane.getChildren().setAll(alarmMap.values());
         Helper.drawAlarms(clock, size, 0.015, 0.485, alarmMap, dateTimeFormatter, time);
-
-
     }
 }

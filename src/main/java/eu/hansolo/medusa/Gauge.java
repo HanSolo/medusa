@@ -563,17 +563,9 @@ public class Gauge extends Control {
                         double ov         = getOldValue();
                         double min        = getMinValue();
                         double max        = getMaxValue();
-                        double halfRange  = getRange() * 0.5;
+                        //double halfRange  = getRange() * 0.5;
                         double cv         = getCurrentValue();
-                        double delta      = VALUE - getCurrentValue();
-
-                        if (delta < -halfRange) {
-                            double kv1 = max - cv;
-                            double kv2 = VALUE;
-                        } else if (delta > halfRange) {
-
-                        }
-
+                        //double delta      = VALUE - getCurrentValue();
                         double tmpValue;
 
                         if (Math.abs(VALUE - ov) > getRange() * 0.5) {
@@ -5491,7 +5483,6 @@ public class Gauge extends Control {
         if (null != blinkService) { blinkService.shutdownNow(); }
     }
 
-    private void createShutdownHook() { Runtime.getRuntime().addShutdownHook(new Thread(() -> stop())); }
 
     @Override public String toString() {
         return new StringBuilder("{")

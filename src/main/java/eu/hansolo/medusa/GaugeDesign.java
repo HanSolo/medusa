@@ -389,7 +389,7 @@ public enum GaugeDesign {
     }
 
     public final double FRAME_FACTOR;
-    public       Color  frameColor;
+    public final Color  frameColor;
 
     public abstract Border getBorder(final double SIZE);
 

@@ -241,7 +241,7 @@ public class SectionSkin extends GaugeSkinBase {
 
     private void drawSections() {
         sectionsCtx.clearRect(0, 0, size, size);
-        if (!sectionsVisible | sections.isEmpty()) return;
+        if (!sectionsVisible || sections.isEmpty()) return;
         double value               = gauge.getCurrentValue();
         boolean sectionTextVisible = gauge.isSectionTextVisible();
         boolean sectionIconVisible = gauge.getSectionIconsVisible();

@@ -146,35 +146,35 @@ public class FGaugeBuilder<B extends FGaugeBuilder<B>> {
         }
 
         final FGauge fGauge = new FGauge(gauge, design, background);
-        for (String key : properties.keySet()) {
+        properties.forEach((key, property) -> {
             switch (key) {
                 case "prefSize"          -> {
-                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) property).get();
                     fGauge.setPrefSize(dim.getWidth(), dim.getHeight());
                 }
                 case "minSize"           -> {
-                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) property).get();
                     fGauge.setPrefSize(dim.getWidth(), dim.getHeight());
                 }
                 case "maxSize"           -> {
-                    Dimension2D dim = ((ObjectProperty<Dimension2D>) properties.get(key)).get();
+                    Dimension2D dim = ((ObjectProperty<Dimension2D>) property).get();
                     fGauge.setPrefSize(dim.getWidth(), dim.getHeight());
                 }
-                case "prefWidth"         -> fGauge.setPrefWidth(((DoubleProperty) properties.get(key)).get());
-                case "prefHeight"        -> fGauge.setPrefHeight(((DoubleProperty) properties.get(key)).get());
-                case "minWidth"          -> fGauge.setMinWidth(((DoubleProperty) properties.get(key)).get());
-                case "minHeight"         -> fGauge.setMinHeight(((DoubleProperty) properties.get(key)).get());
-                case "maxWidth"          -> fGauge.setMaxWidth(((DoubleProperty) properties.get(key)).get());
-                case "maxHeight"         -> fGauge.setMaxHeight(((DoubleProperty) properties.get(key)).get());
-                case "scaleX"            -> fGauge.setScaleX(((DoubleProperty) properties.get(key)).get());
-                case "scaleY"            -> fGauge.setScaleY(((DoubleProperty) properties.get(key)).get());
-                case "layoutX"           -> fGauge.setLayoutX(((DoubleProperty) properties.get(key)).get());
-                case "layoutY"           -> fGauge.setLayoutY(((DoubleProperty) properties.get(key)).get());
-                case "translateX"        -> fGauge.setTranslateX(((DoubleProperty) properties.get(key)).get());
-                case "translateY"        -> fGauge.setTranslateY(((DoubleProperty) properties.get(key)).get());
-                case "foregroundVisible" -> fGauge.setForegroundVisible(((BooleanProperty) properties.get(key)).get());
+                case "prefWidth"         -> fGauge.setPrefWidth(((DoubleProperty) property).get());
+                case "prefHeight"        -> fGauge.setPrefHeight(((DoubleProperty) property).get());
+                case "minWidth"          -> fGauge.setMinWidth(((DoubleProperty) property).get());
+                case "minHeight"         -> fGauge.setMinHeight(((DoubleProperty) property).get());
+                case "maxWidth"          -> fGauge.setMaxWidth(((DoubleProperty) property).get());
+                case "maxHeight"         -> fGauge.setMaxHeight(((DoubleProperty) property).get());
+                case "scaleX"            -> fGauge.setScaleX(((DoubleProperty) property).get());
+                case "scaleY"            -> fGauge.setScaleY(((DoubleProperty) property).get());
+                case "layoutX"           -> fGauge.setLayoutX(((DoubleProperty) property).get());
+                case "layoutY"           -> fGauge.setLayoutY(((DoubleProperty) property).get());
+                case "translateX"        -> fGauge.setTranslateX(((DoubleProperty) property).get());
+                case "translateY"        -> fGauge.setTranslateY(((DoubleProperty) property).get());
+                case "foregroundVisible" -> fGauge.setForegroundVisible(((BooleanProperty) property).get());
             }
-        }
+        });
         return fGauge;
     }
 }

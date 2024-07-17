@@ -25,9 +25,9 @@ plugins {
     id 'maven-publish'
     id 'signing'
     id 'com.google.osdetector'           version '1.7.3'
-    id 'org.javamodularity.moduleplugin' version '1.8.12'
+    id 'org.javamodularity.moduleplugin' version '1.8.15'
     id 'org.beryx.jlink'                 version '3.0.1'
-    id 'net.nemerosa.versioning'         version '3.0.0'
+    id 'net.nemerosa.versioning'         version '3.1.0'
 }
 
 apply plugin: 'maven-publish'
@@ -58,7 +58,7 @@ dependencies {
     implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
-    api "eu.hansolo:toolboxfx:21.0.1"
+    api "eu.hansolo:toolboxfx:21.0.5"
 }
 
 jar {
@@ -179,8 +179,8 @@ publishing {
             name = "OSSRH"
             url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
             credentials {
-                username = null == ciOssrhUsername ? ossrhUsername : ciOssrhUsername
-                password = null == ciOssrhPassword ? ossrhPassword : ciOssrhPassword
+                username = null == ciOssrhUsername ? ossrhToken : ciOssrhUsername
+                password = null == ciOssrhPassword ? ossrhTokenPassword : ciOssrhPassword
             }
         }
         maven {

@@ -74,7 +74,6 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
     private Color                valueColor;
     private Color                unitColor;
     private double               minValue;
-    private double               maxValue;
     private double               range;
     private double               angleStep;
     private double               arcExtend;
@@ -93,7 +92,6 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         minValue             = gauge.getMinValue();
-        maxValue             = gauge.getMaxValue();
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;
         barBackgroundColor   = gauge.getBarBackgroundColor();
@@ -174,7 +172,6 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
             redraw();
         } else if ("RECALC".equals(EVENT_TYPE)) {
             minValue  = gauge.getMinValue();
-            maxValue  = gauge.getMaxValue();
             range     = gauge.getRange();
             angleStep = ANGLE_RANGE / range;
             redraw();
@@ -328,7 +325,7 @@ public class SimpleDigitalSkin extends GaugeSkinBase {
             pane.setMaxSize(size, size);
             pane.relocate((width - size) * 0.5, (height - size) * 0.5);
 
-            if (oldSize != size) { gradientNeedsRefresh = true; }
+            if (Double.compare(oldSize, size) != 0) { gradientNeedsRefresh = true; }
             if (gauge.isGradientBarEnabled() && gradientNeedsRefresh) { setupGradient(); }
 
             center   = size * 0.5;

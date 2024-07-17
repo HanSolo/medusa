@@ -91,18 +91,18 @@ public class AlarmBuilder<B extends AlarmBuilder<B>> {
 
     public final Alarm build() {
         final Alarm ALARM = new Alarm();
-        for (String key : properties.keySet()) {
+        properties.forEach((key, property) -> {
             switch (key) {
-                case "time"                  -> ALARM.setTime(((ObjectProperty<ZonedDateTime>) properties.get(key)).get());
-                case "repetition"            -> ALARM.setRepetition(((ObjectProperty<Repetition>) properties.get(key)).get());
-                case "text"                  -> ALARM.setText(((StringProperty) properties.get(key)).get());
-                case "armed"                 -> ALARM.setArmed(((BooleanProperty) properties.get(key)).get());
-                case "command"               -> ALARM.setCommand(((ObjectProperty<Command>) properties.get(key)).get());
-                case "color"                 -> ALARM.setColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "onAlarmMarkerPressed"  -> ALARM.setOnMarkerPressed(((ObjectProperty<EventHandler>) properties.get(key)).get());
-                case "onAlarmMarkerReleased" -> ALARM.setOnMarkerReleased(((ObjectProperty<EventHandler>) properties.get(key)).get());
+                case "time"                  -> ALARM.setTime(((ObjectProperty<ZonedDateTime>) property).get());
+                case "repetition"            -> ALARM.setRepetition(((ObjectProperty<Repetition>) property).get());
+                case "text"                  -> ALARM.setText(((StringProperty) property).get());
+                case "armed"                 -> ALARM.setArmed(((BooleanProperty) property).get());
+                case "command"               -> ALARM.setCommand(((ObjectProperty<Command>) property).get());
+                case "color"                 -> ALARM.setColor(((ObjectProperty<Color>) property).get());
+                case "onAlarmMarkerPressed"  -> ALARM.setOnMarkerPressed(((ObjectProperty<EventHandler>) property).get());
+                case "onAlarmMarkerReleased" -> ALARM.setOnMarkerReleased(((ObjectProperty<EventHandler>) property).get());
             }
-        }
+        });
         return ALARM;
     }
 }

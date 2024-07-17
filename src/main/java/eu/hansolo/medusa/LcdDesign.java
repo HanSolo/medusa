@@ -64,8 +64,8 @@ public enum LcdDesign {
 
 
     protected final Color[] COLORS;
-    public        Color     lcdForegroundColor;
-    public        Color     lcdBackgroundColor;
+    public    final Color   lcdForegroundColor;
+    public    final Color   lcdBackgroundColor;
 
     public abstract Color[] getColors();
 

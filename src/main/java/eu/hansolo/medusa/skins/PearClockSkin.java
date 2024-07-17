@@ -58,6 +58,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -540,7 +541,7 @@ public class PearClockSkin extends ClockSkinBase {
         }
 
         if (dateText.isVisible()) {
-            dateText.setText(dateTextFormatter.format(TIME).toUpperCase());
+            dateText.setText(dateTextFormatter.format(TIME).toUpperCase(Locale.ENGLISH));
             Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
             dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.4), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
         }
@@ -666,7 +667,7 @@ public class PearClockSkin extends ClockSkinBase {
         Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
         text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
 
-        dateText.setText(dateTextFormatter.format(time).toUpperCase());
+        dateText.setText(dateTextFormatter.format(time).toUpperCase(Locale.ENGLISH));
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.4), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
 

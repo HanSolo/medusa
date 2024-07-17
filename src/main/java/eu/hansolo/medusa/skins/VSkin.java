@@ -1100,7 +1100,7 @@ public class VSkin extends GaugeSkinBase {
 
         tickMarkCanvas.setCache(false);
         tickMarkCtx.clearRect(0, 0, height, height);
-        if (gauge.isGradientBarEnabled() && gauge.getGradientLookup() != null) {
+        if (gauge.isGradientBarEnabled()) {
             drawGradientBar();
         }
         Helper.drawRadialTickMarks(gauge, tickMarkCtx, minValue, maxValue, startAngle, angleRange, angleStep, width * 0.9, height * 0.5, height * 0.9);

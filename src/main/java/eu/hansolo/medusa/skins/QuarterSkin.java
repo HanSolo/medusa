@@ -1824,7 +1824,7 @@ public class QuarterSkin extends GaugeSkinBase {
 
         tickMarkCanvas.setCache(false);
         tickMarkCtx.clearRect(0, 0, size * 1.9, size * 1.9);
-        if (gauge.isGradientBarEnabled() && gauge.getGradientLookup() != null) {
+        if (gauge.isGradientBarEnabled()) {
             drawGradientBar();
         }
         drawTickMarks();

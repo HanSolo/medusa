@@ -17,6 +17,7 @@
  */
 package eu.hansolo.medusa;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import javafx.application.Platform;
@@ -211,9 +212,16 @@ public class Marker implements Comparable<Marker>{
      * @param STYLE_CLASS
      */
     public void setStyleClass(final String STYLE_CLASS) { styleClass = STYLE_CLASS; }
-    
-    public boolean equals(final Marker MARKER) {
-        return (Double.compare(MARKER.getValue(), getValue()) == 0 && MARKER.getText().equals(getText()));
+
+    @Override public boolean equals(final Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        Marker marker = (Marker) o;
+        return Double.compare(_value, marker._value) == 0 && Objects.equals(value, marker.value) && Objects.equals(_text, marker._text) && Objects.equals(text, marker.text);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(_value, value, _text, text);
     }
 
     /**

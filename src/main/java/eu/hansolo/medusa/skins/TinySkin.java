@@ -87,13 +87,10 @@ public class TinySkin extends GaugeSkinBase {
     private double               maxValue;
     private double               range;
     private double               angleStep;
-    private boolean              colorGradientEnabled;
-    private int                  noOfGradientStops;
     private List<Section>        sections;
     private Tooltip              needleTooltip;
     private String               formatString;
     private Locale               locale;
-    private InvalidationListener currentValueListener;
 
 
     // ******************** Constructors **************************************
@@ -105,12 +102,9 @@ public class TinySkin extends GaugeSkinBase {
         maxValue             = gauge.getMaxValue();
         range                = gauge.getRange();
         angleStep            = ANGLE_RANGE / range;
-        colorGradientEnabled = gauge.isGradientBarEnabled();
-        noOfGradientStops    = gauge.getGradientBarStops().size();
         sections             = gauge.getSections();
         formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
         locale               = gauge.getLocale();
-        currentValueListener = o -> rotateNeedle(gauge.getCurrentValue());
 
         initGraphics();
         registerListeners();
@@ -342,7 +336,7 @@ public class TinySkin extends GaugeSkinBase {
             // Areas, Sections and Tick Marks
             sectionCanvas.setCache(false);
             sectionCtx.clearRect(0, 0, size, size);
-            if (gauge.isGradientBarEnabled() && gauge.getGradientLookup() != null) {
+            if (gauge.isGradientBarEnabled()) {
                 drawGradientBar();
                 if (gauge.getMajorTickMarksVisible()) drawTickMarks();
             } else if (gauge.getSectionsVisible()) {
@@ -406,17 +400,15 @@ public class TinySkin extends GaugeSkinBase {
         pane.setBorder(new Border(new BorderStroke(gauge.getBorderPaint(), BorderStrokeStyle.SOLID, new CornerRadii(1024), new BorderWidths(gauge.getBorderWidth() / PREFERRED_WIDTH * size))));
         pane.setBackground(new Background(new BackgroundFill(gauge.getBackgroundPaint(), new CornerRadii(1024), Insets.EMPTY)));
 
-        locale               = gauge.getLocale();
-        formatString         = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
-        colorGradientEnabled = gauge.isGradientBarEnabled();
-        noOfGradientStops    = gauge.getGradientBarStops().size();
+        locale       = gauge.getLocale();
+        formatString = new StringBuilder("%.").append(Integer.toString(gauge.getDecimals())).append("f").toString();
 
         barBackground.setStroke(gauge.getBarBackgroundColor());
 
         // Areas, Sections and Tick Marks
         sectionCanvas.setCache(false);
         sectionCtx.clearRect(0, 0, size, size);
-        if (gauge.isGradientBarEnabled() && gauge.getGradientLookup() != null) {
+        if (gauge.isGradientBarEnabled()) {
             drawGradientBar();
             if (gauge.getMajorTickMarksVisible()) drawTickMarks();
         } else if (gauge.getSectionsVisible()) {

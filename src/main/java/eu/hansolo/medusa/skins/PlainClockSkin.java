@@ -57,6 +57,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -431,7 +432,7 @@ public class PlainClockSkin extends ClockSkinBase {
         }
 
         if (dateNumber.isVisible()) {
-            dateNumber.setText(DATE_NUMBER_FORMATER.format(TIME).toUpperCase());
+            dateNumber.setText(DATE_NUMBER_FORMATER.format(TIME).toUpperCase(Locale.ENGLISH));
             Helper.adjustTextSize(dateNumber, 0.3 * size, size * 0.05);
             dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.6), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
         }
@@ -546,7 +547,7 @@ public class PlainClockSkin extends ClockSkinBase {
         Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
         text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
 
-        dateNumber.setText(DATE_NUMBER_FORMATER.format(time).toUpperCase());
+        dateNumber.setText(DATE_NUMBER_FORMATER.format(time).toUpperCase(Locale.ENGLISH));
         Helper.adjustTextSize(dateNumber, 0.3 * size, size * 0.05);
         dateNumber.relocate(((size * 0.5) - dateNumber.getLayoutBounds().getWidth()) * 0.5 + (size * 0.6), (size - dateNumber.getLayoutBounds().getHeight()) * 0.5);
 

@@ -65,7 +65,6 @@ public class MorphingClockSkin extends ClockSkinBase {
     private                double            spacer;
     private                double            digitSpacer;
     private                double            digitWidth;
-    private                double            digitHeight;
     private                Color             hourColor;
     private                Color             hourOffColor;
     private                Color             minuteColor;
@@ -2292,7 +2291,6 @@ public class MorphingClockSkin extends ClockSkinBase {
             dotSize     = height * 0.045455;
             spacer      = height * 0.022727;
             digitWidth  = 8 * dotSize + 7 * spacer;
-            digitHeight = 15 * dotSize + 14 * spacer;
             digitSpacer = height * 0.09090909;
         }
     }

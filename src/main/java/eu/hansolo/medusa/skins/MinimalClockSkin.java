@@ -149,9 +149,9 @@ public class MinimalClockSkin extends ClockSkinBase {
             secondBackgroundCircle.setManaged(isSecondsVisible);
             secondArc.setVisible(isSecondsVisible);
             secondArc.setManaged(isSecondsVisible);
-        } else if ("FINISHED".equals(EVENT_TYPE)) {
+        } /*else if ("FINISHED".equals(EVENT_TYPE)) {
 
-        }
+        }*/
     }
 
     @Override public void dispose() {

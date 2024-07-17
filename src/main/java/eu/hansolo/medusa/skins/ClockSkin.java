@@ -50,6 +50,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -226,9 +227,9 @@ public class ClockSkin extends ClockSkinBase {
             highlightAreas    = getSkinnable().isHighlightAreas();
             areasVisible      = getSkinnable().getAreasVisible();
             redraw();
-        } else if ("FINISHED".equals(EVENT_TYPE)) {
+        }/* else if ("FINISHED".equals(EVENT_TYPE)) {
 
-        }
+        }*/
     }
 
 
@@ -302,7 +303,7 @@ public class ClockSkin extends ClockSkinBase {
         }
 
         if (dateText.isVisible()) {
-            dateText.setText(dateFormatter.format(TIME).toUpperCase());
+            dateText.setText(dateFormatter.format(TIME).toUpperCase(Locale.ENGLISH));
             Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
             dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.45), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
         }
@@ -442,7 +443,7 @@ public class ClockSkin extends ClockSkinBase {
         Helper.adjustTextSize(text, 0.6 * size, size * 0.12);
         text.relocate((size - text.getLayoutBounds().getWidth()) * 0.5, size * 0.6);
 
-        dateText.setText(dateFormatter.format(time).toUpperCase());
+        dateText.setText(dateFormatter.format(time).toUpperCase(Locale.ENGLISH));
         Helper.adjustTextSize(dateText, 0.3 * size, size * 0.05);
         dateText.relocate(((size * 0.5) - dateText.getLayoutBounds().getWidth()) * 0.5 + (size * 0.45), (size - dateText.getLayoutBounds().getHeight()) * 0.5);
 

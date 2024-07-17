@@ -273,7 +273,7 @@ public class NasaSkin extends GaugeSkinBase {
             pane.setPrefSize(size, size);
             pane.relocate((gauge.getWidth() - size) * 0.5, (gauge.getHeight() - size) * 0.5);
 
-            if (oldSize != size) { gradientNeedsRefresh = true; }
+            if (Double.compare(oldSize, size) != 0) { gradientNeedsRefresh = true; }
             if (gauge.isGradientBarEnabled() && gradientNeedsRefresh) { setupGradient(); }
 
             double centerX = size * 0.5;

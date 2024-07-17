@@ -100,20 +100,20 @@ public class SectionBuilder<B extends SectionBuilder<B>> {
 
     public final Section build() {
         final Section section = new Section();
-        for (String key : properties.keySet()) {
+        properties.forEach((key, property) -> {
             switch (key) {
-                case "start"            -> section.setStart(((DoubleProperty) properties.get(key)).get());
-                case "stop"             -> section.setStop(((DoubleProperty) properties.get(key)).get());
-                case "text"             -> section.setText(((StringProperty) properties.get(key)).get());
-                case "icon"             -> section.setIcon(((ObjectProperty<Image>) properties.get(key)).get());
-                case "color"            -> section.setColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "highlightColor"   -> section.setHighlightColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "textColor"        -> section.setTextColor(((ObjectProperty<Color>) properties.get(key)).get());
-                case "onSectionEntered" -> section.setOnSectionEntered(((ObjectProperty<EventHandler>) properties.get(key)).get());
-                case "onSectionLeft"    -> section.setOnSectionLeft(((ObjectProperty<EventHandler>) properties.get(key)).get());
-                case "styleClass"       -> section.setStyleClass(((StringProperty) properties.get(key)).get());
+                case "start"            -> section.setStart(((DoubleProperty) property).get());
+                case "stop"             -> section.setStop(((DoubleProperty) property).get());
+                case "text"             -> section.setText(((StringProperty) property).get());
+                case "icon"             -> section.setIcon(((ObjectProperty<Image>) property).get());
+                case "color"            -> section.setColor(((ObjectProperty<Color>) property).get());
+                case "highlightColor"   -> section.setHighlightColor(((ObjectProperty<Color>) property).get());
+                case "textColor"        -> section.setTextColor(((ObjectProperty<Color>) property).get());
+                case "onSectionEntered" -> section.setOnSectionEntered(((ObjectProperty<EventHandler>) property).get());
+                case "onSectionLeft"    -> section.setOnSectionLeft(((ObjectProperty<EventHandler>) property).get());
+                case "styleClass"       -> section.setStyleClass(((StringProperty) property).get());
             }
-        }
+        });
         return section;
     }
 }

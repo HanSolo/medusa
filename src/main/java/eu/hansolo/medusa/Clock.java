@@ -2113,7 +2113,7 @@ public class Clock extends Control {
         int hour   = TIME.getHour();
         int minute = TIME.getMinute();
 
-        if (0 <= hour && minute >= 0 && hour <= 5 && minute <= 59|| 17 <= hour && minute <= 59 && hour <= 23 && minute <= 59) {
+        if (0 <= hour && minute >= 0 && hour <= 5 && minute <= 59 || 17 <= hour && minute <= 59 && hour <= 23) {
             if(isNightMode()) return;
             setNightMode(true);
         } else {
@@ -2185,8 +2185,6 @@ public class Clock extends Control {
         if (null != periodicTickTask) { stopTask(periodicTickTask); }
         if (null != periodicTickExecutorService) { periodicTickExecutorService.shutdownNow(); }
     }
-
-    private void createShutdownHook() { Runtime.getRuntime().addShutdownHook(new Thread(() -> stop())); }
 
 
     // ******************** Style related *************************************

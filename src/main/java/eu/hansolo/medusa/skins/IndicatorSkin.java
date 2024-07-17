@@ -89,7 +89,6 @@ public class IndicatorSkin extends GaugeSkinBase {
     private double                minValue;
     private double                range;
     private double                angleStep;
-    private double                startAngle;
     private boolean               colorGradientEnabled;
     private int                   noOfGradientStops;
     private boolean               sectionsAlwaysVisible;
@@ -109,7 +108,6 @@ public class IndicatorSkin extends GaugeSkinBase {
         super(gauge);
         if (gauge.isAutoScale()) gauge.calcAutoScale();
         angleRange                   = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
-        startAngle                   = getStartAngle();
         oldValue                     = gauge.getValue();
         minValue                     = gauge.getMinValue();
         range                        = gauge.getRange();
@@ -224,7 +222,6 @@ public class IndicatorSkin extends GaugeSkinBase {
         super.handleEvents(EVENT_TYPE);
         if ("RECALC".equals(EVENT_TYPE)) {
             angleRange = Helper.clamp(90.0, 180.0, gauge.getAngleRange());
-            startAngle = getStartAngle();
             minValue   = gauge.getMinValue();
             range      = gauge.getRange();
             sections   = gauge.getSections();

@@ -19,6 +19,7 @@ package eu.hansolo.medusa.tools;
 
 import eu.hansolo.medusa.Alarm;
 import eu.hansolo.medusa.Clock;
+import eu.hansolo.medusa.Constants;
 import eu.hansolo.medusa.Fonts;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.SkinType;
@@ -1093,14 +1094,12 @@ public class Helper {
         double              alphaVariationInPercent = Helper.clamp(0.0, 100.0, ALPHA_VARIATION_IN_PERCENT);
         final WritableImage IMAGE                   = new WritableImage(width, height);
         final PixelWriter   PIXEL_WRITER            = IMAGE.getPixelWriter();
-        final Random        BW_RND                  = new Random();
-        final Random        ALPHA_RND               = new Random();
         final double        ALPHA_START             = alphaVariationInPercent / 100 / 2;
         final double        ALPHA_VARIATION         = alphaVariationInPercent / 100;
         for (int y = 0 ; y < height ; y++) {
             for (int x = 0 ; x < width ; x++) {
-                final Color  NOISE_COLOR = BW_RND.nextBoolean() ? BRIGHT_COLOR : DARK_COLOR;
-                final double NOISE_ALPHA = Helper.clamp(0.0, 1.0, ALPHA_START + ALPHA_RND.nextDouble() * ALPHA_VARIATION);
+                final Color  NOISE_COLOR = Constants.RND.nextBoolean() ? BRIGHT_COLOR : DARK_COLOR;
+                final double NOISE_ALPHA = Helper.clamp(0.0, 1.0, ALPHA_START + Constants.RND.nextDouble() * ALPHA_VARIATION);
                 PIXEL_WRITER.setColor(x, y, Color.color(NOISE_COLOR.getRed(), NOISE_COLOR.getGreen(), NOISE_COLOR.getBlue(), NOISE_ALPHA));
             }
         }
