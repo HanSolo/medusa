@@ -58,7 +58,7 @@ dependencies {
     implementation "org.openjfx:javafx-graphics:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-controls:${javafxVersion}:${platform}"
     implementation "org.openjfx:javafx-swing:${javafxVersion}:${platform}"
-    api "eu.hansolo:toolboxfx:21.0.5"
+    api "eu.hansolo:toolboxfx:21.0.7"
 }
 
 jar {
@@ -76,6 +76,7 @@ jar {
                 'Bundle-Name'           : project.name,
                 'Bundle-License'        : 'https://www.apache.org/licenses/LICENSE-2.0;description=Apache License Version 2.0;link=https://spdx.org/licenses/Apache-2.0.html',
                 'Bundle-Description'    : description,
+                'Bundle-Version'        : project.version,
                 'Bundle-SymbolicName'   : 'eu.hansolo',
                 'Export-Package'        : 'eu.hansolo.medusa,eu.hansolo.medusa.tools,eu.hansolo.medusa.skins,eu.hansolo.medusa.events'
         )
